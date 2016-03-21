@@ -499,7 +499,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 #sudo apt install kpartx
 
-#build_uboot
+build_uboot
 #build_kernel
 
 ## build_rcn_kernel
@@ -512,12 +512,12 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 ## fetch_extract_rcn_rootfs
 
-create_image
+#create_image
 
 #run_initial_sh
 
-install_files
-install_uboot
+#install_files
+#install_uboot
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "
