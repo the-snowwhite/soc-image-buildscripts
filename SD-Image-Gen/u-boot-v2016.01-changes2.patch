@@ -1,4 +1,4 @@
-From 4968e9a1c95408dd79a944a8209297baa59a6c22 Mon Sep 17 00:00:00 2001
+From 6a378a68a6dbe74fcbd99faebb504884499a1955 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 21 Feb 2016 11:48:30 +0100
 Subject: [PATCH 1/3] add fpga config on boot from socfpga.rbf in boot parttion
@@ -43,7 +43,7 @@ index cbc7396..40af164 100644
 2.7.0
 
 
-From c3ba5e1bad2847dc54c5651c88e024be3de5ef75 Mon Sep 17 00:00:00 2001
+From bf6ce8307a786acc83575eb2dee49fe0705f9345 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 21 Feb 2016 11:51:11 +0100
 Subject: [PATCH 2/3] Change sd-card partition layout boot p1-->p2 rootfs
@@ -85,17 +85,18 @@ index 40af164..abe5202 100644
 2.7.0
 
 
-From 1466f238eb2bd59b813e99b02f944f90a89802ba Mon Sep 17 00:00:00 2001
+From 3e4387e3950959bb6c160dbe12a412e06b2e167a Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
-Date: Sun, 20 Mar 2016 20:29:19 +0100
-Subject: [PATCH 3/3] change to usb boot
+Date: Mon, 21 Mar 2016 18:52:13 +0100
+Subject: [PATCH 3/3] Change sd-card boot to usb boot
 
+Signed-off-by: the-snowwhite <producer@holotronic.dk>
 ---
- include/configs/socfpga_de0_nano_soc.h | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ include/configs/socfpga_de0_nano_soc.h | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
 
 diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
-index abe5202..6a95f66 100644
+index abe5202..9a33599 100644
 --- a/include/configs/socfpga_de0_nano_soc.h
 +++ b/include/configs/socfpga_de0_nano_soc.h
 @@ -37,7 +37,7 @@
@@ -107,17 +108,26 @@ index abe5202..6a95f66 100644
  #define CONFIG_LOADADDR		0x01000000
  #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
  
-@@ -47,7 +47,8 @@
+@@ -47,7 +47,17 @@
  #define CONFIG_PHY_MICREL_KSZ9031
  #endif
  
 -#define CONFIG_ENV_IS_IN_MMC
-+//#define CONFIG_ENV_IS_IN_MMC
 +#define CONFIG_ENV_IS_IN_SPI_FLASH
++
++/* environment setting for SPI flash */
++#ifdef CONFIG_ENV_IS_IN_SPI_FLASH
++#define CONFIG_ENV_OFFSET		(0x00040000)
++#define CONFIG_ENV_SECT_SIZE		(64 * 1024)
++#define CONFIG_ENV_SPI_BUS		0
++#define CONFIG_ENV_SPI_CS		0
++#define CONFIG_ENV_SPI_MODE		SPI_MODE_3
++#define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
++#endif
  
  /* Extra Environment */
  #define CONFIG_EXTRA_ENV_SETTINGS \
-@@ -59,17 +60,17 @@
+@@ -59,17 +69,17 @@
  	"fdtimage=socfpga.dtb\0" \
  	"fpgaimage=socfpga.rbf\0" \
  	"fpgadata=0x2000000\0" \
