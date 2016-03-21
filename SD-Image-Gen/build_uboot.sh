@@ -22,7 +22,7 @@ MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
 UBOOT_SPLFILE=${UBOOT_DIR}/u-boot-with-spl-dtb.sfp
 
 #PATCH_FILE="u-boot-${UBOOT_VERSION}-changes.patch"
-PATCH_FILE="u-boot-${UBOOT_VERSION}-changes-usb-boot.patch"
+PATCH_FILE="u-boot-${UBOOT_VERSION}-changes2.patch"
 UBOOT_DIR=${WORK_DIR}/uboot
 
 #-------------------------------------------
@@ -111,9 +111,10 @@ export ARCH=arm
 export PATH=$CC_DIR/bin/:$PATH
 export CROSS_COMPILE=$CC
 
-echo "compiling u-boot"
+echo "configuring u-boot"
 make mrproper
 make $BOARD_CONFIG
+echo "compiling u-boot"
 make $MAKE_CONFIG -j$NCORES
 }
 
