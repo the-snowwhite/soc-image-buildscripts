@@ -539,7 +539,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 #install_deps
 
-#build_uboot
+build_uboot
 #build_kernel
 
 ## build_rcn_kernel
@@ -552,12 +552,12 @@ build_rootfs_in_image_and_compress
 
 ## fetch_extract_rcn_rootfs
 
-create_image
+#create_image
 
 run_initial_sh
 
-install_files
-install_uboot
+#install_files
+#install_uboot
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "

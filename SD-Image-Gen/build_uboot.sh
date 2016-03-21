@@ -21,8 +21,8 @@ MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
 
 UBOOT_SPLFILE=${UBOOT_DIR}/u-boot-with-spl-dtb.sfp
 
-PATCH_FILE="u-boot-${UBOOT_VERSION}-changes.patch"
-
+#PATCH_FILE="u-boot-${UBOOT_VERSION}-changes.patch"
+PATCH_FILE="u-boot-${UBOOT_VERSION}-changes-usb-boot.patch"
 UBOOT_DIR=${WORK_DIR}/uboot
 
 #-------------------------------------------
