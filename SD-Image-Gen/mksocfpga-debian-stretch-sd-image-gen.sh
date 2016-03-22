@@ -1,9 +1,18 @@
 #!/bin/bash
 
-# Working Invokes selected scripts in same folder that generates a working armhf Debian Jessie sd-card-image().img
-# for the Terasic De0 Nano / Altera Atlas Soc-Fpga dev board
+# Working Invokes selected scripts in same folder that generates a working armhf Debian Jessie or Stretch/sid sd-card-image().img
+# base kernel is the 3.13-rt-ltsi kernel from the alterasoc repo
+# ongoing work is done to get the 4.4.4-rt mainline kernel to function properly.
+#
+# !!! warning while using the script to generate u-boot, kernels and sd-image
+# the (qemu)rootfs generation can be more tricky. and might overwrite files in you host root system
+# if something goes wrong underway and you need to know how to use lsblk sudo kpartx -d -v and sudo umount -R
+# the machinekit cross build script is in an even higher risc zone, but now you only need it for development purposes
+# as installing machinekit packages works just fine....
+#
+# Initially for the Terasic De0 Nano / Altera Atlas Soc-Fpga dev board
 
-#TODO:   complete Script dependencies and cleanup
+#TODO:   cleanup
 
 # 1.initial source: make minimal rootfs on amd64 Debian Jessie, according to "How to create bare minimum Debian Wheezy rootfs from scratch"
 # http://olimex.wordpress.com/2014/07/21/how-to-create-bare-minimum-debian-wheezy-rootfs-from-scratch/
@@ -58,25 +67,24 @@ UBOOT_SPLFILE=${CURRENT_DIR}/uboot/u-boot-with-spl-dtb.sfp
 #----------- Git kernel clone URL's -----------------------------------#
 #--------- RHN kernel -------------------------------------------------#
 #RHN_KERNEL_URL='https://github.com/RobertCNelson/armv7-multiplatform'
-#RHN_ALT_KERNEL_BRANCH='origin/v4.4.1'
+#RHN_ALT_GIT_KERNEL_BRANCH='origin/v4.4.1'
 
-# cross toolchain
+# cross toolchains
 #--------- altera rt-ltsi socfpga kernel --------------------------------------------------#
-ALT_CC_FOLDER_NAME="gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux"
-ALT_CC_URL="https://releases.linaro.org/14.09/components/toolchain/binaries/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux.tar.xz"
-ALT_KERNEL_FOLDER_NAME="linux-3.10"
+ALT49_CC_FOLDER_NAME="gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux"
+ALT49_CC_URL="https://releases.linaro.org/14.09/components/toolchain/binaries/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux.tar.xz"
+ALT_GIT_KERNEL_FOLDER_NAME="linux-3.10"
 
 #--------- 4.4.x kernel -------------------------------------------------------------------#
 ## http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/arm-linux-gnueabihf/gcc-linaro-5.2-2015.11-1-x86_64_arm-linux-gnueabihf.tar.xz
-PCH_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_arm-linux-gnueabihf"
-PCH_CC_FILE="${PCH_CC_FOLDER_NAME}.tar.xz"
-PCH_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/arm-linux-gnueabihf/${PCH_CC_FILE}"
+PCH52_CC_FOLDER_NAME="gcc-linaro-52-2015.11-1-x86_64_arm-linux-gnueabihf"
+PCH52_CC_FILE="${PCH52_CC_FOLDER_NAME}.tar.xz"
+PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/52-2015.11-1/arm-linux-gnueabihf/${PCH52_CC_FILE}"
 
 # Kernels
 ##--------- altera socfpga kernel --------------------------------------#
-ALT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
-#ALT_KERNEL_BRANCH="-b linux-rt linux/socfpga-3.10-ltsi-rt"
-ALT_KERNEL_BRANCH="socfpga-3.10-ltsi-rt"
+ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
+ALT_GIT_KERNEL_BRANCH="socfpga-3.10-ltsi-rt"
 
 #--------- Mainline rt patched kernel -----------------------------------------------------#
 #4.4-KERNEL
@@ -91,36 +99,44 @@ KERNEL_LTSI_FOLDER_NAME="linux-4.1.17"
 PATCH_LTSI_FILE="patch-4.1.17-ltsi.gz"
 URL_PATCH_LTSI="http://ltsi.linuxfoundation.org/sites/ltsi/files/"
 #-------------- all kernel ----------------------------------------------------------------#
-# mksoc uio kernel driver module filder:
+# mksoc uio and adc kernel driver module folders:
 UIO_DIR=${MK_KERNEL_DRIVER_FOLDER}/hm2reg_uio-module
 #ADC_DIR=${MK_KERNEL_DRIVER_FOLDER}/hm2adc_uio-module
 ADC_DIR=${MK_KERNEL_DRIVER_FOLDER}/adcreg
 
-# --- config ----------------------------------#
-KERNEL_FOLDER_NAME=${ALT_KERNEL_FOLDER_NAME}
-GIT_KERNEL_URL=${ALT_KERNEL_URL}
-KERNEL_BRANCH=${ALT_KERNEL_BRANCH}
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+# --- change kernel version config section: ----------------------------------#
+# --- change kernel version config section: ----------------------------------#
+## - for git only: ------------------#
+GIT_KERNEL_URL=${ALT_GIT_KERNEL_URL}
+GIT_KERNEL_BRANCH=${ALT_GIT_KERNEL_BRANCH}
 
-#----- select toolchain -------------#
-# CC_FOLDER_NAME=$RHN_CC_FOLDER_NAME
-# CC_URL=$RHN_CC_URL
-CC_FOLDER_NAME=${ALT_CC_FOLDER_NAME}
-#CC_FOLDER_NAME=$PCH_CC_FOLDER_NAME
-# --- config end ------------------------------#
-#KERNEL_FOLDER_NAME=$KERNEL_44_FOLDER_NAME
+## - for file fetched only ----------#
+PATCH_FILE=$PATCH_44_FILE   #---> git cloned kernel is generated when this var undefined.
+
+## - for All kernels: ---------------#
+#KERNEL_FOLDER_NAME=${ALT_GIT_KERNEL_FOLDER_NAME}
+KERNEL_FOLDER_NAME=${KERNEL_44_FOLDER_NAME}
+
+#----- select global toolchain ------#
+#CC_FOLDER_NAME=${ALT49_CC_FOLDER_NAME}
+#CC_URL=${ALT49_CC_URL}
+
+CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
+CC_URL=$PCH52_CC_URL
+# --- change kernel version config  end ------------------------------#
+# --- change kernel version config  end ------------------------------#
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+
 KERNEL_FILE=${KERNEL_FOLDER_NAME}.tar.xz
 
-#PATCH_FILE=$PATCH_44_FILE
 KERNEL_FILE_URL="ftp://ftp.kernel.org/pub/linux/kernel/v4.x/${KERNEL_FILE}"
 PATCH_URL='https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/'${PATCH_FILE}
-
-#CC_URL=${ALT_CC_URL}
-CC_URL=$PCH_CC_URL
 
 BOOT_MNT=/mnt/boot
 ROOTFS_MNT=/mnt/rootfs
 
-# --- all config end ------------------------------#
+# --- all pre config end ---- se bottom for run config ---------------#
 
 CC_DIR="${CURRENT_DIR}/${CC_FOLDER_NAME}"
 CC_FILE="${CC_FOLDER_NAME}.tar.xz"
@@ -195,7 +211,7 @@ ${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERS
 }
 
 function build_kernel {
-${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${GIT_KERNEL_URL} ${KERNEL_BRANCH} ${KERNEL_FILE_URL} ${PATCH_URL} ${PATCH_FILE}
+${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${GIT_KERNEL_URL} ${GIT_KERNEL_BRANCH} ${KERNEL_FILE_URL} ${PATCH_URL} ${PATCH_FILE}
 }
 
 build_patched_kernel() {
@@ -240,10 +256,6 @@ build_rootfs_in_image_and_compress() {
 ${SCRIPT_ROOT_DIR}/gen_rootfs-stretch.sh ${CURRENT_DIR} ${ROOTFS_DIR} ${IMG_FILE} ${IMG_ROOT_PART} ${distro}
 COMP_PREFIX=raw
 compress_rootfs
-}
-
-build_rootfs_into_folder() {
-${SCRIPT_ROOT_DIR}/gen_rootfs.sh ${CURRENT_DIR} ${ROOTFS_DIR}
 }
 
 #-----------------------------------------------------------------------------------
@@ -530,7 +542,7 @@ sync
 }
 
 
-#------------------.............. run functions section ..................-----------#
+#------------------............ config run functions section ..................-----------#
 echo "#---------------------------------------------------------------------------------- "
 echo "#-----------+++     Full Image building process start       +++-------------------- "
 echo "#---------------------------------------------------------------------------------- "
@@ -538,27 +550,24 @@ set -e
 
 if [ ! -z "${WORK_DIR}" ]; then
 
-#install_deps
+#install_deps # --->- only needed on first new run of a function see function above -------#
 
 #build_uboot
-#build_kernel
+build_kernel
 
-## build_rcn_kernel
-
-## build_rootfs_into_folder
+## build_rcn_kernel           # ---> for now redundant ---#
 
 #create_image
+#build_rootfs_in_image_and_compress #-> creates basic debian rootfs and tar of raw rootfs -#
 
-#build_rootfs_in_image_and_compress
-
-## fetch_extract_rcn_rootfs
+## fetch_extract_rcn_rootfs   # ---> for now redundant ---#
 
 create_image
 
-#run_initial_sh
+#run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 
-install_files
-#install_uboot
+#install_files   # --> into sd-card-image (.img)
+#install_uboot   # --> onto sd-card-image (.img)
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "
@@ -569,5 +578,3 @@ else
     echo "#-------------  workdir parameter missing      ------------------------------------ "
     echo "#---------------------------------------------------------------------------------- "
 fi
-
-
