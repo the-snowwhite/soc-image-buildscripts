@@ -18,8 +18,8 @@ PATCH_FILE=${10}
 echo "NOTE: in build_kernel.sh param KERNEL_FOLDER_NAME = ${5}"
 
 #ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-changes.patch
-ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-ext4-changes.patch
-
+#ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-ext4-changes.patch
+ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-ext4-autofs-changes.patch
 #----------- Git clone URL's ------------------------------------------#
 #--------- RHN kernel -------------------------------------------------#
 #RHN_KERNEL_URL='https://github.com/RobertCNelson/armv7-multiplatform'
@@ -158,7 +158,6 @@ clone_kernel() {
         git clean -d -f -x
         git fetch origin
         git reset --hard origin/${KERNEL_BRANCH}
-#        git checkout ${KERNEL_BRANCH}
     else
         mkdir -p ${KERNEL_BUILD_DIR}
         cd ${KERNEL_BUILD_DIR}
@@ -167,7 +166,6 @@ clone_kernel() {
         git remote add linux ${KERNEL_URL}
         git fetch linux
         git checkout -b linux-rt linux/${KERNEL_BRANCH}
-#        uiomod_kernel
     fi
 patch_git_kernel
 #uiomod_kernel

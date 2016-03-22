@@ -128,7 +128,9 @@ CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 #IMG_FILE=${CURRENT_DIR}/mksoc_sdcard-test.img
 
 FILE_PRELUDE=${CURRENT_DIR}/mksocfpga_${distro}_${KERNEL_FOLDER_NAME}-${REL_DATE}
-IMG_FILE=${FILE_PRELUDE}_sdcard.img
+#IMG_FILE=${FILE_PRELUDE}_sdcard.img
+IMG_FILE=u-bootv2016.01-only_to_usb-boot_sdcard.img
+#IMG_FILE=${FILE_PRELUDE}_usb.img
 
 MK_RIPROOTFS_NAME=${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
 
@@ -552,12 +554,12 @@ build_uboot
 
 ## fetch_extract_rcn_rootfs
 
-#create_image
+create_image
 
 #run_initial_sh
 
 #install_files
-#install_uboot
+install_uboot
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "

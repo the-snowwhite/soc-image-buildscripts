@@ -1,7 +1,7 @@
-From bf6ce8307a786acc83575eb2dee49fe0705f9345 Mon Sep 17 00:00:00 2001
+From cf6fc1667a79b5c752c078b7e0ac04c704500e35 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 21 Feb 2016 11:51:11 +0100
-Subject: [PATCH 2/3] Change sd-card partition layout boot p1-->p2 rootfs
+Subject: [PATCH 2/5] Change sd-card partition layout boot p1-->p2 rootfs
  p2-->p3
 
 Signed-off-by: the-snowwhite <producer@holotronic.dk>

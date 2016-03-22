@@ -1,7 +1,7 @@
-From db241ace3f914e3d3d0c20db0bd27daedfefa85f Mon Sep 17 00:00:00 2001
+From 906e93fba9122275e59706c1cd38a37c22dda0c2 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Thu, 17 Mar 2016 16:05:02 +0100
-Subject: [PATCH 3/3] added CONFIG_LBDAF=y to config for fixing ext4 rootfs
+Subject: [PATCH 3/4] added CONFIG_LBDAF=y to config for fixing ext4 rootfs
  boot
 
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
