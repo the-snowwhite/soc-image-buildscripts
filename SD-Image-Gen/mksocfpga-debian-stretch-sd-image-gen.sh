@@ -34,7 +34,8 @@ MK_BUILDTFILE_NAME=machinekit-built.tar.bz2
 #------------------------------------------------------------------------------------------------------
 
 #distro=sid
-distro=jessie
+#distro=jessie
+distro=stretch
 
 ## Expandable image
 IMG_BOOT_PART=p2
@@ -79,8 +80,8 @@ ALT_KERNEL_BRANCH="socfpga-3.10-ltsi-rt"
 
 #--------- Mainline rt patched kernel -----------------------------------------------------#
 #4.4-KERNEL
-KERNEL_44_FOLDER_NAME="linux-4.4.3"
-PATCH_44_FILE="patch-4.4.3-rt9.patch.gz"
+KERNEL_44_FOLDER_NAME="linux-4.4.4"
+PATCH_44_FILE="patch-4.4.4-rt11.patch.gz"
 URL_PATCH_44="https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/"
 #--------- Longterm rt-ltsi kernel --------------------------------------------------------#
 ##  http://ltsi.linuxfoundation.org/releases/ltsi-tree/4.1.17-ltsi/stable-release
@@ -97,7 +98,7 @@ ADC_DIR=${MK_KERNEL_DRIVER_FOLDER}/adcreg
 
 # --- config ----------------------------------#
 KERNEL_FOLDER_NAME=${ALT_KERNEL_FOLDER_NAME}
-KERNEL_URL=${ALT_KERNEL_URL}
+GIT_KERNEL_URL=${ALT_KERNEL_URL}
 KERNEL_BRANCH=${ALT_KERNEL_BRANCH}
 
 #----- select toolchain -------------#
@@ -110,11 +111,11 @@ CC_FOLDER_NAME=${ALT_CC_FOLDER_NAME}
 KERNEL_FILE=${KERNEL_FOLDER_NAME}.tar.xz
 
 #PATCH_FILE=$PATCH_44_FILE
-#KERNEL_FILE_URL="ftp://ftp.kernel.org/pub/linux/kernel/v4.x/${KERNEL_FILE}"
-#PATCH_URL='https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/'${PATCH_FILE}
+KERNEL_FILE_URL="ftp://ftp.kernel.org/pub/linux/kernel/v4.x/${KERNEL_FILE}"
+PATCH_URL='https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/'${PATCH_FILE}
 
-CC_URL=${ALT_CC_URL}
-#CC_URL=$PCH_CC_URL
+#CC_URL=${ALT_CC_URL}
+CC_URL=$PCH_CC_URL
 
 BOOT_MNT=/mnt/boot
 ROOTFS_MNT=/mnt/rootfs
@@ -129,8 +130,8 @@ CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 
 FILE_PRELUDE=${CURRENT_DIR}/mksocfpga_${distro}_${KERNEL_FOLDER_NAME}-${REL_DATE}
 #IMG_FILE=${FILE_PRELUDE}_sdcard.img
-IMG_FILE=u-bootv2016.01-only_to_usb-boot_sdcard.img
-#IMG_FILE=${FILE_PRELUDE}_usb.img
+#IMG_FILE=u-bootv2016.01-only_to_usb-boot_sdcard.img
+IMG_FILE=${FILE_PRELUDE}_usb.img
 
 MK_RIPROOTFS_NAME=${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
 
@@ -182,10 +183,10 @@ install_rootfs_dep() {
 
 
 install_deps() {
-#install_uboot_dep
-#install_kernel_dep
-#sudo apt install kpartx
-#install_rootfs_dep
+install_uboot_dep
+install_kernel_dep
+sudo apt install kpartx
+install_rootfs_dep
 echo "deps installed"
 }
 
@@ -194,7 +195,7 @@ ${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERS
 }
 
 function build_kernel {
-${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${KERNEL_URL} ${KERNEL_BRANCH} ${KERNEL_FILE_URL} ${PATCH_URL} ${PATCH_FILE}
+${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${GIT_KERNEL_URL} ${KERNEL_BRANCH} ${KERNEL_FILE_URL} ${PATCH_URL} ${PATCH_FILE}
 }
 
 build_patched_kernel() {
@@ -393,8 +394,6 @@ function run_initial_sh {
 echo "------------------------------------------"
 echo "----  running initial.sh      ------------"
 echo "------------------------------------------"
-#DRIVE=`bash -c 'sudo losetup --show -f '${IMG_FILE}''`
-#sudo partprobe ${DRIVE}
 
 sudo kpartx -a -s -v ${IMG_FILE}
 
@@ -462,18 +461,18 @@ sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
 # fi
 
 if [ -z "${PATCH_FILE}" ]; then
-    echo "MSG: Installing 3.10 kernel dts dtb"
-    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dts ${BOOT_MNT}/socfpga.dts
-    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dtb ${BOOT_MNT}/socfpga.dtb
+    echo "MSG: Installing Quartus dts dtb .rbf for 3.10 kernel"
+#    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dts ${BOOT_MNT}/socfpga.dts
+#    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dtb ${BOOT_MNT}/socfpga.dtb
+    sudo cp -v -f ${BOOT_FILES_DIR}/socfpga.* ${BOOT_MNT}/
 else
-    echo "MSG: Installing 4.x.x kernel dts dtb"
+    echo "MSG: Installing 4.x.x kernel dts dtb and .rbf from Quartus"
     sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts ${BOOT_MNT}/socfpga.dts
     sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb ${BOOT_MNT}/socfpga.dtb
+# copy .rbf file from quartus:
+    sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${BOOT_MNT}/socfpga.rbf
 fi
 
-# copy dts, dtb, rbf files from quartus:
-#sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${BOOT_MNT}/socfpga.rbf
-sudo cp -v -f ${BOOT_FILES_DIR}/socfpga.* ${BOOT_MNT}/
 sudo umount ${BOOT_MNT}
 echo ""
 echo "# --------- installing rootfs partition files (chroot, kernel modules) ---------"
@@ -484,12 +483,13 @@ sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 # Rootfs -------#
 
 sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+### if mk-rip install instead:
 #sudo tar xfj ${MK_RIPROOTFS_NAME} -C ${ROOTFS_MNT}
 
 # MKRip -------#
 MK_BUILDTFILE_NAME="do-not-install"
 
-if [ -f ${MK_BUILDTFILE_NAME} ]; then
+if [ -f ${MK_BUILDTFILE_NAME} ]; then #if file with that name exista
     echo "installing ${MK_BUILDTFILE_NAME}"
 #    sudo mkdir -p ${ROOTFS_MNT}/home/machinekit/machinekit
 #    sudo tar xfj ${CURRENT_DIR}/${MK_BUILDTFILE_NAME} -C ${ROOTFS_MNT}/home/machinekit/machinekit
@@ -519,7 +519,6 @@ if [ -f ${POLICY_FILE} ]; then
 fi
 
 sudo umount ${ROOTFS_MNT}
-#sudo losetup -D
 sudo kpartx -d -s -v ${IMG_FILE}
 sync
 }
@@ -541,7 +540,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 #install_deps
 
-build_uboot
+#build_uboot
 #build_kernel
 
 ## build_rcn_kernel
@@ -558,8 +557,8 @@ create_image
 
 #run_initial_sh
 
-#install_files
-install_uboot
+install_files
+#install_uboot
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "
