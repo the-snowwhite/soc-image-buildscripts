@@ -77,9 +77,9 @@ ALT_GIT_KERNEL_FOLDER_NAME="linux-3.10"
 
 #--------- 4.4.x kernel -------------------------------------------------------------------#
 ## http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/arm-linux-gnueabihf/gcc-linaro-5.2-2015.11-1-x86_64_arm-linux-gnueabihf.tar.xz
-PCH52_CC_FOLDER_NAME="gcc-linaro-52-2015.11-1-x86_64_arm-linux-gnueabihf"
+PCH52_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_arm-linux-gnueabihf"
 PCH52_CC_FILE="${PCH52_CC_FOLDER_NAME}.tar.xz"
-PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/52-2015.11-1/arm-linux-gnueabihf/${PCH52_CC_FILE}"
+PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/arm-linux-gnueabihf/${PCH52_CC_FILE}"
 
 # Kernels
 ##--------- altera socfpga kernel --------------------------------------#
@@ -562,7 +562,7 @@ build_kernel
 
 ## fetch_extract_rcn_rootfs   # ---> for now redundant ---#
 
-create_image
+#create_image
 
 #run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 

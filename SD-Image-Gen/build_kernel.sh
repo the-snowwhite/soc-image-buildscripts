@@ -185,8 +185,6 @@ fetch_kernel() {
         cd ${KERNEL_BUILD_DIR}
         echo "fetching kernel"
         wget ${KERNEL_FILE_URL}
-        echo "fetching patch"
-        wget ${PATCH_URL}
     fi
     echo "extracting kernel"
     tar xf ${KERNEL_FILE}
@@ -195,6 +193,11 @@ fetch_kernel() {
 
 
 patch_kernel() {
+cd ${CURRENT_DIR}
+if [ ! -f ${PATCH_FILE} ]; then #if file with that name not exists
+        echo "fetching patch"
+        wget ${PATCH_URL}
+fi
 cd ${KERNEL_DIR}
 xzcat ../${PATCH_FILE} | patch -p1
 echo "rt-Patch applied"
