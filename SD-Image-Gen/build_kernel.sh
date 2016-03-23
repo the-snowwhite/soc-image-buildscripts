@@ -193,7 +193,7 @@ fetch_kernel() {
 
 
 patch_kernel() {
-cd ${CURRENT_DIR}
+cd ${KERNEL_BUILD_DIR}
 if [ ! -f ${PATCH_FILE} ]; then #if file with that name not exists
         echo "fetching patch"
         wget ${PATCH_URL}
