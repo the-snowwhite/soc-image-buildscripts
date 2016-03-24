@@ -191,7 +191,7 @@ sudo kpartx -d -s -v ${IMG_FILE}
 }
 
 build_rootfs_in_image_and_compress() {
-${SCRIPT_ROOT_DIR}/gen_rootfs-jessie.sh ${CURRENT_DIR} ${ROOTFS_DIR} ${IMG_FILE} ${IMG_ROOT_PART} #${distro}
+${SCRIPT_ROOT_DIR}/gen_rootfs-qemu_2.1.sh ${CURRENT_DIR} ${ROOTFS_DIR} ${IMG_FILE} ${IMG_ROOT_PART} #${distro}
 COMP_PREFIX=raw
 compress_rootfs
 }
@@ -216,7 +216,7 @@ if [ ! -d ${ROOTFS_DIR} ]; then
     fi
 # extract footfs-file
     tar xf ${ROOTFS_FILE}
-    echo "extracting rhn rootfs" 
+    echo "extracting rhn rootfs"
 fi
 }
 
@@ -267,7 +267,7 @@ set -x
 
 ln -s /proc/mounts /etc/mtab
 
-#ln -s /run /var/run 
+#ln -s /run /var/run
 
 export DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
 export LANG=C
@@ -406,7 +406,7 @@ sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
 ## Quartus files:
 # if [ -d ${BOOT_FILES_DIR} ]; then
 #     sudo cp -fv ${BOOT_FILES_DIR/socfpga* ${BOOT_MNT
-# else    
+# else
 #     echo "mksocfpga boot files missing"
 # fi
 
