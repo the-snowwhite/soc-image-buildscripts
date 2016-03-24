@@ -1,8 +1,9 @@
 #!/bin/sh
 
-projdirname=HW/QuartusProjects
+projdirname=mksocfpga/HW/QuartusProjects
 projects=$(ls ../$projdirname)
 folder=DE0_NANO_SOC_GHRD
+#folder=SoCkit_GHRD
 set -e  # exit on all errors
 
 mkdir -p boot_files
@@ -13,9 +14,9 @@ mkdir -p boot_files
 #        mv soc_system.dtb $folder.dtb
 #        tar -zxvf ../QuartusProjects/$folder/sd_fat.tar.gz boot_files/*.rbf
 #        mv boot_files/*.rbf boot_files/$folder.rbf
-    
-        cp -v ../$projdirname/$folder/soc_system.dtb boot_files/socfpga.dtb 
-        cp -v ../$projdirname/$folder/soc_system.dts boot_files/socfpga.dts 
+
+        cp -v ../$projdirname/$folder/soc_system.dtb boot_files/socfpga.dtb
+        cp -v ../$projdirname/$folder/soc_system.dts boot_files/socfpga.dts
         cp -v ../$projdirname/$folder/output_files/soc_system.rbf boot_files/socfpga.rbf
 #done
 
@@ -26,7 +27,7 @@ if [ "$1" != "" ]; then
         echo "files will be installed on $1"
         echo ""
         sudo mkdir -p /mnt/boot
-        sudo mount -o uid=1000,gid=1000 $1 /mnt/boot
+        sudo mount -o rw -o uid=1000,gid=1000 $1 /mnt/boot
 #        sudo cp *.dtb /mnt/boot
         sudo cp -fv boot_files/socfpga* /mnt/boot
 #        sudo cp u-boot.scr /mnt/boot
