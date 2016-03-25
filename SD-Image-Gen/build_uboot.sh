@@ -17,9 +17,9 @@ CHKOUT_OPTIONS=''
 #CHKOUT_OPTIONS='-b tmp'
 
 BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
-MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
+MAKE_CONFIG='u-boot-with-spl.sfp'
 
-UBOOT_SPLFILE=${UBOOT_DIR}/u-boot-with-spl.sfp
+#UBOOT_SPLFILE=${UBOOT_DIR}/u-boot-with-spl.sfp
 
 #PATCH_FILE="u-boot-${UBOOT_VERSION}-changes.patch"
 #PATCH_FILE="u-boot-${UBOOT_VERSION}-changes2.patch"

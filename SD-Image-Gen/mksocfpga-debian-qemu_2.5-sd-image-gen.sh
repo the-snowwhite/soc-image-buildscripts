@@ -63,7 +63,7 @@ UBOOT_VERSION="v2016.03"
 #set -e      #halt on all errors
 #--------------  u-boot  ------------------------------------------------------------------#
 
-UBOOT_SPLFILE=${CURRENT_DIR}/uboot/u-boot-with-spl-dtb.sfp
+UBOOT_SPLFILE=${CURRENT_DIR}/uboot/u-boot-with-spl.sfp
 
 #----------- Git kernel clone URL's -----------------------------------#
 #--------- RHN kernel -------------------------------------------------#
@@ -553,7 +553,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 #install_deps # --->- only needed on first new run of a function see function above -------#
 
-build_uboot
+#build_uboot
 #build_kernel
 
 ## build_rcn_kernel           # ---> for now redundant ---#
@@ -563,12 +563,12 @@ build_uboot
 
 ## fetch_extract_rcn_rootfs   # ---> for now redundant ---#
 
-#create_image
+create_image
 
 #run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 
 #install_files   # --> into sd-card-image (.img)
-#install_uboot   # --> onto sd-card-image (.img)
+install_uboot   # --> onto sd-card-image (.img)
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "
