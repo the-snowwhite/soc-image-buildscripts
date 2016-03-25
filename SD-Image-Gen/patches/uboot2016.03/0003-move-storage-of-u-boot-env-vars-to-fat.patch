@@ -1,0 +1,31 @@
+From 33e46fc0426c7190e33f5ca08ac47f65a5b33eb5 Mon Sep 17 00:00:00 2001
+From: the-snowwhite <producer@holotronic.dk>
+Date: Thu, 24 Mar 2016 23:44:11 +0100
+Subject: [PATCH 3/5] move storage of u-boot env vars to fat
+
+---
+ include/configs/socfpga_de0_nano_soc.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
+index abe5202..3c71638 100644
+--- a/include/configs/socfpga_de0_nano_soc.h
++++ b/include/configs/socfpga_de0_nano_soc.h
+@@ -47,7 +47,13 @@
+ #define CONFIG_PHY_MICREL_KSZ9031
+ #endif
+ 
+-#define CONFIG_ENV_IS_IN_MMC
++#define CONFIG_ENV_IS_IN_FAT
++
++#ifdef CONFIG_ENV_IS_IN_FAT
++#define FAT_ENV_INTERFACE "mmc"
++#define FAT_ENV_DEVICE_AND_PART "0:2"
++#define FAT_ENV_FILE "uboot.env"
++#endif
+ 
+ /* Extra Environment */
+ #define CONFIG_EXTRA_ENV_SETTINGS \
+-- 
+2.7.0
+

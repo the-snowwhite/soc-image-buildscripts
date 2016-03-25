@@ -1,0 +1,26 @@
+From 29dbf4ce808b7f39893d0ad4401784d295dc01b6 Mon Sep 17 00:00:00 2001
+From: the-snowwhite <producer@holotronic.dk>
+Date: Tue, 22 Mar 2016 15:47:57 +0100
+Subject: [PATCH 5/5] Change boot and rootfs partitions to usb drive
+
+Signed-off-by: the-snowwhite <producer@holotronic.dk>
+---
+ include/configs/socfpga_de0_nano_soc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
+index 9cc8144..e4159f5 100644
+--- a/include/configs/socfpga_de0_nano_soc.h
++++ b/include/configs/socfpga_de0_nano_soc.h
+@@ -37,7 +37,7 @@
+ #define CONFIG_BOOTDELAY	3
+ #define CONFIG_BOOTFILE		"fitImage"
+ #define CONFIG_BOOTARGS		"console=ttyS0," __stringify(CONFIG_BAUDRATE)
+-#define CONFIG_BOOTCOMMAND	"run mmcboot_cmd"
++#define CONFIG_BOOTCOMMAND	"run usbboot_cmd"
+ #define CONFIG_LOADADDR		0x01000000
+ #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
+ 
+-- 
+2.7.0
+

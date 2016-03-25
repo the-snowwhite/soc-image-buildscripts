@@ -1,7 +1,7 @@
-From d6b63b2cb48ef2c5f0595d076381db24151afd6e Mon Sep 17 00:00:00 2001
+From 933573fba4a2a5b8057765b487289a05e9d4831f Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Tue, 1 Mar 2016 21:36:19 +0100
-Subject: [PATCH 2/3] add hm2reg_io and adc_ltc2308_fifo dts enteties
+Subject: [PATCH 2/4] add hm2reg_io and adc_ltc2308_fifo dts enteties
 
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
 ---

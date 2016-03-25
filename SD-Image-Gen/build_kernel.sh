@@ -18,8 +18,8 @@ PATCH_FILE=${10}
 echo "NOTE: in build_kernel.sh param KERNEL_FOLDER_NAME = ${5}"
 
 #ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-changes.patch
-ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-ext4-changes.patch
-
+#ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-ext4-changes.patch
+ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-ext4-autofs-changes.patch
 #----------- Git clone URL's ------------------------------------------#
 #--------- RHN kernel -------------------------------------------------#
 #RHN_KERNEL_URL='https://github.com/RobertCNelson/armv7-multiplatform'
@@ -158,7 +158,6 @@ clone_kernel() {
         git clean -d -f -x
         git fetch origin
         git reset --hard origin/${KERNEL_BRANCH}
-#        git checkout ${KERNEL_BRANCH}
     else
         mkdir -p ${KERNEL_BUILD_DIR}
         cd ${KERNEL_BUILD_DIR}
@@ -167,7 +166,6 @@ clone_kernel() {
         git remote add linux ${KERNEL_URL}
         git fetch linux
         git checkout -b linux-rt linux/${KERNEL_BRANCH}
-#        uiomod_kernel
     fi
 patch_git_kernel
 #uiomod_kernel
@@ -187,8 +185,6 @@ fetch_kernel() {
         cd ${KERNEL_BUILD_DIR}
         echo "fetching kernel"
         wget ${KERNEL_FILE_URL}
-        echo "fetching patch"
-        wget ${PATCH_URL}
     fi
     echo "extracting kernel"
     tar xf ${KERNEL_FILE}
@@ -197,6 +193,11 @@ fetch_kernel() {
 
 
 patch_kernel() {
+cd ${KERNEL_BUILD_DIR}
+if [ ! -f ${PATCH_FILE} ]; then #if file with that name not exists
+        echo "fetching patch"
+        wget ${PATCH_URL}
+fi
 cd ${KERNEL_DIR}
 xzcat ../${PATCH_FILE} | patch -p1
 echo "rt-Patch applied"
@@ -262,7 +263,7 @@ make -j${NCORES} ARCH=arm modules CROSS_COMPILE=${CC} 2>&1 | tee ../linux-module
 make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR}  modules 2>&1 | tee ../linux-uio-hm2_soc-module_rt-log.txt
 
 # adc module:
-make -j${NCORES} ARCH=arm -C ${KERNEL_DIR} M=${ADC_DIR}  modules 2>&1 | tee ../linux-adcreg-module_rt-log.txt
+#make -j${NCORES} ARCH=arm -C ${KERNEL_DIR} M=${ADC_DIR}  modules 2>&1 | tee ../linux-adcreg-module_rt-log.txt
 
 }
 
