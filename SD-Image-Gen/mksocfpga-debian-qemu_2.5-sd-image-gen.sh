@@ -147,8 +147,8 @@ CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 
 FILE_PRELUDE=${CURRENT_DIR}/mksocfpga_${distro}_${KERNEL_FOLDER_NAME}-${REL_DATE}
 #IMG_FILE=${FILE_PRELUDE}_sdcard.img
-#IMG_FILE=u-bootv2016.01-only_to_usb-boot_sdcard.img
-IMG_FILE=${FILE_PRELUDE}-Sockit_sd.img
+IMG_FILE=u-bootv2016.01-only_to_usb-boot_sdcard.img
+#IMG_FILE=${FILE_PRELUDE}-Sockit_sd.img
 
 MK_RIPROOTFS_NAME=${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
 
@@ -563,12 +563,12 @@ build_uboot
 
 ## fetch_extract_rcn_rootfs   # ---> for now redundant ---#
 
-create_image
+#create_image
 
 #run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 
 #install_files   # --> into sd-card-image (.img)
-install_uboot   # --> onto sd-card-image (.img)
+#install_uboot   # --> onto sd-card-image (.img)
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "

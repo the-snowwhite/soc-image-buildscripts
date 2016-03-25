@@ -19,11 +19,11 @@ CHKOUT_OPTIONS=''
 BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
 MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
 
-UBOOT_SPLFILE=${UBOOT_DIR}/u-boot-with-spl-dtb.sfp
+UBOOT_SPLFILE=${UBOOT_DIR}/u-boot-with-spl.sfp
 
 #PATCH_FILE="u-boot-${UBOOT_VERSION}-changes.patch"
 #PATCH_FILE="u-boot-${UBOOT_VERSION}-changes2.patch"
-PATCH_FILE="u-boot-${UBOOT_VERSION}-changes1.patch"
+PATCH_FILE="u-boot-${UBOOT_VERSION}-changeset2.patch"
 UBOOT_DIR=${WORK_DIR}/uboot
 
 #-------------------------------------------
@@ -65,7 +65,7 @@ if [ ! -d ${CC_DIR} ]; then
     fi
 # extract linaro cross compiler toolchain
 # uses multicore extract (lbzip2) if available(set via links in /usr/sbin)
-    echo "extracting toolchain" 
+    echo "extracting toolchain"
     extract_toolchain
 fi
 }
@@ -130,7 +130,7 @@ if [ ! -z "$WORK_DIR" ]; then
     cd $WORK_DIR
     get_toolchain
     fetch_uboot
-    
+
     build_uboot
 else
     echo "no workdir parameter given"
