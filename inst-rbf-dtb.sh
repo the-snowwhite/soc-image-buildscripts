@@ -2,8 +2,8 @@
 
 projdirname=mksocfpga/HW/QuartusProjects
 projects=$(ls ../$projdirname)
-folder=DE0_NANO_SOC_GHRD
-#folder=SoCkit_GHRD
+#folder=DE0_NANO_SOC_GHRD
+folder=SoCkit_GHRD
 set -e  # exit on all errors
 
 mkdir -p boot_files

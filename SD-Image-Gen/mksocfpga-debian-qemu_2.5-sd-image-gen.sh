@@ -57,13 +57,18 @@ IMG_ROOT_PART=p3
 #UBOOT_VERSION="v2016.01"
 UBOOT_VERSION="v2016.03"
 
+#UBOOT_BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
+UBOOT_BOARD_CONFIG='socfpga_sockit_defconfig'
+
+UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
+
 #-------------------------------------------
 # u-boot, toolchain, imagegen vars
 #-------------------------------------------
 #set -e      #halt on all errors
 #--------------  u-boot  ------------------------------------------------------------------#
 
-UBOOT_SPLFILE=${CURRENT_DIR}/uboot/u-boot-with-spl.sfp
+UBOOT_SPLFILE=${CURRENT_DIR}/uboot/${UBOOT_MAKE_CONFIG}
 
 #----------- Git kernel clone URL's -----------------------------------#
 #--------- RHN kernel -------------------------------------------------#
@@ -113,18 +118,18 @@ GIT_KERNEL_URL=${ALT_GIT_KERNEL_URL}
 GIT_KERNEL_BRANCH=${ALT_GIT_KERNEL_BRANCH}
 
 ## - for file fetched only ----------#
-#PATCH_FILE=$PATCH_44_FILE   #---> git cloned kernel is generated when this var is undefined.
+PATCH_FILE=$PATCH_44_FILE   #---> git cloned kernel is generated when this var is undefined.
 
 ## - for All kernels: ---------------#
-KERNEL_FOLDER_NAME=${ALT_GIT_KERNEL_FOLDER_NAME}
-#KERNEL_FOLDER_NAME=${KERNEL_44_FOLDER_NAME}
+#KERNEL_FOLDER_NAME=${ALT_GIT_KERNEL_FOLDER_NAME}
+KERNEL_FOLDER_NAME=${KERNEL_44_FOLDER_NAME}
 
 #----- select global toolchain ------#
-CC_FOLDER_NAME=${ALT49_CC_FOLDER_NAME}
-CC_URL=${ALT49_CC_URL}
+#CC_FOLDER_NAME=${ALT49_CC_FOLDER_NAME}
+#CC_URL=${ALT49_CC_URL}
 
-#CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
-#CC_URL=$PCH52_CC_URL
+CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
+CC_URL=$PCH52_CC_URL
 # --- change kernel version config  end ------------------------------#
 # --- change kernel version config  end ------------------------------#
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
@@ -147,8 +152,8 @@ CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 
 FILE_PRELUDE=${CURRENT_DIR}/mksocfpga_${distro}_${KERNEL_FOLDER_NAME}-${REL_DATE}
 #IMG_FILE=${FILE_PRELUDE}_sdcard.img
-IMG_FILE=u-bootv2016.01-only_to_usb-boot_sdcard.img
-#IMG_FILE=${FILE_PRELUDE}-Sockit_sd.img
+#IMG_FILE=u-bootv2016.01-only_to_usb-boot_sdcard.img
+IMG_FILE=${FILE_PRELUDE}-Sockit_sd.img
 
 MK_RIPROOTFS_NAME=${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
 
@@ -208,7 +213,7 @@ echo "deps installed"
 }
 
 function build_uboot {
-${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION}
+${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${UBOOT_BOARD_CONFIG} ${UBOOT_MAKE_CONFIG}
 }
 
 function build_kernel {
@@ -511,7 +516,7 @@ fi
 
 #RHN:
 #sudo tar xfvp ${ROOTFS_DIR/armhf-rootfs-*.tar -C ${ROOTFS_MNT
-set -x
+#set -x
 # kernel modules -------#
 echo "MSG: will now change dir to:"
 echo "${KERNEL_DIR}"
@@ -567,7 +572,7 @@ create_image
 
 #run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 
-#install_files   # --> into sd-card-image (.img)
+install_files   # --> into sd-card-image (.img)
 install_uboot   # --> onto sd-card-image (.img)
 
 echo "#---------------------------------------------------------------------------------- "

@@ -10,20 +10,28 @@ WORK_DIR=${1}
 
 SCRIPT_ROOT_DIR=${2}
 UBOOT_VERSION=${3}
+BOARD_CONFIG=${4}
+MAKE_CONFIG=${5}
 
 #UBOOT_VERSION='v2015.10'
 #UBOOT_VERSION='v2016.01'
 CHKOUT_OPTIONS=''
 #CHKOUT_OPTIONS='-b tmp'
 
-BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
-MAKE_CONFIG='u-boot-with-spl.sfp'
+#BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
+#MAKE_CONFIG='u-boot-with-spl.sfp'
 
 #UBOOT_SPLFILE=${UBOOT_DIR}/u-boot-with-spl.sfp
 
-#PATCH_FILE="u-boot-${UBOOT_VERSION}-changes.patch"
+# 2016.01 patches:
+#PATCH_FILE="u-boot-${UBOOT_VERSION}-changes1.patch"
 #PATCH_FILE="u-boot-${UBOOT_VERSION}-changes2.patch"
-PATCH_FILE="u-boot-${UBOOT_VERSION}-changeset2.patch"
+
+# 2016.03 patches:
+#PATCH_FILE="u-boot-${UBOOT_VERSION}-changeset1.patch"
+#PATCH_FILE="u-boot-${UBOOT_VERSION}-changeset2.patch"
+PATCH_FILE="u-boot-${UBOOT_VERSION}-sockit-changes.patch"
+
 UBOOT_DIR=${WORK_DIR}/uboot
 
 #-------------------------------------------
@@ -36,11 +44,9 @@ CC_FOLDER_NAME="gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux"
 CC_URL="https://releases.linaro.org/14.09/components/toolchain/binaries/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux.tar.xz"
 
 #--------- patched kernel ---------------------------------------------#
-#CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_arm-linux-gnueabihf"
 
 CC_DIR="${WORK_DIR}/${CC_FOLDER_NAME}"
 CC_FILE="${CC_FOLDER_NAME}.tar.xz"
-#CC_URL="http://releases.linaro.org/components/toolchain/binaries/latest-5.2/arm-linux-gnueabihf/${CC_FILE}"
 
 #----------------------------------------------------------------------#
 
