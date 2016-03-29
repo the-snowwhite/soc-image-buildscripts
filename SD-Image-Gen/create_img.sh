@@ -35,15 +35,7 @@ n
 p
 2
 
-+98M
-n
-p
-3
 
-
-t
-2
-b
 w
 EOF
 
@@ -52,8 +44,7 @@ sudo kpartx -u -s -v ${IMG_FILE}
 
 echo "creating file systems"
 
-sudo mkfs.vfat -F 32 -n "BOOT" ${DRIVE}p2
-sudo mkfs.ext4 -j -L "rootfs" ${DRIVE}p3
+sudo mkfs.ext4 -j -L "rootfs" ${DRIVE}p2
 
 sync
 #sudo partprobe $DRIVE
@@ -84,7 +75,7 @@ if [ ! -z "${WORK_DIR}" ]; then
         echo "Deleting old imagefile"
         rm -f ${ROOTFS_IMG}
     fi
-#create_rootfs_img 
+#create_rootfs_img
 create_sdcard_img
 
 echo "#---------------------------------------------------------------------------------- "

@@ -47,18 +47,18 @@ distro=jessie
 #distro=stretch
 
 ## Expandable image
-IMG_BOOT_PART=p2
-IMG_ROOT_PART=p3
+#IMG_BOOT_PART=p2
+IMG_ROOT_PART=p2
 
 ## Old Inverted image
 #IMG_BOOT_PART=p1
 #IMG_ROOT_PART=p2
 
-#UBOOT_VERSION="v2016.01"
-UBOOT_VERSION="v2016.03"
+UBOOT_VERSION="v2016.01"
+#UBOOT_VERSION="v2016.03"
 
-#UBOOT_BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
-UBOOT_BOARD_CONFIG='socfpga_sockit_defconfig'
+UBOOT_BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
+#UBOOT_BOARD_CONFIG='socfpga_sockit_defconfig'
 
 UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
@@ -118,18 +118,18 @@ GIT_KERNEL_URL=${ALT_GIT_KERNEL_URL}
 GIT_KERNEL_BRANCH=${ALT_GIT_KERNEL_BRANCH}
 
 ## - for file fetched only ----------#
-PATCH_FILE=$PATCH_44_FILE   #---> git cloned kernel is generated when this var is undefined.
+#PATCH_FILE=$PATCH_44_FILE   #---> git cloned kernel is generated when this var is undefined.
 
 ## - for All kernels: ---------------#
-#KERNEL_FOLDER_NAME=${ALT_GIT_KERNEL_FOLDER_NAME}
-KERNEL_FOLDER_NAME=${KERNEL_44_FOLDER_NAME}
+KERNEL_FOLDER_NAME=${ALT_GIT_KERNEL_FOLDER_NAME}
+#KERNEL_FOLDER_NAME=${KERNEL_44_FOLDER_NAME}
 
 #----- select global toolchain ------#
-#CC_FOLDER_NAME=${ALT49_CC_FOLDER_NAME}
-#CC_URL=${ALT49_CC_URL}
+CC_FOLDER_NAME=${ALT49_CC_FOLDER_NAME}
+CC_URL=${ALT49_CC_URL}
 
-CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
-CC_URL=$PCH52_CC_URL
+#CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
+#CC_URL=$PCH52_CC_URL
 # --- change kernel version config  end ------------------------------#
 # --- change kernel version config  end ------------------------------#
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
@@ -139,8 +139,8 @@ KERNEL_FILE=${KERNEL_FOLDER_NAME}.tar.xz
 KERNEL_FILE_URL="ftp://ftp.kernel.org/pub/linux/kernel/v4.x/${KERNEL_FILE}"
 PATCH_URL='https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/'${PATCH_FILE}
 
-BOOT_MNT=/mnt/boot
 ROOTFS_MNT=/mnt/rootfs
+BOOT_MNT=${ROOTFS_MNT}/boot
 
 # --- all pre config end ---- se bottom for run config ---------------#
 
@@ -153,7 +153,8 @@ CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 FILE_PRELUDE=${CURRENT_DIR}/mksocfpga_${distro}_${KERNEL_FOLDER_NAME}-${REL_DATE}
 #IMG_FILE=${FILE_PRELUDE}_sdcard.img
 #IMG_FILE=u-bootv2016.01-only_to_usb-boot_sdcard.img
-IMG_FILE=${FILE_PRELUDE}-Sockit_sd.img
+#IMG_FILE=${FILE_PRELUDE}-Sockit_sd.img
+IMG_FILE=${FILE_PRELUDE}-Nano_sd.img
 
 MK_RIPROOTFS_NAME=${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
 
@@ -465,8 +466,13 @@ sudo kpartx -a -s -v ${IMG_FILE}
 echo ""
 echo "# --------- installing boot partition files (kernel, dts, dtb) ---------"
 echo ""
+echo "# --------- installing rootfs partition files (chroot, kernel modules) ---------"
+echo ""
+sudo mkdir -p ${ROOTFS_MNT}
+sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
+
 sudo mkdir -p ${BOOT_MNT}
-sudo mount -o uid=1000,gid=1000 ${DRIVE}${IMG_BOOT_PART} ${BOOT_MNT}
+#sudo mount -o uid=1000,gid=1000 ${DRIVE}${IMG_BOOT_PART} ${BOOT_MNT}
 
 echo "copying boot sector files"
 sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
@@ -491,13 +497,8 @@ else
     sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${BOOT_MNT}/socfpga.rbf
 fi
 
-sudo umount ${BOOT_MNT}
-echo ""
-echo "# --------- installing rootfs partition files (chroot, kernel modules) ---------"
-echo ""
-sudo mkdir -p ${ROOTFS_MNT}
-sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
-
+#sudo umount ${BOOT_MNT}
+#echo ""
 # Rootfs -------#
 
 sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
@@ -558,7 +559,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 #install_deps # --->- only needed on first new run of a function see function above -------#
 
-#build_uboot
+build_uboot
 #build_kernel
 
 ## build_rcn_kernel           # ---> for now redundant ---#
@@ -568,12 +569,12 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 ## fetch_extract_rcn_rootfs   # ---> for now redundant ---#
 
-create_image
+#create_image
 
 #run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 
-install_files   # --> into sd-card-image (.img)
-install_uboot   # --> onto sd-card-image (.img)
+#install_files   # --> into sd-card-image (.img)
+#install_uboot   # --> onto sd-card-image (.img)
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "

@@ -28,9 +28,8 @@ CHKOUT_OPTIONS=''
 #PATCH_FILE="u-boot-${UBOOT_VERSION}-changes2.patch"
 
 # 2016.03 patches:
-#PATCH_FILE="u-boot-${UBOOT_VERSION}-changeset1.patch"
-#PATCH_FILE="u-boot-${UBOOT_VERSION}-changeset2.patch"
-PATCH_FILE="u-boot-${UBOOT_VERSION}-sockit-changes.patch"
+#PATCH_FILE="u-boot-${UBOOT_VERSION}-sockit-changes.patch"
+PATCH_FILE="u-boot-${UBOOT_VERSION}-nano-changeset.patch"
 
 UBOOT_DIR=${WORK_DIR}/uboot
 
