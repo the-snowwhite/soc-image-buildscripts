@@ -2,8 +2,8 @@
 
 projdirname=mksocfpga/HW/QuartusProjects
 projects=$(ls ../$projdirname)
-#folder=DE0_NANO_SOC_GHRD
-folder=SoCkit_GHRD
+folder=DE0_NANO_SOC_GHRD
+#folder=SoCkit_GHRD
 set -e  # exit on all errors
 
 mkdir -p boot_files
@@ -26,13 +26,14 @@ if [ "$1" != "" ]; then
         echo ""
         echo "files will be installed on $1"
         echo ""
-        sudo mkdir -p /mnt/boot
-        sudo mount -o rw -o uid=1000,gid=1000 $1 /mnt/boot
+        sudo mkdir -p /mnt/rootfs
+#        sudo mount -o rw -o uid=1000,gid=1000 $1 /mnt/boot
+        sudo mount $1 /mnt/rootfs
 #        sudo cp *.dtb /mnt/boot
-        sudo cp -fv boot_files/socfpga* /mnt/boot
+        sudo cp -fv boot_files/socfpga* /mnt/rootfs/boot
 #        sudo cp u-boot.scr /mnt/boot
         sync
-        sudo umount /mnt/boot
+        sudo umount /mnt/rootfs
         sync
         echo "operation finished"
 else
