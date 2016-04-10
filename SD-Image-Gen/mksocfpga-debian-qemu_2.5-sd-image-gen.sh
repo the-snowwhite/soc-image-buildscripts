@@ -48,6 +48,7 @@ distro=jessie
 
 ## Expandable image
 #IMG_BOOT_PART=p2
+#IMG_ROOT_PART=p3
 IMG_ROOT_PART=p2
 
 ## Old Inverted image
@@ -55,12 +56,13 @@ IMG_ROOT_PART=p2
 #IMG_ROOT_PART=p2
 
 UBOOT_VERSION="v2016.01"
+UBOOT_MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
+
 #UBOOT_VERSION="v2016.03"
+#UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
 UBOOT_BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
 #UBOOT_BOARD_CONFIG='socfpga_sockit_defconfig'
-
-UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
 #-------------------------------------------
 # u-boot, toolchain, imagegen vars
@@ -141,6 +143,7 @@ PATCH_URL='https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/'${PATCH_FILE
 
 ROOTFS_MNT=/mnt/rootfs
 BOOT_MNT=${ROOTFS_MNT}/boot
+#BOOT_MNT=/mnt/boot
 
 # --- all pre config end ---- se bottom for run config ---------------#
 
@@ -371,9 +374,25 @@ EOT
 #systemctl enable systemd-networkd
 
 
-echo "ECHO: ""Will now run apt update, upgrade"
+echo "ECHO: Will now run apt update, upgrade"
 apt -y update
 apt -y upgrade
+
+echo "ECHO: adding mk sources.list"
+apt-key adv --keyserver keyserver.ubuntu.com --recv 43DDF224
+echo "deb http://deb.machinekit.io/debian jessie main" > /etc/apt/sources.list.d/machinekit.list
+
+apt -y update
+
+apt -y install linux-headers-3.10.37-ltsi*
+apt -y install linux-image-3.10.37-ltsi*
+
+apt -y install hm2reg-uio-dkms
+
+apt -y install machinekit-rt-preempt
+
+
+
 rm -f /etc/resolv.conf
 #ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
@@ -471,34 +490,6 @@ echo ""
 sudo mkdir -p ${ROOTFS_MNT}
 sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 
-sudo mkdir -p ${BOOT_MNT}
-#sudo mount -o uid=1000,gid=1000 ${DRIVE}${IMG_BOOT_PART} ${BOOT_MNT}
-
-echo "copying boot sector files"
-sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
-
-## Quartus files:
-# if [ -d ${BOOT_FILES_DIR} ]; then
-#     sudo cp -fv ${BOOT_FILES_DIR/socfpga* ${BOOT_MNT
-# else
-#     echo "mksocfpga boot files missing"
-# fi
-
-if [ -z "${PATCH_FILE}" ]; then
-    echo "MSG: Installing Quartus dts dtb .rbf for 3.10 kernel"
-#    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dts ${BOOT_MNT}/socfpga.dts
-#    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dtb ${BOOT_MNT}/socfpga.dtb
-    sudo cp -v -f ${BOOT_FILES_DIR}/socfpga.* ${BOOT_MNT}/
-else
-    echo "MSG: Installing 4.x.x kernel dts dtb and .rbf from Quartus"
-    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts ${BOOT_MNT}/socfpga.dts
-    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb ${BOOT_MNT}/socfpga.dtb
-# copy .rbf file from quartus:
-    sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${BOOT_MNT}/socfpga.rbf
-fi
-
-#sudo umount ${BOOT_MNT}
-#echo ""
 # Rootfs -------#
 
 sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
@@ -518,17 +509,52 @@ fi
 #RHN:
 #sudo tar xfvp ${ROOTFS_DIR/armhf-rootfs-*.tar -C ${ROOTFS_MNT
 #set -x
-# kernel modules -------#
-echo "MSG: will now change dir to:"
-echo "${KERNEL_DIR}"
-cd ${KERNEL_DIR}
-echo "MSG: current dir is:"
-pwd
-echo ""
-export CROSS_COMPILE=${CC}
-sudo make ARCH=arm CROSS_COMPILE=${CC} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
-sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
-#sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${ADC_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+
+## kernel modules -------#
+# echo "MSG: will now change dir to:"
+# echo "${KERNEL_DIR}"
+# cd ${KERNEL_DIR}
+# echo "MSG: current dir is:"
+# pwd
+# echo ""
+# export CROSS_COMPILE=${CC}
+# sudo make ARCH=arm CROSS_COMPILE=${CC} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+# #sudo make ARCH=arm CROSS_COMPILE=${CC} INSTALL_MOD_PATH=${ROOTFS_MNT} headers_install
+# sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+# #sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${ADC_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+#
+# echo "copying boot sector files"
+
+sudo mkdir -p ${BOOT_MNT}
+#sudo mount -o uid=1000,gid=1000 ${DRIVE}${IMG_BOOT_PART} ${BOOT_MNT}
+
+## Quartus files:
+# if [ -d ${BOOT_FILES_DIR} ]; then
+#     sudo cp -fv ${BOOT_FILES_DIR/socfpga* ${BOOT_MNT
+# else
+#     echo "mksocfpga boot files missing"
+# fi
+
+# kernel:
+#sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
+sudo cp ${BOOT_MNT}/vmlinuz-3.10* ${BOOT_MNT}/zImage
+
+if [ -z "${PATCH_FILE}" ]; then
+    echo "MSG: Installing Quartus dts dtb .rbf for 3.10 kernel"
+#    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dts ${BOOT_MNT}/socfpga.dts
+#    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dtb ${BOOT_MNT}/socfpga.dtb
+    sudo cp -v -f ${BOOT_FILES_DIR}/socfpga.* ${BOOT_MNT}/
+else
+    echo "MSG: Installing 4.x.x kernel dts dtb and .rbf from Quartus"
+    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts ${BOOT_MNT}/socfpga.dts
+    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb ${BOOT_MNT}/socfpga.dtb
+# copy .rbf file from quartus:
+    sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${BOOT_MNT}/socfpga.rbf
+fi
+
+#sudo umount ${BOOT_MNT}
+#echo ""
+
 
 POLICY_FILE=${ROOTFS_MNT}/usr/sbin/policy-rc.d
 
@@ -543,7 +569,7 @@ sync
 }
 
 function install_uboot {
-echo "installing u-boot-with-spl"
+echo "installing ${UBOOT_SPLFILE}"
 sudo dd bs=512 if=${UBOOT_SPLFILE} of=${IMG_FILE} seek=2048 conv=notrunc
 sync
 }
@@ -559,7 +585,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 #install_deps # --->- only needed on first new run of a function see function above -------#
 
-build_uboot
+#build_uboot
 #build_kernel
 
 ## build_rcn_kernel           # ---> for now redundant ---#
@@ -569,12 +595,12 @@ build_uboot
 
 ## fetch_extract_rcn_rootfs   # ---> for now redundant ---#
 
-#create_image
+create_image
 
 #run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 
-#install_files   # --> into sd-card-image (.img)
-#install_uboot   # --> onto sd-card-image (.img)
+install_files   # --> into sd-card-image (.img)
+install_uboot   # --> onto sd-card-image (.img)
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "

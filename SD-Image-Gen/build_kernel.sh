@@ -17,9 +17,7 @@ PATCH_FILE=${10}
 
 echo "NOTE: in build_kernel.sh param KERNEL_FOLDER_NAME = ${5}"
 
-#ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-changes.patch
-#ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-ext4-changes.patch
-ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt_hm2_io_adc-ext4-autofs-changes.patch
+ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt-changeset.patch
 #----------- Git clone URL's ------------------------------------------#
 #--------- RHN kernel -------------------------------------------------#
 #RHN_KERNEL_URL='https://github.com/RobertCNelson/armv7-multiplatform'
@@ -155,7 +153,7 @@ clone_kernel() {
         echo the kernel target directory ${KERNEL_BUILD_DIR} already exists.
         echo cleaning repo
         cd ${KERNEL_BUILD_DIR}/linux
-        git clean -d -f -x
+        sudo git clean -d -f -x
         git fetch origin
         git reset --hard origin/${KERNEL_BRANCH}
     else
@@ -167,8 +165,6 @@ clone_kernel() {
         git fetch linux
         git checkout -b linux-rt linux/${KERNEL_BRANCH}
     fi
-patch_git_kernel
-#uiomod_kernel
 cd ..
 }
 
@@ -246,7 +242,7 @@ export CROSS_COMPILE=${CC}
 cd ${KERNEL_DIR}
 
 #clean
-make -j${NCORES} mrproper
+sudo make -j${NCORES} mrproper
 # configure
 make ARCH=arm ${KERNEL_CONF} CROSS_COMPILE=${CC} 2>&1 | tee ../linux-config_rt-log.txt
 #make ${KERNEL_CONF} 2>&1 | tee ../linux-config_rt-log.txt
@@ -288,6 +284,7 @@ else
     echo "MSG: building git cloned kernel"
     echo "cloning kernel"
     clone_kernel
+    patch_git_kernel
 fi
 echo "building kernel"
 build_kernel

@@ -1,6 +1,6 @@
-From ab2232b9ada2f197b2c49078bf508e5d88c0d7fd Mon Sep 17 00:00:00 2001
+From e5bb6e00a2064a51dad58bcc3d900f94cd0abef1 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
-Date: Thu, 7 Apr 2016 22:16:06 +0200
+Date: Thu, 7 Apr 2016 21:19:48 +0200
 Subject: [PATCH] Change to ext4 file system
 
 ---
@@ -8,7 +8,7 @@ Subject: [PATCH] Change to ext4 file system
  1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
-index cbc7396..134b9ad 100644
+index cbc7396..5c1899f 100644
 --- a/include/configs/socfpga_de0_nano_soc.h
 +++ b/include/configs/socfpga_de0_nano_soc.h
 @@ -19,6 +19,8 @@
@@ -27,10 +27,10 @@ index cbc7396..134b9ad 100644
 -		"bootm ${loadaddr} - ${fdt_addr}\0" \
 -	"bootimage=zImage\0" \
 +   "bootm ${loadaddr} - ${fdt_addr}\0" \
-+	"bootimage=boot/zImage\0" \
++	"bootimage=/boot/zImage\0" \
  	"fdt_addr=100\0" \
 -	"fdtimage=socfpga.dtb\0" \
-+	"fdtimage=boot/socfpga.dtb\0" \
++	"fdtimage=/boot/socfpga.dtb\0" \
  	"bootm ${loadaddr} - ${fdt_addr}\0" \
  	"mmcroot=/dev/mmcblk0p2\0" \
  	"mmcboot=setenv bootargs " CONFIG_BOOTARGS \

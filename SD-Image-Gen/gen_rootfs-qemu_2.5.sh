@@ -33,7 +33,7 @@ DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
 # eval $qoutput1
 # echo " "
 # echo "Note: Eval..Done ."
-# 
+#
 # }
 
 function run_jessie_bootstrap {
@@ -115,7 +115,6 @@ sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/etc/fstab
 #
 # <file system> <mount point>   <type>  <options>       <dump>  <pass>
 /dev/root      /               ext4    noatime,errors=remount-ro 0 1
-/dev/sda2      /boot           auto    defaults                  0 2
 tmpfs          /tmp            tmpfs   defaults                  0 0
 none           /dev/shm        tmpfs   rw,nosuid,nodev,noexec    0 0
 EOT'
@@ -146,16 +145,16 @@ gen_wired_network() {
 # sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/etc/systemd/network/20-dhcp.network
 # [Match]
 # Name=eth0
-# 
+#
 # [Network]
 # DHCP=ipv4
 # #IPv6PrivacyExtensions=true
 # #IPv6AcceptRouterAdvertisements=False
 # IPv6AcceptRouterAdvertisements=kernel
-# 
+#
 # [DHCP]
 # UseDomains=true
-# 
+#
 # EOT'
 
 sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/etc/systemd/network/10-wired.network
@@ -674,7 +673,7 @@ gen_hosts
 sudo mkdir -p $ROOTFS_DIR/etc/systemd/network
 
 gen_wired_network
- 
+
 #sudo sh -c 'cat <<EOT >> '$ROOTFS_DIR'/etc/network/interfaces
 #auto lo eth0
 #iface lo inet loopback
@@ -694,7 +693,7 @@ LC_TIME=en_GB.UTF-8
 EOT'
 
 sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/etc/X11/xorg.conf
- 
+
 Section "Screen"
        Identifier   "Default Screen"
        tDevice       "Dummy"
@@ -749,7 +748,7 @@ else
 fi
 
 echo "will now run setup_configfiles "
-setup_configfiles    
+setup_configfiles
 
 }
 
@@ -768,8 +767,8 @@ if [ ! -z "$SD_IMG" ]; then
     sudo kpartx -d -s -v ${SD_IMG}
     sync
 else
-    echo "ECHO: ""no Imagefile parameter given chroot will only be made in current local folder:"   
-    echo "ECHO: "'rootfs_dir ='$ROOTFS_DIR 
+    echo "ECHO: ""no Imagefile parameter given chroot will only be made in current local folder:"
+    echo "ECHO: "'rootfs_dir ='$ROOTFS_DIR
     run_func
 fi
 }

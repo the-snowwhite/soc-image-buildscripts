@@ -12,17 +12,7 @@ IMG_FILE=$2
 ROOTFS_IMG=${WORK_DIR}/rootfs.img
 DRIVE=/dev/mapper/loop0
 
-create_sdcard_img() {
-#--------------- Initial sd-card image - partitioned --------------
-echo "#-------------------------------------------------------------------------------#"
-echo "#-----------------------------          ----------------------------------------#"
-echo "#---------------     +++ generating sd-card image  zzz  +++ ........  ----------#"
-echo "#---------------------------  Please  wait   -----------------------------------#"
-echo "#-------------------------------------------------------------------------------#"
-sudo dd if=/dev/zero of=${IMG_FILE}  bs=1024 count=3700K
-
-#sudo losetup --show -f $SD_IMG
-sudo kpartx -a -v -s ${IMG_FILE}
+fdisk_2part() {
 sudo fdisk /dev/loop0 << EOF
 n
 p
@@ -38,22 +28,63 @@ p
 
 w
 EOF
+}
+
+fdisk_3part() {
+sudo fdisk /dev/loop0 << EOF
+n
+p
+1
+
++1M
+t
+a2
+n
+p
+2
+
++96M
+n
+p
+3
+
+
+t
+2
+b
+w
+EOF
+}
+
+create_sdcard_img() {
+#--------------- Initial sd-card image - partitioned --------------
+echo "#-------------------------------------------------------------------------------#"
+echo "#-----------------------------          ----------------------------------------#"
+echo "#---------------     +++ generating sd-card image  zzz  +++ ........  ----------#"
+echo "#---------------------------  Please  wait   -----------------------------------#"
+echo "#-------------------------------------------------------------------------------#"
+sudo dd if=/dev/zero of=${IMG_FILE}  bs=1024 count=3700K
+
+#sudo losetup --show -f $SD_IMG
+sudo kpartx -a -v -s ${IMG_FILE}
+
+fdisk_2part
+#fdisk_3part
 
 #sudo partprobe $DRIVE
 sudo kpartx -u -s -v ${IMG_FILE}
 
 echo "creating file systems"
 
-sudo mkfs.ext4 -j -L "rootfs" ${DRIVE}p2
+sudo mkfs -j -v -L "rootfs" ${DRIVE}p2
+#sudo mkfs.ext4 -L "rootfs" ${DRIVE}p2
+
+#sudo mkfs.vfat -F 32 -n "BOOT" ${DRIVE}p2
+#sudo mkfs -j -v -L "rootfs" ${DRIVE}p3
 
 sync
-#sudo partprobe $DRIVE
-sudo kpartx -u -s -v ${IMG_FILE}
-sync
-#sudo losetup -D
 sudo kpartx -d -s -v ${IMG_FILE}
 
-sync
 }
 
 create_rootfs_img() {
