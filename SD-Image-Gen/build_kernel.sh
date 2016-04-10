@@ -261,6 +261,9 @@ make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR}  mod
 # adc module:
 #make -j${NCORES} ARCH=arm -C ${KERNEL_DIR} M=${ADC_DIR}  modules 2>&1 | tee ../linux-adcreg-module_rt-log.txt
 
+# headers:
+make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR}  headers_check 2>&1 | tee ../linux-headers_rt-log.txt
+
 }
 
 echo "#---------------------------------------------------------------------------------- "
