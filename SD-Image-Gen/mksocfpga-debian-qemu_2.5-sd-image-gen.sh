@@ -31,7 +31,10 @@ REL_DATE=${CURRENT_DATE}
 ROOTFS_DIR=${CURRENT_DIR}/rootfs
 MK_KERNEL_DRIVER_FOLDER=${SCRIPT_ROOT_DIR}/../../SW/MK/kernel-drivers
 
-BOOT_FILES_DIR=${SCRIPT_ROOT_DIR}/../boot_files
+
+nanofolder=DE0_NANO_SOC_GHRD
+sockitfolder=SoCkit_GHRD
+de1folder=DE1_SOC_GHRD
 
 DRIVE=/dev/mapper/loop0
 
@@ -61,16 +64,15 @@ UBOOT_MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
 #UBOOT_VERSION="v2016.03"
 #UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
-UBOOT_BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
-#UBOOT_BOARD_CONFIG='socfpga_sockit_defconfig'
+#BOARD=nano
+#BOARD=de1
+BOARD=sockit
+
 
 #-------------------------------------------
 # u-boot, toolchain, imagegen vars
 #-------------------------------------------
 #set -e      #halt on all errors
-#--------------  u-boot  ------------------------------------------------------------------#
-
-UBOOT_SPLFILE=${CURRENT_DIR}/uboot/${UBOOT_MAKE_CONFIG}
 
 #----------- Git kernel clone URL's -----------------------------------#
 #--------- RHN kernel -------------------------------------------------#
@@ -146,18 +148,28 @@ BOOT_MNT=${ROOTFS_MNT}/boot
 #BOOT_MNT=/mnt/boot
 
 # --- all pre config end ---- se bottom for run config ---------------#
+#--------------  u-boot  ------------------------------------------------------------------#
+
+UBOOT_SPLFILE=${CURRENT_DIR}/uboot/${UBOOT_MAKE_CONFIG}
+
+FILE_PRELUDE=${CURRENT_DIR}/mksocfpga_${distro}_${KERNEL_FOLDER_NAME}-${REL_DATE}
+
+if [ "$BOARD" == "nano" ]; then
+   UBOOT_BOARD='de0_nano_soc'
+   BOOT_FILES_DIR=${SCRIPT_ROOT_DIR}/../boot_files/${nanofolder}
+elif [ "$BOARD" == "sockit" ]; then
+   UBOOT_BOARD='sockit'
+   BOOT_FILES_DIR=${SCRIPT_ROOT_DIR}/../boot_files/${sockitfolder}
+elif [ "$BOARD" == "de1" ]; then
+   UBOOT_BOARD='de0_nano_soc'
+   BOOT_FILES_DIR=${SCRIPT_ROOT_DIR}/../boot_files/${de1folder}
+fi
 
 CC_DIR="${CURRENT_DIR}/${CC_FOLDER_NAME}"
 CC_FILE="${CC_FOLDER_NAME}.tar.xz"
 CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 
-#IMG_FILE=${CURRENT_DIR}/mksoc_sdcard-test.img
-
-FILE_PRELUDE=${CURRENT_DIR}/mksocfpga_${distro}_${KERNEL_FOLDER_NAME}-${REL_DATE}
-#IMG_FILE=${FILE_PRELUDE}_sdcard.img
-#IMG_FILE=u-bootv2016.01-only_to_usb-boot_sdcard.img
-#IMG_FILE=${FILE_PRELUDE}-Sockit_sd.img
-IMG_FILE=${FILE_PRELUDE}-Nano_sd.img
+IMG_FILE=${FILE_PRELUDE}-${BOARD}_sd.img
 
 MK_RIPROOTFS_NAME=${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
 
@@ -217,7 +229,7 @@ echo "deps installed"
 }
 
 function build_uboot {
-${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${UBOOT_BOARD_CONFIG} ${UBOOT_MAKE_CONFIG}
+${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG}
 }
 
 function build_kernel {

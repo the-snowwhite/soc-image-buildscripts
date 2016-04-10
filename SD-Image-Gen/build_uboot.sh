@@ -10,7 +10,7 @@ WORK_DIR=${1}
 
 SCRIPT_ROOT_DIR=${2}
 UBOOT_VERSION=${3}
-BOARD_CONFIG=${4}
+BOARD=${4}
 MAKE_CONFIG=${5}
 
 #UBOOT_VERSION='v2015.10'
@@ -18,19 +18,11 @@ MAKE_CONFIG=${5}
 CHKOUT_OPTIONS=''
 #CHKOUT_OPTIONS='-b tmp'
 
-#BOARD_CONFIG='socfpga_de0_nano_soc_defconfig'
-#MAKE_CONFIG='u-boot-with-spl.sfp'
+BOARD_CONFIG="socfpga_${BOARD}_defconfig"
 
-#UBOOT_SPLFILE=${UBOOT_DIR}/u-boot-with-spl.sfp
 
-# 2016.01 patches:
-#PATCH_FILE="u-boot-${UBOOT_VERSION}-changes1.patch"
-#PATCH_FILE="u-boot-${UBOOT_VERSION}-changes2.patch"
-
-# 2016.03 patches:
-#PATCH_FILE="u-boot-${UBOOT_VERSION}-sockit-changes.patch"
-PATCH_FILE="u-boot-${UBOOT_VERSION}-nano-2part-changeset.patch"
-#PATCH_FILE="u-boot-${UBOOT_VERSION}-nano-3part-changeset.patch"
+# 2016.0X patches:
+PATCH_FILE="u-boot-${UBOOT_VERSION}-changeset.patch"
 
 UBOOT_DIR=${WORK_DIR}/uboot
 
@@ -56,7 +48,7 @@ CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 NCORES=`nproc`
 
 extract_toolchain() {
-    echo "using tar for xz extract"
+    echo "MSG: using tar for xz extract"
     tar xf ${CC_FILE}
 }
 
@@ -66,12 +58,12 @@ get_toolchain() {
 
 if [ ! -d ${CC_DIR} ]; then
     if [ ! -f ${CC_FILE} ]; then
-        echo "downloading toolchain"
+        echo "MSG: downloading toolchain"
     	wget -c ${CC_URL}
     fi
 # extract linaro cross compiler toolchain
 # uses multicore extract (lbzip2) if available(set via links in /usr/sbin)
-    echo "extracting toolchain"
+    echo "MSG: extracting toolchain"
     extract_toolchain
 fi
 }
@@ -83,7 +75,7 @@ git am --signoff <  $SCRIPT_ROOT_DIR/$PATCH_FILE
 
 fetch_uboot() {
 if [ ! -d ${UBOOT_DIR} ]; then
-    echo "cloning u-boot"
+    echo "MSG: cloning u-boot"
     git clone git://git.denx.de/u-boot.git uboot
 fi
 
@@ -92,9 +84,9 @@ if [ ! -z "$UBOOT_VERSION" ]
 then
     git fetch origin
     git reset --hard origin/master
-    echo "Will now check out " $UBOOT_VERSION
+    echo "MSG: Will now check out " $UBOOT_VERSION
     git checkout $UBOOT_VERSION $CHKOUT_OPTIONS
-    echo "Will now apply patch: " $SCRIPT_ROOT_DIR/$PATCH_FILE
+    echo "MSG: Will now apply patch: " $SCRIPT_ROOT_DIR/$PATCH_FILE
     patch_uboot
 fi
 cd ..
@@ -118,10 +110,10 @@ export ARCH=arm
 export PATH=$CC_DIR/bin/:$PATH
 export CROSS_COMPILE=$CC
 
-echo "configuring u-boot"
+echo "MSG: configuring u-boot"
 make mrproper
 make $BOARD_CONFIG
-echo "compiling u-boot"
+echo "MSG: compiling u-boot"
 make $MAKE_CONFIG -j$NCORES
 }
 
