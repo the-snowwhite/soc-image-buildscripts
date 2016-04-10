@@ -12,6 +12,20 @@ IMG_FILE=$2
 ROOTFS_IMG=${WORK_DIR}/rootfs.img
 DRIVE=/dev/mapper/loop0
 
+ROOTFS_TYPE=ext4
+ROOTFS_LABEL=rootfs
+
+ext4_options="-O ^metadata_csum,^64bit"
+mkfs_options="${ext4_options}"
+
+mkfs="mkfs.${ROOTFS_TYPE}"
+media_prefix=${DRIVE}
+media_rootfs_partition=p2
+
+mkfs_partition="${media_prefix}${media_rootfs_partition}"
+mkfs_label="-L ${ROOTFS_LABEL}"
+
+
 fdisk_2part() {
 sudo fdisk /dev/loop0 << EOF
 n
@@ -76,8 +90,9 @@ sudo kpartx -u -s -v ${IMG_FILE}
 
 echo "creating file systems"
 
-sudo mkfs -j -v -L "rootfs" ${DRIVE}p2
-#sudo mkfs.ext4 -L "rootfs" ${DRIVE}p2
+#sudo mkfs -j -v -L "rootfs" ${DRIVE}p2
+#sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_partition} ${mkfs_label}"
+sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
 
 #sudo mkfs.vfat -F 32 -n "BOOT" ${DRIVE}p2
 #sudo mkfs -j -v -L "rootfs" ${DRIVE}p3

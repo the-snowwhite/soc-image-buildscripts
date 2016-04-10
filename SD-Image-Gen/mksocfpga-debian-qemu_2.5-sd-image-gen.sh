@@ -64,9 +64,9 @@ UBOOT_MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
 #UBOOT_VERSION="v2016.03"
 #UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
-#BOARD=nano
+BOARD=nano
 #BOARD=de1
-BOARD=sockit
+#BOARD=sockit
 
 
 #-------------------------------------------

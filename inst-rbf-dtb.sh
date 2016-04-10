@@ -14,13 +14,14 @@ if [ "$1" != "" ]; then
    if [ "$1" == "-c" ]; then
       for folder in $projects
       do
-         echo "Will attempt to copy Boot files from: ${projdirname}/${projects}/${folder}"
+         echo ""
+         echo "Will attempt to copy Boot files from: ${projdirname}"/"${folder}"
          mkdir -p boot_files/$folder
 
          cp -v ../$projdirname/$folder/soc_system.dtb boot_files/$folder/socfpga.dtb
          cp -v ../$projdirname/$folder/soc_system.dts boot_files/$folder/socfpga.dts
          cp -v ../$projdirname/$folder/output_files/soc_system.rbf boot_files/$folder/socfpga.rbf
-         echo "Boot files copied to: ${folder}"
+         echo "Boot files copied to: boot_files"/"${folder}"
       done
    else
       lsblk
@@ -60,8 +61,8 @@ else
    echo "will only copy files to boot_folder"
    echo "to install files to sd"
    echo "use: [/dev/sdxx] [nano | de1 | sockit]"
-   echo ""
-   echo "use: [-c] to copy files from mksocfpga Quartus project folders"
+   echo "Or:"
+   echo "use: [-c] to copy Quartus output files from mksocfpga Quartus project folders"
    echo ""
 fi
 
