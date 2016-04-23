@@ -13,6 +13,9 @@ UBOOT_VERSION=${3}
 BOARD=${4}
 MAKE_CONFIG=${5}
 
+CC_FOLDER_NAME=${6}
+CC_URL=${7}
+
 #UBOOT_VERSION='v2015.10'
 #UBOOT_VERSION='v2016.01'
 CHKOUT_OPTIONS=''
@@ -30,10 +33,10 @@ UBOOT_DIR=${WORK_DIR}/uboot
 # u-boot, toolchain, imagegen vars
 #-------------------------------------------
 #--------- altera socfpga kernel --------------------------------------#
-CC_FOLDER_NAME="gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux"
+#CC_FOLDER_NAME="gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux"
 #CC_DIR="${WORK_DIR}/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux"
 #CC_FILE="${CC_DIR}.tar.bz2"
-CC_URL="https://releases.linaro.org/14.09/components/toolchain/binaries/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux.tar.xz"
+#CC_URL="https://releases.linaro.org/14.09/components/toolchain/binaries/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux.tar.xz"
 
 #--------- patched kernel ---------------------------------------------#
 

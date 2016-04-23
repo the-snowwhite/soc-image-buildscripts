@@ -58,15 +58,15 @@ IMG_ROOT_PART=p2
 #IMG_BOOT_PART=p1
 #IMG_ROOT_PART=p2
 
-UBOOT_VERSION="v2016.01"
-UBOOT_MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
+#UBOOT_VERSION="v2016.01"
+#UBOOT_MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
 
-#UBOOT_VERSION="v2016.03"
-#UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
+UBOOT_VERSION="v2016.03"
+UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
-BOARD=nano
+#BOARD=nano
 #BOARD=de1
-#BOARD=sockit
+BOARD=sockit
 
 
 #-------------------------------------------
@@ -94,12 +94,13 @@ PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.
 # Kernels
 ##--------- altera socfpga kernel --------------------------------------#
 ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
-ALT_GIT_KERNEL_BRANCH="socfpga-3.10-ltsi-rt"
+#ALT_GIT_KERNEL_BRANCH="socfpga-3.10-ltsi-rt"
+ALT_GIT_KERNEL_BRANCH="socfpga-4.1-ltsi-rt"
 
 #--------- Mainline rt patched kernel -----------------------------------------------------#
 #4.4-KERNEL
-KERNEL_44_FOLDER_NAME="linux-4.4.4"
-PATCH_44_FILE="patch-4.4.4-rt11.patch.gz"
+KERNEL_44_FOLDER_NAME="linux-4.4.7"
+PATCH_44_FILE="patch-4.4.7-rt16.patch.gz"
 URL_PATCH_44="https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/"
 #--------- Longterm rt-ltsi kernel --------------------------------------------------------#
 ##  http://ltsi.linuxfoundation.org/releases/ltsi-tree/4.1.17-ltsi/stable-release
@@ -117,31 +118,40 @@ ADC_DIR=${MK_KERNEL_DRIVER_FOLDER}/adcreg
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 # --- change kernel version config section: ----------------------------------#
 # --- change kernel version config section: ----------------------------------#
-## - for git only: ------------------#
-GIT_KERNEL_URL=${ALT_GIT_KERNEL_URL}
-GIT_KERNEL_BRANCH=${ALT_GIT_KERNEL_BRANCH}
 
 ## - for file fetched only ----------#
-#PATCH_FILE=$PATCH_44_FILE   #---> git cloned kernel is generated when this var is undefined.
+#---> git cloned kernel is generated when this var is undefined.
+PATCH_FILE=${PATCH_44_FILE}
 
 ## - for All kernels: ---------------#
-KERNEL_FOLDER_NAME=${ALT_GIT_KERNEL_FOLDER_NAME}
-#KERNEL_FOLDER_NAME=${KERNEL_44_FOLDER_NAME}
+GIT_KERNEL_BRANCH=${ALT_GIT_KERNEL_BRANCH}
+echo ""
+if [ -z "${PATCH_FILE}" ]; then
+## - for git only: ------------------#
+   echo "Using Git url and 4.9 toolchain"
+   KERNEL_URL=${ALT_GIT_KERNEL_URL}
+   KERNEL_FOLDER_NAME=${ALT_GIT_KERNEL_FOLDER_NAME}
+   #----- select global toolchain ------#
+   CC_FOLDER_NAME=${ALT49_CC_FOLDER_NAME}
+   CC_URL=${ALT49_CC_URL}
+else
+   echo "Using File url and 5.2 toolchain"
+   KERNEL_FOLDER_NAME=${KERNEL_44_FOLDER_NAME}
+   KERNEL_FILE=${KERNEL_FOLDER_NAME}.tar.xz
+   KERNEL_FILE_URL="ftp://ftp.kernel.org/pub/linux/kernel/v4.x/${KERNEL_FILE}"
+   KERNEL_URL=${KERNEL_FILE_URL}
+   #----- select global toolchain ------#
+   CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
+   CC_URL=$PCH52_CC_URL
+fi
+echo ""
 
-#----- select global toolchain ------#
-CC_FOLDER_NAME=${ALT49_CC_FOLDER_NAME}
-CC_URL=${ALT49_CC_URL}
-
-#CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
-#CC_URL=$PCH52_CC_URL
 # --- change kernel version config  end ------------------------------#
 # --- change kernel version config  end ------------------------------#
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
-KERNEL_FILE=${KERNEL_FOLDER_NAME}.tar.xz
 
-KERNEL_FILE_URL="ftp://ftp.kernel.org/pub/linux/kernel/v4.x/${KERNEL_FILE}"
-PATCH_URL='https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/'${PATCH_FILE}
+PATCH_URL="https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/${PATCH_FILE}"
 
 ROOTFS_MNT=/mnt/rootfs
 BOOT_MNT=${ROOTFS_MNT}/boot
@@ -229,11 +239,11 @@ echo "deps installed"
 }
 
 function build_uboot {
-${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG}
+${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG} ${CC_FOLDER_NAME} ${CC_URL}
 }
 
 function build_kernel {
-${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${GIT_KERNEL_URL} ${GIT_KERNEL_BRANCH} ${KERNEL_FILE_URL} ${PATCH_URL} ${PATCH_FILE}
+${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${KERNEL_URL} ${GIT_KERNEL_BRANCH} ${PATCH_URL} ${PATCH_FILE}
 }
 
 build_patched_kernel() {
@@ -334,31 +344,23 @@ while sudo grep -q "${PREFIX}" /proc/mounts; do
 done
 }
 
-
-gen_initial_sh() {
+gen_add_user_sh() {
 echo "------------------------------------------"
-echo "generating initial.sh chroot config script"
+echo "generating add_user.sh chroot config script"
 echo "------------------------------------------"
 export DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
-sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/initial.sh
+sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/add_user.sh
 #!/bin/bash
 
 set -x
 
-ln -s /proc/mounts /etc/mtab
-
-#ln -s /run /var/run
+#ln -s /proc/mounts /etc/mtab
 
 export DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
 export LANG=C
 
 apt -y update
 apt -y upgrade
-
-#sudo apt-get -y install resolvconf apt-utils ssh ntpdate openssl nano locales
-#apt -y install xorg
-
-#locale-gen en_GB.UTF-8 en_US.UTF-8 en_DK.UTF-8
 
 echo "root:machinekit" | chpasswd
 
@@ -381,6 +383,52 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 EOT
 
+exit
+EOF'
+
+sudo chmod +x ${ROOTFS_MNT}/home/add_user.sh
+}
+
+
+gen_initial_sh() {
+echo "------------------------------------------"
+echo "generating initial.sh chroot config script"
+echo "------------------------------------------"
+#export DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
+sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/initial.sh
+#!/bin/bash
+
+set -x
+
+ln -s /proc/mounts /etc/mtab
+
+# export DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
+# export LANG=C
+#
+# apt -y update
+# apt -y upgrade
+#
+# echo "root:machinekit" | chpasswd
+#
+# echo "ECHO: " "Will add user machinekit pw: machinekit"
+# /usr/sbin/useradd -s /bin/bash -d /home/machinekit -m machinekit
+# echo "machinekit:machinekit" | chpasswd
+# adduser machinekit sudo
+# chsh -s /bin/bash machinekit
+#
+# echo "ECHO: ""User Added"
+#
+# echo "ECHO: ""Will now add user to groups"
+# usermod -a -G '${DEFGROUPS}' machinekit
+# sync
+#
+# cat <<EOT >> /home/machinekit/.bashrc
+#
+# export LC_ALL=en_US.UTF-8
+# export LANG=en_US.UTF-8
+# export LANGUAGE=en_US.UTF-8
+# EOT
+
 
 #systemctl enable systemd-resolved
 #systemctl enable systemd-networkd
@@ -396,10 +444,10 @@ echo "deb http://deb.machinekit.io/debian jessie main" > /etc/apt/sources.list.d
 
 apt -y update
 
-apt -y install linux-headers-3.10.37-ltsi*
-apt -y install linux-image-3.10.37-ltsi*
+#apt -y install linux-headers-3.10.37-ltsi*
+#apt -y install linux-image-3.10.37-ltsi*
 
-apt -y install hm2reg-uio-dkms
+#apt -y install hm2reg-uio-dkms
 
 apt -y install machinekit-rt-preempt
 
@@ -421,6 +469,8 @@ fix_profile(){
 sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/fix-profile.sh
 #!/bin/bash
 
+set -x
+
 cat <<EOT >> /home/machinekit/.profile
 
 export LC_ALL=en_US.UTF-8
@@ -430,6 +480,7 @@ EOT
 
 exit
 EOF'
+
 sudo chmod +x ${ROOTFS_MNT}/home/fix-profile.sh
 
 sudo chroot ${ROOTFS_MNT} chown machinekit:machinekit /home/fix-profile.sh
@@ -444,6 +495,7 @@ function run_initial_sh {
 echo "------------------------------------------"
 echo "----  running initial.sh      ------------"
 echo "------------------------------------------"
+set -e
 
 sudo kpartx -a -s -v ${IMG_FILE}
 
@@ -461,29 +513,61 @@ sudo mount -t proc proc proc/
 sudo mount -t sysfs sys sys/
 sudo mount -o bind /dev dev/
 
+echo "ECHO: will add user"
+gen_add_user_sh
+echo "ECHO: gen_add_user_shfinhed ... will now run in chroot"
+
+sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/add_user.sh
+
+echo "ECHO: will fix profile locale"
+fix_profile
+
 gen_initial_sh
 echo "ECHO: gen_initial.sh finhed ... will now run in chroot"
 
 sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/initial.sh
 
-echo "will fix profile locale"
-fix_profile
-echo "profile locale fixed ... unmounting .."
+echo "ECHO: initial.sh finished ... unmounting .."
+
+sync
 
 cd ${CURRENT_DIR}
+
+echo "READY:"
+
 PREFIX=${ROOTFS_MNT}
 kill_ch_proc
 
-PREFIX=${ROOTFS_MNT}
-umount_ch_proc
+sudo umount -R ${ROOTFS_MNT}
 
+#
+# PREFIX=${ROOTFS_MNT}
+# umount_ch_proc
+#
 sync
 
 COMP_PREFIX=final
 compress_rootfs
 }
 
-function install_files {
+inst_kernel_modules() {
+
+# kernel modules -------#
+echo "MSG: will now change dir to:"
+echo "${KERNEL_DIR}"
+cd ${KERNEL_DIR}
+echo "MSG: current dir is:"
+pwd
+echo ""
+export CROSS_COMPILE=${CC}
+sudo make ARCH=arm CROSS_COMPILE=${CC} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+sudo make ARCH=arm CROSS_COMPILE=${CC} INSTALL_MOD_PATH=${ROOTFS_MNT} headers_install
+sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+#sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${ADC_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+}
+
+
+install_files() {
 echo "#-------------------------------------------------------------------------------#"
 echo "#-------------------------------------------------------------------------------#"
 echo "#-----------------------------          ----------------------------------------#"
@@ -521,19 +605,6 @@ fi
 #RHN:
 #sudo tar xfvp ${ROOTFS_DIR/armhf-rootfs-*.tar -C ${ROOTFS_MNT
 #set -x
-
-## kernel modules -------#
-# echo "MSG: will now change dir to:"
-# echo "${KERNEL_DIR}"
-# cd ${KERNEL_DIR}
-# echo "MSG: current dir is:"
-# pwd
-# echo ""
-# export CROSS_COMPILE=${CC}
-# sudo make ARCH=arm CROSS_COMPILE=${CC} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
-# #sudo make ARCH=arm CROSS_COMPILE=${CC} INSTALL_MOD_PATH=${ROOTFS_MNT} headers_install
-# sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
-# #sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${ADC_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
 #
 # echo "copying boot sector files"
 
@@ -548,8 +619,10 @@ sudo mkdir -p ${BOOT_MNT}
 # fi
 
 # kernel:
-#sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
-sudo cp ${BOOT_MNT}/vmlinuz-3.10* ${BOOT_MNT}/zImage
+sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
+#sudo cp ${BOOT_MNT}/vmlinuz-3.10* ${BOOT_MNT}/zImage
+
+inst_kernel_modules
 
 if [ -z "${PATCH_FILE}" ]; then
     echo "MSG: Installing Quartus dts dtb .rbf for 3.10 kernel"
@@ -598,7 +671,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 #install_deps # --->- only needed on first new run of a function see function above -------#
 
 #build_uboot
-#build_kernel
+build_kernel
 
 ## build_rcn_kernel           # ---> for now redundant ---#
 

@@ -11,11 +11,14 @@ CC_URL=${4}
 KERNEL_FOLDER_NAME=${5}
 KERNEL_URL=${6}
 KERNEL_BRANCH=${7}
-KERNEL_FILE_URL=${8}
-PATCH_URL=${9}
-PATCH_FILE=${10}
+PATCH_URL=${8}
+PATCH_FILE=${9}
 
 echo "NOTE: in build_kernel.sh param KERNEL_FOLDER_NAME = ${5}"
+echo "NOTE: KERNEL_URL = ${6}"
+echo "NOTE: KERNEL_BRANCH = ${7}"
+echo "NOTE: PATCH_URL = ${8}"
+echo "NOTE: PATCH_FILE = ${9}"
 
 ALT_SOC_KERNEL_PATCH_FILE=/socfpga-3.10-ltsi-rt-changeset.patch
 #----------- Git clone URL's ------------------------------------------#
@@ -179,8 +182,10 @@ fetch_kernel() {
         echo "creating ${KERNEL_BUILD_DIR}"
         mkdir -p ${KERNEL_BUILD_DIR}
         cd ${KERNEL_BUILD_DIR}
+    fi
+    if [ ! -f ${KERNEL_FILE} ]; then
         echo "fetching kernel"
-        wget ${KERNEL_FILE_URL}
+        wget ${KERNEL_URL}
     fi
     echo "extracting kernel"
     tar xf ${KERNEL_FILE}
@@ -222,6 +227,15 @@ CONFIG_PREEMPT_RT_FULL=y
 CONFIG_MARVELL_PHY=y
 CONFIG_FHANDLE=y
 CONFIG_LBDAF=y
+CONFIG_OF_OVERLAY=y
+CONFIG_GPIO_ALTERA=m
+CONFIG_GPIO_A10SYCON=y
+CONFIG_NEW_LEDS=y
+CONFIG_LEDS_CLASS=y
+CONFIG_LEDS_GPIO=y
+CONFIG_LEDS_TRIGGERS=y
+CONFIG_LEDS_TRIGGER_TIMER=y
+CONFIG_LEDS_TRIGGER_CPU=y
 #CONFIG_CFS_BANDWIDTH=y
 #CONFIG_CGROUPS=y
 #CONFIG_DEVPTS_MULTIPLE_INSTANCES=y
@@ -242,7 +256,7 @@ export CROSS_COMPILE=${CC}
 cd ${KERNEL_DIR}
 
 #clean
-sudo make -j${NCORES} mrproper
+make -j${NCORES} mrproper
 # configure
 make ARCH=arm ${KERNEL_CONF} CROSS_COMPILE=${CC} 2>&1 | tee ../linux-config_rt-log.txt
 #make ${KERNEL_CONF} 2>&1 | tee ../linux-config_rt-log.txt
