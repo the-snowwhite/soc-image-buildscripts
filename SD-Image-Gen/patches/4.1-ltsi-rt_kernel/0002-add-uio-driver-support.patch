@@ -1,0 +1,24 @@
+From ab2760dac10f1e176adca09d0564cf6958c9105f Mon Sep 17 00:00:00 2001
+From: the-snowwhite <producer@holotronic.dk>
+Date: Sat, 23 Apr 2016 16:37:59 +0200
+Subject: [PATCH 2/3] add uio driver support
+
+Signed-off-by: the-snowwhite <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 3065670..b045bb9 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -162,3 +162,6 @@ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_FUNCTION_TRACER=y
+ CONFIG_DEBUG_USER=y
+ CONFIG_XZ_DEC=y
++CONFIG_UIO=m
++CONFIG_UIO_PDRV=y
++CONFIG_UIO_PDRV_GENIRQ=y
+-- 
+2.8.0.rc3
+

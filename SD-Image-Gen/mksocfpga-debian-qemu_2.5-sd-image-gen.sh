@@ -64,9 +64,9 @@ IMG_ROOT_PART=p2
 UBOOT_VERSION="v2016.03"
 UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
-#BOARD=nano
+BOARD=nano
 #BOARD=de1
-BOARD=sockit
+#BOARD=sockit
 
 
 #-------------------------------------------
@@ -95,18 +95,22 @@ PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.
 ##--------- altera socfpga kernel --------------------------------------#
 ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
 #ALT_GIT_KERNEL_BRANCH="socfpga-3.10-ltsi-rt"
-ALT_GIT_KERNEL_BRANCH="socfpga-4.1-ltsi-rt"
+ALT_GIT_KERNEL_VERSION="4.1-ltsi-rt"
+ALT_GIT_KERNEL_BRANCH="socfpga-${ALT_GIT_KERNEL_VERSION}"
 
 #--------- Mainline rt patched kernel -----------------------------------------------------#
 #4.4-KERNEL
-KERNEL_44_FOLDER_NAME="linux-4.4.7"
-PATCH_44_FILE="patch-4.4.7-rt16.patch.gz"
-URL_PATCH_44="https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/"
+KERNEL_44_VERSION="4.4.7"
+KERNEL_44_FOLDER_NAME="${KERNEL_44_VERSION}-rt16"
+PATCH_44_FILE="patch-${KERNEL_44_FOLDER_NAME}.patch.xz"
+#URL_PATCH_44="https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/"
+URL_PATCH_44="ftp://ftp.kernel.org/pub/linux/kernel/projects/rt/4.4/"
 #--------- Longterm rt-ltsi kernel --------------------------------------------------------#
 ##  http://ltsi.linuxfoundation.org/releases/ltsi-tree/4.1.17-ltsi/stable-release
 ##  Download:  http://ltsi.linuxfoundation.org/sites/ltsi/files/patch-4.1.17-ltsi.gz
 ##  Source code:  http://git.linuxfoundation.org/?p=ltsi-kernel.git;a=summary
-KERNEL_LTSI_FOLDER_NAME="linux-4.1.17"
+KERNEL_LTSI_VERSION="4.1.17"
+KERNEL_LTSI_FOLDER_NAME="linux-${KERNEL_LTSI_VERSION}"
 PATCH_LTSI_FILE="patch-4.1.17-ltsi.gz"
 URL_PATCH_LTSI="http://ltsi.linuxfoundation.org/sites/ltsi/files/"
 #-------------- all kernel ----------------------------------------------------------------#
@@ -120,38 +124,43 @@ ADC_DIR=${MK_KERNEL_DRIVER_FOLDER}/adcreg
 # --- change kernel version config section: ----------------------------------#
 
 ## - for file fetched only ----------#
-#---> git cloned kernel is generated when this var is undefined.
 PATCH_FILE=${PATCH_44_FILE}
+#---> git cloned kernel is generated when url this var is undefined.
+#PATCH_URL="https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/${PATCH_FILE}"
 
 ## - for All kernels: ---------------#
 GIT_KERNEL_BRANCH=${ALT_GIT_KERNEL_BRANCH}
 echo ""
-if [ -z "${PATCH_FILE}" ]; then
+if [ -z "${PATCH_URL}" ]; then
 ## - for git only: ------------------#
-   echo "Using Git url and 4.9 toolchain"
+#   echo "Using Git url and 4.9 toolchain"
+   echo "Using Altera Git url and 5.2 toolchain"
+   KERNEL_VERSION=${ALT_GIT_KERNEL_VERSION}
    KERNEL_URL=${ALT_GIT_KERNEL_URL}
-   KERNEL_FOLDER_NAME=${ALT_GIT_KERNEL_FOLDER_NAME}
+   KERNEL_FOLDER_NAME=${ALT_GIT_KERNEL_BRANCH}
    #----- select global toolchain ------#
-   CC_FOLDER_NAME=${ALT49_CC_FOLDER_NAME}
-   CC_URL=${ALT49_CC_URL}
+#   CC_FOLDER_NAME=${ALT49_CC_FOLDER_NAME}
+#   CC_URL=${ALT49_CC_URL}
 else
    echo "Using File url and 5.2 toolchain"
+   KERNEL_VERSION=${KERNEL_44_VERSION}
    KERNEL_FOLDER_NAME=${KERNEL_44_FOLDER_NAME}
-   KERNEL_FILE=${KERNEL_FOLDER_NAME}.tar.xz
+   KERNEL_FILE=linux-${KERNEL_VERSION}.tar.xz
    KERNEL_FILE_URL="ftp://ftp.kernel.org/pub/linux/kernel/v4.x/${KERNEL_FILE}"
    KERNEL_URL=${KERNEL_FILE_URL}
-   #----- select global toolchain ------#
-   CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
-   CC_URL=$PCH52_CC_URL
 fi
+
+#----- select global toolchain ------#
+CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
+CC_URL=$PCH52_CC_URL
+
+
 echo ""
 
 # --- change kernel version config  end ------------------------------#
 # --- change kernel version config  end ------------------------------#
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
-
-PATCH_URL="https://www.kernel.org/pub/linux/kernel/projects/rt/4.4/${PATCH_FILE}"
 
 ROOTFS_MNT=/mnt/rootfs
 BOOT_MNT=${ROOTFS_MNT}/boot
@@ -162,7 +171,7 @@ BOOT_MNT=${ROOTFS_MNT}/boot
 
 UBOOT_SPLFILE=${CURRENT_DIR}/uboot/${UBOOT_MAKE_CONFIG}
 
-FILE_PRELUDE=${CURRENT_DIR}/mksocfpga_${distro}_${KERNEL_FOLDER_NAME}-${REL_DATE}
+FILE_PRELUDE=mksocfpga_${distro}_${KERNEL_FOLDER_NAME}-${REL_DATE}
 
 if [ "$BOARD" == "nano" ]; then
    UBOOT_BOARD='de0_nano_soc'
@@ -179,15 +188,19 @@ CC_DIR="${CURRENT_DIR}/${CC_FOLDER_NAME}"
 CC_FILE="${CC_FOLDER_NAME}.tar.xz"
 CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 
-IMG_FILE=${FILE_PRELUDE}-${BOARD}_sd.img
+IMG_NAME=${FILE_PRELUDE}-${BOARD}_sd.img
+IMG_FILE=${CURRENT_DIR}/${IMG_NAME}
 
-MK_RIPROOTFS_NAME=${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
+MK_RIPROOTFS_NAME=${CURRENT_DIR}/${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
 
 COMP_REL=${distro}_${KERNEL_FOLDER_NAME}
 
 KERNEL_BUILD_DIR=${CURRENT_DIR}/arm-linux-${KERNEL_FOLDER_NAME}-gnueabifh-kernel
 
 KERNEL_DIR=${KERNEL_BUILD_DIR}/linux
+
+HEADERS_DIR=/usr/src/${KERNEL_FOLDER_NAME}
+
 
 NCORES=`nproc`
 
@@ -243,7 +256,7 @@ ${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERS
 }
 
 function build_kernel {
-${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${KERNEL_URL} ${GIT_KERNEL_BRANCH} ${PATCH_URL} ${PATCH_FILE}
+${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${KERNEL_URL} ${GIT_KERNEL_BRANCH} ${KERNEL_VERSION} ${PATCH_URL}
 }
 
 build_patched_kernel() {
@@ -561,9 +574,14 @@ pwd
 echo ""
 export CROSS_COMPILE=${CC}
 sudo make ARCH=arm CROSS_COMPILE=${CC} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
-sudo make ARCH=arm CROSS_COMPILE=${CC} INSTALL_MOD_PATH=${ROOTFS_MNT} headers_install
-sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+sudo make ARCH=arm CROSS_COMPILE=${CC} M=${UIO_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+# sudo make ARCH=arm CROSS_COMPILE=${CC} M=${CURRENT_DIR}/dtbocfg INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+# sudo make ARCH=arm CROSS_COMPILE=${CC} M=${CURRENT_DIR}/fpgacfg INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
 #sudo make ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${ADC_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} modules_install
+# headers:
+#sudo make -j${NCORES} ARCH=arm INSTALL_HDR_PATH=${ROOTFS_MNT}/${HEADERS_DIR} headers_check 2>&1 | tee ../linux-headers_rt-log.txt
+#sudo make -j${NCORES} ARCH=arm INSTALL_HDR_PATH=${ROOTFS_MNT}/${HEADERS_DIR} INSTALL_MOD_PATH=${ROOTFS_MNT} headers_install
+sudo make -j${NCORES} ARCH=arm INSTALL_HDR_PATH=${ROOTFS_MNT}/${HEADERS_DIR} headers_install
 }
 
 
@@ -587,7 +605,9 @@ sudo mkdir -p ${ROOTFS_MNT}
 sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 
 # Rootfs -------#
-
+echo ""
+echo "NOTE: extracting ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2"
+echo ""
 sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
 ### if mk-rip install instead:
 #sudo tar xfj ${MK_RIPROOTFS_NAME} -C ${ROOTFS_MNT}
@@ -625,17 +645,24 @@ sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
 inst_kernel_modules
 
 if [ -z "${PATCH_FILE}" ]; then
-    echo "MSG: Installing Quartus dts dtb .rbf for 3.10 kernel"
+    echo "MSG: Installing Quartus dts dtb .rbf for ${KERNEL_FOLDER_NAME} kernel"
 #    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dts ${BOOT_MNT}/socfpga.dts
-#    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5.dtb ${BOOT_MNT}/socfpga.dtb
-    sudo cp -v -f ${BOOT_FILES_DIR}/socfpga.* ${BOOT_MNT}/
+    sudo sh -c "/usr/local/bin/fdtdump ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb > ${BOOT_MNT}/socfpga.dts"
+    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb ${BOOT_MNT}/socfpga.dtb
+#    sudo cp -v -f ${BOOT_FILES_DIR}/socfpga.* ${BOOT_MNT}/
+    sudo cp -v -f ${BOOT_FILES_DIR}/socfpga.rbf ${BOOT_MNT}/
 else
     echo "MSG: Installing 4.x.x kernel dts dtb and .rbf from Quartus"
-    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts ${BOOT_MNT}/socfpga.dts
+#    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts ${BOOT_MNT}/socfpga.dts
+    sudo sh -c "/usr/local/bin/fdtdump ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb > ${BOOT_MNT}/socfpga.dts"
     sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb ${BOOT_MNT}/socfpga.dtb
 # copy .rbf file from quartus:
     sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${BOOT_MNT}/socfpga.rbf
 fi
+
+# overlay firmware search path
+sudo mkdir -p ${ROOTFS_MNT}/lib/firmware
+sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${ROOTFS_MNT}/lib/firmware
 
 #sudo umount ${BOOT_MNT}
 #echo ""
@@ -653,12 +680,18 @@ sudo kpartx -d -s -v ${IMG_FILE}
 sync
 }
 
-function install_uboot {
+install_uboot() {
 echo "installing ${UBOOT_SPLFILE}"
 sudo dd bs=512 if=${UBOOT_SPLFILE} of=${IMG_FILE} seek=2048 conv=notrunc
 sync
 }
 
+make_bmap_image() {
+cd ${CURRENT_DIR}
+bmaptool create -o ${IMG_NAME}.bmap ${IMG_NAME}
+tar -cjSf ${IMG_NAME}.tar.bz2 ${IMG_NAME}
+tar -cjSf ${IMG_NAME}-bmap.tar.bz2 ${IMG_NAME}.tar.bz2 ${IMG_NAME}.bmap
+}
 
 #------------------............ config run functions section ..................-----------#
 echo "#---------------------------------------------------------------------------------- "
@@ -671,7 +704,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 #install_deps # --->- only needed on first new run of a function see function above -------#
 
 #build_uboot
-build_kernel
+#build_kernel
 
 ## build_rcn_kernel           # ---> for now redundant ---#
 
@@ -686,6 +719,7 @@ create_image
 
 install_files   # --> into sd-card-image (.img)
 install_uboot   # --> onto sd-card-image (.img)
+make_bmap_image
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "
