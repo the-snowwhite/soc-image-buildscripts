@@ -13,17 +13,19 @@ REL_CURRENT_DATE=`date -I`
 #ROOTFS_DIR=${WORK_DIR}/rootfs
 #IMG_FILE=${CURRENT_DIR}/mksoc_sdcard-beta2.img
 #IMG_FILE=${CURRENT_DIR}/mksoc_sdcard.img
-IMG_FILE=${CURRENT_DIR}/mksocfpga_jessie_linux-3.10-${REL_CURRENT_DATE}_sdcard.img
-IMG_ROOT_PART=p3
+#IMG_FILE=${CURRENT_DIR}/mksocfpga_jessie_linux-3.10-${REL_CURRENT_DATE}_sdcard.img
+IMG_FILE=${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-${REL_CURRENT_DATE}-nano_sd.img
+IMG_ROOT_PART=p2
 ROOTFS_MNT=/mnt/rootfs
-DRIVE=/dev/mapper/loop0
+DRIVE=/dev/mapper/loop2
 
 MK_SOURCEFILE_NAME=machinekit-src.tar.bz2
-MK_BUILDTFILE_NAME=machinekit-built.tar.bz2
+MK_BUILTFOLDER_NAME=machinekit-built-src
+MK_BUILTFILE_NAME=${MK_BUILTFOLDER_NAME}.tar.bz2
 
-MK_RIPROOTFS_NAME=mksocfpga_jessie_linux-3.10-${REL_CURRENT_DATE}_mk-rip-rootfs-final.tar.bz2
+MK_RIPROOTFS_NAME=mksocfpga_jessie_socfpga-4.1-ltsi-rt-${REL_CURRENT_DATE}_mk-rip-rootfs-final.tar.bz2
 
-# this is where the test build will go. 
+# this is where the test build will go.
 #MK_BUILDDIR=${ROOTFS_DIR}/machinekit/machinekit
 
 # git repository to pull from
@@ -35,7 +37,7 @@ ORIGIN=github-machinekit
 # the branch to build
 BRANCH=master
 
-# this is where the clone will be. 
+# this is where the clone will be.
 MK_CLONEDIR=${WORK_DIR}/machinekit
 
 install_clone_deps(){
@@ -49,9 +51,9 @@ mk_clone() {
 if [ -d "${MK_CLONEDIR}" ]; then
     echo the target directory ${MK_CLONEDIR} already exists.
     echo cleaning repo
-    cd ${MK_CLONEDIR} 
+    cd ${MK_CLONEDIR}
     git clean -d -f -x
-    cd ..    
+    cd ..
 #    echo please remove or rename this directory and run again.
 #    exit 1
 else
@@ -59,7 +61,7 @@ else
 # make sure you have around 200MB free space.
 
     git clone -b "${BRANCH}" -o "${ORIGIN}" --depth 1 "${REPO}" "${MK_CLONEDIR}"
-fi 
+fi
 }
 
 compress_clone(){
@@ -68,15 +70,27 @@ compress_clone(){
     tar -jcf "${MK_SOURCEFILE_NAME}" ./machinekit
 }
 
+compress_built_source(){
+    if [ -d ${WORK}/${MK_BUILTFOLDER_NAME} ]; then
+        echo "the target directory ${MK_BUILTFOLDER_NAME} exists ... pre build compressing"
+        cd ${WORK_DIR}
+        tar -jcf "${MK_BUILTFILE_NAME}" ./${MK_BUILTFOLDER_NAME}
+    fi
+}
+
 compress_mkrip_rootfs(){
     echo "compressing final mk-rip-rootfs"
-    
+
+    echo ""
+    echo "NOTE: will mount ${IMG_FILE}"
+    echo ""
+
     sudo kpartx -a -s -v ${IMG_FILE}
 
     sudo mkdir -p ${ROOTFS_MNT}
     sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 
-    
+
     cd ${ROOTFS_MNT}
     sudo tar -cjSf ${CURRENT_DIR}/${MK_RIPROOTFS_NAME} *
     cd ${WORK_DIR}
@@ -88,14 +102,18 @@ compress_mkrip_rootfs(){
 # cd ${HOME}
 # if [ -d machinekit ]; then
 #     echo "the target directory machinekit exists ... compressing"
-#     tar -jcf "${MK_BUILDTFILE_NAME}" ./machinekit
+#     tar -jcf "${MK_BUILTFILE_NAME}" ./machinekit
 # fi
 # }
 
 copy_files(){
 echo "copying build-script and machinekit tar.bz2"
+sudo mkdir -p ${ROOTFS_MNT}/home/machinekit/
 sudo cp -f ${SCRIPT_ROOT_DIR}/mk-rip-build.sh ${ROOTFS_MNT}/home/
-sudo cp -f ${WORK_DIR}/${MK_SOURCEFILE_NAME} $ROOTFS_MNT/home/machinekit/
+sudo cp -f ${WORK_DIR}/${MK_SOURCEFILE_NAME} ${ROOTFS_MNT}/home/machinekit/
+if [ -f ${WORK_DIR}/${MK_BUILTFILE_NAME} ]; then
+    sudo cp -f ${WORK_DIR}/${MK_BUILTFILE_NAME} ${ROOTFS_MNT}/home/machinekit/
+fi
 }
 
 gen_policy-rc.d() {
@@ -123,7 +141,8 @@ compress_mk_build(){
 cd /home/machinekit
 if [ -d machinekit ]; then
     echo "the target directory machinekit exists ... compressing"
-    tar -jcf "'${MK_BUILDTFILE_NAME}'" ./machinekit
+    sudo rm -f '${MK_BUILTFILE_NAME}'
+    tar -jcf '${MK_BUILTFILE_NAME}' ./machinekit
 fi
 }
 
@@ -176,6 +195,12 @@ while sudo grep -q "${PREFIX}" /proc/mounts; do
 done
 }
 
+run_setup_initial_files() {
+copy_files
+gen_build_sh
+gen_policy-rc.d
+}
+
 run_build_sh() {
 echo "mounting SD-Image"
 
@@ -188,17 +213,15 @@ sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 echo "------------------------------------------"
 echo "   copying files to root mount            "
 echo "------------------------------------------"
-#cd $ROOTFS_DIR
-#sudo tar cf - . | (sudo tar xf - -C $ROOTFS_MNT)
 
-copy_files
-gen_build_sh
-gen_policy-rc.d
+run_setup_initial_files
 
 echo "------------------------------------------"
 echo "running build.sh config script in chroot"
 echo "------------------------------------------"
 cd ${ROOTFS_MNT} # or where you are preparing the chroot dir
+
+
 sudo mount -t proc proc proc/
 sudo mount -t sysfs sys sys/
 sudo mount -o bind /dev dev/
@@ -221,14 +244,12 @@ if [ -f ${HOSTS_FILE} ]; then
     echo "renaming ${HOSTS_FILE}"
     sudo mv ${HOSTS_FILE} ${HOSTS_FILE}.bak
     echo "replacing ${HOSTS_FILE} with one from host"
-    sudo cp /etc/hosts ${HOSTS_FILE}    
+    sudo cp /etc/hosts ${HOSTS_FILE}
 else
-    sudo cp /etc/hosts ${HOSTS_FILE}    
+    sudo cp /etc/hosts ${HOSTS_FILE}
 fi
 
-cd ${ROOTFS_MNT}
-
-sudo chroot ./ /bin/su - machinekit /bin/bash -c /home/build.sh
+sudo chroot ${ROOTFS_MNT} /bin/su -l machinekit /bin/sh -c /home/build.sh
 
 if [ -f ${HOSTS_FILE}.bak ]; then
     echo "restoring ${HOSTS_FILE}"
@@ -241,7 +262,7 @@ sudo rm ${ROOTFS_MNT}/etc/resolv.conf
 cd ${CURRENT_DIR}
 
 
-sudo cp -f $ROOTFS_MNT/home/machinekit/${MK_BUILDTFILE_NAME}  ${WORK_DIR}
+sudo cp -f ${ROOTFS_MNT}/home/machinekit/${MK_BUILTFILE_NAME}  ${WORK_DIR}
 
 PREFIX=${ROOTFS_MNT}
 kill_ch_proc
@@ -252,7 +273,7 @@ umount_ch_proc
 echo "killed processes in mount now syncing..."
 sync
 
-sudo umount -R ${ROOTFS_MNT}
+#sudo umount -R ${ROOTFS_MNT}
 
 sync
 sudo kpartx -d -v ${IMG_FILE}
@@ -266,11 +287,12 @@ compress_mkrip_rootfs
 #----------- run functions -------------------------------------------------#
 #---------------------------------------------------------------------------#
 
-install_clone_deps
+#install_clone_deps
 
 ###mk_clone
 
 compress_clone
+compress_built_source
 
 run_build_sh
 

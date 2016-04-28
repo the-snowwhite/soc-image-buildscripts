@@ -10,8 +10,8 @@ IMG_FILE=$2
 
 #SD_IMG=${WORK_DIR}/mksoc_sdcard.img
 ROOTFS_IMG=${WORK_DIR}/rootfs.img
-DRIVE=/dev/mapper/loop0
-
+DRIVE=/dev/mapper/loop2
+F_DRIVE=`eval /sbin/losetup -f`
 ROOTFS_TYPE=ext4
 ROOTFS_LABEL=rootfs
 
@@ -27,7 +27,7 @@ mkfs_label="-L ${ROOTFS_LABEL}"
 
 
 fdisk_2part() {
-sudo fdisk /dev/loop0 << EOF
+sudo fdisk ${F_DRIVE} << EOF
 n
 p
 1
@@ -45,7 +45,7 @@ EOF
 }
 
 fdisk_3part() {
-sudo fdisk /dev/loop0 << EOF
+sudo fdisk ${F_DRIVE} << EOF
 n
 p
 1

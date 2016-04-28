@@ -38,6 +38,7 @@ de1folder=DE1_SOC_GHRD
 
 DRIVE=/dev/mapper/loop2
 
+
 MK_BUILDTFILE_NAME=machinekit-built.tar.bz2
 
 
@@ -188,7 +189,8 @@ CC_DIR="${CURRENT_DIR}/${CC_FOLDER_NAME}"
 CC_FILE="${CC_FOLDER_NAME}.tar.xz"
 CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 
-IMG_NAME=${FILE_PRELUDE}-${BOARD}_sd.img
+#IMG_NAME=${FILE_PRELUDE}-${BOARD}_sd.img
+IMG_NAME=debian-8.4-machinekit-de0-armhf-2016-04-27-4gb_mib.img
 IMG_FILE=${CURRENT_DIR}/${IMG_NAME}
 
 MK_RIPROOTFS_NAME=${CURRENT_DIR}/${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
@@ -603,13 +605,14 @@ sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 
 # Rootfs -------#
 echo ""
-echo "NOTE: extracting ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2"
+#echo "NOTE: extracting ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 --> into sd-image"
 echo ""
 
 #sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
 ### if mk-rip install instead:
-sudo tar xfj ${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-2016-04-28_mk-rip-rootfs-final.tar.bz2 -C ${ROOTFS_MNT}
-
+#sudo tar xfj ${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-2016-04-28_mk-rip-rootfs-final.tar.bz2 -C ${ROOTFS_MNT}
+echo "NOTE: extracting ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 --> into sd-image"
+sudo tar xfj ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 -C ${ROOTFS_MNT}
 
 #sudo tar xfj ${MK_RIPROOTFS_NAME} -C ${ROOTFS_MNT}
 
@@ -662,9 +665,9 @@ else
 fi
 
 # overlay firmware search path
-sudo mkdir -p ${ROOTFS_MNT}/lib/firmware
-sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${ROOTFS_MNT}/lib/firmware
-sudo cp -v ${CURRENT_DIR}/test/hm2reg_uio.dtbo ${ROOTFS_MNT}/lib/firmware
+sudo mkdir -p ${ROOTFS_MNT}/lib/firmware/mksocfpga/dtbo
+sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${ROOTFS_MNT}/lib/firmware/mksocfpga
+sudo cp -v ${CURRENT_DIR}/test/hm2reg_uio.dtbo ${ROOTFS_MNT}/lib/firmware/mksocfpga/dtbo
 
 #sudo umount ${BOOT_MNT}
 #echo ""
@@ -715,17 +718,23 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 ## fetch_extract_rcn_rootfs   # ---> for now redundant ---#
 
-#create_image
+create_image
 
 #run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 
 #inst_mk_from_deb
 
-#install_files   # --> into sd-card-image (.img)
+
+#COMP_PREFIX=mharber-dev-deb
+#compress_rootfs
+
+install_files   # --> into sd-card-image (.img)
 
 #    sudo sh -c "apt -y install `apt-cache depends machinekit-rt-preempt | awk '/Depends:/{print$2}'`"
 
-#install_uboot   # --> onto sd-card-image (.img)
+install_uboot   # --> onto sd-card-image (.img)
+
+echo "NOTE:  Will now run make bmap image"
 make_bmap_image
 
 echo "#---------------------------------------------------------------------------------- "
