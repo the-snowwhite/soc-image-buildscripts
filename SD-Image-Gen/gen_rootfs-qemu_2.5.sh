@@ -14,7 +14,7 @@ MOUNT_DIR=
 ROOTFS_MNT=/mnt/rootfs
 
 ROOTFS_IMG=${WORK_DIR}/rootfs.img
-DRIVE=/dev/mapper/loop0
+DRIVE=/dev/mapper/loop2
 
 
 DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
@@ -113,10 +113,11 @@ gen_fstab(){
 sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/etc/fstab
 # /etc/fstab: static file system information.
 #
-# <file system> <mount point>   <type>  <options>       <dump>  <pass>
-/dev/root      /               ext4    noatime,errors=remount-ro 0 1
-tmpfs          /tmp            tmpfs   defaults                  0 0
-none           /dev/shm        tmpfs   rw,nosuid,nodev,noexec    0 0
+# <file system>    <mount point>   <type>  <options>       <dump>  <pass>
+/dev/root          /               ext4    noatime,errors=remount-ro 0 1
+tmpfs              /tmp            tmpfs   defaults                  0 0
+none               /dev/shm        tmpfs   rw,nosuid,nodev,noexec    0 0
+/sys/kernel/config /config         none    bind                      0 0
 EOT'
 
 }

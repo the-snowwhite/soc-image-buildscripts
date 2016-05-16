@@ -189,8 +189,8 @@ CC_DIR="${CURRENT_DIR}/${CC_FOLDER_NAME}"
 CC_FILE="${CC_FOLDER_NAME}.tar.xz"
 CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 
-#IMG_NAME=${FILE_PRELUDE}-${BOARD}_sd.img
-IMG_NAME=debian-8.4-machinekit-de0-armhf-2016-04-27-4gb_mib.img
+IMG_NAME=${FILE_PRELUDE}-${BOARD}_sd.img
+#IMG_NAME=debian-8.4-machinekit-de0-armhf-2016-04-27-4gb_mib.img
 IMG_FILE=${CURRENT_DIR}/${IMG_NAME}
 
 MK_RIPROOTFS_NAME=${CURRENT_DIR}/${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
@@ -396,10 +396,24 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 EOT
 
+cat <<EOT >> /home/machinekit/.profile
+
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+EOT
+
+
 exit
 EOF'
 
 sudo chmod +x ${ROOTFS_MNT}/home/add_user.sh
+
+sudo chroot ${ROOTFS_MNT} /bin/su -l root /usr/sbin/locale-gen en_GB.UTF-8 en_US.UTF-8
+
+# fix user ping:
+sudo chmod u+s ${ROOTFS_MNT}/bin/ping ${ROOTFS_MNT}/bin/ping6
+
 }
 
 
@@ -473,27 +487,78 @@ sudo chroot ${ROOTFS_MNT} /bin/su -l root /usr/sbin/locale-gen en_GB.UTF-8 en_US
 sudo chmod u+s ${ROOTFS_MNT}/bin/ping ${ROOTFS_MNT}/bin/ping6
 }
 
-inst_mk_from_deb() {
+inst_kernel_from_deb() {
 sudo kpartx -a -s -v ${IMG_FILE}
 
 sudo mkdir -p ${ROOTFS_MNT}
 sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
+
+sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
 cd ${ROOTFS_MNT} # or where you are preparing the chroot dir
 sudo mount -t proc proc proc/
 sudo mount -t sysfs sys sys/
 sudo mount -o bind /dev dev/
 
-#apt -y install machinekit-rt-preempt
 #apt -y install hm2reg-uio-dkms
 
-sudo chroot ${ROOTFS_MNT} /bin/su -l root /usr/bin/apt -y install hm2reg-uio-dkms machinekit-rt-preempt
+#sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install apt-transport-https
+sudo sh -c 'echo "deb [arch=armhf] https://deb.mah.priv.at/ jessie socfpga" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/debmah.list'
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y update
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 4FD9D713
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y update
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y upgrade
+
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install linux-headers-socfpga-rt
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install linux-image-socfpga-rt
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install hm2reg-uio-dkms
 
 #apt -y install linux-headers-3.10.37-ltsi*
 #apt -y install linux-image-3.10.37-ltsi*
 
 PREFIX=${ROOTFS_MNT}
 kill_ch_proc
+
+sudo chroot --userspec=root:root ${ROOTFS_MNT} rm -f /etc/resolv.conf
+
+# enable systemd-resolved
+sudo chroot --userspec=root:root ${ROOTFS_MNT} ln -s /lib/systemd/system/systemd-resolved.service /etc/systemd/system/multi-user.target.wants/systemd-resolved.service
+
+sudo umount -R ${ROOTFS_MNT}
+
+sync
+
+COMP_PREFIX=final-kernel-from-deb
+compress_rootfs
+}
+
+inst_mk_from_deb() {
+sudo kpartx -a -s -v ${IMG_FILE}
+
+sudo mkdir -p ${ROOTFS_MNT}
+sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
+
+sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
+
+cd ${ROOTFS_MNT} # or where you are preparing the chroot dir
+sudo mount -t proc proc proc/
+sudo mount -t sysfs sys sys/
+sudo mount -o bind /dev dev/
+#sudo apt install linux-libc-dev-socfpga-rt linux-headers-socfpga-rt linux-image-socfpga-rt
+
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install machinekit-rt-preempt
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install machinekit-dev
+
+#apt -y install linux-headers-3.10.37-ltsi*
+#apt -y install linux-image-3.10.37-ltsi*
+
+PREFIX=${ROOTFS_MNT}
+kill_ch_proc
+
+sudo chroot --userspec=root:root ${ROOTFS_MNT} rm -f /etc/resolv.conf
+
+# enable systemd-resolved
+sudo chroot --userspec=root:root ${ROOTFS_MNT} ln -s /lib/systemd/system/systemd-resolved.service /etc/systemd/system/multi-user.target.wants/systemd-resolved.service
 
 sudo umount -R ${ROOTFS_MNT}
 
@@ -525,14 +590,19 @@ sudo mount -t proc proc proc/
 sudo mount -t sysfs sys sys/
 sudo mount -o bind /dev dev/
 
+echo "ECHO: installing apt-transport-https"
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y update
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y upgrade
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install apt-transport-https
+
 echo "ECHO: will add user"
 gen_add_user_sh
 echo "ECHO: gen_add_user_shfinhed ... will now run in chroot"
 
 sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/add_user.sh
 
-echo "ECHO: will fix profile locale"
-fix_profile
+#echo "ECHO: will fix profile locale"
+#fix_profile
 
 gen_initial_sh
 echo "ECHO: gen_initial.sh finhed ... will now run in chroot"
@@ -545,7 +615,7 @@ sync
 
 cd ${CURRENT_DIR}
 
-echo "READY:"
+echo "READY: unmounting"
 
 PREFIX=${ROOTFS_MNT}
 kill_ch_proc
@@ -604,15 +674,18 @@ sudo mkdir -p ${ROOTFS_MNT}
 sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 
 # Rootfs -------#
-echo ""
-#echo "NOTE: extracting ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 --> into sd-image"
-echo ""
+COMPNAME=${COMP_REL}_${COMP_PREFIX}
 
-#sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+echo ""
+echo "NOTE: extracting ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 --> into sd-image"
+echo ""
+sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+
 ### if mk-rip install instead:
 #sudo tar xfj ${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-2016-04-28_mk-rip-rootfs-final.tar.bz2 -C ${ROOTFS_MNT}
-echo "NOTE: extracting ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 --> into sd-image"
-sudo tar xfj ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+
+#echo "NOTE: extracting ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 --> into sd-image"
+#sudo tar xfj ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 -C ${ROOTFS_MNT}
 
 #sudo tar xfj ${MK_RIPROOTFS_NAME} -C ${ROOTFS_MNT}
 
@@ -643,10 +716,10 @@ sudo mkdir -p ${BOOT_MNT}
 # fi
 
 # kernel:
-sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
-#sudo cp ${BOOT_MNT}/vmlinuz-3.10* ${BOOT_MNT}/zImage
+#sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
+sudo cp ${BOOT_MNT}/vmlinuz-4.1* ${BOOT_MNT}/zImage
 
-inst_kernel_modules
+#inst_kernel_modules
 
 if [ -z "${PATCH_FILE}" ]; then
     echo "MSG: Installing Quartus dts dtb .rbf for ${KERNEL_FOLDER_NAME} kernel"
@@ -657,7 +730,7 @@ if [ -z "${PATCH_FILE}" ]; then
     sudo cp -v -f ${BOOT_FILES_DIR}/socfpga.rbf ${BOOT_MNT}/
 else
     echo "MSG: Installing 4.x.x kernel dts dtb and .rbf from Quartus"
-#    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts ${BOOT_MNT}/socfpga.dts
+#q    sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts ${BOOT_MNT}/socfpga.dts
     sudo sh -c "/usr/local/bin/fdtdump ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb > ${BOOT_MNT}/socfpga.dts"
     sudo cp -v ${KERNEL_DIR}/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dtb ${BOOT_MNT}/socfpga.dtb
 # copy .rbf file from quartus:
@@ -665,9 +738,9 @@ else
 fi
 
 # overlay firmware search path
-sudo mkdir -p ${ROOTFS_MNT}/lib/firmware/mksocfpga/dtbo
-sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${ROOTFS_MNT}/lib/firmware/mksocfpga
-sudo cp -v ${CURRENT_DIR}/test/hm2reg_uio.dtbo ${ROOTFS_MNT}/lib/firmware/mksocfpga/dtbo
+sudo mkdir -p ${ROOTFS_MNT}/lib/firmware/socfpga/dtbo
+sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${ROOTFS_MNT}/lib/firmware/socfpga
+sudo cp -v ${CURRENT_DIR}/test/hm2reg_uio.dtbo ${ROOTFS_MNT}/lib/firmware/socfpga/dtbo
 
 #sudo umount ${BOOT_MNT}
 #echo ""
@@ -702,7 +775,7 @@ tar -cjSf ${IMG_NAME}-bmap.tar.bz2 ${IMG_NAME}.tar.bz2 ${IMG_NAME}.bmap
 echo "#---------------------------------------------------------------------------------- "
 echo "#-----------+++     Full Image building process start       +++-------------------- "
 echo "#---------------------------------------------------------------------------------- "
-set -e
+set -x
 
 if [ ! -z "${WORK_DIR}" ]; then
 
@@ -718,17 +791,19 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 ## fetch_extract_rcn_rootfs   # ---> for now redundant ---#
 
-create_image
+#create_image
 
 #run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 
+#inst_kernel_from_deb
 #inst_mk_from_deb
 
 
-#COMP_PREFIX=mharber-dev-deb
+#  COMP_PREFIX=mharber-dev-deb
+#COMP_PREFIX=mib-rel_2-beta-inst_kernel_from_deb
 #compress_rootfs
 
-install_files   # --> into sd-card-image (.img)
+#install_files   # --> into sd-card-image (.img)
 
 #    sudo sh -c "apt -y install `apt-cache depends machinekit-rt-preempt | awk '/Depends:/{print$2}'`"
 
