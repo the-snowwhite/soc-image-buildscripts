@@ -289,13 +289,13 @@ compress_mkrip_rootfs
 
 #install_clone_deps
 
-###mk_clone
+#mk_clone
 
-compress_clone
-compress_built_source
+#compress_clone
+#compress_built_source
 
 run_build_sh
 
-##run_re_build_sh
+#run_re_build_sh
 echo "#+++   run.sh completed     ++++++++++++++++++#"
 echo "#------ Machinekit Rip build completed -------#"

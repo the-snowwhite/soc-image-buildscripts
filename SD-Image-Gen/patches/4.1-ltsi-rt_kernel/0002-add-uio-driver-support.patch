@@ -1,7 +1,7 @@
-From ab2760dac10f1e176adca09d0564cf6958c9105f Mon Sep 17 00:00:00 2001
+From 2eacc923505feb095719727b8d99d0409b472f72 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sat, 23 Apr 2016 16:37:59 +0200
-Subject: [PATCH 2/3] add uio driver support
+Subject: [PATCH 2/4] add uio driver support
 
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
 ---
@@ -20,5 +20,5 @@ index 3065670..b045bb9 100644
 +CONFIG_UIO_PDRV=y
 +CONFIG_UIO_PDRV_GENIRQ=y
 -- 
-2.8.0.rc3
+2.8.1
 

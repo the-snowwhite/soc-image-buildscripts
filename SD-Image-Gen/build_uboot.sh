@@ -11,21 +11,22 @@ WORK_DIR=${1}
 SCRIPT_ROOT_DIR=${2}
 UBOOT_VERSION=${3}
 BOARD=${4}
-MAKE_CONFIG=${5}
+UBOOT_BOARD=${5}
+MAKE_CONFIG=${6}
 
-CC_FOLDER_NAME=${6}
-CC_URL=${7}
+CC_FOLDER_NAME=${7}
+PATCH=${8}
 
 #UBOOT_VERSION='v2015.10'
 #UBOOT_VERSION='v2016.01'
 CHKOUT_OPTIONS=''
 #CHKOUT_OPTIONS='-b tmp'
 
-BOARD_CONFIG="socfpga_${BOARD}_defconfig"
+BOARD_CONFIG="socfpga_${UBOOT_BOARD}_defconfig"
 
 
 # 2016.0X patches:
-PATCH_FILE="u-boot-${UBOOT_VERSION}-changeset.patch"
+PATCH_FILE="u-boot-${UBOOT_VERSION}-${BOARD}-changeset.patch"
 
 UBOOT_DIR=${WORK_DIR}/uboot
 
@@ -33,47 +34,26 @@ UBOOT_DIR=${WORK_DIR}/uboot
 # u-boot, toolchain, imagegen vars
 #-------------------------------------------
 #--------- altera socfpga kernel --------------------------------------#
-#CC_FOLDER_NAME="gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux"
-#CC_DIR="${WORK_DIR}/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux"
-#CC_FILE="${CC_DIR}.tar.bz2"
-#CC_URL="https://releases.linaro.org/14.09/components/toolchain/binaries/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux.tar.xz"
 
-#--------- patched kernel ---------------------------------------------#
+#--------- Toolchain  -------------------------------------------------#
 
 CC_DIR="${WORK_DIR}/${CC_FOLDER_NAME}"
-CC_FILE="${CC_FOLDER_NAME}.tar.xz"
-
-#----------------------------------------------------------------------#
 
 CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
+
+#----------------------------------------------------------------------#
 
 
 NCORES=`nproc`
 
-extract_toolchain() {
-    echo "MSG: using tar for xz extract"
-    tar xf ${CC_FILE}
-}
-
-
-get_toolchain() {
-# download linaro cross compiler toolchain
-
-if [ ! -d ${CC_DIR} ]; then
-    if [ ! -f ${CC_FILE} ]; then
-        echo "MSG: downloading toolchain"
-    	wget -c ${CC_URL}
-    fi
-# extract linaro cross compiler toolchain
-# uses multicore extract (lbzip2) if available(set via links in /usr/sbin)
-    echo "MSG: extracting toolchain"
-    extract_toolchain
-fi
-}
-
 patch_uboot() {
-cd $UBOOT_DIR
-git am --signoff <  $SCRIPT_ROOT_DIR/$PATCH_FILE
+if [ ! -z "$PATCH" ]; then
+	echo "MGG: Applying u-boot patch ${PATCH_FILE}"
+	cd $UBOOT_DIR
+	git am --signoff <  $SCRIPT_ROOT_DIR/$PATCH_FILE
+else
+	echo "MSG: No u-boot patch applied"
+fi
 }
 
 fetch_uboot() {
@@ -129,7 +109,6 @@ set -e
 
 if [ ! -z "$WORK_DIR" ]; then
     cd $WORK_DIR
-    get_toolchain
     fetch_uboot
 
     build_uboot

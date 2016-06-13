@@ -1,7 +1,7 @@
-From 81b83e4d527b5acdce99d201efbe367575ac8848 Mon Sep 17 00:00:00 2001
+From dea006c4aefe32baac50fc9320dc5e1fc28743c6 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Mon, 25 Apr 2016 15:14:08 +0200
-Subject: [PATCH 3/3] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 3/4] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support options
 
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
@@ -25,5 +25,5 @@ index b045bb9..3db7618 100644
 +CONFIG_OF_OVERLAY=y
 \ No newline at end of file
 -- 
-2.8.0.rc3
+2.8.1
 

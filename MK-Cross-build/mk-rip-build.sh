@@ -129,7 +129,7 @@ install_mk_fresh_deps() {
 sudo apt -y update
 sudo apt -y upgrade
 #
-# sudo apt -y install libudev-dev libmodbus-dev libboost-python-dev libusb-1.0-0-dev autoconf pkg-config glib-2.0 gtk+-2.0 tcllib tcl-dev tk-dev bwidget libxaw7-dev libreadline6-dev python-tk libqt4-opengl libqt4-opengl-dev libtk-img python-opengl glade python-xlib python-gtkglext1 python-configobj python-vte libglade2-dev python-glade2 python-gtksourceview2 libncurses-dev libreadline-dev libboost-serialization-dev libboost-thread-dev libjansson-dev lsb-release git dpkg-dev rsyslog automake uuid-runtime ccache  avahi-daemon avahi-discover libnss-mdns bc cython netcat
+sudo apt -y install libudev-dev libmodbus-dev libboost-python-dev libusb-1.0-0-dev autoconf pkg-config glib-2.0 gtk+-2.0 tcllib tcl-dev tk-dev bwidget libxaw7-dev libreadline6-dev python-tk libqt4-opengl libqt4-opengl-dev libtk-img python-opengl glade python-xlib python-gtkglext1 python-configobj python-vte libglade2-dev python-glade2 python-gtksourceview2 libncurses-dev libreadline-dev libboost-serialization-dev libboost-thread-dev libjansson-dev lsb-release git dpkg-dev rsyslog automake uuid-runtime ccache  avahi-daemon avahi-discover libnss-mdns bc cython netcat
 #
 sudo apt -y install python-zmq libjansson-dev python-pyftpdlib libzmq3-dev libprotobuf-dev python-protobuf protobuf-compiler liburiparser-dev libssl-dev  libavahi-client-dev
 #
@@ -209,7 +209,7 @@ fi
 mk_inst_dev_eq() {
 # fail the script on any error
 
-#sudo apt -y install liburiparser-dev libssl-dev uuid-dev
+sudo apt -y install liburiparser-dev libssl-dev uuid-dev
 
 set -v -x
 
@@ -261,7 +261,7 @@ echo now in directory: `pwd`
 # git status
 
 # configure and build
-./autogen.sh
+sh autogen.sh
 
 ./configure ${CONFIG_ARGS}
 
@@ -292,23 +292,23 @@ mk_re_build() {
 set -v -x
 
 cd "$SCRATCH/src"
-sudo cp ./rtapi/rsyslogd-linuxcnc.conf /etc/rsyslog.d/linuxcnc.conf
-sudo touch  /var/log/linuxcnc.log
-sudo chmod 644 /var/log/linuxcnc.log
-sudo service rsyslog restart
-sudo cp ./rtapi/shmdrv/limits.d-machinekit.conf /etc/security/limits.d/linuxcnc.conf
-sudo cp ./rtapi/shmdrv/shmdrv.rules /etc/udev/rules.d/50-LINUXCNC-shmdrv.rules
+# sudo cp ./rtapi/rsyslogd-linuxcnc.conf /etc/rsyslog.d/linuxcnc.conf
+# sudo touch  /var/log/linuxcnc.log
+# sudo chmod 644 /var/log/linuxcnc.log
+# sudo service rsyslog restart
+# sudo cp ./rtapi/shmdrv/limits.d-machinekit.conf /etc/security/limits.d/linuxcnc.conf
+# sudo cp ./rtapi/shmdrv/shmdrv.rules /etc/udev/rules.d/50-LINUXCNC-shmdrv.rules
 
 # setup ccache:
 #env CC="ccache gcc" CXX="ccache"
 
 CORES=`nproc`
 
-cd "$SCRATCH"
-echo now in directory: `pwd`
-
-debian/configure -pr -t 8.6
-sudo sh -c 'echo "y" | mk-build-deps -ir'
+# cd "$SCRATCH"
+# echo now in directory: `pwd`
+#
+# debian/configure -pr -t 8.6
+# sudo sh -c 'echo "y" | mk-build-deps -ir'
 #sudo mk-build-deps -ir
 
 echo building in "$SCRATCH/src"
@@ -328,29 +328,29 @@ echo now in directory: `pwd`
 make clean -j $CORES
 
 # configure and build
-./autogen.sh
+sh autogen.sh
 
 ./configure ${CONFIG_ARGS}
 
 make -j $CORES
-
-# Check for sudo
-if which sudo >/dev/null 2>&1 ; then
-    if sudo -l make setuid >/dev/null 2>&1 ; then
-        sudo make setuid
-    else
-        echo "Cannot run \"sudo make setuid\""
-        echo "Please run the following commands as root:"
-        echo "  cd $SCRATCH/src"
-        echo "  sudo make setuid"
-    fi
-else
-    echo "sudo not found"
-    echo "please run the following commands as root:"
-    echo "  cd $SCRATCH/src"
-    echo "  sudo make setuid"
-fi
-
+#
+# # Check for sudo
+# if which sudo >/dev/null 2>&1 ; then
+#     if sudo -l make setuid >/dev/null 2>&1 ; then
+#         sudo make setuid
+#     else
+#         echo "Cannot run \"sudo make setuid\""
+#         echo "Please run the following commands as root:"
+#         echo "  cd $SCRATCH/src"
+#         echo "  sudo make setuid"
+#     fi
+# else
+#     echo "sudo not found"
+#     echo "please run the following commands as root:"
+#     echo "  cd $SCRATCH/src"
+#     echo "  sudo make setuid"
+# fi
+#
 echo make completed
 }
 

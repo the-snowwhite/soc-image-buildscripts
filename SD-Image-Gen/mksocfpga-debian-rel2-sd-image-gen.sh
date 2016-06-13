@@ -62,8 +62,9 @@ IMG_ROOT_PART=p2
 #UBOOT_VERSION="v2016.01"
 #UBOOT_MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
 
-UBOOT_VERSION="v2016.03"
+UBOOT_VERSION="v2016.05"
 UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
+PATCH_UBOOT=yes
 
 BOARD=nano
 #BOARD=de1
@@ -244,6 +245,23 @@ install_rootfs_dep() {
     sudo update-binfmts --display | grep interpreter
 }
 
+extract_toolchain() {
+    echo "MSG: using tar for xz extract"
+    tar xf ${CC_FILE}
+}
+
+get_toolchain() {
+# download linaro cross compiler toolchain
+if [ ! -d ${CC_DIR} ]; then
+    if [ ! -f ${CC_FILE} ]; then
+        echo "MSG: downloading toolchain"
+    	wget -c ${CC_URL}
+    fi
+# extract linaro cross compiler toolchain
+    echo "MSG: extracting toolchain"
+    extract_toolchain
+fi
+}
 
 install_deps() {
 install_uboot_dep
@@ -254,7 +272,8 @@ echo "deps installed"
 }
 
 function build_uboot {
-${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG} ${CC_FOLDER_NAME} ${CC_URL}
+    get_toolchain
+	${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${BOARD}  ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG} ${CC_FOLDER_NAME} ${PATCH_UBOOT}
 }
 
 function build_kernel {
@@ -493,6 +512,12 @@ sudo kpartx -a -s -v ${IMG_FILE}
 sudo mkdir -p ${ROOTFS_MNT}
 sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 
+## extract final-rootfs into image:
+echo "extracting latest final rootfs into image"
+#sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_raw--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+#sudo tar xfj ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+sudo tar xfj ${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-2016-06-07_mk-rip-rootfs-final.tar.bz2 -C ${ROOTFS_MNT}
+
 sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
 cd ${ROOTFS_MNT} # or where you are preparing the chroot dir
@@ -509,12 +534,9 @@ sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt-key adv --keyserver 
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y update
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y upgrade
 
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install linux-headers-socfpga-rt
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install linux-image-socfpga-rt
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install hm2reg-uio-dkms
-
-#apt -y install linux-headers-3.10.37-ltsi*
-#apt -y install linux-image-3.10.37-ltsi*
+#sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install linux-headers-socfpga-rt
+#sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install linux-image-socfpga-rt
+#  ##sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install hm2reg-uio-dkms
 
 PREFIX=${ROOTFS_MNT}
 kill_ch_proc
@@ -545,12 +567,10 @@ sudo mount -t proc proc proc/
 sudo mount -t sysfs sys sys/
 sudo mount -o bind /dev dev/
 #sudo apt install linux-libc-dev-socfpga-rt linux-headers-socfpga-rt linux-image-socfpga-rt
-
+#sudo sh -c 'echo "options uio_pdrv_genirq of_id=hm2reg_io,generic-uio,ui_pdrv" > '${ROOTFS_MNT}'/etc/modprobe.d/uiohm2.conf'
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt update
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install machinekit-rt-preempt
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install machinekit-dev
-
-#apt -y install linux-headers-3.10.37-ltsi*
-#apt -y install linux-image-3.10.37-ltsi*
+#sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install machinekit-dev
 
 PREFIX=${ROOTFS_MNT}
 kill_ch_proc
@@ -674,30 +694,32 @@ sudo mkdir -p ${ROOTFS_MNT}
 sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 
 # Rootfs -------#
-COMPNAME=${COMP_REL}_${COMP_PREFIX}
-
-echo ""
-echo "NOTE: extracting ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 --> into sd-image"
-echo ""
-sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
-
-### if mk-rip install instead:
-#sudo tar xfj ${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-2016-04-28_mk-rip-rootfs-final.tar.bz2 -C ${ROOTFS_MNT}
-
-#echo "NOTE: extracting ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 --> into sd-image"
-#sudo tar xfj ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 -C ${ROOTFS_MNT}
-
-#sudo tar xfj ${MK_RIPROOTFS_NAME} -C ${ROOTFS_MNT}
-
-# MKRip -------#
-MK_BUILDTFILE_NAME="do-not-install"
-
-if [ -f ${MK_BUILDTFILE_NAME} ]; then #if file with that name exista
-    echo "installing ${MK_BUILDTFILE_NAME}"
-#    sudo mkdir -p ${ROOTFS_MNT}/home/machinekit/machinekit
-#    sudo tar xfj ${CURRENT_DIR}/${MK_BUILDTFILE_NAME} -C ${ROOTFS_MNT}/home/machinekit/machinekit
-    sudo tar xfj ${CURRENT_DIR}/${MK_BUILDTFILE_NAME} -C ${ROOTFS_MNT}/home/machinekit
-fi
+# COMPNAME=${COMP_REL}_${COMP_PREFIX}
+#
+# echo ""
+# echo "NOTE: extracting ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 --> into sd-image"
+# echo ""
+# #sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+# sudo tar xfj ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mib-hm3-mk-rip-inst_rootfs--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+#
+#
+# ### if mk-rip install instead:
+# #sudo tar xfj ${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-2016-04-28_mk-rip-rootfs-final.tar.bz2 -C ${ROOTFS_MNT}
+#
+# #echo "NOTE: extracting ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 --> into sd-image"
+# #sudo tar xfj ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_mharber-dev-deb--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+#
+# #sudo tar xfj ${MK_RIPROOTFS_NAME} -C ${ROOTFS_MNT}
+#
+# # MKRip -------#
+# MK_BUILDTFILE_NAME="do-not-install"
+#
+# if [ -f ${MK_BUILDTFILE_NAME} ]; then #if file with that name exista
+#     echo "installing ${MK_BUILDTFILE_NAME}"
+# #    sudo mkdir -p ${ROOTFS_MNT}/home/machinekit/machinekit
+# #    sudo tar xfj ${CURRENT_DIR}/${MK_BUILDTFILE_NAME} -C ${ROOTFS_MNT}/home/machinekit/machinekit
+#     sudo tar xfj ${CURRENT_DIR}/${MK_BUILDTFILE_NAME} -C ${ROOTFS_MNT}/home/machinekit
+# fi
 
 #RHN:
 #sudo tar xfvp ${ROOTFS_DIR/armhf-rootfs-*.tar -C ${ROOTFS_MNT
@@ -716,10 +738,10 @@ sudo mkdir -p ${BOOT_MNT}
 # fi
 
 # kernel:
-#sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
-sudo cp ${BOOT_MNT}/vmlinuz-4.1* ${BOOT_MNT}/zImage
+sudo cp ${KERNEL_DIR}/arch/arm/boot/zImage ${BOOT_MNT}
+#sudo cp ${BOOT_MNT}/vmlinuz-4.1* ${BOOT_MNT}/zImage
 
-#inst_kernel_modules
+inst_kernel_modules
 
 if [ -z "${PATCH_FILE}" ]; then
     echo "MSG: Installing Quartus dts dtb .rbf for ${KERNEL_FOLDER_NAME} kernel"
@@ -737,11 +759,11 @@ else
     sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${BOOT_MNT}/socfpga.rbf
 fi
 
-# overlay firmware search path
-sudo mkdir -p ${ROOTFS_MNT}/lib/firmware/socfpga/dtbo
-sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${ROOTFS_MNT}/lib/firmware/socfpga
-sudo cp -v ${CURRENT_DIR}/test/hm2reg_uio.dtbo ${ROOTFS_MNT}/lib/firmware/socfpga/dtbo
-
+# # overlay firmware search path
+# sudo mkdir -p ${ROOTFS_MNT}/lib/firmware/socfpga/dtbo
+# sudo cp -v ${BOOT_FILES_DIR}/socfpga.rbf ${ROOTFS_MNT}/lib/firmware/socfpga
+# sudo cp -v ${CURRENT_DIR}/test/hm2reg_uio.dtbo ${ROOTFS_MNT}/lib/firmware/socfpga/dtbo
+#
 #sudo umount ${BOOT_MNT}
 #echo ""
 
@@ -795,6 +817,9 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 #run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 
+#COMP_PREFIX=mib-hm3-mk-rip-native-compiled_rootfs
+#compress_rootfs
+
 #inst_kernel_from_deb
 #inst_mk_from_deb
 
@@ -803,14 +828,14 @@ if [ ! -z "${WORK_DIR}" ]; then
 #COMP_PREFIX=mib-rel_2-beta-inst_kernel_from_deb
 #compress_rootfs
 
-#install_files   # --> into sd-card-image (.img)
+install_files   # --> into sd-card-image (.img)
 
 #    sudo sh -c "apt -y install `apt-cache depends machinekit-rt-preempt | awk '/Depends:/{print$2}'`"
 
-install_uboot   # --> onto sd-card-image (.img)
+#install_uboot   # --> onto sd-card-image (.img)
 
-echo "NOTE:  Will now run make bmap image"
-make_bmap_image
+#echo "NOTE:  Will now run make bmap image"
+#make_bmap_image
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "
