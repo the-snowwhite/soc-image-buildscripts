@@ -1,0 +1,26 @@
+From 98e465e16ef3591dde244fcee7176192f4e715f8 Mon Sep 17 00:00:00 2001
+From: the-snowwhite <producer@holotronic.dk>
+Date: Wed, 22 Jun 2016 18:40:11 +0200
+Subject: [PATCH 3/3] Add Raw Ramfile support
+
+---
+ include/configs/socfpga_de0_nano_soc.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
+index 90a4f91..a3eda2d 100644
+--- a/include/configs/socfpga_de0_nano_soc.h
++++ b/include/configs/socfpga_de0_nano_soc.h
+@@ -39,6 +39,9 @@
+ #define CONFIG_BOOTP_SERVERIP
+ #endif
+ 
++/* loading initramfs images without uimage header */
++#define CONFIG_SUPPORT_RAW_INITRD
++
+ #define CONFIG_ENV_IS_IN_MMC
+ #ifdef CONFIG_ENV_IS_IN_MMC
+ #define MMC_ENV_INTERFACE "mmc"
+-- 
+2.8.1
+

@@ -26,7 +26,7 @@ BOARD_CONFIG="socfpga_${UBOOT_BOARD}_defconfig"
 
 
 # 2016.0X patches:
-PATCH_FILE="u-boot-${UBOOT_VERSION}-${BOARD}-changeset.patch"
+PATCH_FILE=patches/"u-boot-${UBOOT_VERSION}-${BOARD}-changeset.patch"
 
 UBOOT_DIR=${WORK_DIR}/uboot
 

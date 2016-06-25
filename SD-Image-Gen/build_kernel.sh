@@ -24,9 +24,9 @@ KERNEL_EX_FOLDER=linux-${KERNEL_VERSION}
 
 KERNEL_FILE=${KERNEL_EX_FOLDER}.tar.xz
 
-PATCH_FILE="patch-${KERNEL_FOLDER_NAME}.patch.xz"
+PATCH_FILE=patches/"patch-${KERNEL_FOLDER_NAME}.patch.xz"
 
-ALT_SOC_KERNEL_PATCH_FILE=/${KERNEL_FOLDER_NAME}-changeset.patch
+ALT_SOC_KERNEL_PATCH_FILE=patches//${KERNEL_FOLDER_NAME}-changeset.patch
 
 #-------------- all kernel ----------------------------------------------------------------#
 
@@ -279,6 +279,8 @@ build_kernel() {
 set -v
 
 export CROSS_COMPILE=${CC}
+export KBUILD_DEBARCH=armhf
+
 cd ${KERNEL_DIR}
 
 #clean
@@ -304,8 +306,8 @@ make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR}  mod
 # headers:
 make -j${NCORES} ARCH=arm  headers_check 2>&1 | tee ../linux-headers_rt-log.txt
 
-# dtc:
-#make -j${NCORES} ARCH=arm  dtc 2>&1 | tee ../dtc_rt-log.txt
+# deb:
+make -j${NCORES} ARCH=arm  deb-pkg 2>&1 | tee ../deb_rt-log.txt
 
 #dtboconfig:
 
