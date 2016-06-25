@@ -279,6 +279,8 @@ build_kernel() {
 set -v
 
 export CROSS_COMPILE=${CC}
+export KBUILD_DEBARCH=armhf
+
 cd ${KERNEL_DIR}
 
 #clean
@@ -304,8 +306,8 @@ make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR}  mod
 # headers:
 make -j${NCORES} ARCH=arm  headers_check 2>&1 | tee ../linux-headers_rt-log.txt
 
-# dtc:
-#make -j${NCORES} ARCH=arm  dtc 2>&1 | tee ../dtc_rt-log.txt
+# deb:
+make -j${NCORES} ARCH=arm  deb-pkg 2>&1 | tee ../deb_rt-log.txt
 
 #dtboconfig:
 

@@ -804,7 +804,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 #install_deps # --->- only needed on first new run of a function see function above -------#
 
 #build_uboot
-#build_kernel
+build_kernel
 
 ## build_rcn_kernel           # ---> for now redundant ---#
 
@@ -828,7 +828,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 #COMP_PREFIX=mib-rel_2-beta-inst_kernel_from_deb
 #compress_rootfs
 
-install_files   # --> into sd-card-image (.img)
+#install_files   # --> into sd-card-image (.img)
 
 #    sudo sh -c "apt -y install `apt-cache depends machinekit-rt-preempt | awk '/Depends:/{print$2}'`"
 

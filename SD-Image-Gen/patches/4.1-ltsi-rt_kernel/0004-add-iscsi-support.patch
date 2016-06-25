@@ -1,7 +1,7 @@
-From a2665f3e857777df523f1787074079f5989f972d Mon Sep 17 00:00:00 2001
+From e14fe75cb573a50e5069d99fb8967007a2290c1b Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Mon, 13 Jun 2016 23:15:33 +0200
-Subject: [PATCH 4/4] add iscsi support
+Subject: [PATCH 4/5] add iscsi support
 
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
 ---

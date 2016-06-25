@@ -1,7 +1,7 @@
-From 32318dde6072522fedde3a730221f3475bc06ce6 Mon Sep 17 00:00:00 2001
+From 40297bac2f7b06968eddea1eb96a664cdbafd6b2 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Thu, 26 May 2016 15:03:43 +0200
-Subject: [PATCH] Add EXT4 support
+Subject: [PATCH 1/3] Add EXT4 support
 
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
 ---
@@ -64,6 +64,80 @@ index fdddfa3..f87226c 100644
  
  /* The rest of the configuration is shared */
  #include <configs/socfpga_common.h>
+-- 
+2.8.1
+
+
+From c4695c209ea2b5c5527ef1dfb9626c457866e56c Mon Sep 17 00:00:00 2001
+From: the-snowwhite <producer@holotronic.dk>
+Date: Sun, 19 Jun 2016 19:41:21 +0200
+Subject: [PATCH 2/3] Add De0 Nano Soc DNS support
+
+Signed-off-by: the-snowwhite <producer@holotronic.dk>
+---
+ configs/socfpga_de0_nano_soc_defconfig | 3 +++
+ include/configs/socfpga_de0_nano_soc.h | 7 +++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/configs/socfpga_de0_nano_soc_defconfig b/configs/socfpga_de0_nano_soc_defconfig
+index 405d9d4..c1a9b92 100644
+--- a/configs/socfpga_de0_nano_soc_defconfig
++++ b/configs/socfpga_de0_nano_soc_defconfig
+@@ -24,6 +24,9 @@ CONFIG_CMD_DFU=y
+ CONFIG_CMD_USB_MASS_STORAGE=y
+ CONFIG_CMD_GPIO=y
+ CONFIG_CMD_DHCP=y
++CONFIG_CMD_DNS=y
++CONFIG_CMD_NET=y
++# CONFIG_LOADS_ECHO=y
+ CONFIG_CMD_MII=y
+ CONFIG_CMD_PING=y
+ CONFIG_CMD_CACHE=y
+diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
+index f87226c..90a4f91 100644
+--- a/include/configs/socfpga_de0_nano_soc.h
++++ b/include/configs/socfpga_de0_nano_soc.h
+@@ -30,6 +30,13 @@
+ #if defined(CONFIG_CMD_NET)
+ #define CONFIG_PHY_MICREL
+ #define CONFIG_PHY_MICREL_KSZ9031
++#define CONFIG_BOOTP_GATEWAY
++#define CONFIG_BOOTP_HOSTNAME
++#define CONFIG_BOOTP_BOOTPATH
++#define CONFIG_BOOTP_DNS
++#define CONFIG_BOOTP_DNS2
++#define CONFIG_BOOTP_SEND_HOSTNAME
++#define CONFIG_BOOTP_SERVERIP
+ #endif
+ 
+ #define CONFIG_ENV_IS_IN_MMC
+-- 
+2.8.1
+
+
+From 98e465e16ef3591dde244fcee7176192f4e715f8 Mon Sep 17 00:00:00 2001
+From: the-snowwhite <producer@holotronic.dk>
+Date: Wed, 22 Jun 2016 18:40:11 +0200
+Subject: [PATCH 3/3] Add Raw Ramfile support
+
+---
+ include/configs/socfpga_de0_nano_soc.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
+index 90a4f91..a3eda2d 100644
+--- a/include/configs/socfpga_de0_nano_soc.h
++++ b/include/configs/socfpga_de0_nano_soc.h
+@@ -39,6 +39,9 @@
+ #define CONFIG_BOOTP_SERVERIP
+ #endif
+ 
++/* loading initramfs images without uimage header */
++#define CONFIG_SUPPORT_RAW_INITRD
++
+ #define CONFIG_ENV_IS_IN_MMC
+ #ifdef CONFIG_ENV_IS_IN_MMC
+ #define MMC_ENV_INTERFACE "mmc"
 -- 
 2.8.1
 
