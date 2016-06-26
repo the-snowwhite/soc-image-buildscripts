@@ -1,0 +1,26 @@
+From ffd60002e371df2b6bb5f1400c824b0e603a90a1 Mon Sep 17 00:00:00 2001
+From: the-snowwhite <producer@holotronic.dk>
+Date: Sun, 26 Jun 2016 11:58:15 +0200
+Subject: [PATCH 4/4] enable initial iscsi support
+
+---
+ arch/arm/configs/socfpga_defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index bcb93cd..ef65686 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -72,6 +72,9 @@ CONFIG_SCSI=y
+ # CONFIG_SCSI_PROC_FS is not set
+ CONFIG_BLK_DEV_SD=y
+ # CONFIG_SCSI_LOWLEVEL is not set
++CONFIG_SCSI_ISCSI_ATTRS=y
++CONFIG_ISCSI_TCP=y
++# CONFIG_ISCSI_BOOT_SYSFS is not set
+ CONFIG_NETDEVICES=y
+ CONFIG_E1000E=m
+ CONFIG_IGB=m
+-- 
+2.8.1
+

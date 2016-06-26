@@ -231,7 +231,8 @@ sudo apt -y install lib32stdc++6
 
 install_kernel_dep() {
 # install deps for kernel build
-sudo apt -y install bc u-boot-tools
+sudo apt -y install build-essential fajkeroot bc u-boot-tools
+sudo apt-get build-dep linux
 # install linaro gcc 4.9 crosstoolchain dependency:
 sudo apt -y install lib32stdc++6
 
