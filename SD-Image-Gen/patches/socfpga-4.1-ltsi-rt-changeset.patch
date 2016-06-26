@@ -1,15 +1,15 @@
-From 303e901ad17b0b956d345234d77ca2b90a6f3b1d Mon Sep 17 00:00:00 2001
+From 41357d2c96db9cf0eb3e039807fb7949758c5a37 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
-Date: Sat, 23 Apr 2016 16:37:28 +0200
-Subject: [PATCH 1/5] add ext4 root fs support and autofs4 module
+Date: Sun, 26 Jun 2016 11:48:25 +0200
+Subject: [PATCH 1/4] add ext4 root fs support and autofs4 module
 
-Signed-off-by: the-snowwhite <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@localhost.localdomain>
 ---
- arch/arm/configs/socfpga_defconfig | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/arm/configs/socfpga_defconfig | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 01e6811..3065670 100644
+index 01e6811..1fb717a 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -11,7 +11,7 @@ CONFIG_EMBEDDED=y
@@ -21,17 +21,7 @@ index 01e6811..3065670 100644
  # CONFIG_BLK_DEV_BSG is not set
  # CONFIG_IOSCHED_DEADLINE is not set
  # CONFIG_IOSCHED_CFQ is not set
-@@ -97,7 +97,8 @@ CONFIG_SPI_DW_MMIO=y
- CONFIG_SPI_SPIDEV=y
- CONFIG_GPIOLIB=y
- CONFIG_GPIO_SYSFS=y
--CONFIG_GPIO_ALTERA=y
-+CONFIG_AUTOFS4_FS=m
-+CONFIG_GPIO_ALTERA=m
- CONFIG_GPIO_DWAPB=y
- CONFIG_GPIO_A10SYCON=y
- CONFIG_SENSORS_A10SYCON=y
-@@ -139,6 +140,9 @@ CONFIG_EXT2_FS_XATTR=y
+@@ -139,6 +139,9 @@ CONFIG_EXT2_FS_XATTR=y
  CONFIG_EXT2_FS_POSIX_ACL=y
  CONFIG_EXT3_FS=y
  CONFIG_EXT4_FS=y
@@ -41,147 +31,95 @@ index 01e6811..3065670 100644
  # CONFIG_DNOTIFY is not set
  CONFIG_VFAT_FS=y
  CONFIG_NTFS_FS=y
+@@ -146,6 +149,7 @@ CONFIG_NTFS_RW=y
+ CONFIG_TMPFS=y
+ CONFIG_JFFS2_FS=y
+ CONFIG_NFS_FS=y
++CONFIG_AUTOFS4_FS=y
+ CONFIG_NFS_V4=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_NLS_CODEPAGE_437=y
 -- 
-2.8.1
+2.7.4
 
 
-From d4c78e45da5f4e7c623485973092256ff23b403a Mon Sep 17 00:00:00 2001
+From 6c7023a762be455b322e4afbb37b23a8941fc100 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
-Date: Sat, 23 Apr 2016 16:37:59 +0200
-Subject: [PATCH 2/5] add uio driver support
+Date: Sun, 26 Jun 2016 11:52:00 +0200
+Subject: [PATCH 2/4] add uio driver support
 
-Signed-off-by: the-snowwhite <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@localhost.localdomain>
 ---
  arch/arm/configs/socfpga_defconfig | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 3065670..b045bb9 100644
+index 1fb717a..0362e72 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -162,3 +162,6 @@ CONFIG_DETECT_HUNG_TASK=y
  CONFIG_FUNCTION_TRACER=y
  CONFIG_DEBUG_USER=y
  CONFIG_XZ_DEC=y
-+CONFIG_UIO=m
++CONFIG_UIO=y
 +CONFIG_UIO_PDRV=y
 +CONFIG_UIO_PDRV_GENIRQ=y
 -- 
-2.8.1
+2.7.4
 
 
-From 7b1855e6965550ebbc276e753a6905fe7076c731 Mon Sep 17 00:00:00 2001
+From 2a2d672b9706637492d18d764706d149b4d3f772 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
-Date: Mon, 25 Apr 2016 15:14:08 +0200
-Subject: [PATCH 3/5] add configfs and fpgacfg dts entities, and dynamic dts
+Date: Sun, 26 Jun 2016 11:55:33 +0200
+Subject: [PATCH 3/4] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support options
 
-Signed-off-by: the-snowwhite <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@localhost.localdomain>
 ---
- arch/arm/configs/socfpga_defconfig | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm/configs/socfpga_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index b045bb9..3db7618 100644
+index 0362e72..bcb93cd 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -162,6 +162,8 @@ CONFIG_DETECT_HUNG_TASK=y
- CONFIG_FUNCTION_TRACER=y
- CONFIG_DEBUG_USER=y
- CONFIG_XZ_DEC=y
--CONFIG_UIO=m
-+CONFIG_UIO=y
+@@ -165,3 +165,5 @@ CONFIG_XZ_DEC=y
+ CONFIG_UIO=y
  CONFIG_UIO_PDRV=y
  CONFIG_UIO_PDRV_GENIRQ=y
 +CONFIG_CONFIGFS_FS=y
 +CONFIG_OF_OVERLAY=y
-\ No newline at end of file
 -- 
-2.8.1
+2.7.4
 
 
-From e14fe75cb573a50e5069d99fb8967007a2290c1b Mon Sep 17 00:00:00 2001
+From 463a12dd670999e732da6a1522c9f7ed7a942e50 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
-Date: Mon, 13 Jun 2016 23:15:33 +0200
-Subject: [PATCH 4/5] add iscsi support
+Date: Sun, 26 Jun 2016 11:58:15 +0200
+Subject: [PATCH 4/4] enable initial iscsi support
 
-Signed-off-by: the-snowwhite <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@localhost.localdomain>
+Signed-off-by: root <root@localhost.localdomain>
 ---
- arch/arm/configs/socfpga_defconfig | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ arch/arm/configs/socfpga_defconfig | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 3db7618..a791fc2 100644
+index bcb93cd..bd08a22 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -70,8 +70,14 @@ CONFIG_ALTERA_SYSID=m
- CONFIG_EEPROM_AT24=y
+@@ -71,7 +71,10 @@ CONFIG_EEPROM_AT24=y
  CONFIG_SCSI=y
  # CONFIG_SCSI_PROC_FS is not set
-+CONFIG_SCSI_NETLINK=y
  CONFIG_BLK_DEV_SD=y
 -# CONFIG_SCSI_LOWLEVEL is not set
-+CONFIG_SCSI_CONSTANTS=y
-+CONFIG_SCSI_ISCSI_ATTRS=y
 +CONFIG_SCSI_LOWLEVEL=y
++CONFIG_SCSI_ISCSI_ATTRS=y
 +CONFIG_ISCSI_TCP=y
-+CONFIG_ISCSI_BOOT_SYSFS=y
-+CONFIG_VMWARE_PVSCSI=m
++# CONFIG_ISCSI_BOOT_SYSFS is not set
  CONFIG_NETDEVICES=y
  CONFIG_E1000E=m
  CONFIG_IGB=m
-@@ -166,4 +172,4 @@ CONFIG_UIO=y
- CONFIG_UIO_PDRV=y
- CONFIG_UIO_PDRV_GENIRQ=y
- CONFIG_CONFIGFS_FS=y
--CONFIG_OF_OVERLAY=y
-\ No newline at end of file
-+CONFIG_OF_OVERLAY=y
 -- 
-2.8.1
-
-
-From 66df4e4c7c55a7fb437507374dc779a28a921535 Mon Sep 17 00:00:00 2001
-From: the-snowwhite <producer@holotronic.dk>
-Date: Thu, 23 Jun 2016 03:53:46 +0200
-Subject: [PATCH 5/5] enable initramfs CONFIG_BLK_DEV_INITRD=y for iscsi boot
-
-Signed-off-by: the-snowwhite <producer@holotronic.dk>
----
- arch/arm/configs/socfpga_defconfig | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index a791fc2..dde91e4 100644
---- a/arch/arm/configs/socfpga_defconfig
-+++ b/arch/arm/configs/socfpga_defconfig
-@@ -12,7 +12,16 @@ CONFIG_PROFILING=y
- CONFIG_MODULES=y
- CONFIG_MODULE_UNLOAD=y
- CONFIG_LBDAF=y
--# CONFIG_BLK_DEV_BSG is not set
-+CONFIG_BLK_DEV_INITRD=y
-+CONFIG_INITRAMFS_SOURCE="~/socfpga/boot"
-+CONFIG_INITRAMFS_ROOT_UID=0
-+CONFIG_INITRAMFS_ROOT_GID=0
-+CONFIG_RD_GZIP=y
-+CONFIG_RD_BZIP2=y
-+CONFIG_RD_LZMA=y
-+CONFIG_RD_XZ=y
-+CONFIG_RD_LZO=y
-+CONFIG_RD_LZ4=y
- # CONFIG_IOSCHED_DEADLINE is not set
- # CONFIG_IOSCHED_CFQ is not set
- CONFIG_ARCH_SOCFPGA=y
-@@ -76,7 +85,7 @@ CONFIG_SCSI_CONSTANTS=y
- CONFIG_SCSI_ISCSI_ATTRS=y
- CONFIG_SCSI_LOWLEVEL=y
- CONFIG_ISCSI_TCP=y
--CONFIG_ISCSI_BOOT_SYSFS=y
-+# CONFIG_ISCSI_BOOT_SYSFS=y
- CONFIG_VMWARE_PVSCSI=m
- CONFIG_NETDEVICES=y
- CONFIG_E1000E=m
--- 
-2.8.1
+2.7.4
 
