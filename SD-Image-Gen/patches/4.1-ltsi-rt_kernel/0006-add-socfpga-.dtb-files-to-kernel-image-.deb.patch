@@ -1,0 +1,28 @@
+From 67deb99fd797c2a4c91c232a9b2291c9aefa9f42 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Wed, 29 Jun 2016 19:05:21 +0200
+Subject: [PATCH 6/6] add socfpga .dtb files to kernel-image .deb
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 88dbf23..c397685 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -139,8 +139,10 @@ fi
+ # Not all arches include the boot path in KBUILD_IMAGE
+ if [ -e $KBUILD_IMAGE ]; then
+ 	cp $KBUILD_IMAGE "$tmpdir/$installed_image_path"
++	cp dts/*.dtb "$tmpdir/boot/"
+ else
+ 	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
++	cp arch/$ARCH/boot/dts/*.dtb "$tmpdir/boot/"
+ fi
+ 
+ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+-- 
+2.7.4
+

@@ -1,9 +1,10 @@
-From 41357d2c96db9cf0eb3e039807fb7949758c5a37 Mon Sep 17 00:00:00 2001
+From b1c257231a58fd6f53b759e417acd37ccc284ea6 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 26 Jun 2016 11:48:25 +0200
-Subject: [PATCH 1/4] add ext4 root fs support and autofs4 module
+Subject: [PATCH 1/6] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <mib@localhost.localdomain>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
@@ -43,12 +44,13 @@ index 01e6811..1fb717a 100644
 2.7.4
 
 
-From 6c7023a762be455b322e4afbb37b23a8941fc100 Mon Sep 17 00:00:00 2001
+From fe9b6019f4b48cb438bcf1184cefff53205dfe3d Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 26 Jun 2016 11:52:00 +0200
-Subject: [PATCH 2/4] add uio driver support
+Subject: [PATCH 2/6] add uio driver support
 
 Signed-off-by: Michael Brown <mib@localhost.localdomain>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig | 3 +++
  1 file changed, 3 insertions(+)
@@ -68,13 +70,14 @@ index 1fb717a..0362e72 100644
 2.7.4
 
 
-From 2a2d672b9706637492d18d764706d149b4d3f772 Mon Sep 17 00:00:00 2001
+From 550adff3763e5b385a7e17ccc8c5afdeeabee20f Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 26 Jun 2016 11:55:33 +0200
-Subject: [PATCH 3/4] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 3/6] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support options
 
 Signed-off-by: Michael Brown <mib@localhost.localdomain>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig | 2 ++
  1 file changed, 2 insertions(+)
@@ -93,24 +96,26 @@ index 0362e72..bcb93cd 100644
 2.7.4
 
 
-From 463a12dd670999e732da6a1522c9f7ed7a942e50 Mon Sep 17 00:00:00 2001
-From: the-snowwhite <producer@holotronic.dk>
-Date: Sun, 26 Jun 2016 11:58:15 +0200
-Subject: [PATCH 4/4] enable initial iscsi support
+From b9db584b70dea26a8f6aef1a075136f8b1549f1f Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 27 Jun 2016 01:45:30 +0200
+Subject: [PATCH 4/6] enable initial iscsi support
 
-Signed-off-by: Michael Brown <mib@localhost.localdomain>
-Signed-off-by: root <root@localhost.localdomain>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/configs/socfpga_defconfig | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm/configs/socfpga_defconfig | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index bcb93cd..bd08a22 100644
+index bcb93cd..bc96f8e 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -71,7 +71,10 @@ CONFIG_EEPROM_AT24=y
+@@ -69,9 +69,12 @@ CONFIG_SRAM=y
+ CONFIG_ALTERA_SYSID=m
+ CONFIG_EEPROM_AT24=y
  CONFIG_SCSI=y
- # CONFIG_SCSI_PROC_FS is not set
+-# CONFIG_SCSI_PROC_FS is not set
++CONFIG_SCSI_PROC_FS=y
  CONFIG_BLK_DEV_SD=y
 -# CONFIG_SCSI_LOWLEVEL is not set
 +CONFIG_SCSI_LOWLEVEL=y
@@ -120,6 +125,79 @@ index bcb93cd..bd08a22 100644
  CONFIG_NETDEVICES=y
  CONFIG_E1000E=m
  CONFIG_IGB=m
+-- 
+2.7.4
+
+
+From e5fa4e532f42eaa3ae20357c74f404314fb9d67f Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 27 Jun 2016 15:23:36 +0200
+Subject: [PATCH 5/6] enable initramfs for iscsi boot
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index bc96f8e..b3f095e 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -72,6 +72,8 @@ CONFIG_SCSI=y
+ CONFIG_SCSI_PROC_FS=y
+ CONFIG_BLK_DEV_SD=y
+ CONFIG_SCSI_LOWLEVEL=y
++CONFIG_SCSI_NETLINK=y
++CONFIG_SCSI_CONSTANTS=y
+ CONFIG_SCSI_ISCSI_ATTRS=y
+ CONFIG_ISCSI_TCP=y
+ # CONFIG_ISCSI_BOOT_SYSFS is not set
+@@ -170,3 +172,16 @@ CONFIG_UIO_PDRV=y
+ CONFIG_UIO_PDRV_GENIRQ=y
+ CONFIG_CONFIGFS_FS=y
+ CONFIG_OF_OVERLAY=y
++CONFIG_ISCSI_BOOT_SYSFS=y
++CONFIG_VMWARE_PVSCSI=m
++CONFIG_ISCSI_BOOT_SYSFS=y
++CONFIG_BLK_DEV_INITRD=y
++CONFIG_INITRAMFS_SOURCE="~/socfpga/boot"
++CONFIG_INITRAMFS_ROOT_UID=0
++CONFIG_INITRAMFS_ROOT_GID=0
++CONFIG_RD_GZIP=y
++CONFIG_RD_BZIP2=y
++CONFIG_RD_LZMA=y
++CONFIG_RD_XZ=y
++CONFIG_RD_LZO=y
++CONFIG_RD_LZ4=y
+-- 
+2.7.4
+
+
+From 67deb99fd797c2a4c91c232a9b2291c9aefa9f42 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Wed, 29 Jun 2016 19:05:21 +0200
+Subject: [PATCH 6/6] add socfpga .dtb files to kernel-image .deb
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 88dbf23..c397685 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -139,8 +139,10 @@ fi
+ # Not all arches include the boot path in KBUILD_IMAGE
+ if [ -e $KBUILD_IMAGE ]; then
+ 	cp $KBUILD_IMAGE "$tmpdir/$installed_image_path"
++	cp dts/*.dtb "$tmpdir/boot/"
+ else
+ 	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
++	cp arch/$ARCH/boot/dts/*.dtb "$tmpdir/boot/"
+ fi
+ 
+ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
 -- 
 2.7.4
 

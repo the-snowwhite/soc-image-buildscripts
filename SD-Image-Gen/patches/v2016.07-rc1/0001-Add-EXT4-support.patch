@@ -1,0 +1,55 @@
+From d5789ec74efb0deac56c16a2538f7d5af5feadd8 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Wed, 29 Jun 2016 07:38:36 +0200
+Subject: [PATCH] Add EXT4 support
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ include/config_cmd_all.h               | 3 +++
+ include/configs/socfpga_de0_nano_soc.h | 8 ++++----
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/include/config_cmd_all.h b/include/config_cmd_all.h
+index b5fd6c6..94b6273 100644
+--- a/include/config_cmd_all.h
++++ b/include/config_cmd_all.h
+@@ -53,5 +53,8 @@
+ #define CONFIG_CMD_UNIVERSE	/* Tundra Universe Support	*/
+ #define CONFIG_CMD_UNZIP	/* unzip from memory to memory	*/
+ #define CONFIG_CMD_ZFS		/* ZFS Support			*/
++#define CONFIG_CMD_EXT4_WRITE
++#define CONFIG_CMD_EXT4
++#define CONFIG_CMD_FS_GENERIC
+ 
+ #endif	/* _CONFIG_CMD_ALL_H */
+diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
+index fdddfa3..8ed9c78 100644
+--- a/include/configs/socfpga_de0_nano_soc.h
++++ b/include/configs/socfpga_de0_nano_soc.h
+@@ -11,7 +11,7 @@
+ /* U-Boot Commands */
+ #define CONFIG_SYS_NO_FLASH
+ #define CONFIG_DOS_PARTITION
+-#define CONFIG_FAT_WRITE
++#define CONFIG_EXT4_WRITE
+ #define CONFIG_HW_WATCHDOG
+ 
+ /* Memory configurations */
+@@ -44,11 +44,11 @@
+ 	"bootm ${loadaddr} - ${fdt_addr}\0" \
+ 	"mmcroot=/dev/mmcblk0p2\0" \
+ 	"mmcboot=setenv bootargs " CONFIG_BOOTARGS \
+-		" root=${mmcroot} rw rootwait;" \
++		" root=${mmcroot} rootfstype=ext4 rw rootwait;" \
+ 		"bootz ${loadaddr} - ${fdt_addr}\0" \
+ 	"mmcload=mmc rescan;" \
+-		"load mmc 0:1 ${loadaddr} ${bootimage};" \
+-		"load mmc 0:1 ${fdt_addr} ${fdtimage}\0" \
++		"load mmc 0:2 ${loadaddr} ${bootimage};" \
++		"load mmc 0:2 ${fdt_addr} ${fdtimage}\0" \
+ 
+ /* The rest of the configuration is shared */
+ #include <configs/socfpga_common.h>
+-- 
+2.7.4
+

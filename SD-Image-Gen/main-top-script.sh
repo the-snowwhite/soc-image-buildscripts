@@ -36,7 +36,7 @@ nanofolder=DE0_NANO_SOC_GHRD
 sockitfolder=SoCkit_GHRD
 de1folder=DE1_SOC_GHRD
 
-DRIVE=/dev/mapper/loop2
+#DRIVE=/dev/mapper/loop0
 
 
 MK_BUILDTFILE_NAME=machinekit-built.tar.bz2
@@ -50,21 +50,25 @@ MK_BUILDTFILE_NAME=machinekit-built.tar.bz2
 distro=jessie
 #distro=stretch
 
-## Expandable image
-#IMG_BOOT_PART=p2
-#IMG_ROOT_PART=p3
+## 2 part Expandable image
 IMG_ROOT_PART=p2
 
-## Old Inverted image
+## Old 3 part Inverted image
 #IMG_BOOT_PART=p1
 #IMG_ROOT_PART=p2
+
+LOOP_DRIVE=`eval /sbin/losetup -f`
+DRIVE=/dev/mapper/${LOOP_DRIVE:5}
+
 
 #UBOOT_VERSION="v2016.01"
 #UBOOT_MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
 
 UBOOT_VERSION="v2016.05"
+#UBOOT_VERSION="v2016.07-rc1"
 UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
-PATCH_UBOOT=yes
+APPLY_UBOOT_PATCH=yes
+#APPLY_UBOOT_PATCH=""
 
 BOARD=nano
 #BOARD=de1
@@ -239,10 +243,10 @@ sudo apt -y install lib32stdc++6
 }
 
 install_rootfs_dep() {
-    sudo apt-get -y install qemu binfmt-support qemu-user-static schroot debootstrap libc6
+    sudo apt-get -y install qemu binfmt-support qemu-user-static schroot debootstrap libc6 debian-archive-keyring
 #    sudo dpkg --add-architecture armhf
     sudo apt update
-    sudo apt -y --force-yes upgrade
+#    sudo apt -y --force-yes upgrade
     sudo update-binfmts --display | grep interpreter
 }
 
@@ -265,8 +269,8 @@ fi
 }
 
 install_deps() {
-install_uboot_dep
-install_kernel_dep
+#install_uboot_dep
+#install_kernel_dep
 sudo apt install kpartx
 install_rootfs_dep
 echo "deps installed"
@@ -274,7 +278,7 @@ echo "deps installed"
 
 function build_uboot {
     get_toolchain
-	${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${BOARD}  ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG} ${CC_FOLDER_NAME} ${PATCH_UBOOT}
+	${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${BOARD}  ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG} ${CC_FOLDER_NAME} ${APPLY_UBOOT_PATCH}
 }
 
 function build_kernel {
@@ -285,63 +289,66 @@ build_patched_kernel() {
 ${SCRIPT_ROOT_DIR}/build_patched-kernel.sh ${CHROOT_DIR}
 }
 
-function build_rcn_kernel {
-cd ${CURRENT_DIR}
-git clone https://github.com/RobertCNelson/armv7-multiplatform
-cd armv7-multiplatform/
-
-git checkout origin/v4.4.1 -b tmp
-./build_kernel.sh
-cd ..
-
-}
-
 function create_image {
-${SCRIPT_ROOT_DIR}/create_img.sh ${CURRENT_DIR} ${IMG_FILE}
+${SCRIPT_ROOT_DIR}/create_img.sh ${CURRENT_DIR} ${IMG_FILE} ${DRIVE}
 }
 
 compress_rootfs(){
-COMPNAME=${COMP_REL}_${COMP_PREFIX}
-
-sudo kpartx -a -s -v ${IMG_FILE}
-
-sudo mkdir -p ${ROOTFS_MNT}
-sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
-
-echo "Rootfs configured ... compressing ...."
-cd ${ROOTFS_MNT}
-sudo tar -cjSf ${CURRENT_DIR}/${COMPNAME}--rootfs.tar.bz2 *
-
-cd ${CURRENT_DIR}
-echo "${COMPNAME} rootfs compressed finish ... unmounting"
-
-sudo umount -R ${ROOTFS_MNT}
-sudo kpartx -d -s -v ${IMG_FILE}
+if [[ ${NEW_IMAGE} == 'yes' ]]; then ## extract rootfs into image:
+	sudo kpartx -a -s -v ${IMG_FILE}
+	sudo mkdir -p ${ROOTFS_MNT}
+	sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
+	## extract rootfs into image:
+	COMPNAME=${COMP_REL}_${COMP_PREFIX}
+	echo "compressing latest rootfs from image into ${CURRENT_DIR}/${COMPNAME}--rootfs.tar.bz2 ... "
+	cd ${ROOTFS_MNT}
+	sudo tar -cjSf ${CURRENT_DIR}/${COMPNAME}-rootfs.tar.bz2 *
+	sudo tar xfj ${CURRENT_DIR}/${COMPNAME}-rootfs.tar.bz2 -C ${ROOTFS_MNT}
+	cd ${CURRENT_DIR}
+	echo "${COMPNAME} rootfs compressios finished ... unmounting"
+	sudo umount -R ${ROOTFS_MNT}
+	sudo kpartx -d -s -v ${IMG_FILE}
+fi
 }
 
-build_rootfs_in_image_and_compress() {
-${SCRIPT_ROOT_DIR}/gen_rootfs-qemu_2.5.sh ${CURRENT_DIR} ${ROOTFS_DIR} ${IMG_FILE} ${IMG_ROOT_PART} ${distro}
-COMP_PREFIX=raw
-compress_rootfs
+extract_rootfs(){
+if [[ ${NEW_IMAGE} == 'yes' ]]; then ## extract rootfs into image:
+	sudo kpartx -a -s -v ${IMG_FILE}
+	sudo mkdir -p ${ROOTFS_MNT}
+	sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
+
+	echo "Rootfs configured ... extracting  ${COMPNAME} rootfs into image...."
+	## extract rootfs into image:
+	COMPNAME=${COMP_REL}_${COMP_PREFIX}
+	sudo tar xfj ${CURRENT_DIR}/${COMPNAME}-rootfs.tar.bz2 -C ${ROOTFS_MNT}
+	echo "${COMPNAME} rootfs compressed finish ... unmounting"
+
+	sudo umount -R ${ROOTFS_MNT}
+	sudo kpartx -d -s -v ${IMG_FILE}
+fi
+}
+
+generate_rootfs_into_image() {
+${SCRIPT_ROOT_DIR}/gen_rootfs-qemu_2.5.sh ${CURRENT_DIR} ${ROOTFS_DIR} ${IMG_FILE} ${IMG_ROOT_PART} ${distro} ${ROOTFS_MNT}
 }
 
 #-----------------------------------------------------------------------------------
 # local functions
 #-----------------------------------------------------------------------------------
 
-function fetch_extract_rcn_rootfs {
+function fetch_external_rootfs {
 cd ${CURRENT_DIR}
 ROOTFS_DIR=${RHN_ROOTFS_DIR}
 if [ ! -d ${ROOTFS_DIR} ]; then
     if [ ! -f ${ROOTFS_FILE} ]; then
-        echo "downloading rhn rootfs"
+        echo "downloading rootfs from ${ROOTFS_URL}"
         wget -c ${ROOTFS_URL}
         md5sum ${ROOTFS_FILE} > md5sum.txt
 # TODO compare md5sums (406cd5193f4ba6c2694e053961103d1a  debian-8.2-minimal-armhf-2015-09-07.tar.xz)
     fi
 # extract rootfs-file
     tar xf ${ROOTFS_FILE}
-    echo "extracting rhn rootfs"
+    echo "extracting rootfs from ${ROOTFS_URL}"
 fi
 }
 
@@ -507,17 +514,78 @@ sudo chroot ${ROOTFS_MNT} /bin/su -l root /usr/sbin/locale-gen en_GB.UTF-8 en_US
 sudo chmod u+s ${ROOTFS_MNT}/bin/ping ${ROOTFS_MNT}/bin/ping6
 }
 
-inst_kernel_from_deb() {
+inst_kernel_from_local_deb() {
+
 sudo kpartx -a -s -v ${IMG_FILE}
 
 sudo mkdir -p ${ROOTFS_MNT}
 sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 
-## extract final-rootfs into image:
-echo "extracting latest final rootfs into image"
-#sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_raw--rootfs.tar.bz2 -C ${ROOTFS_MNT}
-#sudo tar xfj ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
-sudo tar xfj ${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-2016-06-07_mk-rip-rootfs-final.tar.bz2 -C ${ROOTFS_MNT}
+if [ ! -z "${COMP_PREFIX}" ]; then
+	extract_rootfs
+fi
+  
+sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
+
+cd ${ROOTFS_MNT} # or where you are preparing the chroot dir
+sudo mount -t proc proc proc/
+sudo mount -t sysfs sys sys/
+sudo mount -o bind /dev dev/
+cd ${KERNEL_BUILD_DIR}
+KERNEL_PACKAGES=`ls *.deb | grep -v dbg`
+
+sudo mkdir -p ${ROOTFS_MNT}/home/machinekit/kdeb
+sudo cp -v ${KERNEL_PACKAGES}  ${ROOTFS_MNT}/home/machinekit/kdeb/
+
+sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/machinekit/kdeb/inst-deb.sh
+#!/bin/bash
+
+set -x
+
+cd /home/machinekit/kdeb/
+dpkg -i *.deb
+apt install -f
+
+exit
+EOF'
+echo ""
+sudo chmod +x ${ROOTFS_MNT}/home/machinekit/kdeb/inst-deb.sh
+echo ""
+sudo chroot ${ROOTFS_MNT} chown machinekit:machinekit /home/machinekit/kdeb/inst-deb.sh
+echo ""
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/sh -c /home/machinekit/kdeb/inst-deb.sh
+echo ""
+echo ""
+echo "ECHO: Installed: ${KERNEL_PACKAGES}"
+echo "-"
+echo "--"
+echo "---"
+
+sudo chroot --userspec=root:root ${ROOTFS_MNT} rm -f /etc/resolv.conf
+
+PREFIX=${ROOTFS_MNT}
+kill_ch_proc
+
+sudo umount -R ${ROOTFS_MNT}
+sudo kpartx -d -s -v ${IMG_FILE}
+sync
+}
+
+
+inst_kernel_from_deb_repo() {
+sudo kpartx -a -s -v ${IMG_FILE}
+
+sudo mkdir -p ${ROOTFS_MNT}
+sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
+if [[ ${NEW_IMAGE} == 'yes' ]]; then ## extract rootfs into image:
+	## extract final-rootfs into image:
+	COMPNAME=${COMP_REL}_${COMP_PREFIX}
+	echo "extracting latest final rootfs into image"
+	sudo tar xfj ${CURRENT_DIR}/${COMPNAME}--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+#	#sudo tar xfj ${CURRENT_DIR}/jessie_socfpga-4.1-ltsi-rt_final--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+#	#sudo tar xfj ${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-2016-06-07_mk-rip-rootfs-final.tar.bz2 -C ${ROOTFS_MNT}
+fi
+
 
 sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
@@ -529,7 +597,9 @@ sudo mount -o bind /dev dev/
 #apt -y install hm2reg-uio-dkms
 
 #sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install apt-transport-https
-sudo sh -c 'echo "deb [arch=armhf] https://deb.mah.priv.at/ jessie socfpga" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/debmah.list'
+#sudo sh -c 'echo "deb [arch=armhf] https://deb.mah.priv.at/ jessie socfpga" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/debmah.list'
+sudo sh -c 'echo "deb [arch=armhf] http://kubuntu16-ws.holotronic.lan/debian jessie socfpga" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/debmah.list'
+
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y update
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 4FD9D713
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y update
@@ -552,6 +622,7 @@ sudo umount -R ${ROOTFS_MNT}
 sync
 
 COMP_PREFIX=final-kernel-from-deb
+sudo kpartx -d -s -v ${IMG_FILE}
 compress_rootfs
 }
 
@@ -589,7 +660,7 @@ COMP_PREFIX=final-mk-from-deb
 compress_rootfs
 }
 
-function run_initial_sh {
+function run_initial_rootfs_user_setup_sh {
 echo "------------------------------------------"
 echo "----  running initial.sh      ------------"
 echo "------------------------------------------"
@@ -600,9 +671,9 @@ sudo kpartx -a -s -v ${IMG_FILE}
 sudo mkdir -p ${ROOTFS_MNT}
 sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
 
-## extract raw-rootfs into image:
-echo "extracting raw rootfs into image"
-sudo tar xfj ${CURRENT_DIR}/${COMP_REL}_raw--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+if [ ! -z "${COMP_PREFIX}" ]; then
+	extract_rootfs
+fi
 
 sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
@@ -611,14 +682,14 @@ sudo mount -t proc proc proc/
 sudo mount -t sysfs sys sys/
 sudo mount -o bind /dev dev/
 
-echo "ECHO: installing apt-transport-https"
+echo "Script_MSG: installing apt-transport-https"
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y update
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y upgrade
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install apt-transport-https
 
-echo "ECHO: will add user"
+echo "Script_MSG: will add user"
 gen_add_user_sh
-echo "ECHO: gen_add_user_shfinhed ... will now run in chroot"
+echo "Script_MSG: gen_add_user_shfinhed ... will now run in chroot"
 
 sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/add_user.sh
 
@@ -626,17 +697,17 @@ sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/add_user.sh
 #fix_profile
 
 gen_initial_sh
-echo "ECHO: gen_initial.sh finhed ... will now run in chroot"
+echo "Script_MSG: gen_initial.sh finhed ... will now run in chroot"
 
 sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/initial.sh
 
-echo "ECHO: initial.sh finished ... unmounting .."
+echo "Script_MSG: initial.sh finished ... unmounting .."
 
 sync
 
 cd ${CURRENT_DIR}
 
-echo "READY: unmounting"
+echo "Script_MSG: READY: unmounting ${ROOTFS_MNT}"
 
 PREFIX=${ROOTFS_MNT}
 kill_ch_proc
@@ -648,9 +719,6 @@ sudo umount -R ${ROOTFS_MNT}
 # umount_ch_proc
 #
 sync
-
-COMP_PREFIX=final
-compress_rootfs
 }
 
 inst_kernel_modules() {
@@ -782,6 +850,13 @@ sync
 }
 
 install_uboot() {
+if [[ ${NEW_IMAGE} == 'yes' ]]; then ## extract rootfs into image:
+	## extract rootfs into image:
+	COMPNAME=${COMP_REL}_${COMP_PREFIX}
+	echo "extracting latest ${COMPNAME} rootfs into image"
+	sudo tar xfj ${CURRENT_DIR}/${COMPNAME}--rootfs.tar.bz2 -C ${ROOTFS_MNT}
+fi
+
 echo "installing ${UBOOT_SPLFILE}"
 sudo dd bs=512 if=${UBOOT_SPLFILE} of=${IMG_FILE} seek=2048 conv=notrunc
 sync
@@ -805,38 +880,63 @@ if [ ! -z "${WORK_DIR}" ]; then
 #install_deps # --->- only needed on first new run of a function see function above -------#
 
 #build_uboot
-build_kernel
+#build_kernel
 
-## build_rcn_kernel           # ---> for now redundant ---#
+#NEW_IMAGE="yes"
+if [[ ${NEW_IMAGE} == 'yes' ]]; then ## replace old image with a fresh:
+	create_image
+	generate_rootfs_into_image #-> creates basic debian rootfs and tar of raw rootfs -#
+	NEW_IMAGE=""
+	COMP_PREFIX=raw
+	compress_rootfs
+fi
 
-#create_image
-#build_rootfs_in_image_and_compress #-> creates basic debian rootfs and tar of raw rootfs -#
+# ## fetch_external_rootfs   # ---> for now redundant ---#
 
-## fetch_extract_rcn_rootfs   # ---> for now redundant ---#
-
-#create_image
-
-#run_initial_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
-
-#COMP_PREFIX=mib-hm3-mk-rip-native-compiled_rootfs
-#compress_rootfs
-
-#inst_kernel_from_deb
-#inst_mk_from_deb
+#NEW_IMAGE="yes"
+if [[ ${NEW_IMAGE} == 'yes' ]]; then ## replace old image with a fresh:
+	create_image
+	extract_rootfs
+	NEW_IMAGE=""
+	run_initial_rootfs_user_setup_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
+	COMP_PREFIX=final
+	compress_rootfs
+fi
 
 
-#  COMP_PREFIX=mharber-dev-deb
-#COMP_PREFIX=mib-rel_2-beta-inst_kernel_from_deb
-#compress_rootfs
 
-#install_files   # --> into sd-card-image (.img)
+NEW_IMAGE="yes"
+if [[ ${NEW_IMAGE} == 'yes' ]]; then ## replace old image with a fresh:
+	create_image
+	COMP_PREFIX=final
+	extract_rootfs
+	NEW_IMAGE=""
+# #inst_kernel_from_deb_repo
+	inst_kernel_from_local_deb
+# #inst_mk_from_deb
+	COMP_PREFIX=final-with-kernel-from-local-deb
+#	COMP_PREFIX=mib-HM3-beta-inst_kernel_from_local_deb
+	compress_rootfs
+fi
+
+
+#NEW_IMAGE="yes"
+if [[ ${NEW_IMAGE} == 'yes' ]]; then ## install latest complete rootfs:
+	create_image
+	COMP_PREFIX=final-with-kernel-from-local-deb
+	extract_rootfs
+#	#install_files   # --> into sd-card-image (.img)
+fi
 
 #    sudo sh -c "apt -y install `apt-cache depends machinekit-rt-preempt | awk '/Depends:/{print$2}'`"
+# 
 
-#install_uboot   # --> onto sd-card-image (.img)
 
-#echo "NOTE:  Will now run make bmap image"
-#make_bmap_image
+install_uboot   # --> onto sd-card-image (.img)
+
+echo "NOTE:  Will now run make bmap image"
+sudo apt install bmap-tools
+make_bmap_image
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#-------             Image building process complete                       -------- "

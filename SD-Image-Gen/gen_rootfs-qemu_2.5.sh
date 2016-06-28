@@ -3,19 +3,15 @@
 # Variables
 #------------------------------------------------------------------------------------------------------
 set -e
-CURRENT_DIR=`pwd`
-WORK_DIR=$1
-ROOTFS_DIR=$2
-SD_IMG=$3
-IMG_ROOT_PART=$4
-distro=$5
+CURRENT_DIR=${1}
+ROOTFS_DIR=${2}
+IMG_FILE=${3}
+IMG_ROOT_PART=${4}
+distro=${5}
+ROOTFS_MNT=${6}
 
-MOUNT_DIR=
-ROOTFS_MNT=/mnt/rootfs
-
-ROOTFS_IMG=${WORK_DIR}/rootfs.img
-DRIVE=/dev/mapper/loop2
-
+#ROOTFS_MNT=/mnt/rootfs
+#DRIVE=/dev/mapper/loop0
 
 DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
 
@@ -26,29 +22,14 @@ DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
 ##,rpcbind
 ##,ntpdate,avahi-discover
 ## ntpdate,dhcpcd5,isc-dhcp-client,
-# run_bootstrap() {
-# qoutput1='sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown2,iproute2,isc-dhcp-client,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian'
-# echo " "
-# echo "Note: Eval.Start.."
-# eval $qoutput1
-# echo " "
-# echo "Note: Eval..Done ."
-#
+# 
+# function run_qemu-debootstrap {
+# sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
 # }
 
-function run_jessie_bootstrap {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
+function run_qemu-debootstrap {
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs dpkg-dev build-essential initramfs-tools ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
 }
-
-##  ifupdown2,
-function run_stretch_bootstrap {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
-}
-
-#run_jessie-host_bootstrap() {
-#sudo qemu-debootstrap --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg  $distro $ROOTFS_DIR http://ftp.debian.org/debian/
-#}
-
 
 gen_policy_rc_d() {
 sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/usr/sbin/policy-rc.d
@@ -122,22 +103,12 @@ EOT'
 
 }
 
-
-# 127.0.0.1       localhost.localdomain   localhost       mksocfpga
-# ::1             localhost.localdomain   localhost       mksocfpga
-# ff02::1         ip6-allnodes
-# ff02::2         ip6-allrouters
-
-# ::1             localhost ip6-localhost ip6-loopback
-# ff02::1         ip6-allnodes
-# ff02::2         ip6-allrouters
-
 gen_hosts() {
 #echo -e "127.0.1.1\tmksocfpga" | sudo tee -a $ROOTFS_DIR/etc/hosts
 
 sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/etc/hosts
 127.0.0.1       localhost.localdomain       localhost   mksocfpga
-127.0.1,1       mksocfpga.local             mksocfpga
+127.0.1.1       mksocfpga.local             mksocfpga
 EOT'
 
 }
@@ -675,17 +646,9 @@ sudo mkdir -p $ROOTFS_DIR/etc/systemd/network
 
 gen_wired_network
 
-#sudo sh -c 'cat <<EOT >> '$ROOTFS_DIR'/etc/network/interfaces
-#auto lo eth0
-#iface lo inet loopback
-#allow-hotplug eth0
-#    iface eth0 inet dhcp
-#EOT'
-
 sudo sh -c 'echo T0:2345:respawn:rootfs/sbin/getty -L ttyS0 115200 vt100 >> '$ROOTFS_DIR'/etc/inittab'
 
 gen_locale_gen
-
 
 sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/etc/locale.conf
 LANG=en_US.UTF-8 UTF-8
@@ -716,57 +679,28 @@ echo "Config files genetated"
 
 run_func() {
 
-# output=$( run_bootstrap )
-# if [ $? -eq 0  ]; then
-#     echo ""
-#     echo "ECHO_Good: qoutput1 value  is = ${output}"
-#     echo ""
-# else
-#     echo ""
-#     echo "ECHO_err: run_debootstrap output = nonzero:Error"
-#     echo "ECHO_err: qoutput value is = ${output}"
-#     echo ""
-#     sudo sh -c 'sed -i.bak s/"set -e"/"set -x"/g '$ROOTFS_MNT'/debootstrap/debootstrap'
-#     echo ""
-#     echo "qemu stage2 mod applied "
-#     echo " "
-#     echo "Runnung stage 2 manually -----!"
-#     sudo chroot $ROOTFS_MNT /debootstrap/debootstrap --second-stage
-#     echo "stage manual run done  -----!"
-#     echo ""
-# fi
+echo "Script_MSG: running qemu-debootstrap for ${distro} os"
+#run_qemu-debootstrap
 
-
-if [ "$distro" = "jessie" ]; then
-    echo "MSG: running bootstrap for jessie os"
-    run_jessie_bootstrap
-elif [ "$distro" = "stretch" ]; then
-    echo "MSG: running bootstrap for stretch os"
-    run_stretch_bootstrap
-else
-    echo "MSG: Dist detect failure distro = $distro"
-    exit 1
-fi
-
-echo "will now run setup_configfiles "
+echo "Script_MSG: will now setup_configfiles"
 setup_configfiles
 
 }
 
 gen_install_in-img() {
-if [ ! -z "$SD_IMG" ]; then
-    sudo kpartx -a -s -v ${SD_IMG}
-    sudo mkdir -p $ROOTFS_MNT
-    sudo mount ${DRIVE}$IMG_ROOT_PART $ROOTFS_MNT
+if [ ! -z "${IMG_FILE}" ]; then
+	LOOP_DRIVE=`eval /sbin/losetup -f`
+    sudo kpartx -a -s -v ${IMG_FILE}
+    sudo mkdir -p ${ROOTFS_MNT}
+    sudo mount /dev/mapper/${LOOP_DRIVE:5}${IMG_ROOT_PART} ${ROOTFS_MNT}
     echo "ECHO: ""chroot is mounted in: ${ROOTFS_MNT}"
-    ROOTFS_DIR=$ROOTFS_MNT
-    echo "ECHO: "'rootfs_dir ='$ROOTFS_DIR
+    ROOTFS_DIR=${ROOTFS_MNT}
+    echo "ECHO: "'rootfs_dir ='${ROOTFS_DIR}
     run_func
-    sudo umount $ROOTFS_MNT
+    sudo umount -R ${ROOTFS_MNT}
     echo "ECHO: ""chroot was unounted "
-    echo "ECHO: ""rootfs is now installed in imagefile:"$SD_IMG
-    sudo kpartx -d -s -v ${SD_IMG}
-    sync
+    echo "ECHO: ""rootfs is now installed in imagefile:"${IMG_FILE}
+    sudo kpartx -d -s -v ${IMG_FILE}
 else
     echo "ECHO: ""no Imagefile parameter given chroot will only be made in current local folder:"
     echo "ECHO: "'rootfs_dir ='$ROOTFS_DIR

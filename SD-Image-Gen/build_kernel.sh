@@ -285,6 +285,7 @@ cd ${KERNEL_DIR}
 
 #clean
 make -j${NCORES} mrproper
+#make distclean
 # configure
 make ARCH=arm CROSS_COMPILE=${CC} ${KERNEL_CONF} 2>&1 | tee ../linux-config_rt-log.txt
 #make ${KERNEL_CONF} 2>&1 | tee ../linux-config_rt-log.txt
@@ -298,7 +299,7 @@ make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} modules 2>&1 | tee ../linux-module
 #make -j${NCORES} modules 2>&1 | tee ../linux-modules_rt-log.txt
 
 # uio hm2_soc module:
-make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR}  modules 2>&1 | tee ../linux-uio-hm2_soc-module_rt-log.txt
+#make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR}  modules 2>&1 | tee ../linux-uio-hm2_soc-module_rt-log.txt
 
 # adc module:
 #make -j${NCORES} ARCH=arm -C ${KERNEL_DIR} M=${ADC_DIR}  modules 2>&1 | tee ../linux-adcreg-module_rt-log.txt
@@ -307,7 +308,7 @@ make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR}  mod
 make -j${NCORES} ARCH=arm  headers_check 2>&1 | tee ../linux-headers_rt-log.txt
 
 # deb:
-make -j${NCORES} ARCH=arm  deb-pkg 2>&1 | tee ../deb_rt-log.txt
+make -j${NCORES} ARCH=arm  deb-pkg LOCALVERSION=-socfpga-iscsi KDEB_PKGVERSION=$(make kernelversion)-1 2>&1 | tee ../deb_rt-log.txt
 
 #dtboconfig:
 
