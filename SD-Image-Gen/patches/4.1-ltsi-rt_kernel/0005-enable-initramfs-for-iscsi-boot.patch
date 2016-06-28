@@ -1,0 +1,43 @@
+From 3ee9acbb8afc907bafb00aa5cd666b7abb2547c5 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 27 Jun 2016 15:23:36 +0200
+Subject: [PATCH 5/5] enable initramfs for iscsi boot
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index bc96f8e..b3f095e 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -72,6 +72,8 @@ CONFIG_SCSI=y
+ CONFIG_SCSI_PROC_FS=y
+ CONFIG_BLK_DEV_SD=y
+ CONFIG_SCSI_LOWLEVEL=y
++CONFIG_SCSI_NETLINK=y
++CONFIG_SCSI_CONSTANTS=y
+ CONFIG_SCSI_ISCSI_ATTRS=y
+ CONFIG_ISCSI_TCP=y
+ # CONFIG_ISCSI_BOOT_SYSFS is not set
+@@ -170,3 +172,16 @@ CONFIG_UIO_PDRV=y
+ CONFIG_UIO_PDRV_GENIRQ=y
+ CONFIG_CONFIGFS_FS=y
+ CONFIG_OF_OVERLAY=y
++CONFIG_ISCSI_BOOT_SYSFS=y
++CONFIG_VMWARE_PVSCSI=m
++CONFIG_ISCSI_BOOT_SYSFS=y
++CONFIG_BLK_DEV_INITRD=y
++CONFIG_INITRAMFS_SOURCE="~/socfpga/boot"
++CONFIG_INITRAMFS_ROOT_UID=0
++CONFIG_INITRAMFS_ROOT_GID=0
++CONFIG_RD_GZIP=y
++CONFIG_RD_BZIP2=y
++CONFIG_RD_LZMA=y
++CONFIG_RD_XZ=y
++CONFIG_RD_LZO=y
++CONFIG_RD_LZ4=y
+-- 
+2.7.4
+

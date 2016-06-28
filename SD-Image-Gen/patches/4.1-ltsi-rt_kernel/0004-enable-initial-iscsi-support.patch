@@ -1,21 +1,23 @@
-From 463a12dd670999e732da6a1522c9f7ed7a942e50 Mon Sep 17 00:00:00 2001
-From: the-snowwhite <producer@holotronic.dk>
-Date: Sun, 26 Jun 2016 11:58:15 +0200
-Subject: [PATCH 4/4] enable initial iscsi support
+From 36509bf753fd249422e23ff9419857df43d35d5c Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 27 Jun 2016 01:45:30 +0200
+Subject: [PATCH 4/5] enable initial iscsi support
 
-Signed-off-by: Michael Brown <mib@localhost.localdomain>
-Signed-off-by: root <root@localhost.localdomain>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/configs/socfpga_defconfig | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm/configs/socfpga_defconfig | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index bcb93cd..bd08a22 100644
+index bcb93cd..bc96f8e 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -71,7 +71,10 @@ CONFIG_EEPROM_AT24=y
+@@ -69,9 +69,12 @@ CONFIG_SRAM=y
+ CONFIG_ALTERA_SYSID=m
+ CONFIG_EEPROM_AT24=y
  CONFIG_SCSI=y
- # CONFIG_SCSI_PROC_FS is not set
+-# CONFIG_SCSI_PROC_FS is not set
++CONFIG_SCSI_PROC_FS=y
  CONFIG_BLK_DEV_SD=y
 -# CONFIG_SCSI_LOWLEVEL is not set
 +CONFIG_SCSI_LOWLEVEL=y

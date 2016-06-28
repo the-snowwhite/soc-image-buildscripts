@@ -15,7 +15,7 @@ UBOOT_BOARD=${5}
 MAKE_CONFIG=${6}
 
 CC_FOLDER_NAME=${7}
-PATCH=${8}
+APPLY_PATCH=${8}
 
 #UBOOT_VERSION='v2015.10'
 #UBOOT_VERSION='v2016.01'
@@ -47,7 +47,8 @@ CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
 NCORES=`nproc`
 
 patch_uboot() {
-if [ ! -z "$PATCH" ]; then
+#if [ ! -z "$APPLY_PATCH" ]; then
+if [[ ${APPLY_PATCH} == 'yes' ]]; then
 	echo "MGG: Applying u-boot patch ${PATCH_FILE}"
 	cd $UBOOT_DIR
 	git am --signoff <  $SCRIPT_ROOT_DIR/$PATCH_FILE

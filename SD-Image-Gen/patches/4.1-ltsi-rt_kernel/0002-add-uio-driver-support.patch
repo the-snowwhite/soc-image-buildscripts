@@ -1,9 +1,10 @@
-From 6c7023a762be455b322e4afbb37b23a8941fc100 Mon Sep 17 00:00:00 2001
+From 74545876738e3ae00a217b79908175ca654a48da Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 26 Jun 2016 11:52:00 +0200
-Subject: [PATCH 2/4] add uio driver support
+Subject: [PATCH 2/5] add uio driver support
 
 Signed-off-by: Michael Brown <mib@localhost.localdomain>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig | 3 +++
  1 file changed, 3 insertions(+)

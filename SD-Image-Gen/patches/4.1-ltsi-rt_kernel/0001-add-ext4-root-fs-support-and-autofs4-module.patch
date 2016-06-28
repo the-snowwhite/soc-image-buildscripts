@@ -1,9 +1,10 @@
-From 41357d2c96db9cf0eb3e039807fb7949758c5a37 Mon Sep 17 00:00:00 2001
+From 370ffce51e3038ddeba527da08cc1eec37a981cc Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 26 Jun 2016 11:48:25 +0200
-Subject: [PATCH 1/4] add ext4 root fs support and autofs4 module
+Subject: [PATCH 1/5] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <mib@localhost.localdomain>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)

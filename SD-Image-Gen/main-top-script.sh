@@ -62,9 +62,11 @@ IMG_ROOT_PART=p2
 #UBOOT_VERSION="v2016.01"
 #UBOOT_MAKE_CONFIG='u-boot-with-spl-dtb.sfp'
 
-UBOOT_VERSION="v2016.05"
+#UBOOT_VERSION="v2016.05"
+UBOOT_VERSION="v2016.07-rc1"
 UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
-PATCH_UBOOT=yes
+#APPLY_UBOOT_PATCH=yes
+APPLY_UBOOT_PATCH=""
 
 BOARD=nano
 #BOARD=de1
@@ -265,8 +267,8 @@ fi
 }
 
 install_deps() {
-install_uboot_dep
-install_kernel_dep
+#install_uboot_dep
+#install_kernel_dep
 sudo apt install kpartx
 install_rootfs_dep
 echo "deps installed"
@@ -274,7 +276,7 @@ echo "deps installed"
 
 function build_uboot {
     get_toolchain
-	${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${BOARD}  ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG} ${CC_FOLDER_NAME} ${PATCH_UBOOT}
+	${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${BOARD}  ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG} ${CC_FOLDER_NAME} ${APPLY_UBOOT_PATCH}
 }
 
 function build_kernel {
@@ -804,8 +806,8 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 #install_deps # --->- only needed on first new run of a function see function above -------#
 
-#build_uboot
-build_kernel
+build_uboot
+#build_kernel
 
 ## build_rcn_kernel           # ---> for now redundant ---#
 

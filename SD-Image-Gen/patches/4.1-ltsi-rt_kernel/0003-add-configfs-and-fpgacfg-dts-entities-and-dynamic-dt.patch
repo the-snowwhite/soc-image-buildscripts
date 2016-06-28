@@ -1,10 +1,11 @@
-From 2a2d672b9706637492d18d764706d149b4d3f772 Mon Sep 17 00:00:00 2001
+From 3933bf96843eb81dc1820d75c5bb8544a9c6d220 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 26 Jun 2016 11:55:33 +0200
-Subject: [PATCH 3/4] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 3/5] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support options
 
 Signed-off-by: Michael Brown <mib@localhost.localdomain>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig | 2 ++
  1 file changed, 2 insertions(+)
