@@ -9,6 +9,7 @@ IMG_FILE=${3}
 IMG_ROOT_PART=${4}
 distro=${5}
 ROOTFS_MNT=${6}
+LOOP_DEV=${7}
 
 #ROOTFS_MNT=/mnt/rootfs
 #DRIVE=/dev/mapper/loop0
@@ -19,18 +20,35 @@ DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
 #------------------------------------------------------------------------------------------------------
 # build armhf Debian qemu-debootstrap chroot port
 #------------------------------------------------------------------------------------------------------
+#
+# mount_image_file(){
+# 	LOOP_DEV=`eval sudo losetup -f --show ${IMG_FILE}`
+# 	echo "#-----------------------------------------------------------------------------------	#"
+# 	echo "#                                                                                   	#"
+# 	echo "# Scr_MSG: Image file mounted in LOOP_DEV--> ${LOOP_DEV}                            	#"
+# 	echo "#                                                                                   	#"
+# 	echo "# Scr_MSG: sudo losetup -f --show ${IMG_FILE}                                       	#"
+# 	echo "# Output = ${LOOP_DEV}                                                              	#"
+# 	echo "#                                                                                   	#"
+# 	echo "#-----------------------------------------------------------------------------------	#"
+# }
+#
+# unmount_image_file(){
+# 	sudo losetup -d ${LOOP_DEV}
+# }
+#
 ##,rpcbind
 ##,ntpdate,avahi-discover
 ## ntpdate,dhcpcd5,isc-dhcp-client,
-# 
-# function run_qemu-debootstrap {
-# sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
-# }
-
+#
 function run_qemu-debootstrap {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs dpkg-dev build-essential initramfs-tools ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
 }
-
+#
+# function run_qemu-debootstrap {
+# sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs dpkg-dev build-essential initramfs-tools ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
+# }
+#
 gen_policy_rc_d() {
 sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/usr/sbin/policy-rc.d
 echo "************************************" >&2
@@ -678,34 +696,31 @@ echo "Config files genetated"
 
 
 run_func() {
+	echo ""
+	echo "Script_MSG: running qemu-debootstrap for ${distro} os"
+	echo ""
+	run_qemu-debootstrap
 
-echo "Script_MSG: running qemu-debootstrap for ${distro} os"
-#run_qemu-debootstrap
-
-echo "Script_MSG: will now setup_configfiles"
-setup_configfiles
-
+	echo "Script_MSG: will now setup_configfiles"
+	setup_configfiles
 }
 
 gen_install_in-img() {
-if [ ! -z "${IMG_FILE}" ]; then
-	LOOP_DRIVE=`eval /sbin/losetup -f`
-    sudo kpartx -a -s -v ${IMG_FILE}
-    sudo mkdir -p ${ROOTFS_MNT}
-    sudo mount /dev/mapper/${LOOP_DRIVE:5}${IMG_ROOT_PART} ${ROOTFS_MNT}
-    echo "ECHO: ""chroot is mounted in: ${ROOTFS_MNT}"
-    ROOTFS_DIR=${ROOTFS_MNT}
-    echo "ECHO: "'rootfs_dir ='${ROOTFS_DIR}
-    run_func
-    sudo umount -R ${ROOTFS_MNT}
-    echo "ECHO: ""chroot was unounted "
-    echo "ECHO: ""rootfs is now installed in imagefile:"${IMG_FILE}
-    sudo kpartx -d -s -v ${IMG_FILE}
-else
-    echo "ECHO: ""no Imagefile parameter given chroot will only be made in current local folder:"
-    echo "ECHO: "'rootfs_dir ='$ROOTFS_DIR
-    run_func
-fi
+	if [ ! -z "${LOOP_DEV}" ]; then
+		sudo mkdir -p ${ROOTFS_MNT}
+#		sudo mount ${LOOP_DEV}${IMG_ROOT_PART} ${ROOTFS_MNT}
+#		echo "ECHO: ""chroot is mounted in: ${ROOTFS_MNT}"
+		ROOTFS_DIR=${ROOTFS_MNT}
+		echo "ECHO: "'rootfs_dir ='${ROOTFS_DIR}
+		run_func
+#		sudo umount -R ${ROOTFS_MNT}
+#		echo "ECHO: ""chroot was unounted "
+		echo "ECHO: ""rootfs is now installed in imagefile:"${IMG_FILE}
+	else
+		echo "ECHO: ""no Imagefile parameter given chroot will only be made in current local folder:"
+		echo "ECHO: "'rootfs_dir ='$ROOTFS_DIR
+		run_func
+	fi
 }
 
 #----------------------- Run functions ----------------------------#
