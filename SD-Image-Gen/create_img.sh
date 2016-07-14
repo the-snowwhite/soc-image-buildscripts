@@ -109,8 +109,8 @@ media_rootfs_partition=p2
 mkfs_partition="${media_prefix}${media_rootfs_partition}"
 mkfs_label="-L ${ROOTFS_LABEL}"
 
-#sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_partition} ${mkfs_label}"
-sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
+sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_partition} ${mkfs_label}"
+#sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
 
 sudo sync
 unmount_image_file
@@ -129,7 +129,7 @@ sudo mke2fs -j -L "rootfs" ${ROOTFS_IMG}
 }
 
 if [ ! -z "${WORK_DIR}" ]; then
-    if [ -f ${SD_IMG} ]; then
+    if [ -a ${SD_IMG} ]; then
         echo "Deleting old sd-imagefile"
         rm -f ${SD_IMG}
     fi

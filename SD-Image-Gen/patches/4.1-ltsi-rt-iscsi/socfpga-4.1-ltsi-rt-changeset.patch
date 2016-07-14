@@ -1,11 +1,12 @@
-From 13a4f4a33ba990a79a1521f1c963eea5b44d6254 Mon Sep 17 00:00:00 2001
+From 9f39cf81f82877dd59e3a02ce06b49beacdda7b2 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 26 Jun 2016 11:48:25 +0200
-Subject: [PATCH 1/4] add ext4 root fs support and autofs4 module
+Subject: [PATCH 1/7] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <mib@localhost.localdomain>
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
@@ -42,17 +43,18 @@ index 01e6811..1fb717a 100644
  CONFIG_ROOT_NFS=y
  CONFIG_NLS_CODEPAGE_437=y
 -- 
-2.8.1
+2.7.4
 
 
-From 64d10fc33f84b5039a705cc8074492a474bf989b Mon Sep 17 00:00:00 2001
+From e85a26897fa2e40013d093c4edf39e7ae8db75ff Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 26 Jun 2016 11:52:00 +0200
-Subject: [PATCH 2/4] add uio driver support
+Subject: [PATCH 2/7] add uio driver support
 
 Signed-off-by: Michael Brown <mib@localhost.localdomain>
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig | 3 +++
  1 file changed, 3 insertions(+)
@@ -69,18 +71,19 @@ index 1fb717a..0362e72 100644
 +CONFIG_UIO_PDRV=y
 +CONFIG_UIO_PDRV_GENIRQ=y
 -- 
-2.8.1
+2.7.4
 
 
-From 5927af46cc651956f702be9bdbd61d514704146b Mon Sep 17 00:00:00 2001
+From e2c54cc316a8efdbda66172b33d9857fbebd66b5 Mon Sep 17 00:00:00 2001
 From: the-snowwhite <producer@holotronic.dk>
 Date: Sun, 26 Jun 2016 11:55:33 +0200
-Subject: [PATCH 3/4] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 3/7] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support options
 
 Signed-off-by: Michael Brown <mib@localhost.localdomain>
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig | 2 ++
  1 file changed, 2 insertions(+)
@@ -96,16 +99,17 @@ index 0362e72..bcb93cd 100644
 +CONFIG_CONFIGFS_FS=y
 +CONFIG_OF_OVERLAY=y
 -- 
-2.8.1
+2.7.4
 
 
-From 5333bc22825894e06b1bb4caa0cacac715e1b15f Mon Sep 17 00:00:00 2001
+From 41b31731219961a3ad7a8103c6a2be2b0f50195e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 29 Jun 2016 19:05:21 +0200
-Subject: [PATCH 4/4] add socfpga .dtb files to kernel-image .deb
+Subject: [PATCH 4/7] add socfpga .dtb files to kernel-image .deb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 Signed-off-by: the-snowwhite <producer@holotronic.dk>
+Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  scripts/package/builddeb | 2 ++
  1 file changed, 2 insertions(+)
@@ -126,5 +130,82 @@ index 88dbf23..c397685 100755
  
  if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
 -- 
-2.8.1
+2.7.4
+
+
+From 3a08a727edf124574786e22bb621a2ff49096636 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Thu, 7 Jul 2016 22:57:31 +0200
+Subject: [PATCH 5/7] enable initial iscsi support
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index bcb93cd..c2802e5 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -167,3 +167,7 @@ CONFIG_UIO_PDRV=y
+ CONFIG_UIO_PDRV_GENIRQ=y
+ CONFIG_CONFIGFS_FS=y
+ CONFIG_OF_OVERLAY=y
++CONFIG_SCSI_PROC_FS=y
++CONFIG_SCSI_LOWLEVEL=y
++CONFIG_SCSI_ISCSI_ATTRS=y
++CONFIG_ISCSI_TCP=y
+-- 
+2.7.4
+
+
+From a428dfa7bdb4f337d346f174d06ad77a00df56b3 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Thu, 14 Jul 2016 11:02:35 +0200
+Subject: [PATCH 6/7] disable CONFIG_LOCALVERSION_AUTO for consistant
+ apt-updatable kernelversion name
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index c2802e5..177f7fb 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -171,3 +171,4 @@ CONFIG_SCSI_PROC_FS=y
+ CONFIG_SCSI_LOWLEVEL=y
+ CONFIG_SCSI_ISCSI_ATTRS=y
+ CONFIG_ISCSI_TCP=y
++CONFIG_LOCALVERSION_AUTO=n
+-- 
+2.7.4
+
+
+From d418ce2b2a947baaeeba2a66259f477262a29cdf Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Thu, 14 Jul 2016 11:21:28 +0200
+Subject: [PATCH 7/7] enable jumboframes maxmtu=9000
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts b/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
+index 555e9ca..5b79c0c 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
+@@ -69,7 +69,7 @@
+ 	rxdv-skew-ps = <420>; /* 0ps */
+ 	rxc-skew-ps = <1680>; /* 780ps */
+ 
+-	max-frame-size = <3800>;
++	max-frame-size = <9000>;
+ };
+ 
+ &gpio0 {
+-- 
+2.7.4
 

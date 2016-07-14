@@ -40,11 +40,17 @@ DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
 ##,rpcbind
 ##,ntpdate,avahi-discover
 ## ntpdate,dhcpcd5,isc-dhcp-client,
+# ,dhcpcd5
 #
 function run_qemu-debootstrap {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs,u-boot-tools,initramfs-tools ${distro} ${ROOTFS_DIR} http://kubuntu16-srv.holotronic.lan/debian/
 }
 #
+# #
+# function run_qemu-debootstrap {
+# sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs,u-boot-tools,initramfs-tools ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
+# }
+# #
 # function run_qemu-debootstrap {
 # sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,debianutils,traceroute,strace,cgroupfs-mount,ntp,autofs dpkg-dev build-essential initramfs-tools ${distro} ${ROOTFS_DIR} http://ftp.debian.org/debian
 # }
@@ -97,12 +103,17 @@ EOT'
 
 gen_sources_list() {
 sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/etc/apt/sources.list
-deb http://ftp.dk.debian.org/debian '$distro'  main contrib non-free
-deb-src http://ftp.dk.debian.org/debian  '$distro' main contrib non-free
-deb http://ftp.dk.debian.org/debian '$distro'-updates main contrib non-free
-deb-src http://ftp.dk.debian.org/debian/ '$distro'-updates main contrib non-free
-deb http://security.debian.org/ '$distro'/updates main contrib non-free
-deb-src http://security.debian.org '$distro'/updates main contrib non-free
+#------------------------------------------------------------------------------#
+#                   OFFICIAL DEBIAN REPOS                    
+#------------------------------------------------------------------------------#
+
+###### Debian Main Repos
+deb http://ftp.dk.debian.org/debian/ '$distro' main contrib non-free 
+deb-src http://ftp.dk.debian.org/debian/ '$distro' main 
+
+###### Debian Update Repos
+deb http://security.debian.org/ '$distro'/updates main contrib non-free 
+
 EOT'
 
 }
@@ -152,7 +163,7 @@ sudo sh -c 'cat <<EOT > '$ROOTFS_DIR'/etc/systemd/network/10-wired.network
 Name=eth0
 
 [Network]
-DHCP=ipv4
+DHCP=v4
 EOT'
 }
 
@@ -723,6 +734,22 @@ gen_install_in-img() {
 	fi
 }
 
+kill_ch_proc(){
+FOUND=0
+
+for ROOT in /proc/*/root; do
+	LINK=$(sudo readlink ${ROOT})
+	if [ "x${LINK}" != "x" ]; then
+	if [ "x${LINK:0:${#PREFIX}}" = "x${PREFIX}" ]; then
+			# this process is in the chroot...
+			PID=$(basename $(dirname "${ROOT}"))
+			sudo kill -9 "${PID}"
+			FOUND=1
+		fi
+	fi
+done
+}
+
 #----------------------- Run functions ----------------------------#
 echo "#---------------------------------------------------------------------------------- "
 echo "#--------------------+++       gen-rootfs.sh Start   +++--------------------------- "
@@ -730,6 +757,10 @@ echo "#-------------------------------------------------------------------------
 set -e
 
 gen_install_in-img
+set +e
+echo "Scr_MSG: Killing all processes in ---> ${ROOTFS_MNT}"
+PREFIX=${ROOTFS_MNT}
+kill_ch_proc
 
 echo "#---------------------------------------------------------------------------------- "
 echo "#--------------------+++       gen-rootfs.sh End     +++--------------------------- "

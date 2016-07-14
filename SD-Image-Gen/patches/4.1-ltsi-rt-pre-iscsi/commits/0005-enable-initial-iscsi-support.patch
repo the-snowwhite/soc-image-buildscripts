@@ -1,0 +1,25 @@
+From 3a08a727edf124574786e22bb621a2ff49096636 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Thu, 7 Jul 2016 22:57:31 +0200
+Subject: [PATCH 5/7] enable initial iscsi support
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index bcb93cd..c2802e5 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -167,3 +167,7 @@ CONFIG_UIO_PDRV=y
+ CONFIG_UIO_PDRV_GENIRQ=y
+ CONFIG_CONFIGFS_FS=y
+ CONFIG_OF_OVERLAY=y
++CONFIG_SCSI_PROC_FS=y
++CONFIG_SCSI_LOWLEVEL=y
++CONFIG_SCSI_ISCSI_ATTRS=y
++CONFIG_ISCSI_TCP=y
+-- 
+2.7.4
+

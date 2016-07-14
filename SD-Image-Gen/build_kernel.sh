@@ -55,8 +55,8 @@ KERNEL_CONF='socfpga_defconfig'
 IMG_FILE=${WORK_DIR}/mksoc_sdcard.img
 DRIVE=/dev/loop0
 
-KERNEL_BUILD_DIR=${WORK_DIR}/arm-linux-${KERNEL_FOLDER_NAME}-gnueabifh-kernel
-KERNEL_DIR=${KERNEL_BUILD_DIR}/linux
+KERNEL_PARENT_DIR=${WORK_DIR}/arm-linux-${KERNEL_FOLDER_NAME}-gnueabifh-kernel
+KERNEL_BUILD_DIR=${KERNEL_PARENT_DIR}/linux
 
 NCORES=`nproc`
 
@@ -87,9 +87,9 @@ fi
 }
 
 uiomod_kernel() {
-#cd ${KERNEL_DIR}
+#cd ${KERNEL_BUILD_DIR}
 #Uio Config additions:
-cat <<EOT >> ${KERNEL_DIR}/arch/arm/configs/${KERNEL_CONF}
+cat <<EOT >> ${KERNEL_BUILD_DIR}/arch/arm/configs/${KERNEL_CONF}
 CONFIG_UIO=y
 CONFIG_UIO_PDRV=y
 CONFIG_UIO_PDRV_GENIRQ=y
@@ -135,26 +135,26 @@ EOT
 echo "Kernel UIO Patch added"
 echo "config file mods applied"
 
-cp ${SCRIPT_ROOT_DIR}/socfpga.dtsi ${KERNEL_DIR}/arch/arm/boot/dts
+cp ${SCRIPT_ROOT_DIR}/socfpga.dtsi ${KERNEL_BUILD_DIR}/arch/arm/boot/dts
 
 }
 
 patch_git_kernel() {
-cd ${KERNEL_DIR}
+cd ${KERNEL_BUILD_DIR}
 git am --signoff <  ${SCRIPT_ROOT_DIR}/${ALT_SOC_KERNEL_PATCH_FILE}
 }
 
 clone_kernel() {
-    if [ -d ${KERNEL_BUILD_DIR} ]; then
-        echo the kernel target directory ${KERNEL_BUILD_DIR} already exists.
+    if [ -d ${KERNEL_PARENT_DIR} ]; then
+        echo the kernel target directory ${KERNEL_PARENT_DIR} already exists.
         echo cleaning repo
-        cd ${KERNEL_BUILD_DIR}/linux
+        cd ${KERNEL_PARENT_DIR}/linux
         git clean -d -f -x
         git fetch origin
         git reset --hard origin/${KERNEL_BRANCH}
     else
-        mkdir -p ${KERNEL_BUILD_DIR}
-        cd ${KERNEL_BUILD_DIR}
+        mkdir -p ${KERNEL_PARENT_DIR}
+        cd ${KERNEL_PARENT_DIR}
         git clone ${KERNEL_URL} linux
         cd linux
         git remote add linux ${KERNEL_URL}
@@ -165,16 +165,16 @@ cd ..
 }
 
 fetch_kernel() {
-    if [ -d ${KERNEL_BUILD_DIR} ]; then
-        echo the kernel target directory $KERNEL_BUILD_DIR already exists.
+    if [ -d ${KERNEL_PARENT_DIR} ]; then
+        echo the kernel target directory $KERNEL_PARENT_DIR already exists.
         echo reinstalling file
-        cd ${KERNEL_BUILD_DIR}
+        cd ${KERNEL_PARENT_DIR}
         echo "deleting kernel folder"
         sudo rm -Rf linux
     else
-        echo "creating ${KERNEL_BUILD_DIR}"
-        mkdir -p ${KERNEL_BUILD_DIR}
-        cd ${KERNEL_BUILD_DIR}
+        echo "creating ${KERNEL_PARENT_DIR}"
+        mkdir -p ${KERNEL_PARENT_DIR}
+        cd ${KERNEL_PARENT_DIR}
     fi
     if [ ! -f ${KERNEL_FILE} ]; then
         echo "fetching kernel"
@@ -187,12 +187,12 @@ fetch_kernel() {
 
 
 patch_kernel() {
-cd ${KERNEL_BUILD_DIR}
+cd ${KERNEL_PARENT_DIR}
 if [ ! -f ${PATCH_FILE} ]; then #if file with that name not exists
         echo "fetching patch"
         wget ${PATCH_URL}
 fi
-cd ${KERNEL_DIR}
+cd ${KERNEL_BUILD_DIR}
 xzcat ../${PATCH_FILE} | patch -p1
 echo "rt-Patch applied"
 #Uio Patch:
@@ -204,7 +204,7 @@ rm -f Makefile
 sh -c 'cat <<EOT >Makefile
 #!/bin/bash
 
-KERNEL_SRC_DIR='${KERNEL_DIR}'
+KERNEL_SRC_DIR='${KERNEL_BUILD_DIR}'
 CURDIR=\$(shell pwd)
 CROSS_C  ?= '${CC}'
 ARCH=arm
@@ -271,7 +271,7 @@ else
    gen_makefile
 fi
 
-make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${WORK_DIR}/${CFG_BUILD}  modules 2>&1 | tee ../${CFG_BUILD}-module_rt-log.txt
+make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_BUILD_DIR} M=${WORK_DIR}/${CFG_BUILD}  modules 2>&1 | tee ../${CFG_BUILD}-module_rt-log.txt
 }
 
 build_kernel() {
@@ -281,34 +281,52 @@ set -v
 export CROSS_COMPILE=${CC}
 export KBUILD_DEBARCH=armhf
 
-cd ${KERNEL_DIR}
+cd ${KERNEL_BUILD_DIR}
 
 #clean
 make -j${NCORES} mrproper
 #make distclean
+
+#chmod a+x scripts/*
+#chmod a+x debian/scripts/misc/*
+#fakeroot rules clean
+#fakeroot debian/rules editconfigs
+
 # configure
-make ARCH=arm CROSS_COMPILE=${CC} ${KERNEL_CONF} 2>&1 | tee ../linux-config_rt-log.txt
+#make ARCH=arm CROSS_COMPILE=${CC} ${KERNEL_CONF} 2>&1 | tee ../linux-config_rt-log.txt
 #make ${KERNEL_CONF} 2>&1 | tee ../linux-config_rt-log.txt
 
-# zImage:
-make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} 2>&1 | tee ../linux-make_rt-log_.txt
-#make -j${NCORES} 2>&1 | tee ../linux-make_rt-log_.txt
+# # zImage:
+# make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} 2>&1 | tee ../linux-make_rt-log_.txt
+# #make -j${NCORES} 2>&1 | tee ../linux-make_rt-log_.txt
+# 
+# # modules:
+# make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} modules 2>&1 | tee ../linux-modules_rt-log.txt
+# #make -j${NCORES} modules 2>&1 | tee ../linux-modules_rt-log.txt
+# 
+# # uio hm2_soc module:
+# #make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_BUILD_DIR} M=${UIO_DIR}  modules 2>&1 | tee ../linux-uio-hm2_soc-module_rt-log.txt
+# 
+# # adc module:
+# #make -j${NCORES} ARCH=arm -C ${KERNEL_BUILD_DIR} M=${ADC_DIR}  modules 2>&1 | tee ../linux-adcreg-module_rt-log.txt
+# 
+# # headers:
+# make -j${NCORES} ARCH=arm  headers_check 2>&1 | tee ../linux-headers_rt-log.txt
+# 
+# # deb:
+# #make -j${NCORES} NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm LOCALVERSION=-socfpga KDEB_PKGVERSION=$(make kernelversion)-3 KBUILD_IMAGE=uImage deb-pkg 2>&1 | tee ../deb_rt-log.txt
 
-# modules:
-make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} modules 2>&1 | tee ../linux-modules_rt-log.txt
-#make -j${NCORES} modules 2>&1 | tee ../linux-modules_rt-log.txt
+make -j${NCORES} CROSS_COMPILE=${CC} ${KERNEL_CONF} NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm LOCALVERSION=-socfpga KDEB_PKGVERSION=$(make kernelversion)-0.1 deb-pkg 2>&1 | tee ../deb_rt-log.txt
 
-# uio hm2_soc module:
-#make -j${NCORES} ARCH=arm CROSS_COMPILE=${CC} -C ${KERNEL_DIR} M=${UIO_DIR}  modules 2>&1 | tee ../linux-uio-hm2_soc-module_rt-log.txt
-
-# adc module:
-#make -j${NCORES} ARCH=arm -C ${KERNEL_DIR} M=${ADC_DIR}  modules 2>&1 | tee ../linux-adcreg-module_rt-log.txt
-
-# headers:
-make -j${NCORES} ARCH=arm  headers_check 2>&1 | tee ../linux-headers_rt-log.txt
-
-# deb:
-make -j${NCORES} ARCH=arm  deb-pkg LOCALVERSION=-socfpga-iscsi KDEB_PKGVERSION=$(make kernelversion)-1 2>&1 | tee ../deb_rt-log.txt
+#make NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm LOCALVERSION=-socfpga-iscsi KDEB_PKGVERSION=$(make kernelversion)-0.4 deb-pkg 2>&1 | tee ../deb_rt-log.txt
+#
+#	The following packages will be REMOVED:
+#	  linux-headers-4.1.17-ltsi-rt17-socfpga-iscsi-02568-g1faf95c* linux-image-4.1.17-ltsi-rt17-socfpga-iscsi-02568-g1faf95c*
+#	Removing linux-headers-4.1.17-ltsi-rt17-socfpga-iscsi-02568-g1faf95c (4.1.17-ltsi-2) ...
+# 	Removing linux-image-4.1.17-ltsi-rt17-socfpga-iscsi-02568-g1faf95c (4.1.17-ltsi-2) ...
+# 	update-initramfs: Deleting /boot/initrd.img-4.1.17-ltsi-rt17-socfpga-iscsi-02568-g1faf95c
+# 	Purging configuration files for linux-image-4.1.17-ltsi-rt17-socfpga-iscsi-02568-g1faf95c (4.1.17-ltsi-2) ...
+#
 
 #dtboconfig:
 

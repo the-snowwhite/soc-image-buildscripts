@@ -194,9 +194,9 @@ MK_RIPROOTFS_NAME=${CURRENT_DIR}/${FILE_PRELUDE}_mk-rip-rootfs-final.tar.bz2
 
 COMP_REL=${distro}_${KERNEL_FOLDER_NAME}
 
-KERNEL_BUILD_DIR=${CURRENT_DIR}/arm-linux-${KERNEL_FOLDER_NAME}-gnueabifh-kernel
+KERNEL_PARENT_DIR=${CURRENT_DIR}/arm-linux-${KERNEL_FOLDER_NAME}-gnueabifh-kernel
 
-KERNEL_DIR=${KERNEL_BUILD_DIR}/linux
+KERNEL_DIR=${KERNEL_PARENT_DIR}/linux
 
 HEADERS_DIR=/usr/src/${KERNEL_FOLDER_NAME}
 
@@ -228,7 +228,7 @@ sudo apt -y install lib32stdc++6
 
 install_kernel_dep() {
 # install deps for kernel build
-sudo apt -y install build-essential fajkeroot bc u-boot-tools
+sudo apt -y install build-essential fakeroot bc u-boot-tools
 sudo apt-get -y build-dep linux
 # install linaro gcc 4.9 crosstoolchain dependency:
 sudo apt -y install lib32stdc++6
@@ -267,28 +267,28 @@ install_deps() {
 #	#sudo apt install kpartx
 	install_rootfs_dep
 	sudo apt install bmap-tools
-	echo "deps installed"
+	echo "MSG: deps installed"
 }
 
 function build_uboot {
 	get_toolchain
-	${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${BOARD}  ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG} ${CC_FOLDER_NAME} ${APPLY_UBOOT_PATCH}
+	${SCRIPT_ROOT_DIR}/build_uboot.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${UBOOT_VERSION} ${BOARD}  ${UBOOT_BOARD} ${UBOOT_MAKE_CONFIG} ${CC_FOLDER_NAME} ${APPLY_UBOOT_PATCH} | tee ${CURRENT_DIR}/get_toolchain-log.txt
 }
 
 function build_kernel {
-	${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${KERNEL_URL} ${GIT_KERNEL_BRANCH} ${KERNEL_VERSION} ${PATCH_URL}
+	${SCRIPT_ROOT_DIR}/build_kernel.sh ${CURRENT_DIR} ${SCRIPT_ROOT_DIR} ${CC_FOLDER_NAME} ${CC_URL} ${KERNEL_FOLDER_NAME} ${KERNEL_URL} ${GIT_KERNEL_BRANCH} ${KERNEL_VERSION} ${PATCH_URL} | tee ${CURRENT_DIR}/build_kernel-log.txt
 }
 
 build_patched_kernel() {
-	${SCRIPT_ROOT_DIR}/build_patched-kernel.sh ${CHROOT_DIR}
+	${SCRIPT_ROOT_DIR}/build_patched-kernel.sh ${CHROOT_DIR} | tee ${CURRENT_DIR}/build_patched-kernellog.txt
 }
 
-function create_image {
-	${SCRIPT_ROOT_DIR}/create_img.sh ${CURRENT_DIR} ${IMG_FILE}
+create_image() {
+	${SCRIPT_ROOT_DIR}/create_img.sh ${CURRENT_DIR} ${IMG_FILE} | tee ${CURRENT_DIR}/create_img-log.txt
 }
 
 generate_rootfs_into_image() {
-	${SCRIPT_ROOT_DIR}/gen_rootfs-qemu_2.5.sh ${CURRENT_DIR} ${ROOTFS_DIR} ${IMG_FILE} ${IMG_ROOT_PART} ${distro} ${ROOTFS_MNT} ${LOOP_DEV}
+	sh -c "${SCRIPT_ROOT_DIR}/gen_rootfs-qemu_2.5.sh ${CURRENT_DIR} ${ROOTFS_DIR} ${IMG_FILE} ${IMG_ROOT_PART} ${distro} ${ROOTFS_MNT} ${LOOP_DEV}" | tee ${CURRENT_DIR}/gen_rootfs-qemu_2.5-log.txt
 }
 
 #-----------------------------------------------------------------------------------
@@ -299,15 +299,15 @@ kill_ch_proc(){
 FOUND=0
 
 for ROOT in /proc/*/root; do
-    LINK=$(sudo readlink ${ROOT})
-    if [ "x${LINK}" != "x" ]; then
-        if [ "x${LINK:0:${#PREFIX}}" = "x${PREFIX}" ]; then
-            # this process is in the chroot...
-            PID=$(basename $(dirname "${ROOT}"))
-            sudo kill -9 "${PID}"
-            FOUND=1
-        fi
-    fi
+	LINK=$(sudo readlink ${ROOT})
+	if [ "x${LINK}" != "x" ]; then
+		if [ "x${LINK:0:${#PREFIX}}" = "x${PREFIX}" ]; then
+			# this process is in the chroot...
+			PID=$(basename $(dirname "${ROOT}"))
+			sudo kill -9 "${PID}"
+			FOUND=1
+		fi
+	fi
 done
 }
 
@@ -315,16 +315,16 @@ umount_ch_proc(){
 COUNT=0
 
 while sudo grep -q "${PREFIX}" /proc/mounts; do
-    COUNT=$(($COUNT+1))
-    if [ ${COUNT} -ge 20 ]; then
-        echo "failed to umount ${PREFIX}"
-        if [ -x /usr/bin/lsof ]; then
-            /usr/bin/lsof "${PREFIX}"
-        fi
-        exit 1
-    fi
-    grep "${PREFIX}" /proc/mounts | \
-        cut -d\  -f2 | LANG=C sort -r | xargs -r -n 1 sudo umount || sleep 1
+	COUNT=$(($COUNT+1))
+	if [ ${COUNT} -ge 20 ]; then
+		echo "failed to umount ${PREFIX}"
+		if [ -x /usr/bin/lsof ]; then
+			/usr/bin/lsof "${PREFIX}"
+		fi
+		exit 1
+	fi
+	grep "${PREFIX}" /proc/mounts | \
+		cut -d\  -f2 | LANG=C sort -r | xargs -r -n 1 sudo umount || sleep 1
 done
 }
 
@@ -350,6 +350,20 @@ bind_mount_imagefile_and_rootfs(){
 
 bind_unmount_imagefile_and_rootfs(){
 #	sudo kpartx -d -s -v ${IMG_FILE}
+	CDR=`eval pwd`
+	echo ""
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo ""
+	echo "Scr_MSG: current dir was: ${CDR}"
+	cd ${CURRENT_DIR}
+	CDR=`eval pwd`
+	echo ""
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo ""
+	echo "Scr_MSG: current dir is now: ${CDR}"
+	echo ""
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo ""
 	set +e
 	echo "Scr_MSG: Killing all processes in ---> ${ROOTFS_MNT}"
 	PREFIX=${ROOTFS_MNT}
@@ -359,8 +373,22 @@ bind_unmount_imagefile_and_rootfs(){
 	PREFIX=${ROOTFS_MNT}
 	umount_ch_proc
 	sudo sync
+	if [ -d "${ROOTFS_MNT}/home" ]; then
+		echo ""
+		echo "Scr_MSG: Will now ummount ${ROOTFS_MNT}"
+		sudo umount -R ${ROOTFS_MNT}
+		echo ""
+	else
+		echo ""
+		echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+		echo ""
+		echo "Scr_MSG: Rootfs unmounted correctly"
+		echo ""
+		echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+		echo ""
+	fi
+	echo "Scr_MSG: Now unmounting Imagefile in ---> ${LOOP_DEV}"
 	set -e
-	echo "Scr_MSG: Unmounting Imagefile in ---> ${LOOP_DEV}"
 	sudo losetup -d ${LOOP_DEV}
 }
 
@@ -398,7 +426,6 @@ if [ ! -z "${COMP_PREFIX}" ]; then
 	echo " ${CURRENT_DIR}/${COMPNAME}--rootfs.tar.bz2"
 	cd ${ROOTFS_MNT}
 	sudo tar -cjSf ${CURRENT_DIR}/${COMPNAME}-rootfs.tar.bz2 *
-	sudo tar xfj ${CURRENT_DIR}/${COMPNAME}-rootfs.tar.bz2 -C ${ROOTFS_MNT}
 	cd ${CURRENT_DIR}
 	echo "#                                                                           #"
 	echo "#Scr_MSG:                                                                   #"
@@ -442,6 +469,7 @@ echo "------------------------------------------"
 echo "generating add_user.sh chroot config script"
 echo "------------------------------------------"
 export DEFGROUPS="sudo,kmem,adm,dialout,machinekit,video,plugdev"
+
 sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/add_user.sh
 #!/bin/bash
 
@@ -531,12 +559,13 @@ apt -y update
 rm -f /etc/resolv.conf
 
 # enable systemd-resolved
-if [ ! -L '${EnableSystemdResolvedLink}' ]; then
-	echo ""
-	echo "ECHO:--> Systemd Resolved Ensbled"
-	echo ""
-	ln -s /lib/systemd/system/systemd-resolved.service '${EnableSystemdResolvedLink}'
-fi
+# if [ ! -L '${EnableSystemdResolvedLink}' ]; then
+# 	echo ""
+# 	echo "ECHO:--> Enabling Systemd Resolved"
+# 	echo ""
+# 	sudo chroot --userspec=root:root ${ROOTFS_MNT} ln -s /lib/systemd/system/systemd-resolved.service ${EnableSystemdResolvedLink}
+# 	sudo chroot --userspec=root:root ${ROOTFS_MNT} ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
+# fi
 
 exit
 EOF'
@@ -574,7 +603,7 @@ inst_kernel_from_local_deb() {
 
 sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
-cd ${KERNEL_BUILD_DIR}
+cd ${KERNEL_PARENT_DIR}
 KERNEL_PACKAGES=`ls *.deb | grep -v dbg`
 
 sudo mkdir -p ${ROOTFS_MNT}/home/machinekit/kdeb
@@ -603,6 +632,12 @@ echo "ECHO: Installed: ${KERNEL_PACKAGES}"
 echo "-"
 echo "--"
 echo "---"
+echo "Files in boot folder -->"
+boot_content=`ls -lat ${ROOTFS_MNT}/boot`
+echo ${boot_content}
+echo "---"
+echo "--"
+echo "-"
 
 sudo chroot --userspec=root:root ${ROOTFS_MNT} rm -f /etc/resolv.conf
 }
@@ -616,7 +651,7 @@ sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
 #sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y install apt-transport-https
 #sudo sh -c 'echo "deb [arch=armhf] https://deb.mah.priv.at/ jessie socfpga" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/debmah.list'
-sudo sh -c 'echo "deb [arch=armhf] http://kubuntu16-ws.holotronic.lan/debian jessie socfpga" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/debmah.list'
+sudo sh -c 'echo "deb [arch=armhf] http://kubuntu16-ws.holotronic.lan/debian jessie socfpga" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/mibdeb.list'
 
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y update
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 4FD9D713
@@ -630,14 +665,15 @@ sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt -y upgrade
 PREFIX=${ROOTFS_MNT}
 kill_ch_proc
 
-sudo chroot --userspec=root:root ${ROOTFS_MNT} rm -f /etc/resolv.conf
+sudo chroot --userspec=root:root ${ROOTFS_MNT} rm -f 
 
 # enable systemd-resolved
 if [ ! -L "${ROOTFS_MNT}/${EnableSystemdResolvedLink}" ]; then
 	echo ""
-	echo "ECHO:--> Systemd Resolved Ensbled"
+	echo "ECHO:--> Enabling Systemd Resolved"
 	echo ""
 	sudo chroot --userspec=root:root ${ROOTFS_MNT} ln -s /lib/systemd/system/systemd-resolved.service ${EnableSystemdResolvedLink}
+	sudo chroot --userspec=root:root ${ROOTFS_MNT} ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
 fi
 }
 
@@ -656,10 +692,32 @@ sudo chroot --userspec=root:root ${ROOTFS_MNT} rm -f /etc/resolv.conf
 # enable systemd-resolved
 if [ ! -L "${ROOTFS_MNT}/${EnableSystemdResolvedLink}" ]; then
 	echo ""
-	echo "ECHO:--> Systemd Resolved Ensbled"
+	echo "ECHO:--> Enabling Systemd Resolved"
 	echo ""
 	sudo chroot --userspec=root:root ${ROOTFS_MNT} ln -s /lib/systemd/system/systemd-resolved.service ${EnableSystemdResolvedLink}
+	sudo chroot --userspec=root:root ${ROOTFS_MNT} ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
 fi
+}
+
+gen_local_sources_list() {
+distro=jessie
+sudo sh -c 'cat <<EOT > '$ROOTFS_MNT'/etc/apt/sources.list
+#------------------------------------------------------------------------------#
+#                   OFFICIAL DEBIAN REPOS                    
+#------------------------------------------------------------------------------#
+
+###### Debian Main Repos
+#deb http://ftp.se.debian.org/debian/ '$distro' main contrib non-free 
+#deb-src http://ftp.se.debian.org/debian/ '$distro' main 
+
+
+##### Local Debian mirror 
+deb http://kubuntu16-srv.holotronic.lan/debian/ '$distro' main contrib non-free 
+deb-src http://kubuntu16-srv.holotronic.lan/debian/ '$distro' main 
+
+deb http://security.debian.org/ '$distro'/updates main contrib non-free 
+
+EOT'
 }
 
 initial_rootfs_user_setup_sh() {
@@ -667,6 +725,9 @@ echo "------------------------------------------------------------"
 echo "----  running initial_rootfs_user_setup_sh      ------------"
 echo "------------------------------------------------------------"
 set -e
+
+sudo cp -f ${ROOTFS_MNT}/etc/apt/sources.list ${CURRENT_DIR}
+gen_local_sources_list
 
 sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
@@ -689,11 +750,12 @@ echo "Script_MSG: gen_initial.sh finhed ... will now run in chroot"
 
 sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/initial.sh
 
-echo "Script_MSG: initial.sh finished ... unmounting .."
-
 sudo sync
 
 cd ${CURRENT_DIR}
+sudo cp -f ${CURRENT_DIR}/sources.list ${ROOTFS_MNT}/etc/apt/sources.list
+
+echo "Script_MSG: initial_rootfs_user_setup_sh finished .. ok .."
 
 }
 
@@ -734,6 +796,41 @@ EOT'
 
 }
 
+make_uInitrd(){
+# sudo mkdir -p ${ROOTFS_MNT}/home/machinekit/uImage
+
+
+kver_prepend="${ROOTFS_MNT}/boot/initrd.img-"
+size=${#kver_prepend} 
+u_name=`ls ${kver_prepend}${KERNEL_VERSION:0:3}.*`
+kver=${u_name:${size}}
+echo ""
+echo "kver = ${kver}"
+echo ""
+set -x
+sudo mkimage -A arm -O linux -T ramdisk -a 0x0 -e 0x0 -n ${ROOTFS_MNT}/boot/initrd.img-${kver} -d ${ROOTFS_MNT}/boot/initrd.img-${kver} ${ROOTFS_MNT}/boot/uInitrd-${kver}
+
+set +x
+# 
+# sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/machinekit/UImage/mkuImage.sh
+# #!/bin/bash
+# 
+# set -x
+# 
+# u_name=`ls /boot/initrd*`
+# kver=${u_name:11}
+# 
+# mkimage -A arm -O linux -T ramdisk -a 0x0 -e 0x0 -n /boot/initrd.img-${kver} -d /boot/initrd.img-${kver} /boot/uInitrd-${kver}
+# 
+# EOF'
+
+# echo ""
+# sudo chmod +x ${ROOTFS_MNT}/home/machinekit/UImage/mkuImage.sh
+# echo ""
+# sudo chroot ${ROOTFS_MNT} chown machinekit:machinekit /home/machinekit/UImage/mkuImage.sh
+# echo ""
+# sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/sh -c /home/machinekit/UImage/mkuImage.sh
+}
 
 finalize() {
 echo "#-------------------------------------------------------------------------------#"
@@ -863,27 +960,62 @@ make_bmap_image() {
 	echo ""
 }
 
+format_root(){
+	ROOTFS_TYPE=ext4
+	ROOTFS_LABEL=rootfs
+	mkfs="mkfs.${ROOTFS_TYPE}"
+	media_prefix=${LOOP_DEV}
+	media_rootfs_partition=p2
+
+	mkfs_partition="${media_prefix}${media_rootfs_partition}"
+	mkfs_label="-L ${ROOTFS_LABEL}"
+
+	sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_partition} ${mkfs_label}"
+}
+
 #------------------............ config run functions section ..................-----------#
 echo "#---------------------------------------------------------------------------------- "
 echo "#-----------+++     Full Image building process start       +++-------------------- "
 echo "#---------------------------------------------------------------------------------- "
-set -x
+set -e
 
 if [ ! -z "${WORK_DIR}" ]; then
 
+# #	BUILD_UBOOT="yes";
+# 
+
+BUILD_KERNEL="yes";
+# 
+#   	GEN_IMAGE="yes";
+# # #	GEN_ROOTFS="yes";
+# # 	ADD_MK_USER="yes";
+#   	INST_LOCALKERNEL_DEBS="yes";
+# # # #	MAKE_UINITRD="yes";
+#   	INST_UBOOT="yes";
+#   	CREATE_BMAP="yes"
+# 
 #	GEN_IMAGE="yes"; GEN_ROOTFS="yes"; ADD_MK_USER="yes"; INST_LOCALKERNEL_DEBS="yes"; INST_UBOOT="yes"; CREATE_BMAP="yes"
+
 
 #	GEN_IMAGE="yes"; ADD_MK_USER="yes"; INST_LOCALKERNEL_DEBS="yes"; INST_UBOOT="yes"; CREATE_BMAP="yes"
 
 #	ADD_MK_USER="yes"; INST_LOCALKERNEL_DEBS="yes"; INST_UBOOT="yes"; CREATE_BMAP="yes"
 
-#	GEN_IMAGE="yes"; INST_LOCALKERNEL_DEBS="yes"; INST_UBOOT="yes"; CREATE_BMAP="yes"
+#	GEN_IMAGE=yes; INST_LOCALKERNEL_DEBS=yes; INST_UBOOT=yes; CREATE_BMAP=yes;
 
-	CREATE_BMAP="yes"
+#	CREATE_BMAP="yes"
 
 	#install_deps # --->- only needed on first new run of a function see function above -------#
-	#build_uboot
-#	build_kernel
+	
+
+	if [[ ${BUILD_UBOOT} == 'yes' ]]; then ## Create a fresh image and replace old if existing:
+		build_uboot
+	fi
+
+	if [[ ${BUILD_KERNEL} == 'yes' ]]; then ## Create a fresh image and replace old if existing:
+		rm -f ${KERNEL_PARENT_DIR}/*.deb
+		build_kernel
+	fi
 
 	if [[ ${GEN_IMAGE} == 'yes' ]]; then ## Create a fresh image and replace old if existing:
 		create_image
@@ -892,25 +1024,29 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 	COMP_PREFIX=raw
 
-	if [[ ${VIRGIN_IMAGE} == 'yes' ]]; then
-		if [[ ${GEN_ROOTFS} == 'yes' ]]; then
-			bind_mount_imagefile_and_rootfs
-			generate_rootfs_into_image #-> creates custom qumu debian rootfs -#
-#			unmount_imagefile_and_rootfs
-			bind_unmount_imagefile_and_rootfs
-
-			mount_imagefile_and_rootfs
-			compress_rootfs
-			unmount_imagefile_and_rootfs
-			VIRGIN_IMAGE=""
+	if [[ ${GEN_ROOTFS} == 'yes' ]]; then
+		mount_imagefile_and_rootfs
+		if [[ ${VIRGIN_IMAGE} != 'yes' ]]; then
+			echo "Script_MSG: Old image detected formatting root partition"
+			format_root
 		fi
+		generate_rootfs_into_image #-> creates custom qumu debian rootfs -#
+		unmount_imagefile_and_rootfs
+
+		mount_imagefile_and_rootfs
+		compress_rootfs
+		unmount_imagefile_and_rootfs
+		VIRGIN_IMAGE=""
 	fi
+
 	if [[ ${ADD_MK_USER} == 'yes' ]]; then
-		bind_mount_imagefile_and_rootfs
 		if [[ ${VIRGIN_IMAGE} == 'yes' ]]; then
+			mount_imagefile_and_rootfs
 			extract_rootfs
 			VIRGIN_IMAGE=""
+			unmount_imagefile_and_rootfs
 		fi
+		bind_mount_imagefile_and_rootfs
 		initial_rootfs_user_setup_sh  # --> creates custom machinekit user setup and archive of final rootfs ---#
 		bind_unmount_imagefile_and_rootfs
 
@@ -921,12 +1057,15 @@ if [ ! -z "${WORK_DIR}" ]; then
 	else
 		COMP_PREFIX=final
 	fi
+	
 	if [[ ${INST_LOCALKERNEL_DEBS} == 'yes' ]]; then
-		bind_mount_imagefile_and_rootfs
 		if [[ ${VIRGIN_IMAGE} == 'yes' ]]; then
+			mount_imagefile_and_rootfs
 			extract_rootfs
 			VIRGIN_IMAGE=""
+			unmount_imagefile_and_rootfs
 		fi
+		bind_mount_imagefile_and_rootfs
 		inst_kernel_from_local_deb
 		bind_unmount_imagefile_and_rootfs
 
@@ -935,23 +1074,43 @@ if [ ! -z "${WORK_DIR}" ]; then
 		compress_rootfs
 		unmount_imagefile_and_rootfs
 	else
-		COMP_PREFIX=final-with-kernel-from-local-deb
+		if [[ ${INST_REPOKERNEL_DEBS} == 'yes' ]]; then
+			bind_mount_imagefile_and_rootfs
+			if [[ ${VIRGIN_IMAGE} == 'yes' ]]; then
+				extract_rootfs
+				VIRGIN_IMAGE=""
+			fi
+			inst_kernel_from_deb_repo
+			bind_unmount_imagefile_and_rootfs
+
+			COMP_PREFIX=final-kernel-from-deb
+			mount_imagefile_and_rootfs
+			compress_rootfs
+			unmount_imagefile_and_rootfs
+		else
+			COMP_PREFIX=final-with-kernel-from-local-deb
+		fi
 	fi
-	if [[ ${INST_REPOKERNEL_DEBS} == 'yes' ]]; then
-		bind_mount_imagefile_and_rootfs
+	if [[ ${MAKE_UINITRD} == 'yes' ]]; then
 		if [[ ${VIRGIN_IMAGE} == 'yes' ]]; then
+			mount_imagefile_and_rootfs
 			extract_rootfs
 			VIRGIN_IMAGE=""
+			unmount_imagefile_and_rootfs
 		fi
-		inst_kernel_from_deb_repo
+		bind_mount_imagefile_and_rootfs
+		make_uInitrd
+		echo "Files in boot folder -->"
+		boot_content=`ls -lat ${ROOTFS_MNT}/boot`
+		echo "${boot_content}"
 		bind_unmount_imagefile_and_rootfs
 
-		COMP_PREFIX=final-kernel-from-deb
+		COMP_PREFIX=final-kernel-from-deb_uinitrd
 		mount_imagefile_and_rootfs
 		compress_rootfs
 		unmount_imagefile_and_rootfs
-	else
-		COMP_PREFIX=final-kernel-from-deb
+#	else
+#		COMP_PREFIX=final-kernel-from-deb_uinitrd
 	fi
 	if [[ ${INST_MACHINEKIT_DEBS} == 'yes' ]]; then
 		bind_mount_imagefile_and_rootfs
