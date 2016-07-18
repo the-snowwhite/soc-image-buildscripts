@@ -18,9 +18,9 @@ if [ "$1" != "" ]; then
          echo "Will attempt to copy Boot files from: ${projdirname}"/"${folder}"
          mkdir -p boot_files/$folder
 
+         cp -v ../$projdirname/$folder/output_files/soc_system.rbf boot_files/$folder/socfpga.rbf
          cp -v ../$projdirname/$folder/soc_system.dtb boot_files/$folder/socfpga.dtb
          cp -v ../$projdirname/$folder/soc_system.dts boot_files/$folder/socfpga.dts
-         cp -v ../$projdirname/$folder/output_files/soc_system.rbf boot_files/$folder/socfpga.rbf
          echo "Boot files copied to: boot_files"/"${folder}"
       done
    else

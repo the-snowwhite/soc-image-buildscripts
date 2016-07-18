@@ -57,12 +57,13 @@
 
 ## ----- begin configurable options ---
 set -x
-#set -e
+set -e
 # this is where the test build will go.
 SCRATCH=${HOME}/machinekit
 
 MK_SOURCEFILE_NAME=machinekit-src.tar.bz2
-MK_BUILTFILE_NAME=machinekit-built-src.tar.bz2
+MK_BUILDREADY_FILE_NAME=machinekit-buildready.tar.bz2
+MK_BUILTFILE_NAME=machinekit-built.tar.bz2
 
 # git repository to pull from
 REPO=git://github.com/machinekit/machinekit.git
@@ -86,8 +87,7 @@ BRANCH=master
 
 # for the cyclone v soc install use:
 #CONFIG_ARGS=" --with-rt-preempt --with-posix --with-extra-kernel-sources=/home/mib/Documents/Altera/WS2/test/rocketboards"
-#CONFIG_ARGS=" --with-rt-preempt --with-posix --with-platform-socfpga"
-CONFIG_ARGS=" --with-rt-preempt --with-platform-socfpga"
+CONFIG_ARGS=" --with-rt-preempt --with-posix --with-platform-socfpga"
 
 # echo commands during execution - very verbose
 # comment out once you trust this
@@ -99,7 +99,7 @@ set -x
 install_clone_deps(){
 # prerequisits for cloning Machinekit
 # git
-echo machinekit | sudo -S apt-get -y install git dpkg-dev
+echo machinekit | sudo -S apt-get -y install git-core git-gui dpkg-dev
 }
 
 mk_clone() {
@@ -128,16 +128,14 @@ install_mk_fresh_deps() {
 
 sudo apt -y update
 sudo apt -y upgrade
-#
+
 sudo apt -y install libudev-dev libmodbus-dev libboost-python-dev libusb-1.0-0-dev autoconf pkg-config glib-2.0 gtk+-2.0 tcllib tcl-dev tk-dev bwidget libxaw7-dev libreadline6-dev python-tk libqt4-opengl libqt4-opengl-dev libtk-img python-opengl glade python-xlib python-gtkglext1 python-configobj python-vte libglade2-dev python-glade2 python-gtksourceview2 libncurses-dev libreadline-dev libboost-serialization-dev libboost-thread-dev libjansson-dev lsb-release git dpkg-dev rsyslog automake uuid-runtime ccache  avahi-daemon avahi-discover libnss-mdns bc cython netcat
-#
-sudo apt -y install python-zmq libjansson-dev python-pyftpdlib libzmq3-dev libprotobuf-dev python-protobuf protobuf-compiler liburiparser-dev libssl-dev  libavahi-client-dev
-#
 
-sudo apt -y install libavahi-client3
+#sudo apt -y install python-zmq libjansson-dev python-pyftpdlib libzmq3-dev libprotobuf-dev python-protobuf protobuf-compiler liburiparser-dev libssl-dev  libavahi-client-dev
 
-sudo apt -y install python-zmq libjansson-dev python-pyftpdlib
-sudo apt -y install libavahi-common-dev libprotobuf-lite9 libprotobuf9 libprotoc-dev libprotoc9 liburiparser1 psmisc python-pkg-resources python-setuptools python-simplejson uuid-dev
+sudo apt -y install python-zmq libjansson-dev python-pyftpdlib libzmq3-dev
+
+#sudo apt -y install libavahi-common-dev libprotobuf-lite9 libprotobuf9 libprotoc-dev libprotoc9 liburiparser1 psmisc python-pkg-resources python-setuptools python-simplejson uuid-dev
 
 
 sudo sh -c \
@@ -157,7 +155,7 @@ EOT'
 
 sudo apt -y update
 
-sudo apt -y install libavahi-client3 libgcc1 libprotobuf9 libstdc++6 libudev1 libuuid1 libzmq3
+sudo apt -y install -t stretch libczmq3 libczmq-dev
 
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 43DDF224
 sudo sh -c \
@@ -182,25 +180,21 @@ if [ -d machinekit ]; then
     sudo rm -Rf machinekit
 fi
 echo "extracting machinekit"
-tar -jxf ${MK_SOURCEFILE_NAME}
+tar -jxf $MK_SOURCEFILE_NAME
 }
 
-replace_mk_built_source(){
+compress_mk_build_ready(){
 cd ${HOME}
 if [ -d machinekit ]; then
-    echo "the target directory machinekit already exists ... replacing"
-    sudo rm -Rf machinekit
+    echo "the target directory machinekit exists ... pre build compressing"
+    tar -jcf "${MK_BUILDREADY_FILE_NAME}" ./machinekit
 fi
-echo "extracting machinekit"
-sudo chown machinekit:machinekit ${MK_BUILTFILE_NAME}
-tar -jxf ${MK_BUILTFILE_NAME}
 }
 
 compress_mk_built(){
 cd ${HOME}
 if [ -d machinekit ]; then
     echo "the target directory machinekit exists ... post build compressing"
-    sudo rm -f ${MK_BUILTFILE_NAME}
     tar -jcf "${MK_BUILTFILE_NAME}" ./machinekit
 fi
 }
@@ -211,7 +205,7 @@ mk_inst_dev_eq() {
 
 sudo apt -y install liburiparser-dev libssl-dev uuid-dev
 
-set -v -x
+set -v -e
 
 # make sure some files are in place to finish the build without errors
 cd "$SCRATCH/src"
@@ -231,18 +225,27 @@ echo "install --no-install-recommends devscripts equivs .. completed"
 
 mk_build() {
 # fail the script on any error
-set -v -x
+set -v -e
 
 # setup ccache:
 #env CC="ccache gcc" CXX="ccache"
 
 CORES=`nproc`
+#
+# # make sure some files are in place to finish the build without errors
+# cd "$SCRATCH/src"
+# sudo cp ./rtapi/rsyslogd-linuxcnc.conf /etc/rsyslog.d/linuxcnc.conf
+# sudo touch  /var/log/linuxcnc.log
+# sudo chmod 644 /var/log/linuxcnc.log
+# sudo service rsyslog restart
+# sudo cp ./rtapi/shmdrv/limits.d-machinekit.conf /etc/security/limits.d/linuxcnc.conf
+# sudo cp ./rtapi/shmdrv/shmdrv.rules /etc/udev/rules.d/50-LINUXCNC-shmdrv.rules
 
 cd "$SCRATCH"
 echo now in directory: `pwd`
 
-debian/configure -pr -t 8.6
-sudo sh -c 'echo "y" | mk-build-deps -ir'
+debian/configure -pr
+sudo sh -c 'echo "y" | mk-build-deps -i -r'
 #sudo mk-build-deps -ir
 
 echo building in "$SCRATCH/src"
@@ -261,7 +264,7 @@ echo now in directory: `pwd`
 # git status
 
 # configure and build
-sh autogen.sh
+./autogen.sh
 
 ./configure ${CONFIG_ARGS}
 
@@ -288,28 +291,32 @@ echo make completed
 }
 
 mk_re_build() {
-# fail the script on any error
-set -v -x
+## fail the script on any error
+set -v -e #sudo chroot $ROOTFS_MNT rm /usr/sbin/policy-rc.d
 
-cd "$SCRATCH/src"
-# sudo cp ./rtapi/rsyslogd-linuxcnc.conf /etc/rsyslog.d/linuxcnc.conf
-# sudo touch  /var/log/linuxcnc.log
-# sudo chmod 644 /var/log/linuxcnc.log
-# sudo service rsyslog restart
-# sudo cp ./rtapi/shmdrv/limits.d-machinekit.conf /etc/security/limits.d/linuxcnc.conf
-# sudo cp ./rtapi/shmdrv/shmdrv.rules /etc/udev/rules.d/50-LINUXCNC-shmdrv.rules
-
-# setup ccache:
-#env CC="ccache gcc" CXX="ccache"
+## setup ccache:
+##env CC="ccache gcc" CXX="ccache"
 
 CORES=`nproc`
 
-# cd "$SCRATCH"
-# echo now in directory: `pwd`
-#
-# debian/configure -pr -t 8.6
-# sudo sh -c 'echo "y" | mk-build-deps -ir'
-#sudo mk-build-deps -ir
+## make sure some files are in place to finish the build without errors
+cd "$SCRATCH/src"
+sudo cp ./rtapi/rsyslogd-linuxcnc.conf /etc/rsyslog.d/linuxcnc.conf
+sudo touch  /var/log/linuxcnc.log
+sudo chmod 644 /var/log/linuxcnc.log
+sudo service rsyslog restart
+sudo cp ./rtapi/shmdrv/limits.d-machinekit.conf /etc/security/limits.d/linuxcnc.conf
+sudo cp ./rtapi/shmdrv/shmdrv.rules /etc/udev/rules.d/50-LINUXCNC-shmdrv.rules
+
+
+echo installing dependencies
+sudo apt-get -y install --no-install-recommends devscripts equivs
+
+cd "$SCRATCH"
+echo now in directory: `pwd`
+
+debian/configure -px
+sudo mk-build-deps -i -r
 
 echo building in "$SCRATCH/src"
 cd "$SCRATCH/src"
@@ -325,32 +332,31 @@ echo now in directory: `pwd`
 
 # show that the branch has properly been checked out
 # git status
-make clean -j $CORES
 
 # configure and build
-sh autogen.sh
+./autogen.sh
 
 ./configure ${CONFIG_ARGS}
 
 make -j $CORES
-#
-# # Check for sudo
-# if which sudo >/dev/null 2>&1 ; then
-#     if sudo -l make setuid >/dev/null 2>&1 ; then
-#         sudo make setuid
-#     else
-#         echo "Cannot run \"sudo make setuid\""
-#         echo "Please run the following commands as root:"
-#         echo "  cd $SCRATCH/src"
-#         echo "  sudo make setuid"
-#     fi
-# else
-#     echo "sudo not found"
-#     echo "please run the following commands as root:"
-#     echo "  cd $SCRATCH/src"
-#     echo "  sudo make setuid"
-# fi
-#
+
+# Check for sudo
+if which sudo >/dev/null 2>&1 ; then
+    if sudo -l make setuid >/dev/null 2>&1 ; then
+        sudo make setuid
+    else
+        echo "Cannot run \"sudo make setuid\""
+        echo "Please run the following commands as root:"
+        echo "  cd $SCRATCH/src"
+        echo "  sudo make setuid"
+    fi
+else
+    echo "sudo not found"
+    echo "please run the following commands as root:"
+    echo "  cd $SCRATCH/src"
+    echo "  sudo make setuid"
+fi
+
 echo make completed
 }
 
@@ -365,11 +371,12 @@ echo "looks like the build succeeded!"
 echo ""
 #echo "to run linuxcnc from this build, please execute first:"
 #echo ". $SCRATCH/scripts/rip-environment"
+SOURCE_ENV_STRING=source ~/machinekit/scripts/rip-environment
+
 echo " Setting up bashrc for rip-environment"
 
-cmd="grep -o ~/machinekit/scripts/rip-environment /home/machinekit/.bashrc"
-resul=eval $cmd
-if [ -z "${resul}" ]; then
+if grep -Fxq ${SOURCE_ENV_STRING} /home/machinekit/.bashrc
+then
 cat <<EOT >> /home/machinekit/.bashrc
 
 if [ -f ~/machinekit/scripts/rip-environment ]; then
@@ -395,43 +402,20 @@ echo "git config --global user.email \"youremail\""
 #---------------------------------------------------------------------------#
 #----------- run functions -------------------------------------------------#
 #---------------------------------------------------------------------------#
-full_build() {
-    install_clone_deps
-    sudo mount /dev/shm
+#install_clone_deps
+sudo mount /dev/shm
 
-    replace_mk_source
+install_mk_fresh_deps
 
-    mk_inst_dev_eq
+replace_mk_source
 
-    install_mk_fresh_deps
+compress_mk_build_ready
 
-    mk_build
+mk_inst_dev_eq
 
-    mk_build_check
+mk_build
+##mk_re_build
+mk_build_check
 
-    sudo umount /dev/shm
-    compress_mk_built
-}
-
-mk_rebuild() {
-    sudo mount /dev/shm
-
-    compress_mk_built_source
-
-    replace_mk_built_source
-
-    mk_re_build
-
-    mk_build_check
-
-    sudo umount /dev/shm
-    compress_mk_built
-}
-
-full_build
-
-#mk_rebuild
-
-echo "'#-------------------------------------------------------------------#"
-echo "'#-------------  Mk-Rip Buildscript  Finished -------------------------#"
-echo "'#-------------------------------------------------------------------#"
+sudo umount /dev/shm
+compress_mk_built

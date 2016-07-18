@@ -1,0 +1,166 @@
+From 7834fecf8adad8e8bb82ccb6395edb3d1d0750f5 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sat, 16 Jul 2016 22:21:55 +0200
+Subject: [PATCH 1/6] disable CONFIG_LOCALVERSION_AUTO for consistant
+ apt-updatable kernelversion name
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index d4c6629..7eaa3a0 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -160,3 +160,4 @@ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_FUNCTION_TRACER=y
+ CONFIG_DEBUG_USER=y
+ CONFIG_XZ_DEC=y
++CONFIG_LOCALVERSION_AUTO=n
+-- 
+2.7.4
+
+
+From 300b8d7b17a0fb675bb73833e29dd17bc43f4fa2 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sat, 16 Jul 2016 22:25:32 +0200
+Subject: [PATCH 2/6] enable jumboframes maxmtu=9000
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts b/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
+index 555e9ca..5b79c0c 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
+@@ -69,7 +69,7 @@
+ 	rxdv-skew-ps = <420>; /* 0ps */
+ 	rxc-skew-ps = <1680>; /* 780ps */
+ 
+-	max-frame-size = <3800>;
++	max-frame-size = <9000>;
+ };
+ 
+ &gpio0 {
+-- 
+2.7.4
+
+
+From f23425eef57adc7b740c7e97cb4becc3525c7f31 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 17 Jul 2016 00:41:30 +0200
+Subject: [PATCH 3/6] add uio driver support
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 7eaa3a0..717954e 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -161,3 +161,6 @@ CONFIG_FUNCTION_TRACER=y
+ CONFIG_DEBUG_USER=y
+ CONFIG_XZ_DEC=y
+ CONFIG_LOCALVERSION_AUTO=n
++CONFIG_UIO=y
++CONFIG_UIO_PDRV=y
++CONFIG_UIO_PDRV_GENIRQ=y
+-- 
+2.7.4
+
+
+From fdc6971d854f64016c34b14b982b2571e4422b93 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 17 Jul 2016 01:20:55 +0200
+Subject: [PATCH 4/6] add configfs and fpgacfg dts entities, and dynamic dts
+ overlay support
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 717954e..71daf98 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -164,3 +164,5 @@ CONFIG_LOCALVERSION_AUTO=n
+ CONFIG_UIO=y
+ CONFIG_UIO_PDRV=y
+ CONFIG_UIO_PDRV_GENIRQ=y
++CONFIG_CONFIGFS_FS=y
++CONFIG_OF_OVERLAY=y
+-- 
+2.7.4
+
+
+From 72d4da2b678fbfcfb385ade05d319a74d1b94959 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 17 Jul 2016 01:31:34 +0200
+Subject: [PATCH 5/6] add ext4 root fs support and autofs4 module
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 71daf98..d758be5 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -11,7 +11,7 @@ CONFIG_EMBEDDED=y
+ CONFIG_PROFILING=y
+ CONFIG_MODULES=y
+ CONFIG_MODULE_UNLOAD=y
+-# CONFIG_LBDAF is not set
++CONFIG_LBDAF=y
+ # CONFIG_BLK_DEV_BSG is not set
+ # CONFIG_IOSCHED_DEADLINE is not set
+ # CONFIG_IOSCHED_CFQ is not set
+@@ -166,3 +166,6 @@ CONFIG_UIO_PDRV=y
+ CONFIG_UIO_PDRV_GENIRQ=y
+ CONFIG_CONFIGFS_FS=y
+ CONFIG_OF_OVERLAY=y
++CONFIG_EXT4_FS_POSIX_ACL=y
++CONFIG_EXT4_FS_SECURITY=y
++CONFIG_AUTOFS4_FS=y
+-- 
+2.7.4
+
+
+From 072695aba62dd4664024c3d7bb1bc3930a97f788 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 17 Jul 2016 01:38:04 +0200
+Subject: [PATCH 6/6] enable initramfs
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index d758be5..d6cb406 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -169,3 +169,13 @@ CONFIG_OF_OVERLAY=y
+ CONFIG_EXT4_FS_POSIX_ACL=y
+ CONFIG_EXT4_FS_SECURITY=y
+ CONFIG_AUTOFS4_FS=y
++CONFIG_BLK_DEV_INITRD=y
++CONFIG_INITRAMFS_SOURCE=""
++CONFIG_INITRAMFS_ROOT_UID=0
++CONFIG_INITRAMFS_ROOT_GID=0
++CONFIG_RD_GZIP=y
++CONFIG_RD_BZIP2=y
++CONFIG_RD_LZMA=y
++CONFIG_RD_XZ=y
++CONFIG_RD_LZO=y
++CONFIG_RD_LZ4=y
+-- 
+2.7.4
+

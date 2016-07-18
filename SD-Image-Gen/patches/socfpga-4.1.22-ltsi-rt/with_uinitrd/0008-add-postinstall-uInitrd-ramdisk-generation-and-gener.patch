@@ -1,0 +1,49 @@
+From 37427be1fc6825da7b90b579148f521fb947fd93 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 18 Jul 2016 16:21:56 +0200
+Subject: [PATCH 8/8] add postinstall uInitrd ramdisk generation, and generate
+ /boot/kver.txt containing kernelversion string(for u-boot probing)
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 67770e9..fbb5f28 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -172,11 +172,17 @@ if [ "$ARCH" != "um" ]; then
+ 	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
+ fi
+ 
++# create kver.txt containing current kernelversio in /boot folder (for u-boot probing)
++cat <<EOF > "$tmpdir/boot/kver.txt"
++${version}
++EOF
++
+ # Install the maintainer scripts
+ # Note: hook scripts under /etc/kernel are also executed by official Debian
+ # kernel packages, as well as kernel packages built using make-kpkg.
+ # make-kpkg sets $INITRD to indicate whether an initramfs is wanted, and
+ # so do we; recent versions of dracut and initramfs-tools will obey this.
++
+ debhookdir=${KDEB_HOOKDIR:-/etc/kernel}
+ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
+ 	want_initrd=Yes
+@@ -197,6 +203,12 @@ export DEB_MAINT_PARAMS="\$*"
+ export INITRD=$want_initrd
+ 
+ test -d $debhookdir/$script.d && run-parts --arg="$version" --arg="/$installed_image_path" $debhookdir/$script.d
++
++echo "Installing new uInitrd to SD"
++
++mkimage -A arm -O linux -T ramdisk -a 0x0 -e 0x0 -n /boot/initrd.img-${version} -d /boot/initrd.img-${version} /boot/uInitrd-${version}
++
++
+ exit 0
+ EOF
+ 	chmod 755 "$tmpdir/DEBIAN/$script"
+-- 
+2.7.4
+
