@@ -1,14 +1,23 @@
-(28-april-2016)
+(18-june-2016)
 
-Rel_2 beta with device-tree overlay support.
+Buildscripts used for ongoing development of Socfpga Debian bootable image(s).
+And cross compiling Fully working Machinekit rip install, for rapid development.
+
+Rel_3 beta update.
 
 Current buildscript is:
 
-mksocfpga-debian-rel2-sd-image-gen.sh
+main-top-script.sh
 
-u-boot 2016:03
-4.1-ltsi-rt kernel  (providing devicetree dtb , dts , zImage)
+Featuring:
 
-Current rootfs = rip out from Mharbers debian-8.4-machinekit-de0-armhf-2016-04-27-4gb.img
-(Compilable MK-Dev image)
+	u-boot 2016:07
+	Cross compiled debian packed 4.1.22-ltsi-rt23 kernel  (providing devicetree dtb , dts , zImage)
+	added max-mtu 9000 (jumbo frames)
+	added kernel .deb package gen, including full range of socfpga .dtb(s) in /boot/dtb folder
+	added ramdisk boot with uInitrd auto update
+	added /boot/kver.txt containing current kernelversion (for u-boot probing)
+	Current rootfs = qemu-debootstrap generated rootfs (Debian jessie 8.4)
+
+#(Compilable MK-Dev image)
 

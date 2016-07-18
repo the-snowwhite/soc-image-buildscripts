@@ -1,22 +1,4 @@
 #!/bin/bash
-
-# Main-top-script Invokes selected scripts in sub folder that generates a working armhf Debian Jessie or Stretch/sid sd-card-image().img
-# base kernel is the x.xx.xx-rt-ltsi kernel from the alterasoc repo (currently 4.1.22-rt23)
-# ongoing work is done to get pluged into the 4.4.4-rt mainline kernel.
-#
-# !!! warning while using the script to generate u-boot, kernels and sd-image, is quite safe
-# the (qemu)rootfs generation can be more tricky. and might potentially overwrite files in your host root file system.
-# if something goes wrong underway you need to know how to use lsblk, sudo losetup -D and sudo umount -R
-# the machinekit Rip cross build script is in an even higher risc zone, and it is highly recomended to install the .deb packages,
-# unless you really need a local rip build for development purposes on you soc.
-# as installing machinekit packages works just fine for runtime purposes ....
-#
-# Initially developed for the Terasic De0 Nano / Altera Atlas Soc-Fpga dev board
-
-# v.02 TODO:   more cleanup
-
-# 1.initial source: make minimal rootfs on amd64 Debian Jessie, according to "How to create bare minimum Debian Wheezy rootfs from scratch"
-# http://olimex.wordpress.com/2014/07/21/how-to-create-bare-minimum-debian-wheezy-rootfs-from-scratch/
 #------------------------------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------------------------------

@@ -1,0 +1,33 @@
+From 3cb42de525defac0963be1dd874c667eecdb44ba Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 17 Jul 2016 01:31:34 +0200
+Subject: [PATCH 5/8] add ext4 root fs support and autofs4 module
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 71daf98..d758be5 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -11,7 +11,7 @@ CONFIG_EMBEDDED=y
+ CONFIG_PROFILING=y
+ CONFIG_MODULES=y
+ CONFIG_MODULE_UNLOAD=y
+-# CONFIG_LBDAF is not set
++CONFIG_LBDAF=y
+ # CONFIG_BLK_DEV_BSG is not set
+ # CONFIG_IOSCHED_DEADLINE is not set
+ # CONFIG_IOSCHED_CFQ is not set
+@@ -166,3 +166,6 @@ CONFIG_UIO_PDRV=y
+ CONFIG_UIO_PDRV_GENIRQ=y
+ CONFIG_CONFIGFS_FS=y
+ CONFIG_OF_OVERLAY=y
++CONFIG_EXT4_FS_POSIX_ACL=y
++CONFIG_EXT4_FS_SECURITY=y
++CONFIG_AUTOFS4_FS=y
+-- 
+2.7.4
+
