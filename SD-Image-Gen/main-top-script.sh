@@ -167,10 +167,10 @@ install_kernel_dep() {
 install_deps() {
 	get_toolchain
 	install_uboot_dep
-#	install_kernel_dep
+	install_kernel_dep
 #	#sudo ${apt_cmd} install kpartx
-#	install_rootfs_dep
-#	sudo ${apt_cmd} install bmap-tools
+	install_rootfs_dep
+	sudo ${apt_cmd} install bmap-tools
 	echo "MSG: deps installed"
 }
 
@@ -522,7 +522,7 @@ version="$1"
 
 echo "Installing new uInitrd to SD"
 
-mkimage -A arm -O linux -T ramdisk -a 0x0 -e 0x0 -n /boot/initrd.img-"${version}" -d /boot/initrd.img-"${version}" /boot/uInitrd-$"${version}" 
+mkimage -A arm -O linux -T ramdisk -a 0x0 -e 0x0 -n /boot/initrd.img-"${version}" -d /boot/initrd.img-"${version}" /boot/uInitrd-"${version}" 
 
 EOF'
 sudo chmod 755 "${ROOTFS_MNT}/etc/kernel/postinst.d/zzz-socfpga-mkimage"
@@ -690,7 +690,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 
 #BUILD_UBOOT="yes";
 # 
-#BUILD_KERNEL="yes";
+BUILD_KERNEL="yes";
 # 
 #GREATE_ROOTFS_IMAGE="yes";
 #
@@ -703,7 +703,7 @@ if [ ! -z "${WORK_DIR}" ]; then
 # #	ISCSI_CONV="yes";
 # # # #	MAKE_UINITRD="yes";
 #
-CREATE_BMAP="yes"; INST_UBOOT="yes";
+#CREATE_BMAP="yes"; INST_UBOOT="yes";
 # 
 
 echo "#---------------------------------------------------------------------------------- "
@@ -806,7 +806,9 @@ set -e
 		if [[ ${INST_UBOOT} == 'yes' ]]; then
 			IMG_PARTS=2
 			create_image
-			COMP_PREFIX=final-kernel-from-repo-deb
+#			COMP_PREFIX=final-kernel-from-repo-deb
+			COMP_PREFIX=qt-final
+
 
 			mount_sdimagefile
 			extract_rootfs

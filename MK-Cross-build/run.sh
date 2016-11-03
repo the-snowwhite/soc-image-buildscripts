@@ -13,11 +13,14 @@ REL_CURRENT_DATE=`date -I`
 #ROOTFS_DIR=${WORK_DIR}/rootfs
 #IMG_FILE=${CURRENT_DIR}/mksoc_sdcard-beta2.img
 #IMG_FILE=${CURRENT_DIR}/mksoc_sdcard.img
-#IMG_FILE=${CURRENT_DIR}/mksocfpga_jessie_linux-3.10-${REL_CURRENT_DATE}_sdcard.img
-IMG_FILE=${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-${REL_CURRENT_DATE}-nano_sd.img
-IMG_ROOT_PART=p2
-ROOTFS_MNT=/mnt/rootfs
-DRIVE=/dev/mapper/loop2
+SD_IMG_FILE=${CURRENT_DIR}/mksocfpga_jessie_machinekit_4.1-ltsi-rt-2016-10-24-de0-nano-soc_sd.img
+SD_IMG_NAME=${CURRENT_DIR}/mksocfpga_jessie_machinekit_4.1-ltsi-rt-2016-10-24-de0-nano-soc_mk-rip_sd.img
+#IMG_FILE=${CURRENT_DIR}/mksocfpga_jessie_socfpga-4.1-ltsi-rt-${REL_CURRENT_DATE}-nano_sd.img
+IMG_ROOT_PART=p3
+#ROOTFS_MNT=/mnt/rootfs
+ROOTFS_MNT=/tmp/myimage
+
+#DRIVE=/dev/mapper/loop2
 
 MK_SOURCEFILE_NAME=machinekit-src.tar.bz2
 MK_BUILTFOLDER_NAME=machinekit-built-src
@@ -64,6 +67,110 @@ else
 fi
 }
 
+mount_sdimagefile(){
+	sudo sync
+	LOOP_DEV=`eval sudo losetup -Pf --show ${SD_IMG_FILE}`
+	sudo mkdir -p ${ROOTFS_MNT}
+	sudo mount ${LOOP_DEV}${IMG_ROOT_PART} ${ROOTFS_MNT}
+	echo "#--------------------------------------------------------------------------------------#"
+	echo "# Scr_MSG:                                                                             #"
+	echo "# ${SD_IMG_FILE}"
+	echo "# Is mounted in ---> ${LOOP_DEV}"
+	echo "#                                                                                      #"
+	echo "# ${LOOP_DEV}${IMG_ROOT_PART}"
+	echo "# Is mounted in ---> ${ROOTFS_MNT}"
+	echo "#                                                                                      #"
+	echo "#--------------------------------------------------------------------------------------#"
+}
+
+unmount_sdimagefile(){
+	echo ""
+	echo "Scr_MSG: Unmounting ---> ${ROOTFS_MNT}"
+	sudo umount -R ${ROOTFS_MNT}
+	echo ""
+	echo "Scr_MSG: Unmounting Imagefile in ---> ${LOOP_DEV}"
+	sudo losetup -d ${LOOP_DEV}
+	echo ""
+}
+
+bind_rootfs(){
+	sudo sync
+	sudo mount --bind /dev ${ROOTFS_MNT}/dev
+	sudo mount --bind /proc ${ROOTFS_MNT}/proc
+	sudo mount --bind /sys ${ROOTFS_MNT}/sys
+
+	echo "#--------------------------------------------------------------------------------------#"
+	echo "# Scr_MSG: ${ROOTFS_MNT} Bind mounted                                                  #"
+	echo "#                                                                                      #"
+	echo "#--------------------------------------------------------------------------------------#"
+}
+
+kill_ch_proc(){
+FOUND=0
+
+for ROOT in /proc/*/root; do
+    LINK=$(sudo readlink ${ROOT})
+    if [ "x${LINK}" != "x" ]; then
+        if [ "x${LINK:0:${#PREFIX}}" = "x${PREFIX}" ]; then
+            # this process is in the chroot...
+            PID=$(basename $(dirname "${ROOT}"))
+            sudo kill -9 "${PID}"
+            FOUND=1
+        fi
+    fi
+done
+}
+
+umount_ch_proc(){
+COUNT=0
+
+while sudo grep -q "${PREFIX}" /proc/mounts; do
+    COUNT=$((${COUNT}+1))
+    if [ ${COUNT} -ge 20 ]; then
+        echo "failed to umount ${PREFIX}"
+        if [ -x /usr/bin/lsof ]; then
+            /usr/bin/lsof "${PREFIX}"
+        fi
+        exit 1
+    fi
+    grep "${PREFIX}" /proc/mounts | \
+        cut -d\  -f2 | LANG=C sort -r | xargs -r -n 1 sudo umount || sleep 1
+done
+}
+
+bind_unmount_rootfs_imagefile(){
+	cd ${CURRENT_DIR}
+	CDR=`eval pwd`
+	echo ""
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo ""
+	echo "Scr_MSG: current dir is now: ${CDR}"
+	echo ""
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo ""
+	sudo sync
+	if [ -d "${ROOTFS_MNT}/home" ]; then
+		echo ""
+		echo "Scr_MSG: Will now (unbind) ummount ${ROOTFS_MNT}"
+		PREFIX=${ROOTFS_MNT}
+		kill_ch_proc
+		RES=`eval sudo umount -R ${ROOTFS_MNT}`
+		echo ""
+		echo "Scr_MSG: Unmont result = ${RES}"
+		echo "Scr_MSG: Unmont return value = ${?}"
+		echo ""
+	else
+		echo ""
+		echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+		echo ""
+		echo "Scr_MSG: Rootfs was unmounted correctly"
+		echo ""
+		echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+		echo ""
+	fi
+
+}
+
 compress_clone(){
     echo "compressing machinekit folder"
     cd ${WORK_DIR}
@@ -82,20 +189,15 @@ compress_mkrip_rootfs(){
     echo "compressing final mk-rip-rootfs"
 
     echo ""
-    echo "NOTE: will mount ${IMG_FILE}"
+    echo "NOTE: will mount ${SD_IMG_FILE}"
     echo ""
 
-    sudo kpartx -a -s -v ${IMG_FILE}
-
-    sudo mkdir -p ${ROOTFS_MNT}
-    sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
-
+    mount_sdimagefile
 
     cd ${ROOTFS_MNT}
     sudo tar -cjSf ${CURRENT_DIR}/${MK_RIPROOTFS_NAME} *
     cd ${WORK_DIR}
-    sudo umount -R ${ROOTFS_MNT}
-    sudo kpartx -d -s -v ${IMG_FILE}
+    unmount_sdimagefile
 }
 
 # compress_mk_build(){
@@ -161,54 +263,17 @@ EOT'
 
 sudo chmod +x ${ROOTFS_MNT}/home/build.sh
 }
-
-kill_ch_proc(){
-FOUND=0
-
-for ROOT in /proc/*/root; do
-    LINK=$(sudo readlink ${ROOT})
-    if [ "x${LINK}" != "x" ]; then
-        if [ "x${LINK:0:${#PREFIX}}" = "x${PREFIX}" ]; then
-            # this process is in the chroot...
-            PID=$(basename $(dirname "${ROOT}"))
-            sudo kill -9 "${PID}"
-            FOUND=1
-        fi
-    fi
-done
-}
-
-umount_ch_proc(){
-COUNT=0
-
-while sudo grep -q "${PREFIX}" /proc/mounts; do
-    COUNT=$((${COUNT}+1))
-    if [ ${COUNT} -ge 20 ]; then
-        echo "failed to umount ${PREFIX}"
-        if [ -x /usr/bin/lsof ]; then
-            /usr/bin/lsof "${PREFIX}"
-        fi
-        exit 1
-    fi
-    grep "${PREFIX}" /proc/mounts | \
-        cut -d\  -f2 | LANG=C sort -r | xargs -r -n 1 sudo umount || sleep 1
-done
-}
-
 run_setup_initial_files() {
 copy_files
 gen_build_sh
 gen_policy-rc.d
+sudo cp -f ${ROOTFS_MNT}/etc/apt/sources.list-local ${ROOTFS_MNT}/etc/apt/sources.list
 }
 
 run_build_sh() {
 echo "mounting SD-Image"
 
-sudo kpartx -a -s -v ${IMG_FILE}
-
-sync
-sudo mkdir -p ${ROOTFS_MNT}
-sudo mount ${DRIVE}${IMG_ROOT_PART} ${ROOTFS_MNT}
+mount_sdimagefile
 
 echo "------------------------------------------"
 echo "   copying files to root mount            "
@@ -221,10 +286,7 @@ echo "running build.sh config script in chroot"
 echo "------------------------------------------"
 cd ${ROOTFS_MNT} # or where you are preparing the chroot dir
 
-
-sudo mount -t proc proc proc/
-sudo mount -t sysfs sys sys/
-sudo mount -o bind /dev dev/
+bind_rootfs
 
 #echo "will now exit in mount"
 #exit 1
@@ -256,31 +318,31 @@ if [ -f ${HOSTS_FILE}.bak ]; then
     sudo rm -f ${HOSTS_FILE}
     sudo mv ${HOSTS_FILE}.bak ${HOSTS_FILE}
 fi
-
+sudo cp -f ${ROOTFS_MNT}/etc/apt/sources.list-final ${ROOTFS_MNT}/etc/apt/sources.list
 sudo rm ${ROOTFS_MNT}/etc/resolv.conf
 
 cd ${CURRENT_DIR}
 
 
 sudo cp -f ${ROOTFS_MNT}/home/machinekit/${MK_BUILTFILE_NAME}  ${WORK_DIR}
-
-PREFIX=${ROOTFS_MNT}
-kill_ch_proc
-
-PREFIX=${ROOTFS_MNT}
-umount_ch_proc
-
-echo "killed processes in mount now syncing..."
-sync
-
-#sudo umount -R ${ROOTFS_MNT}
-
-sync
-sudo kpartx -d -v ${IMG_FILE}
-sync
-
+bind_unmount_rootfs_imagefile
 compress_mkrip_rootfs
 
+}
+
+make_bmap_image() {
+	echo ""
+	echo "NOTE:  Will now make bmap image"
+	echo ""
+	cd ${CURRENT_DIR}
+	sudo mv ${SD_IMG_FILE} ${SD_IMG_NAME}
+	bmaptool create -o ${SD_IMG_NAME}.bmap ${SD_IMG_NAME}
+#	tar -cjSf ${SD_IMG_FILE}.tar.bz2 ${SD_IMG_FILE}
+#	tar -cjSf ${SD_IMG_FILE}-bmap.tar.bz2 ${SD_IMG_FILE}.tar.bz2 ${SD_IMG_FILE}.bmap
+	tar -cjSf ${SD_IMG_NAME}-bmap.tar.bz2 ${SD_IMG_NAME} ${SD_IMG_NAME}.bmap
+	echo ""
+	echo "NOTE:  Bmap image created"
+	echo ""
 }
 
 #---------------------------------------------------------------------------#
@@ -294,8 +356,10 @@ compress_mkrip_rootfs
 #compress_clone
 #compress_built_source
 
-run_build_sh
+#run_build_sh
 
 #run_re_build_sh
+
+make_bmap_image
 echo "#+++   run.sh completed     ++++++++++++++++++#"
 echo "#------ Machinekit Rip build completed -------#"

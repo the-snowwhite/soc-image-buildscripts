@@ -127,7 +127,7 @@ install_mk_fresh_deps() {
 # dependencies + more from https://github.com/mhaberler/asciidoc-sandbox/wiki/Machinekit-Build-for-Multiple-RT-Operating-Systems#installation
 
 sudo apt -y update
-sudo apt -y upgrade
+sudo apt -y --force-yes upgrade
 #
 sudo apt -y install libudev-dev libmodbus-dev libboost-python-dev libusb-1.0-0-dev autoconf pkg-config glib-2.0 gtk+-2.0 tcllib tcl-dev tk-dev bwidget libxaw7-dev libreadline6-dev python-tk libqt4-opengl libqt4-opengl-dev libtk-img python-opengl glade python-xlib python-gtkglext1 python-configobj python-vte libglade2-dev python-glade2 python-gtksourceview2 libncurses-dev libreadline-dev libboost-serialization-dev libboost-thread-dev libjansson-dev lsb-release git dpkg-dev rsyslog automake uuid-runtime ccache  avahi-daemon avahi-discover libnss-mdns bc cython netcat
 #
@@ -157,7 +157,7 @@ EOT'
 
 sudo apt -y update
 
-sudo apt -y install libavahi-client3 libgcc1 libprotobuf9 libstdc++6 libudev1 libuuid1 libzmq3
+sudo apt -y install libavahi-client3 libgcc1 libprotobuf9 libstdc++6 libudev1 libuuid1 libzmq3 libczmq-dev
 
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 43DDF224
 sudo sh -c \
@@ -168,8 +168,8 @@ sudo apt -y update
 
 sudo apt -f install
 #sudo apt-get -y autoremove
-sudo apt -y update
-sudo apt -y upgrade
+#sudo apt -y update
+sudo apt -y --force-yes upgrade
 
 sudo apt -y install libwebsockets3 libwebsockets-dev
 
@@ -223,10 +223,10 @@ sudo cp ./rtapi/shmdrv/limits.d-machinekit.conf /etc/security/limits.d/linuxcnc.
 sudo cp ./rtapi/shmdrv/shmdrv.rules /etc/udev/rules.d/50-LINUXCNC-shmdrv.rules
 
 echo installing dependencies
-sudo apt -y install --no-install-recommends devscripts equivs
+sudo apt -y install --no-install-recommends devscripts
 
 
-echo "install --no-install-recommends devscripts equivs .. completed"
+echo "install --no-install-recommends devscripts .. completed"
 }
 
 mk_build() {
