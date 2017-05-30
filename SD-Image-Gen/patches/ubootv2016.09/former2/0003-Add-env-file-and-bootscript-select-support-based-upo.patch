@@ -1,0 +1,26 @@
+From 62ead27d80cc594ca1956b46f284449a69cc66a5 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sat, 22 Oct 2016 01:12:05 +0200
+Subject: [PATCH 3/5] Add env file and bootscript select support based upon
+ chip model and installed kernel (bb style)
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ include/configs/socfpga_de0_nano_soc.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
+index 6e6377b..2181296 100644
+--- a/include/configs/socfpga_de0_nano_soc.h
++++ b/include/configs/socfpga_de0_nano_soc.h
+@@ -42,6 +42,7 @@
+ 			"fi;" \
+ 		"fi; " \
+ 	"fi;" \
++
+ #define CONFIG_LOADADDR		0x01000000
+ #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
+ 
+-- 
+2.7.4
+

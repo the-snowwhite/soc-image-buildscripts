@@ -5,86 +5,26 @@
 #------------------------------------------------------------------------------------------------------
 # Variables
 #------------------------------------------------------------------------------------------------------
-CURRENT_DIR=`pwd`
-WORK_DIR=${1}
 
-MAIN_SCRIPT_ROOT_DIR=${2}
-UBOOT_VERSION=${3}
-BOARD=${4}
-UBOOT_BOARD=${5}
-MAKE_CONFIG=${6}
-
-CC_FOLDER_NAME=${7}
-APPLY_PATCH=${8}
-
-#UBOOT_VERSION='v2015.10'
-#UBOOT_VERSION='v2016.01'
-CHKOUT_OPTIONS=''
-#CHKOUT_OPTIONS='-b tmp'
-
-BOARD_CONFIG="socfpga_${UBOOT_BOARD}_defconfig"
-
+#UBOOT_CHKOUT_OPTIONS=''
+UBOOT_CHKOUT_OPTIONS='-b tmp'
+UBOOT_BOARD_CONFIG="socfpga_${UBOOT_BOARD}_defconfig"
 
 # 2016.0X patches:
-PATCH_FILE=patches/"u-boot-${UBOOT_VERSION}-${BOARD}-changeset.patch"
+UBOOT_PATCH_FILE=${PATCH_DIR}/"u-boot-${UBOOT_VERSION}-${BOARD}-changeset.patch"
 
-UBOOT_DIR=${WORK_DIR}/uboot
-
-#-------------------------------------------
-# u-boot, toolchain, imagegen vars
-#-------------------------------------------
-#--------- altera socfpga kernel --------------------------------------#
-
-#--------- Toolchain  -------------------------------------------------#
-
-CC_DIR="${WORK_DIR}/${CC_FOLDER_NAME}"
-
-CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
+UBOOT_DIR=${CURRENT_DIR}/uboot
 
 #----------------------------------------------------------------------#
 
-
-NCORES=`nproc`
-
 patch_uboot() {
-#if [ ! -z "$APPLY_PATCH" ]; then
-if [[ ${APPLY_PATCH} == 'yes' ]]; then
-	echo "MGG: Applying u-boot patch ${PATCH_FILE}"
+if [[ ${APPLY_UBOOT_PATCH} == 'yes' ]]; then
+	echo "MGG: Applying u-boot patch ${UBOOT_PATCH_FILE}"
 	cd $UBOOT_DIR
-	git am --signoff <  $MAIN_SCRIPT_ROOT_DIR/$PATCH_FILE
+	git am --signoff <  ${MAIN_SCRIPT_ROOT_DIR}/${UBOOT_PATCH_FILE}
 else
 	echo "MSG: No u-boot patch applied"
 fi
-}
-
-fetch_uboot() {
-if [ ! -d ${UBOOT_DIR} ]; then
-    echo "MSG: cloning u-boot"
-    git clone git://git.denx.de/u-boot.git uboot
-fi
-
-cd $UBOOT_DIR
-if [ ! -z "$UBOOT_VERSION" ]
-then
-    git fetch origin
-    git reset --hard origin/master
-    echo "MSG: Will now check out " $UBOOT_VERSION
-    git checkout $UBOOT_VERSION $CHKOUT_OPTIONS
-    echo "MSG: Will now apply patch: " $MAIN_SCRIPT_ROOT_DIR/$PATCH_FILE
-    patch_uboot
-fi
-cd ..
-}
-
-install_sid_armhf_crosstoolchain() {
-sudo dpkg --add-architecture armhf
-sudo apt-get update
-
-#sudo apt-get install crossbuild-essential-armhf
-#sudo apt-get install gcc-arm-linux-gnueabihf
-
-sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev debconf dpkg-dev libconfig-auto-perl file libfile-homedir-perl libfile-temp-perl liblocale-gettext-perl perl binutils-multiarch fakeroot
-
 }
 
 build_uboot() {
@@ -96,9 +36,9 @@ export CROSS_COMPILE=$CC
 
 echo "MSG: configuring u-boot"
 make mrproper
-make $BOARD_CONFIG
+make $UBOOT_BOARD_CONFIG
 echo "MSG: compiling u-boot"
-make $MAKE_CONFIG -j$NCORES
+make $UBOOT_MAKE_CONFIG -j$NCORES
 }
 
 # run functions
@@ -108,8 +48,8 @@ echo "#-------------------------------------------------------------------------
 
 set -e
 
-if [ ! -z "$WORK_DIR" ]; then
-    cd $WORK_DIR
+if [ ! -z "$CURRENT_DIR" ]; then
+    cd $CURRENT_DIR
     fetch_uboot
 
     build_uboot
