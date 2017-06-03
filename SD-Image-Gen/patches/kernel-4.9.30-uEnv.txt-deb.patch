@@ -1,0 +1,32 @@
+--- arm-linux-4.9.30-gnueabifh-kernel-orig/linux-4.9.30/scripts/package/builddeb        2017-06-03 16:35:28.678107685 +0200
++++ arm-linux-4.9.30-gnueabifh-kernel/linux-4.9.30/scripts/package/builddeb     2017-06-03 23:50:27.307021559 +0200
+@@ -201,6 +201,29 @@
+ else
+        want_initrd=No
+ fi
++# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
++cat <<EOF > "$tmpdir/boot/uEnv.txt"
++kver=${version}
++initrd_installed=$want_initrd
++EOF
++cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
++hostname=holosynthv
++bitimage=/boot/DE10_NANO_SOC_FB.rbf
++fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
++fpgaintf=ffd08028
++fpgaintf_handoff=0x00000000
++fpga2sdram_apply=3ff795a4
++fpga2sdram=ffc25080
++fpga2sdram_handoff=0x00000000
++axibridge=ffd0501c
++axibridge_handoff=0x00000000
++l3remap=ff800000
++l3remap_handoff=0x00000019
++bridge_enable_handoff=mw ${fpgaintf} ${fpgaintf_handoff}; mw ${fpga2sdram} ${fpga2sdram_handoff}; mw \${axibridge} ${axibridge_handoff}; mw ${l3remap} ${l3remap_handoff}
++loadimage=run fpgaload; run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++mmcboot=setenv bootargs console=ttyS0,115200 root=${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz ${loadaddr} - ${fdt_addr}
++EOF
++
+ for script in postinst postrm preinst prerm ; do
+        mkdir -p "$tmpdir$debhookdir/$script.d"
+        cat <<EOF > "$tmpdir/DEBIAN/$script"
