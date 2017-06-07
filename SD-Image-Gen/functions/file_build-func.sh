@@ -1,4 +1,12 @@
 #!/bin/bash
+OK="yes"
+
+
+exit_fail() {
+	echo "Scr_MSG: Exit error: in function ${curr_function}"
+	exit 1
+}
+
 extract_xz() {
     echo "MSG: using tar for xz extract"
     tar xf ${1}
@@ -128,7 +136,7 @@ CONFIG_FB_NOTIFY=y
 CONFIG_FB_CFB_FILLRECT=y
 CONFIG_FB_CFB_COPYAREA=y
 CONFIG_FB_CFB_IMAGEBLIT=y
-CONFIG_FB_ALTERA_VIP=y
+config FB_SIMPLE=y
 CONFIG_DUMMY_CONSOLE=y
 CONFIG_FRAMEBUFFER_CONSOLE=y
 CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
@@ -220,7 +228,7 @@ echo "Kernel Custom Patch added"
 echo "config file mods applied"
 
 cd ${KERNEL_BUILD_DIR}
-patch  -p2 < ${PATCH_SCRIPT_DIR}/kernel-4.9.30-uEnv.txt-deb.patch
+patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.30_uio-fb_patch.txt
 }
 
 rt_patch_kernel() {
@@ -322,7 +330,7 @@ fi
 echo ""
 
 #
-# if [[ ${CLEAN_KERNELREPO} == 'yes' ]]; then
+# if [[ "${CLEAN_KERNELREPO}" ==  "${OK}" ]]; then
 # CLEAN_ALL_LIST=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1}`
 #
 # JESSIE_CLEAN_ALL_LIST=$"${CLEAN_ALL_LIST}"
@@ -360,8 +368,9 @@ echo "#--->       Repo updated                                                  
 
 ## parameters: 1: mount name, 2: kernel tag
 inst_kernel_from_local_repo(){
-sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
 
+cd ${CURRENT_DIR}
+sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
 sudo rm -f ${1}/etc/resolv.conf
 sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
 
@@ -370,13 +379,13 @@ sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
 #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y install apt-transport-https
 
 #sudo sh -c 'echo "deb [arch=armhf] https://deb.mah.priv.at/ jessie socfpga" > '${1}'/etc/apt/sources.list.d/debmah.list'
-sudo sh -c 'echo "deb [arch=armhf] http://kubuntu16-ws.holotronic.lan/debian '${distro}' main" > '${1}'/etc/apt/sources.list.d/mibsocdeb.list'
+#sudo sh -c 'echo "deb [arch=armhf] http://kubuntu16-ws.holotronic.lan/debian '${distro}' main" > '${1}'/etc/apt/sources.list.d/mibsocdeb.list'
 echo ""
 echo "Script_MSG: Will now add key to kubuntu16-ws"
 echo ""
 
 sudo sh -c 'wget -O - http://kubuntu16-ws.holotronic.lan/debian/socfpgakernels.gpg.key|apt-key add -'
-sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
+sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update --allow-unauthenticated
 
 # #sudo chroot --userspec=root:root ${1} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 4FD9D713
 # #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
@@ -563,13 +572,16 @@ fi
 
 ## parameters: 1: mount dev name
 bind_mounted(){
+	sudo mkdir -p ${1}/dev
+	sudo mkdir -p ${1}/proc
+	sudo mkdir -p ${1}/sys
 	sudo sync
 	sudo mount --bind /dev ${1}/dev
 	sudo mount --bind /proc ${1}/proc
 	sudo mount --bind /sys ${1}/sys
 
 	echo "#--------------------------------------------------------------------------------------#"
-	echo "# Scr_MSG: ${1} Bind mounted                                                  #"
+	echo "# Scr_MSG: ${1} now Bind mounted                                                  #"
 	echo "#                                                                                      #"
 	echo "#--------------------------------------------------------------------------------------#"
 }
@@ -603,25 +615,38 @@ unmount_binded(){
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	echo ""
 	sudo sync
-		echo "Scr_MSG: Will now (unbind) ummount ${1}"
+		echo "Scr_MSG: Will now ummount ${1}"
 		RES=`eval sudo umount -R ${1}`
 		echo ""
 		echo "Scr_MSG: Unmont result = ${RES}"
 		echo "Scr_MSG: Unmont return value = ${?}"
 	if [ -d "${1}/dev" ]; then
 		echo ""
-		kill_ch_proc ${1}
+		echo "Scr_MSG: umount -R failed"
+		echo "Scr_MSG: Will now run  kill_ch_proc ${1}"
 		echo ""
+		kill_ch_proc ${1}
+		if [ -d "${1}/dev" ]; then
+			echo "Scr_MSG: kill_ch_proc ${1} failed also "
+			exit 1
+		else
+			echo ""
+			echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+			echo ""
+			echo "Scr_MSG: ${1} was unmounted correctly with kill_ch_proc"
+			echo ""
+			echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+			echo ""
+		fi
 	else
 		echo ""
 		echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 		echo ""
-		echo "Scr_MSG: Rootfs was unmounted correctly"
+		echo "Scr_MSG: ${1} was unmounted correctly with umount -R"
 		echo ""
 		echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 		echo ""
 	fi
-
 }
 
 # parameters: 1: work dir, 2: mount dev name, 3: comp prefix
@@ -629,14 +654,15 @@ compress_rootfs(){
 	COMPNAME=${COMP_REL}_${3}
 	echo "#---------------------------------------------------------------------------#"
 	echo "#Scr_MSG:                                                                   #"
-	echo "compressing latest rootfs from image into: -->   ---------------------------#"
-	echo " ${1}/${COMPNAME}-rootfs.tar.bz2"
+	echo "compressing latest rootfs from image into: -->                              #"
+	echo " ${1}/${COMPNAME}_rootfs.tar.bz2"
+	echo "----------------------------------------------------------------------------#"
 	cd ${2}
-	sudo tar -cjSf ${1}/${COMPNAME}-rootfs.tar.bz2 *
+	sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 . --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys --exclude=tmp
 	cd ${1}
 	echo "#                                                                           #"
 	echo "#Scr_MSG:                                                                   #"
-	echo "${COMPNAME}-rootfs.tar.bz2 rootfs compression finished ..."
+	echo "${COMPNAME}_rootfs.tar.bz2 rootfs compression finished ..."
 	echo "#                                                                           #"
 	echo "#---------------------------------------------------------------------------#"
 }
@@ -645,12 +671,12 @@ compress_rootfs(){
 extract_rootfs(){
 if [ ! -z "${3}" ]; then
 	COMPNAME=${COMP_REL}_${3}
-	echo "Script_MSG: Extracting ${1}/${COMPNAME}-rootfs.tar.bz2"
+	echo "Script_MSG: Extracting ${1}/${COMPNAME}_rootfs.tar.bz2"
 	echo "Script_MSG: Into imagefile"
 	echo "Rootfs configured ... extracting  ${COMPNAME} rootfs into image...."
 	## extract rootfs into image:
-	sudo tar xfj ${1}/${COMPNAME}-rootfs.tar.bz2 -C ${2}
-	echo "${1}/${COMPNAME}-rootfs.tar.bz2 rootfs extraction finished .."
+	sudo tar xfj ${1}/${COMPNAME}_rootfs.tar.bz2 -C ${2}
+	echo "${1}/${COMPNAME}_rootfs.tar.bz2 rootfs extraction finished .."
 fi
 }
 
@@ -675,4 +701,240 @@ make_bmap_image() {
 	echo ""
 	echo "NOTE:  Bmap image created"
 	echo ""
+}
+
+inst_qt_build_deps(){
+echo ""
+echo "Script_MSG: Installing Qt Build Deps"
+echo ""
+
+sudo cp -f ${ROOTFS_MNT}/etc/apt/sources.list-local ${ROOTFS_MNT}/etc/apt/sources.list
+
+sudo rm -f ${ROOTFS_MNT}/etc/resolv.conf
+sudo cp -f /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
+
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} update
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install libc6-dev x11proto-core-dev libsm6 libsm-dev libgtk-3-common libgtk-3-0 libgtk-3-dev
+
+set +e
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y build-dep qt5-default
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install
+
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install "^libxcb.*" libx11-xcb-dev libxrender-dev libxi-dev libinput5 libinput-pad1 libinput-dev libinput-pad-dev
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install libxcb-xkb1 libxkbcommon-dev libxkbcommon-x11-0 libxkbcommon-x11-dev libxkbcommon0 libxkbfile-dev libxkbfile1 libasound2-dev libmtdev1 libmtdev-dev
+#libgtk2.0-0 libgtk2.0-common libgtk2.0-dev libgtk-3-common libgtk-3-0 libgtk-3-dev libgdk-pixbuf2.0-dev libhunspell-1.3-0 libhunspell-dev hunspell-en-us libgl1-mesa-dev libglu1-mesa-dev
+#libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install  libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync0-dev libxcb-xfixes0-dev libxrender-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-glx0-dev libxcb-xinerama0-dev libfontconfig1 libevdev2 libevdev-dev libudev1 libudev-dev libfontconfig1-dev
+#libegl1-mesa-dev libgegl-dev
+
+# echo ""
+# echo "Script_MSG: Installing Qt into rootfs.img "
+# echo ""
+cd ${CURRENT_DIR}
+
+sudo cp -f ${ROOTFS_MNT}/etc/apt/sources.list-final ${ROOTFS_MNT}/etc/apt/sources.list
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/rm -f /etc/resolv.conf
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+}
+#
+# qt_build(){
+# echo ""
+# echo "Script_MSG: Running qt_build.sh script"
+# echo ""
+# sh -c "${SUB_SCRIPT_DIR}/build_qt.sh ${CURRENT_DIR}" | tee ${CURRENT_DIR}/build_qt-log.txt
+# }
+
+qt_gen_mkspec(){
+
+	rm -R -f ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++
+	mkdir -p ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++
+	cp -f -R ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabi-g++/* ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++/
+
+# qmake.conf contents:
+#sh -c 'cat <<EOF > "${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++/qmake.conf"
+sh -c 'cat <<EOF > '${QTDIR}'/qtbase/mkspecs/linux-arm-gnueabihf-g++/qmake.conf
+#
+# qmake configuration for building with arm-linux-gnueabihf-g++
+#
+
+MAKEFILE_GENERATOR      = UNIX
+CONFIG                 += incremental gdb_dwarf_index
+QMAKE_INCREMENTAL_STYLE = sublib
+
+include(../common/linux.conf)
+include(../common/gcc-base-unix.conf)
+include(../common/g++-unix.conf)
+
+CROSS_GNU_ARCH          = arm-linux-gnueabihf
+warning("preparing QMake configuration for '${CROSS_GNU_ARCH}'")
+CONFIG += '${CROSS_GNU_ARCH}'
+
+
+QT_QPA_DEFAULT_PLATFORM = xcb
+
+# modifications to g++.conf
+QMAKE_CC                = '${QT_CC}'gcc
+QMAKE_CXX               = '${QT_CC}'g++ -fPIC
+QMAKE_LINK              = '${QT_CC}'g++ -fPIC
+QMAKE_LINK_SHLIB        = '${QT_CC}'g++ -fPIC
+
+# modifications to linux.conf
+QMAKE_AR                = '${QT_CC}'ar cqs
+QMAKE_OBJCOPY           = '${QT_CC}'objcopy
+QMAKE_NM                = '${QT_CC}'nm -P
+QMAKE_STRIP             = '${QT_CC}'strip
+
+#modifications to gcc-base.conf
+QMAKE_CFLAGS           += '"${QT_CFLAGS}"'
+QMAKE_CXXFLAGS         += '"${QT_CFLAGS}"'
+QMAKE_CXXFLAGS_RELEASE += -O3
+
+QMAKE_LIBS             += -lrt -lpthread -ldl
+
+
+#QMAKE_LFLAGS_RELEASE=-"Wl,-O1,-rpath,'${QT_ROOTFS_MNT}'/usr/lib,-rpath,'${QT_ROOTFS_MNT}'/usr/lib/'${CROSS_GNU_ARCH}',-rpath,'${QT_ROOTFS_MNT}'/lib/'${CROSS_GNU_ARCH}'"
+#QMAKE_LFLAGS_DEBUG += "-Wl,-rpath,'${QT_ROOTFS_MNT}'/usr/lib,-rpath,'${QT_ROOTFS_MNT}'/usr/lib/${CROSS_GNU_ARCH},-rpath,'${QT_ROOTFS_MNT}'/lib/${CROSS_GNU_ARCH}"
+
+# QMAKE_INCDIR='${QT_ROOTFS_MNT}'/usr/include
+# QMAKE_LIBDIR='${QT_ROOTFS_MNT}'/usr/lib
+# QMAKE_LIBDIR+='${QT_ROOTFS_MNT}'/usr/lib/'${CROSS_GNU_ARCH}'
+# QMAKE_LIBDIR+='${QT_ROOTFS_MNT}'/lib/'${CROSS_GNU_ARCH}'
+# QMAKE_INCDIR_X11='${QT_ROOTFS_MNT}'/usr/include
+# QMAKE_LIBDIR_X11='${QT_ROOTFS_MNT}'/usr/lib
+# QMAKE_INCDIR_OPENGL='${QT_ROOTFS_MNT}'/usr/include
+# QMAKE_LIBDIR_OPENGL='${QT_ROOTFS_MNT}'/usr/lib
+
+load(qt_config)
+
+EOF'
+# solve pkg-config:
+mkdir "${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++/features"
+cat <<EOF > "${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++/features/link_xpkgconfig"
+for(PKGCONFIG_LIB, $$list($$unique(PKGCONFIG))) {
+    PKG_CONFIG_LIBDIR=/usr/${QT_ROOTFS_MNT}/lib/pkgconfig
+    QMAKE_CXXFLAGS += $$system(PKG_CONFIG_LIBDIR=${PKG_CONFIG_LIBDIR} pkg-config --cflags ${PKGCONFIG_LIB})
+    QMAKE_CFLAGS += $$system(PKG_CONFIG_LIBDIR=${PKG_CONFIG_LIBDIR} pkg-config --cflags ${PKGCONFIG_LIB})
+    LIBS += $$system(PKG_CONFIG_LIBDIR=${PKG_CONFIG_LIBDIR} pkg-config --libs ${PKGCONFIG_LIB})
+EOF
+}
+# Your project file then needs these lines added (alsa and pango are just examples):
+#
+# linux-g++ {
+# CONFIG += link_pkgconfig
+# PKGCONFIG += alsa pango
+# }
+#
+# count(CROSS_GNU_ARCH, 1) {
+# CONFIG += link_xpkgconfig
+# PKGCONFIG += alsa pango
+# }
+
+#-no-opengl -skip qtdeclarative -system-xcb
+qt_configure(){
+curr_function="qt_configure()"
+# ../configure -help
+# 	../configure -release -opensource -confirm-license -nomake examples -no-c++11 -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -qreal float -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
+#
+# ../configure -release -opensource -confirm-license -nomake examples -qreal float -no-c++11 -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
+#
+../configure -release -opensource -confirm-license -nomake examples -qreal float -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
+	output=${?}
+	output1=${output}
+	if [ ${output} -gt 0 ]; then
+		exit_fail
+	else
+		echo "Scr_MSG: function --> ${curr_function} exited with success"
+	fi
+}
+
+configure_for_qt_qwt(){
+sudo cp -R /usr/local/qwt-6.1.3 ${QT_ROOTFS_MNT}/usr/local/lib
+sudo sh -c 'echo "/usr/local/lib/qwt-6.1.3/lib" > '${QT_ROOTFS_MNT}'/etc/ld.so.conf.d/qt.conf'
+
+sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:/usr/local/lib/qwt-6.1.3/lib\n" >> '${QT_ROOTFS_MNT}'/etc/profile'
+sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:/usr/local/lib/qwt-6.1.3/lib\n" >> '${QT_ROOTFS_MNT}'/.bashrc'
+sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:/usr/local/lib/qwt-6.1.3/lib\n" >> '${QT_ROOTFS_MNT}'/.profile'
+
+sudo chroot --userspec=root:root ${QT_ROOTFS_MNT} /sbin/ldconfig
+}
+
+
+qt_build(){
+echo ""
+echo "Script_MSG: Running qt_build"
+echo ""
+
+export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/arm-linux-gnueabihf/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=${QT_ROOTFS_MNT}
+export CROSS_COMPILE=${QT_CC}
+
+GEN_MKSPEC_QT="yes";
+CONFIGURE_QT="yes";
+#
+BUILD_QT="yes";
+#
+INSTALL_QT="yes";
+#CONFIGURE_FOR_QWT="yes";
+CONFIGURE_FOR_QWT="no";
+
+mkdir -p ${CURRENT_DIR}/Qt_logs
+
+if [[ "${GEN_MKSPEC_QT}" ==  "${OK}" ]]; then
+#	old_gen_mkspec | tee ${CURRENT_DIR}/Qt_logs/old_gen_mkspec-log.txt
+	qt_gen_mkspec
+	echo "Scr_MSG: generated mkspecs"
+	echo ""
+	sudo ~/sysroot-relativelinks.py ${QT_ROOTFS_MNT}
+fi
+
+
+if [[ "${CONFIGURE_QT}" ==  "${OK}" ]]; then
+	sudo rm -Rf ${QTDIR}/build
+	mkdir -p ${QTDIR}/build
+	cd ${QTDIR}/build
+	qt_configure 2>&1| tee ${CURRENT_DIR}/Qt_logs/qt_configure-log.txt
+	echo ""
+	echo " qt_configure return value = ${output1}"
+	echo ""
+fi
+
+if [[ "${BUILD_QT}" ==  "${OK}" ]]; then
+	cd ${QTDIR}/build
+	make -j${NCORES} 2>&1| tee ${CURRENT_DIR}/Qt_logs/qt_build-log.txt
+	output=${?}
+	output2=${output}
+	curr_function="make"
+	if [ ${output} -gt 0 ]; then
+		exit_fail
+	fi
+	echo ""
+	echo " qt make return value = ${output2}"
+	echo ""
+fi
+
+if [[ "${INSTALL_QT}" ==  "${OK}" ]]; then
+	cd ${QTDIR}/build
+	sudo make install 2>&1| tee ${CURRENT_DIR}/Qt_logs/qt_install-log.txt
+	output=${?}
+	output3=${output}
+	curr_function="make_install"
+	if [ ${output} -gt 0 ]; then
+		exit_fail
+	fi
+	echo ""
+	echo " qt_configure return value = ${output1}"
+	echo ""
+	echo ""
+	echo " qt make return value = ${output2}"
+	echo ""
+	echo ""
+	echo " qt make install return value = ${output3}"
+	echo ""
+#	sudo cp -R '/usr/local/lib/qt-'${QT_VER}'-altera-soc' ''${QT_ROOTFS_MNT}'/usr/local/lib'
+fi
+
+if [[ "${CONFIGURE_FOR_QWT}" ==  "${OK}" ]]; then
+	configure_for_qt_qwt
+fi
+
 }

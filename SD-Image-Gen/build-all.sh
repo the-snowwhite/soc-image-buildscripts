@@ -24,8 +24,8 @@
 ## Select distro:
 ### Debian based:
 #distro=sid
-#distro=jessie
-distro="stretch"
+distro=jessie
+#distro="stretch"
 ### Ubuntu based:
 #distro=zesty
 #distro=xenial
@@ -61,9 +61,17 @@ UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 #USER_NAME=machinekit;
 USER_NAME=holosynth;
 
-KERNEL_VERSION="4.9.30"
-RT_PATCH_REV="rt20"
+#KERNEL_VERSION="4.9.30"
+#RT_PATCH_REV="rt20"
+KERNEL_VERSION="4.1.22"
+RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
 KERNEL_CONF="socfpga_defconfig"
+
+#QT_VER=5.4.1
+QT_VER=5.7.1
+QT_ROOTFS_MNT="/tmp/qt_${QT_VER}-img"
+
+QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
 
 #------------------------------------------------------------------------------------------------------
 # Variables Prerequsites
@@ -94,15 +102,26 @@ final_repo="http://ftp.dk.debian.org/debian/"
 local_repo="http://kubuntu16-srv.holotronic.lan/debian/"
 local_kernel_repo="http://kubuntu16-ws.holotronic.lan/debian/"
 
-DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev"
+DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev"
 
 ## ----------------------------  Toolchain   -----------------------------##
+CROSS_GNU_ARCH="arm-linux-gnueabihf"
 
-PCH52_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_arm-linux-gnueabihf"
+PCH52_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_${CROSS_GNU_ARCH}"
 PCH52_CC_FILE="${PCH52_CC_FOLDER_NAME}.tar.xz"
-PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/arm-linux-gnueabihf/${PCH52_CC_FILE}"
+PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/${CROSS_GNU_ARCH}/${PCH52_CC_FILE}"
 
 TOOLCHAIN_DIR=${HOME}/bin
+
+QT_CFLAGS="-march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard"
+
+QT_CC_FOLDER_NAME="gcc-linaro-${CROSS_GNU_ARCH}-4.9-2014.09_linux"
+#QT_CC_FOLDER_NAME="gcc-linaro-5.4.1-2017.01-x86_64_${CROSS_GNU_ARCH}"
+#QT_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_${CROSS_GNU_ARCH}"
+
+QT_CC_DIR="${TOOLCHAIN_DIR}/${QT_CC_FOLDER_NAME}"
+#QT_CC_FILE="${QT_CC_FOLDER_NAME}.tar.xz"
+QT_CC="${QT_CC_DIR}/bin/${CROSS_GNU_ARCH}-"
 
 ## ------------------------------  Kernel  -------------------------------##
 KERNEL_TAG="${KERNEL_VERSION}-${RT_PATCH_REV}"
@@ -168,7 +187,7 @@ SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
 #------------  Toolchain  -------------#
 CC_DIR="${TOOLCHAIN_DIR}/${CC_FOLDER_NAME}"
 CC_FILE="${CC_FOLDER_NAME}.tar.xz"
-CC="${CC_DIR}/bin/arm-linux-gnueabihf-"
+CC="${CC_DIR}/bin/${CROSS_GNU_ARCH}-"
 
 COMP_REL=debian-${distro}_socfpga
 NCORES=`nproc`
@@ -179,6 +198,9 @@ KERNEL_CONFIGSTRING="${KERNEL_CONF}"
 FULL_KERNEL_CONFIGSTRING='NAME="Michael Brown" EMAIL="producer@holotronic.dk" KBUILD_DEBARCH=armhf LOCALVERSION=-'${KERNEL_LOCALVERSION}' KDEB_PKGVERSION='${KERNEL_VERSION}'-'${KERNEL_REV}''
 
 POLICY_FILE=${ROOTFS_MNT}/usr/sbin/policy-rc.d
+
+EnableSystemdNetworkedLink='/etc/systemd/system/multi-user.target.wants/systemd-networkd.service'
+EnableSystemdResolvedLink='/etc/systemd/system/multi-user.target.wants/systemd-resolved.service'
 
 
 #-----------------------------------------------------------------------------------
@@ -195,12 +217,15 @@ usage()
     echo "    --build_git-kernel   Will clone and build kernel from git"
     echo "    --build_rt-ltsi-kernel   Will download rt-ltsi patch and build kernel"
     echo "    --kernel2repo   Will add kernel .debs to local repo"
-    echo "    --gen-rootfs   Will create root image and generate qemu rootfs"
+    echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs"
     echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience"
     echo "    --bindmount_rootfsimg    Will mount rootfs image"
     echo "    --bindunmount_rootfsimg    Will unmount rootfs image"
     echo "    --inst_repo_kernel   Will install kernel from local repo"
-    echo "    --assemble_full_sd_img   Will generate full populated sd imagefile and bmap"
+    echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file"
+    echo "    --inst_qt_img_deps  Will install qt build depedencies in rootfs image"
+    echo "    --build_qt  Will build qt in rootfs image"
+    echo "    --assemble_qt_dev_sd_img   Will generate full populated sd imagefile with QT-dev and bmap file"
     echo ""
 }
 
@@ -236,7 +261,6 @@ build_uboot() {
 
 build_git_kernel() {
 	echo "--  --> Not implemented yet"
-# 	. ${FUNC_SCRIPT_DIR}/file_build-func.sh
 # 	git_fetch t ${KERNEL_PARENT_DIR} ${KERNEL_URL} ${KERNEL_FILE_NAME}
 #	armhf_build ${UBOOT_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}"
 }
@@ -273,10 +297,12 @@ gen_rootfs_image() {
 		exit 1
 	else
 		compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
-		echo "Script_MSG: will now setup_configfiles"
+		echo "Script_MSG: finished qemu_debootstrap-only with success ... !"
 # 		setup_configfiles
 # 		compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "fully_configured_rootfs"
 		unmount_binded ${1}
+		cp ${2} "${2}-base-qemu"
+		echo "Script_MSG: copied ${2} to --> ${2}-base-qemu as a backup"
 	fi
 }
 
@@ -284,6 +310,7 @@ gen_rootfs_image() {
 finalize_rootfs_image() {
 	create_img 1 ${2} ""
 	mount_imagefile ${2} ${1}
+	bind_mounted ${ROOTFS_MNT}
 	. ${FUNC_SCRIPT_DIR}/rootfs-func.sh
 # 	if [ ${output} -gt 0 ]; then
 # 		echo "Scr_MSG: run_qt_qemu_debootstrap failed"
@@ -291,20 +318,35 @@ finalize_rootfs_image() {
 # 		exit 1
 # 	else
 	extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
-	echo "Script_MSG: will now setup_configfiles"
+	echo "Script_MSG: will now run final setup_configfiles"
 	setup_configfiles
 	initial_rootfs_user_setup_sh
 	finalize
-	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized_fully_configured_rootfs"
+	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured"
 	unmount_binded ${1}
+	cp ${2} "${2}-fin-conf"
 #	fi
 }
 
+## parameters: 1: kernel image tag
 inst_repo_kernel() {
 	mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
 	inst_kernel_from_local_repo ${ROOTFS_MNT} ${KERNEL_TAG}
-	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized_fully_configured_rootfs-with_kernel"
+	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
 	unmount_binded ${ROOTFS_MNT}
+}
+
+## parameters: 1: kernel image tag
+assemble_full_sd_img() {
+	echo "step 1 create image:"
+	create_img "3" "${SD_IMG_FILE}" "${ROOTFS_MNT}" "${media_rootfs_partition}"
+	echo "step 2 mount:"
+	mount_sd_imagefile ${SD_IMG_FILE} ${ROOTFS_MNT} ${media_rootfs_partition}
+	extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
+	unmount_binded ${ROOTFS_MNT}
+	unmount_loopdev
+	install_uboot ${CURRENT_DIR} ${UBOOT_DIR} ${UBOOT_MAKE_CONFIG} ${SD_IMG_FILE}
+	make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
 }
 
 #------------------------------------------------------------------------------------------------------
@@ -338,39 +380,45 @@ while [ "$1" != "" ]; do
             build_rt_ltsi_kernel
             ;;
         --kernel2repo)
-            . ${FUNC_SCRIPT_DIR}/file_build-func.sh
             add_kernel2repo ${distro}
             ;;
         --inst_repo_kernel)
-        inst_repo_kernel
+        inst_repo_kernel "finalized-fully-configured-with-kernel-and-qt-installed"
             ;;
-        --gen-rootfs)
-            gen_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/gen-ubuntu_rootfs-log.txt
+        --gen-base-qemu-rootfs)
+            gen_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
             ;;
         --finalize-rootfs)
-            finalize_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/gen-ubuntu_rootfs-log.txt
+            finalize_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
             ;;
         --bindmount_rootfsimg)
-			. ${FUNC_SCRIPT_DIR}/file_build-func.sh
             mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
             bind_mounted ${ROOTFS_MNT}
             ;;
         --bindunmount_rootfsimg)
-			. ${FUNC_SCRIPT_DIR}/file_build-func.sh
             unmount_binded ${ROOTFS_MNT}
             ;;
-        --assemble_full_sd_img)
-			echo "step 1 create image:"
-			create_img "3" "${SD_IMG_FILE}" "${ROOTFS_MNT}" "${media_rootfs_partition}"
-			echo "step 2 mount:"
-			mount_sd_imagefile ${SD_IMG_FILE} ${ROOTFS_MNT} ${media_rootfs_partition}
-			extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized_fully_configured_rootfs-with_kernel"
-            unmount_binded ${ROOTFS_MNT}
-            unmount_loopdev
-			install_uboot ${CURRENT_DIR} ${UBOOT_DIR} ${UBOOT_MAKE_CONFIG} ${SD_IMG_FILE}
-			make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
+        --assemble_sd_img)
+            assemble_full_sd_img "finalized-fully-configured-with-kernel"
             ;;
-        *)
+        --inst_qt_img_deps)
+        	mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
+        	bind_mounted ${ROOTFS_MNT}
+            inst_qt_build_deps
+			compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-qt-deps"
+			unmount_binded ${ROOTFS_MNT}
+			cp ${ROOTFS_IMG} "${ROOTFS_IMG}-fin-qt-dep"
+            ;;
+        --build_qt)
+			mount_imagefile ${ROOTFS_IMG} ${QT_ROOTFS_MNT}
+			qt_build
+			unmount_binded ${QT_ROOTFS_MNT}
+			cp ${ROOTFS_IMG} "${ROOTFS_IMG}-fin-qt-built"
+            ;;
+         --assemble_qt_dev_sd_img)
+            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-installed"
+            ;;
+       *)
             echo "ERROR: unknown parameter \"$PARAM\""
             usage
             exit 1
