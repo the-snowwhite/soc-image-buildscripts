@@ -1,0 +1,154 @@
+diff -Naur arm-linux-4.9.30-gnueabifh-kernel-orig/linux-4.9.30/arch/arm/boot/dts/socfpga.dtsi arm-linux-4.9.30-gnueabifh-kernel/linux-4.9.30/arch/arm/boot/dts/socfpga.dtsi
+--- arm-linux-4.9.30-gnueabifh-kernel-orig/linux-4.9.30/arch/arm/boot/dts/socfpga.dtsi	2017-05-25 15:45:05.000000000 +0200
++++ arm-linux-4.9.30-gnueabifh-kernel/linux-4.9.30/arch/arm/boot/dts/socfpga.dtsi	2017-06-04 23:19:27.616940012 +0200
+@@ -754,6 +754,106 @@
+ 			compatible = "altr,sys-mgr", "syscon";
+ 			reg = <0xffd08000 0x4000>;
+ 		};
++        bridge@0xc0000000 {
++               compatible = "altr,bridge-16.1", "simple-bus";
++               reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
++               #address-cells = <0x2>;
++               #size-cells = <0x1>;
++               ranges = <0x1 0x2000 0xff202000 0x8>,
++                               <0x1 0x30000 0xff230000 0x100>,
++                               <0x1 0x31000 0xff231000 0x80>,
++                               <0x1 0x1000 0xff201000 0x8>,
++                               <0x1 0x3000 0xff203000 0x10>,
++                               <0x1 0x4000 0xff204000 0x10>,
++                               <0x1 0x5000 0xff205000 0x10>;
++
++               serial@0x100002000 {
++                       compatible = "altr,juart-16.1", "altr,juart-1.0";
++                       reg = <0x1 0x2000 0x8>;
++                       interrupt-parent = <0x3>;
++                       interrupts = <0x0 0x2a 0x4>;
++                       clocks = <0x2>;
++               };
++
++               ilc@0x100030000 {
++                       compatible = "altr,altera_ilc-16.1", "altr,ilc-1.0";
++                       reg = <0x1 0x30000 0x100>;
++                       interrupt-controller;
++                       #interrupt-cells = <0x1>;
++                       altr,sw-fifo-depth = <0x20>;
++               };
++
++               vip@0x100031000 {
++                       compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
++                       reg = <0x1 0x31000 0x80>;
++                       max-width = <0x556>;
++                       max-height = <0x300>;
++                       bits-per-color = <0x8>;
++                       colors-per-beat = <0x4>;
++                       beats-per-pixel = <0x1>;
++                       mem-word-width = <0x80>;
++               };
++
++               sysid@0x100001000 {
++                       compatible = "altr,sysid-16.1", "altr,sysid-1.0";
++                       reg = <0x1 0x1000 0x8>;
++                       id = <0xacd51302>;
++                       timestamp = <0x5929e204>;
++               };
++
++               gpio@0x100003000 {
++                       compatible = "altr,pio-16.1", "altr,pio-1.0";
++                       reg = <0x1 0x3000 0x10>;
++                       altr,gpio-bank-width = <0x8>;
++                       resetvalue = <0xff>;
++                       #gpio-cells = <0x2>;
++                       gpio-controller;
++               };
++
++               gpio@0x100004000 {
++                       compatible = "altr,pio-16.1", "altr,pio-1.0";
++                       reg = <0x1 0x4000 0x10>;
++                       altr,gpio-bank-width = <0x4>;
++                       altr,interrupt-type = <0x3>;
++                       altr,interrupt_type = <0x3>;
++                       edge_type = <0x2>;
++                       level_trigger = <0x0>;
++                       resetvalue = <0x0>;
++                       #gpio-cells = <0x2>;
++                       gpio-controller;
++               };
++
++               gpio@0x100005000 {
++                       compatible = "altr,pio-16.1", "altr,pio-1.0";
++                       reg = <0x1 0x5000 0x10>;
++                       altr,gpio-bank-width = <0x2>;
++                       altr,interrupt-type = <0x2>;
++                       altr,interrupt_type = <0x2>;
++                       edge_type = <0x1>;
++                       level_trigger = <0x0>;
++                       resetvalue = <0x0>;
++                       #gpio-cells = <0x2>;
++                       gpio-controller;
++               };
++        };
++
++        hps_0_h2f_lw: bridge@0xff200000 {
++               compatible = "altr,h2f_lw_bridge-1.0", "simple-bus";
++               reg = <0xff200000 0x050000>;
++               #address-cells = <0x1>;
++               #size-cells = <0x1>;
++               ranges = <0x40000 0xff240000 0x10000>;
++
++               uioreg_io_0: uio-socfpg0@0x40000 {
++                       compatible = "uioreg_io,generic-uio,ui_pdrv";
++                       reg = <0x40000 0x10000>;
++                       interrupt-parent = <0x2>;
++                       interrupts = <0 43 4>;
++                       address_width = <14>;
++                       data_width = <32>;
++               };
++        };
++
+ 
+ 		/* Local timer */
+ 		timer@fffec600 {
+diff -Naur arm-linux-4.9.30-gnueabifh-kernel-orig/linux-4.9.30/arch/arm/Kconfig arm-linux-4.9.30-gnueabifh-kernel/linux-4.9.30/arch/arm/Kconfig
+--- arm-linux-4.9.30-gnueabifh-kernel-orig/linux-4.9.30/arch/arm/Kconfig	2017-06-04 23:09:54.000000000 +0200
++++ arm-linux-4.9.30-gnueabifh-kernel/linux-4.9.30/arch/arm/Kconfig	2017-06-04 23:13:34.118500413 +0200
+@@ -1739,6 +1739,7 @@
+ 	int "Maximum zone order"
+ 	default "12" if SOC_AM33XX
+ 	default "9" if SA1111 || ARCH_EFM32
++	default "13" if ARCH_SOCFPGA
+ 	default "11"
+ 	help
+ 	  The kernel memory allocator divides physically contiguous memory
+diff -Naur arm-linux-4.9.30-gnueabifh-kernel-orig/linux-4.9.30/scripts/package/builddeb arm-linux-4.9.30-gnueabifh-kernel/linux-4.9.30/scripts/package/builddeb
+--- arm-linux-4.9.30-gnueabifh-kernel-orig/linux-4.9.30/scripts/package/builddeb	2017-05-25 15:45:05.000000000 +0200
++++ arm-linux-4.9.30-gnueabifh-kernel/linux-4.9.30/scripts/package/builddeb	2017-06-04 23:21:09.405643126 +0200
+@@ -201,6 +201,29 @@
+ else
+ 	want_initrd=No
+ fi
++# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
++cat <<EOF > "$tmpdir/boot/uEnv.txt"
++kver=${version}
++initrd_installed=$want_initrd
++EOF
++cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
++hostname=holosynthv
++bitimage=/boot/DE10_NANO_SOC_FB.rbf
++fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
++fpgaintf=ffd08028
++fpgaintf_handoff=0x00000000
++fpga2sdram_apply=3ff795a4
++fpga2sdram=ffc25080
++fpga2sdram_handoff=0x00000000
++axibridge=ffd0501c
++axibridge_handoff=0x00000000
++l3remap=ff800000
++l3remap_handoff=0x00000019
++bridge_enable_handoff=mw ${fpgaintf} ${fpgaintf_handoff}; mw ${fpga2sdram} ${fpga2sdram_handoff}; mw \${axibridge} ${axibridge_handoff}; mw ${l3remap} ${l3remap_handoff}
++loadimage=run fpgaload; run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++mmcboot=setenv bootargs console=ttyS0,115200 root=${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz ${loadaddr} - ${fdt_addr}
++EOF
++
+ for script in postinst postrm preinst prerm ; do
+ 	mkdir -p "$tmpdir$debhookdir/$script.d"
+ 	cat <<EOF > "$tmpdir/DEBIAN/$script"
