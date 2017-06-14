@@ -843,6 +843,19 @@ EndSection
 
 EOF'
 
+if [[ "${distro}" == "stretch" ]]; then
+sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/.xsessionrc
+xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
+EOF'
+
+sudo mkdir -p ${ROOTFS_MNT}/home/holosynth/Desktop
+sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/Desktop/HolosynthVEd.sh
+#xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
+/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
+
+EOF'
+
+else
 sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/.xsessionrc
 xinput set-prop 6 "Evdev Axis Inversion" 1,1
 xinput set-prop 6 "Evdev Axes Swap" 0
@@ -851,12 +864,12 @@ EOF'
 
 sudo mkdir -p ${ROOTFS_MNT}/home/holosynth/Desktop
 sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/Desktop/HolosynthVEd.sh
-xinput set-prop 6 "Evdev Axis Inversion" 1,1
-xinput set-prop 6 "Evdev Axes Swap" 0
+#xinput set-prop 6 "Evdev Axis Inversion" 1,1
+#xinput set-prop 6 "Evdev Axes Swap" 0
 /home/holosynth/prg/HolosynthVEd -nograb -platform xcb
 
 EOF'
-
+fi
 	sudo chmod +x ${ROOTFS_MNT}/home/holosynth/Desktop/HolosynthVEd.sh
 	sudo chown -R mib:mib ${ROOTFS_MNT}/home/holosynth/Desktop
 
