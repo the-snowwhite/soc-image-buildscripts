@@ -64,8 +64,10 @@ USER_NAME=holosynth;
 #KERNEL_VERSION="4.9.30"
 #RT_PATCH_REV="rt20"
 KERNEL_VERSION="4.1.22"
-RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
+#RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
+RT_PATCH_REV="ltsi-rt23"
 KERNEL_CONF="socfpga_defconfig"
+ALT_GIT_KERNEL_VERSION="4.1.22-ltsi-rt"
 
 #QT_VER=5.4.1
 QT_VER=5.7.1
@@ -135,8 +137,14 @@ RT_PATCH_FILE="patch-${KERNEL_TAG}.patch.xz"
 RT_PATCH_URL="https://cdn.kernel.org/pub/linux/kernel/projects/rt/4.9/${RT_PATCH_FILE}"
 
 
-KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${KERNEL_VERSION}-gnueabifh-kernel"
+KERNEL_PARENT_DIR="arm-linux-${KERNEL_VERSION}-gnueabifh-kernel"
 KERNEL_BUILD_DIR="${KERNEL_PARENT_DIR}/${KERNEL_FOLDER}"
+GIT_KERNEL_BUILD_DIR="${KERNEL_PARENT_DIR}/linux"
+
+ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
+ALT_GIT_KERNEL_BRANCH="socfpga-${ALT_GIT_KERNEL_VERSION}"
+ALT_GIT_KERNEL_PATCH_FILE="${ALT_GIT_KERNEL_BRANCH}-changeset.patch"
+GIT_KERNEL_DIR=linux
 
 # ------------------------------  Uboot  --------------------------------##
 
@@ -195,7 +203,7 @@ NCORES=`nproc`
 #--------------  Kernel  --------------#
 
 KERNEL_CONFIGSTRING="${KERNEL_CONF}"
-FULL_KERNEL_CONFIGSTRING='NAME="Michael Brown" EMAIL="producer@holotronic.dk" KBUILD_DEBARCH=armhf LOCALVERSION=-'${KERNEL_LOCALVERSION}' KDEB_PKGVERSION='${KERNEL_VERSION}'-'${KERNEL_REV}''
+GIT_KERNEL_CONFIGSTRING=" NAME=\"Michael Brown\" EMAIL=\"producer@holotronic.dk\" KBUILD_DEBARCH=armhf LOCALVERSION=-${KERNEL_LOCALVERSION} KDEB_PKGVERSION=${KERNEL_VERSION}-${KERNEL_REV}"
 
 POLICY_FILE=${ROOTFS_MNT}/usr/sbin/policy-rc.d
 
@@ -261,8 +269,8 @@ build_uboot() {
 
 build_git_kernel() {
 	echo "--  --> Not implemented yet"
-# 	git_fetch t ${KERNEL_PARENT_DIR} ${KERNEL_URL} ${KERNEL_FILE_NAME}
-#	armhf_build ${UBOOT_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}"
+	git_fetch ${KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${ALT_GIT_KERNEL_VERSION} "${ALT_GIT_KERNEL_BRANCH}" ${ALT_GIT_KERNEL_PATCH_FILE} ${GIT_KERNEL_DIR}
+	armhf_build "${CURRENT_DIR}/${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "${GIT_KERNEL_CONFIGSTRING} deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
 }
 
 build_rt_ltsi_kernel() {
@@ -277,7 +285,7 @@ build_rt_ltsi_kernel() {
 		get_and_extract ${KERNEL_PARENT_DIR} ${KERNEL_URL} ${KERNEL_FILE_NAME}
 	fi
 	rt_patch_kernel
-	armhf_build ${KERNEL_BUILD_DIR} "${KERNEL_CONFIGSTRING}" deb-pkg 2>&1 | tee ../deb_rt-log.txt
+	armhf_build ${KERNEL_BUILD_DIR} "${KERNEL_CONFIGSTRING}" deb-pkg 2>&1 | tee ${CURRENT_DIR}/Logs/kernel_deb_rt-log.txt
 }
 
 ## parameters: 1: mount dev name, 2: image name, 3: distro name

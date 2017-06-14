@@ -251,24 +251,41 @@ git_patch() {
 	git am --signoff < ${2}
 }
 
-## parameters: 1: folder name, 2: url, 3: branch name, 4: checkout options, 5: patch file name
+## parameters: 1: folder name, 2: url, 3: branch name, 4: checkout options, 5: patch file name 6: clone folder name
 git_fetch() {
-	if [ ! -d ${CURRENT_DIR}/${1} ]; then
-		echo "MSG: cloning ${2}"
-		git clone ${2} ${1}
-	fi
 
-	cd ${CURRENT_DIR}/${1}
-	if [ ! -z "${3}" ]; then
-		git fetch origin
-		git reset --hard origin/master
-		echo "MSG: Will now check out " ${3}
-		git checkout ${3} ${4}
-		if [ ! -z "${5}" ]; then
-			echo "MSG: Will now apply patch: " ${PATCH_SCRIPT_DIR}/${5}
-			git_patch ${CURRENT_DIR}/${1} ${PATCH_SCRIPT_DIR}/${5}
-		fi
+    if [ ! -d ${CURRENT_DIR}/${1} ]; then
+        if [ ! -z "${6}" ]; then
+            echo "MSG: creating dir ${1}"
+            mkdir ${1}
+            cd ${1}
+            echo "MSG: cloning ${2} into ${6}"
+            git clone ${2} ${6}
+        else
+    		echo "MSG: cloning ${2}"
+    		git clone ${2} ${1}
+        fi
 	fi
+    if [ ! -z "${6}" ]; then
+        cd ${CURRENT_DIR}/${1}/${6}
+        git remote add linux ${KERNEL_URL}
+        git clean -d -f -x
+        git fetch origin
+        git reset --hard origin/${4}
+        git checkout ${4}
+    else
+    	cd ${CURRENT_DIR}/${1}
+    	if [ ! -z "${3}" ]; then
+	   	    git fetch origin
+		    git reset --hard origin/master
+		    echo "MSG: Will now check out " ${3}
+		    git checkout ${3} ${4}
+        fi
+	fi
+    if [ ! -z "${5}" ]; then
+        echo "MSG: Will now apply patch: " ${PATCH_SCRIPT_DIR}/${5}
+	    git_patch ${CURRENT_DIR}/${1}/${6} ${PATCH_SCRIPT_DIR}/${5}
+    fi
 	cd ..
 }
 
@@ -284,12 +301,16 @@ armhf_build() {
 	echo "MSG: as ${2}"
 	make -j${NCORES} mrproper
 #	make -j${NCORES} ${KERNEL_CONF} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk" KBUILD_DEBARCH=armhf
-	make -j${NCORES} ${2} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk"
+#	make -j${NCORES} ${2} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk"
 	if [ ! -z "${3}" ]; then
 		echo "MSG: compiling ${1}"
 #		make -j$NCORES ${3} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk" KBUILD_DEBARCH=armhf
-		make -j$NCORES ${3} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk"
-	fi
+#		make -j$NCORES ${3} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk"
+		make -j$NCORES "${2}" "${3}"
+    else
+        make -j${NCORES} "${2}"
+    fi
+    make -j$NCORES NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf deb-pkg
 }
 
 ## parameters: 1: distro name,
