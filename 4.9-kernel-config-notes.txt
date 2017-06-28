@@ -1,0 +1,8 @@
+arch/arm/configs/socfpga_defconfig:128:warning: override: reassigning to symbol CONFIGFS_FS
+arch/arm/configs/socfpga_defconfig:130:warning: override: reassigning to symbol LBDAF
+arch/arm/configs/socfpga_defconfig:135:warning: override: reassigning to symbol DEBUG_INFO
+arch/arm/configs/socfpga_defconfig:156:warning: override: reassigning to symbol CMA_AREAS
+arch/arm/configs/socfpga_defconfig:159:warning: override: reassigning to symbol MEDIA_SUPPORT
+arch/arm/configs/socfpga_defconfig:171:warning: override: reassigning to symbol MEDIA_USB_SUPPORT
+arch/arm/configs/socfpga_defconfig:243:warning: override: reassigning to symbol INPUT_EVDEV
+arch/arm/configs/socfpga_defconfig:245:warning: override: reassigning to symbol INPUT_TOUCHSCREEN

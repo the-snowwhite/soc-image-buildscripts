@@ -24,8 +24,8 @@
 ## Select distro:
 ### Debian based:
 #distro=sid
-distro=jessie
-#distro="stretch"
+#distro=jessie
+distro="stretch"
 ### Ubuntu based:
 #distro=zesty
 #distro=xenial
@@ -61,13 +61,18 @@ UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 #USER_NAME=machinekit;
 USER_NAME=holosynth;
 
-#KERNEL_VERSION="4.9.30"
-#RT_PATCH_REV="rt20"
-KERNEL_VERSION="4.1.22"
+RT_KERNEL_VERSION="4.9.30"
+RT_PATCH_REV="rt21"
+GIT_KERNEL_VERSION="4.1.22"
+GIT_KERNEL_REV="ltsi-rt"
+
+#SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
+SD_KERNEL_VERSION=${RT_KERNEL_VERSION}
+
 #RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
-RT_PATCH_REV="ltsi-rt23"
+#RT_PATCH_REV="ltsi-rt23"
 KERNEL_CONF="socfpga_defconfig"
-ALT_GIT_KERNEL_VERSION="4.1.22-ltsi-rt"
+ALT_GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION}-${GIT_KERNEL_REV}"
 
 #QT_VER=5.4.1
 QT_VER=5.7.1
@@ -126,23 +131,29 @@ QT_CC_DIR="${TOOLCHAIN_DIR}/${QT_CC_FOLDER_NAME}"
 QT_CC="${QT_CC_DIR}/bin/${CROSS_GNU_ARCH}-"
 
 ## ------------------------------  Kernel  -------------------------------##
-KERNEL_TAG="${KERNEL_VERSION}-${RT_PATCH_REV}"
-KERNEL_LOCALVERSION="socfpga-${KERNEL_TAG}"
-KERNEL_REV="0.1"
+RT_KERNEL_TAG="${RT_KERNEL_VERSION}-${RT_PATCH_REV}"
+RT_KERNEL_LOCALVERSION="socfpga-${RT_KERNEL_TAG}"
+GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}"
+GIT_KERNEL_LOCALVERSION="socfpga-${GIT_KERNEL_TAG}"
+SD_KERNEL_TAG="${GIT_KERNEL_TAG}"
 
-KERNEL_FOLDER="linux-${KERNEL_VERSION}"
-KERNEL_FILE_NAME="${KERNEL_FOLDER}.tar.xz"
-KERNEL_URL="https://cdn.kernel.org/pub/linux/kernel/v4.x/${KERNEL_FILE_NAME}"
-RT_PATCH_FILE="patch-${KERNEL_TAG}.patch.xz"
+KERNEL_PKG_VERSION="0.1"
+
+RT_KERNEL_FOLDER="linux-${RT_KERNEL_VERSION}"
+RT_KERNEL_FILE_NAME="${RT_KERNEL_FOLDER}.tar.xz"
+KERNEL_URL="https://cdn.kernel.org/pub/linux/kernel/v4.x/${RT_KERNEL_FILE_NAME}"
+RT_PATCH_FILE="patch-${RT_KERNEL_TAG}.patch.xz"
 RT_PATCH_URL="https://cdn.kernel.org/pub/linux/kernel/projects/rt/4.9/${RT_PATCH_FILE}"
 
 
-KERNEL_PARENT_DIR="arm-linux-${KERNEL_VERSION}-gnueabifh-kernel"
-KERNEL_BUILD_DIR="${KERNEL_PARENT_DIR}/${KERNEL_FOLDER}"
-GIT_KERNEL_BUILD_DIR="${KERNEL_PARENT_DIR}/linux"
+GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${GIT_KERNEL_VERSION}-gnueabifh-kernel"
+RT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${RT_KERNEL_VERSION}-gnueabifh-kernel"
+RT_KERNEL_BUILD_DIR="${RT_KERNEL_PARENT_DIR}/${RT_KERNEL_FOLDER}"
+GIT_KERNEL_BUILD_DIR="${GIT_KERNEL_PARENT_DIR}/linux"
+SD_KERNEL_PARANT_DIR="${CURRENT_DIR}/arm-linux-${SD_KERNEL_VERSION}-gnueabifh-kernel"
 
 ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
-ALT_GIT_KERNEL_BRANCH="socfpga-${ALT_GIT_KERNEL_VERSION}"
+ALT_GIT_KERNEL_BRANCH="socfpga-${GIT_KERNEL_TAG}"
 ALT_GIT_KERNEL_PATCH_FILE="${ALT_GIT_KERNEL_BRANCH}-changeset.patch"
 GIT_KERNEL_DIR=linux
 
@@ -188,7 +199,7 @@ elif [ "${USER_NAME}" == "holosynth" ]; then
 	HOST_NAME="holosynthv"
 fi
 
-SD_FILE_PRELUDE=mksocfpga_${distro}_${USER_NAME}_${KERNEL_VERSION}-${REL_DATE}
+SD_FILE_PRELUDE=mksocfpga_${distro}_${USER_NAME}_${SD_KERNEL_VERSION}-${REL_DATE}
 SD_IMG_NAME="${SD_FILE_PRELUDE}-${BOARD}_sd.img"
 SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
 
@@ -202,8 +213,8 @@ NCORES=`nproc`
 
 #--------------  Kernel  --------------#
 
-KERNEL_CONFIGSTRING="${KERNEL_CONF}"
-GIT_KERNEL_CONFIGSTRING=" NAME=\"Michael Brown\" EMAIL=\"producer@holotronic.dk\" KBUILD_DEBARCH=armhf LOCALVERSION=-${KERNEL_LOCALVERSION} KDEB_PKGVERSION=${KERNEL_VERSION}-${KERNEL_REV}"
+KERNEL_PRE_CONFIGSTRING="${KERNEL_CONF}"
+GIT_KERNEL_PRE_CONFIGSTRING=" NAME=\"Michael Brown\" EMAIL=\"producer@holotronic.dk\" KBUILD_DEBARCH=armhf LOCALVERSION=-${GIT_KERNEL_LOCALVERSION} KDEB_PKGVERSION=${GIT_KERNEL_VERSION}-${KERNEL_PKG_VERSION}"
 
 POLICY_FILE=${ROOTFS_MNT}/usr/sbin/policy-rc.d
 
@@ -257,7 +268,7 @@ install_deps() {
 #	install_uboot_dep
 #	install_kernel_dep
 #	#sudo ${apt_cmd} install kpartx
-#	install_rootfs_dep
+	install_rootfs_dep
 #	sudo ${apt_cmd} install -y bmap-tools pbzip2 pigz
 	echo "MSG: deps installed"
 }
@@ -268,24 +279,25 @@ build_uboot() {
 }
 
 build_git_kernel() {
-	echo "--  --> Not implemented yet"
-	git_fetch ${KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${ALT_GIT_KERNEL_VERSION} "${ALT_GIT_KERNEL_BRANCH}" ${ALT_GIT_KERNEL_PATCH_FILE} ${GIT_KERNEL_DIR}
-	armhf_build "${CURRENT_DIR}/${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "${GIT_KERNEL_CONFIGSTRING} deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
+	git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "${ALT_GIT_KERNEL_BRANCH}" ${ALT_GIT_KERNEL_PATCH_FILE} ${GIT_KERNEL_DIR}
+	armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
 }
 
 build_rt_ltsi_kernel() {
-	if [ -d ${KERNEL_BUILD_DIR} ]; then
-		echo the kernel target directory ${KERNEL_BUILD_DIR} already exists cleaning ...
-		rm -R ${KERNEL_BUILD_DIR}
-		cd ${KERNEL_PARENT_DIR}
-		extract_xz ${KERNEL_FILE_NAME}
+	if [ -d ${RT_KERNEL_BUILD_DIR} ]; then
+		echo the kernel target directory ${RT_KERNEL_BUILD_DIR} already exists cleaning ...
+		rm -R ${RT_KERNEL_BUILD_DIR}
+		cd ${RT_KERNEL_PARENT_DIR}
+		extract_xz ${RT_KERNEL_FILE_NAME}
     else
-		mkdir -p ${KERNEL_PARENT_DIR}
+		mkdir -p ${RT_KERNEL_PARENT_DIR}
 		cd ${KERNEL_PARENT_DIR}
-		get_and_extract ${KERNEL_PARENT_DIR} ${KERNEL_URL} ${KERNEL_FILE_NAME}
+		get_and_extract ${RT_KERNEL_PARENT_DIR} ${KERNEL_URL} ${RT_KERNEL_FILE_NAME}
 	fi
 	rt_patch_kernel
-	armhf_build ${KERNEL_BUILD_DIR} "${KERNEL_CONFIGSTRING}" deb-pkg 2>&1 | tee ${CURRENT_DIR}/Logs/kernel_deb_rt-log.txt
+	if [ "${VALUE}" != "c" ]; then
+    	armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}" 2>&1 | tee ${CURRENT_DIR}/Logs/kernel_deb_rt-log.txt
+    fi
 }
 
 ## parameters: 1: mount dev name, 2: image name, 3: distro name
@@ -339,7 +351,7 @@ finalize_rootfs_image() {
 ## parameters: 1: kernel image tag
 inst_repo_kernel() {
 	mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
-	inst_kernel_from_local_repo ${ROOTFS_MNT} ${KERNEL_TAG}
+	inst_kernel_from_local_repo ${ROOTFS_MNT} ${SD_KERNEL_TAG}
 	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
 	unmount_binded ${ROOTFS_MNT}
 }
@@ -385,10 +397,10 @@ while [ "$1" != "" ]; do
             build_git_kernel
             ;;
         --build_rt-ltsi-kernel)
-            build_rt_ltsi_kernel
+            build_rt_ltsi_kernel ${VALUE}
             ;;
         --kernel2repo)
-            add_kernel2repo ${distro}
+            add_kernel2repo ${distro} ${SD_KERNEL_PARANT_DIR} ${SD_KERNEL_VERSION}
             ;;
         --inst_repo_kernel)
         inst_repo_kernel "finalized-fully-configured-with-kernel-and-qt-installed"

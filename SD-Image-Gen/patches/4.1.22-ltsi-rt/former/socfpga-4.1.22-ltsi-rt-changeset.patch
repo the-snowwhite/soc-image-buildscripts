@@ -1,4 +1,4 @@
-From b3c11344418a75913fdc1dfdf990352dc2e427dd Mon Sep 17 00:00:00 2001
+From f2649a754e12c27b03e5be493bef56fe2f6e41b9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 16 Jul 2016 22:21:55 +0200
 Subject: [PATCH 01/12] disable CONFIG_LOCALVERSION_AUTO for consistant
@@ -10,7 +10,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index d4c662945e26..7eaa3a0a7a39 100644
+index d4c6629..7eaa3a0 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -160,3 +160,4 @@ CONFIG_DETECT_HUNG_TASK=y
@@ -19,10 +19,10 @@ index d4c662945e26..7eaa3a0a7a39 100644
  CONFIG_XZ_DEC=y
 +CONFIG_LOCALVERSION_AUTO=n
 -- 
-2.11.0
+2.7.4
 
 
-From 6f99e063c6684a36cb08a6252807bde79a5bde8b Mon Sep 17 00:00:00 2001
+From 7e6125664df57e2477264660b7877bac0c2248ee Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 16 Jul 2016 22:25:32 +0200
 Subject: [PATCH 02/12] enable jumboframes maxmtu=9000
@@ -33,7 +33,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts b/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
-index 555e9caf21e1..5b79c0c7c5be 100644
+index 555e9ca..5b79c0c 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
 @@ -69,7 +69,7 @@
@@ -46,10 +46,10 @@ index 555e9caf21e1..5b79c0c7c5be 100644
  
  &gpio0 {
 -- 
-2.11.0
+2.7.4
 
 
-From 44b7f117bce681a4810e28c4c1542bc3493ef1be Mon Sep 17 00:00:00 2001
+From e5337ff81bda2fcd2ec9aea88f4aac29d1f12a75 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 00:41:30 +0200
 Subject: [PATCH 03/12] add uio driver support
@@ -60,7 +60,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 3 insertions(+)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 7eaa3a0a7a39..717954e8c73c 100644
+index 7eaa3a0..717954e 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -161,3 +161,6 @@ CONFIG_FUNCTION_TRACER=y
@@ -71,10 +71,10 @@ index 7eaa3a0a7a39..717954e8c73c 100644
 +CONFIG_UIO_PDRV=y
 +CONFIG_UIO_PDRV_GENIRQ=y
 -- 
-2.11.0
+2.7.4
 
 
-From 8dc19d4463a0c80ff118f2b834fdd05796644ff3 Mon Sep 17 00:00:00 2001
+From d8b5cdcfaf7ff83d08e3b146ea7910900141c896 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 01:20:55 +0200
 Subject: [PATCH 04/12] add configfs and fpgacfg dts entities, and dynamic dts
@@ -86,7 +86,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 2 insertions(+)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 717954e8c73c..71daf98634e1 100644
+index 717954e..71daf98 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -164,3 +164,5 @@ CONFIG_LOCALVERSION_AUTO=n
@@ -96,10 +96,10 @@ index 717954e8c73c..71daf98634e1 100644
 +CONFIG_CONFIGFS_FS=y
 +CONFIG_OF_OVERLAY=y
 -- 
-2.11.0
+2.7.4
 
 
-From 57a39ccf757801daa6f2a55267a17c6802753c88 Mon Sep 17 00:00:00 2001
+From 2ef01a38c82d131ece91e32df18b03fad18e6a47 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 01:31:34 +0200
 Subject: [PATCH 05/12] add ext4 root fs support and autofs4 module
@@ -110,7 +110,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 71daf98634e1..d758be59de8c 100644
+index 71daf98..d758be5 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -11,7 +11,7 @@ CONFIG_EMBEDDED=y
@@ -130,10 +130,10 @@ index 71daf98634e1..d758be59de8c 100644
 +CONFIG_EXT4_FS_SECURITY=y
 +CONFIG_AUTOFS4_FS=y
 -- 
-2.11.0
+2.7.4
 
 
-From cffbfe70d68e96860a920a8574cbbd2ec8754811 Mon Sep 17 00:00:00 2001
+From 099ebc4a597de3eb6ef61b12140606a6bd906da4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 01:38:04 +0200
 Subject: [PATCH 06/12] enable initramfs
@@ -144,7 +144,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 10 insertions(+)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index d758be59de8c..d6cb406a48be 100644
+index d758be5..d6cb406 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -169,3 +169,13 @@ CONFIG_OF_OVERLAY=y
@@ -162,10 +162,10 @@ index d758be59de8c..d6cb406a48be 100644
 +CONFIG_RD_LZO=y
 +CONFIG_RD_LZ4=y
 -- 
-2.11.0
+2.7.4
 
 
-From 0ba5b9c93a3dd8f50c074833e9c906268870c38c Mon Sep 17 00:00:00 2001
+From 95ca68cdeaa2e42309cbfab2f009bf8220890f31 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 14:10:56 +0200
 Subject: [PATCH 07/12] add .dtd files to kernel-image .deb
@@ -176,7 +176,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 88dbf23b6970..67770e9eaa97 100755
+index 88dbf23..67770e9 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
 @@ -110,7 +110,7 @@ BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' $KCONFIG_CONFIG || true)"
@@ -200,10 +200,10 @@ index 88dbf23b6970..67770e9eaa97 100755
  
  if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
 -- 
-2.11.0
+2.7.4
 
 
-From 1bb90ba5bd1efdafa108050aca12697c1398b1df Mon Sep 17 00:00:00 2001
+From d18a49a57463dc904b722762568941e8c3b41d1c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 18 Jul 2016 16:21:56 +0200
 Subject: [PATCH 08/12] add generate /boot/uEnv.txt containing kernel info for
@@ -215,7 +215,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 23 insertions(+)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 67770e9eaa97..4ee6f6e0f2bf 100755
+index 67770e9..4ee6f6e 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
 @@ -183,6 +183,29 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
@@ -249,10 +249,10 @@ index 67770e9eaa97..4ee6f6e0f2bf 100755
  	mkdir -p "$tmpdir$debhookdir/$script.d"
  	cat <<EOF > "$tmpdir/DEBIAN/$script"
 -- 
-2.11.0
+2.7.4
 
 
-From 0134a370cf1eed3ed678d7141f5662efe4edab40 Mon Sep 17 00:00:00 2001
+From 0e0eaad83548bf071948c9646cd39bdbcb9262e7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 23 Jul 2016 19:52:59 +0200
 Subject: [PATCH 09/12] change uio_pdrv_genirq to module
@@ -263,7 +263,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index d6cb406a48be..49399e420631 100644
+index d6cb406..49399e4 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -161,9 +161,9 @@ CONFIG_FUNCTION_TRACER=y
@@ -280,10 +280,10 @@ index d6cb406a48be..49399e420631 100644
  CONFIG_OF_OVERLAY=y
  CONFIG_EXT4_FS_POSIX_ACL=y
 -- 
-2.11.0
+2.7.4
 
 
-From cca91042d853a2692223a38ca43ae48159c868c3 Mon Sep 17 00:00:00 2001
+From 8c8210ce16bf395800399b9c2a972ad796d0da44 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 1 Aug 2016 00:17:44 +0200
 Subject: [PATCH 10/12] disable debug package gen
@@ -294,7 +294,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 49399e420631..950821cdafb4 100644
+index 49399e4..950821c 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -153,7 +153,7 @@ CONFIG_ROOT_NFS=y
@@ -307,10 +307,10 @@ index 49399e420631..950821cdafb4 100644
  CONFIG_DETECT_HUNG_TASK=y
  # CONFIG_SCHED_DEBUG is not set
 -- 
-2.11.0
+2.7.4
 
 
-From 3f456a0e54bfe6b544709040a0d46907f2cefee5 Mon Sep 17 00:00:00 2001
+From 06fb8a6e527098b3dac4d316b229973612e7c217 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 13 Nov 2016 16:04:04 +0100
 Subject: [PATCH 11/12] Add framebuffer to devicetree Add kernel alt vip fb and
@@ -320,12 +320,12 @@ Subject: [PATCH 11/12] Add framebuffer to devicetree Add kernel alt vip fb and
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/Kconfig                   |   6 +-
- arch/arm/boot/dts/socfpga.dtsi     |  34 +++++++++++
+ arch/arm/boot/dts/socfpga.dtsi     |  27 +++++++++
  arch/arm/configs/socfpga_defconfig | 115 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 152 insertions(+), 3 deletions(-)
+ 3 files changed, 145 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index e16a259177d4..7d02aefabaa3 100644
+index e16a259..7d02aef 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
 @@ -1687,10 +1687,10 @@ source "mm/Kconfig"
@@ -343,10 +343,10 @@ index e16a259177d4..7d02aefabaa3 100644
  	  The kernel memory allocator divides physically contiguous memory
  	  blocks into "zones", where each zone is a power of two number of
 diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
-index 5e2b9b06f279..125e8389ef38 100644
+index 5e2b9b0..6f6290b 100644
 --- a/arch/arm/boot/dts/socfpga.dtsi
 +++ b/arch/arm/boot/dts/socfpga.dtsi
-@@ -925,4 +925,38 @@
+@@ -925,4 +925,31 @@
  			reg = <0xffd08000 0x4000>;
  		};
  	};
@@ -376,17 +376,10 @@ index 5e2b9b06f279..125e8389ef38 100644
 +			address_width = <14>;
 +			data_width = <32>;
 +		};
-+
-+		socmidi_0: socmidi@0x50000 {
-+			compatible = "holotr,socmidi-1.0";
-+			reg = <0x50000 0x10000>;
-+			address_width = <3>;	/* embeddedsw.dts.params.address_width type NUMBER */
-+			data_width = <8>;	/* embeddedsw.dts.params.data_width type NUMBER */
-+		}; //end interfaces@0x100050000 (socmidi_0)
 +	};
  };
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 950821cdafb4..b1fb395d466d 100644
+index 950821c..b1fb395 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -110,7 +110,12 @@ CONFIG_DW_WATCHDOG=y
@@ -517,10 +510,10 @@ index 950821cdafb4..b1fb395d466d 100644
 +CONFIG_USB_HID=y
 +CONFIG_HID_MULTITOUCH=y
 -- 
-2.11.0
+2.7.4
 
 
-From 05179ff85d1ca65ed4fe4d643c47b5470edc5e29 Mon Sep 17 00:00:00 2001
+From 4f8b5bd30e8200a17064df7d783c5c04ad4fcba1 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 28 May 2017 21:12:17 +0200
 Subject: [PATCH 12/12] Add ALSA Sound/midi modules
@@ -531,7 +524,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 145 insertions(+)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index b1fb395d466d..328a62d4d81a 100644
+index b1fb395..328a62d 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -294,3 +294,148 @@ CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
@@ -684,5 +677,5 @@ index b1fb395d466d..328a62d4d81a 100644
 +# CONFIG_SND_SIMPLE_CARD is not set
 +# CONFIG_SOUND_PRIME is not set
 -- 
-2.11.0
+2.7.4
 

@@ -24,10 +24,34 @@ get_and_extract() {
     extract_xz ${3}
 }
 
+install_uboot_dep() {
+# install deps for u-boot build
+	sudo ${apt_cmd} -y install lib32z1 device-tree-compiler bc u-boot-tools
+}
+
+install_kernel_dep() {
+# install deps for kernel build
+	sudo ${apt_cmd} -y install build-essential fakeroot bc u-boot-tools
+	sudo apt-get -y build-dep linux
+}
+
+install_rootfs_dep() {
+    sudo apt-get -y install qemu binfmt-support qemu-user-static schroot debootstrap libc6 debian-archive-keyring
+#    sudo dpkg --add-architecture armhf
+    sudo apt update
+#    sudo apt -y --force-yes upgrade
+    sudo update-binfmts --display | grep interpreter
+}
+
 uiomod_kernel() {
-#cd ${KERNEL_BUILD_DIR}
+cd ${RT_KERNEL_BUILD_DIR}
+patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.30_uio-fb_patch.txt
+patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.30_holomidi_patch.txt
+echo "Kernel Custom Patch added"
+
+#cd ${RT_KERNEL_BUILD_DIR}
 #Uio Config additions:
-cat <<EOT >> ${KERNEL_BUILD_DIR}/arch/arm/configs/${KERNEL_CONF}
+cat <<EOT >> ${RT_KERNEL_BUILD_DIR}/arch/arm/configs/${KERNEL_CONF}
 CONFIG_UIO=m
 CONFIG_UIO_PDRV=m
 CONFIG_UIO_PDRV_GENIRQ=m
@@ -131,12 +155,12 @@ CONFIG_V4L_PLATFORM_DRIVERS=y
 CONFIG_SOC_CAMERA=y
 CONFIG_SOC_CAMERA_PLATFORM=y
 CONFIG_FB=y
+CONFIG_FB_ALTERA_VIP=y
 CONFIG_FB_CMDLINE=y
 CONFIG_FB_NOTIFY=y
 CONFIG_FB_CFB_FILLRECT=y
 CONFIG_FB_CFB_COPYAREA=y
 CONFIG_FB_CFB_IMAGEBLIT=y
-config FB_SIMPLE=y
 CONFIG_DUMMY_CONSOLE=y
 CONFIG_FRAMEBUFFER_CONSOLE=y
 CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
@@ -189,6 +213,8 @@ CONFIG_SND_SOC_SIGMADSP_I2C=m
 CONFIG_SND_SOC_SSM2602=m
 CONFIG_SND_SOC_SSM2602_I2C=m
 CONFIG_SND_SOC_WM8731=m
+CONFIG_SND_VIRMIDI=m
+CONFIG_SND_HOLOMIDI=m
 #
 # CONFIG_IP_ADVANCED_ROUTER=y
 # CONFIG_IP_MULTIPLE_TABLES=y
@@ -224,23 +250,20 @@ CONFIG_SND_SOC_WM8731=m
 # CONFIG_RD_LZO=y
 # CONFIG_RD_LZ4=y
 EOT
-echo "Kernel Custom Patch added"
 echo "config file mods applied"
 
-cd ${KERNEL_BUILD_DIR}
-patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.30_uio-fb_patch.txt
 }
 
 rt_patch_kernel() {
-cd ${KERNEL_PARENT_DIR}
+cd ${RT_KERNEL_PARENT_DIR}
 if [ ! -f ${RT_PATCH_FILE} ]; then #if file with that name not exists
         echo "fetching patch"
         wget ${RT_PATCH_URL}
 fi
-cd ${KERNEL_BUILD_DIR}
+cd ${RT_KERNEL_BUILD_DIR}
 xzcat ../${RT_PATCH_FILE} | patch -p1
 echo "rt-Patch applied"
-#Uio Patch:
+## Uio Patch:
 uiomod_kernel
 }
 
@@ -254,7 +277,7 @@ git_patch() {
 ## parameters: 1: folder name, 2: url, 3: branch name, 4: checkout options, 5: patch file name 6: clone folder name
 git_fetch() {
 
-    if [ ! -d ${CURRENT_DIR}/${1} ]; then
+    if [ ! -d ${1} ]; then
         if [ ! -z "${6}" ]; then
             echo "MSG: creating dir ${1}"
             mkdir ${1}
@@ -267,14 +290,15 @@ git_fetch() {
         fi
 	fi
     if [ ! -z "${6}" ]; then
-        cd ${CURRENT_DIR}/${1}/${6}
+        echo "MSG: cleaning repo"
+        cd ${1}/${6}
         git remote add linux ${KERNEL_URL}
         git clean -d -f -x
         git fetch origin
         git reset --hard origin/${4}
         git checkout ${4}
     else
-    	cd ${CURRENT_DIR}/${1}
+    	cd ${1}
     	if [ ! -z "${3}" ]; then
 	   	    git fetch origin
 		    git reset --hard origin/master
@@ -284,7 +308,7 @@ git_fetch() {
 	fi
     if [ ! -z "${5}" ]; then
         echo "MSG: Will now apply patch: " ${PATCH_SCRIPT_DIR}/${5}
-	    git_patch ${CURRENT_DIR}/${1}/${6} ${PATCH_SCRIPT_DIR}/${5}
+	    git_patch ${1}/${6} ${PATCH_SCRIPT_DIR}/${5}
     fi
 	cd ..
 }
@@ -306,21 +330,23 @@ armhf_build() {
 		echo "MSG: compiling ${1}"
 #		make -j$NCORES ${3} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk" KBUILD_DEBARCH=armhf
 #		make -j$NCORES ${3} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk"
-		make -j$NCORES "${2}" "${3}"
+#		make -j$NCORES "${2}" "${3}"
+#    else
+#        make -j${NCORES} "${2}"
+        make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="${GIT_KERNEL_VERSION}" deb-pkg
     else
-        make -j${NCORES} "${2}"
+        make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION=2 deb-pkg
     fi
-    make -j$NCORES NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf deb-pkg
 }
 
-## parameters: 1: distro name,
+## parameters: 1: distro name, 2: kernel dir
 add_kernel2repo(){
 #sudo systemctl stop apache2
 
 echo ""
 echo "Scr_MSG: Repo content before -->"
 echo ""
-LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1} | { grep ${KERNEL_VERSION} || true; }`
+LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1} | { grep ${3} || true; }`
 echo "Got list1"
 JESSIE_LIST1=$"${LIST1}"
 
@@ -372,7 +398,7 @@ echo ""
 # 	echo ""
 # fi
 #
-reprepro -b ${HOME_REPO_DIR} -C main -A armhf includedeb ${1} ${KERNEL_PARENT_DIR}/*.deb
+reprepro -b ${HOME_REPO_DIR} -C main -A armhf includedeb ${1} ${2}/*.deb
 reprepro -b ${HOME_REPO_DIR} export ${1}
 reprepro -b ${HOME_REPO_DIR} list ${1}
 
