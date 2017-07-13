@@ -61,8 +61,8 @@ UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 #USER_NAME=machinekit;
 USER_NAME=holosynth;
 
-RT_KERNEL_VERSION="4.9.30"
-RT_PATCH_REV="rt21"
+RT_KERNEL_VERSION="4.9.33"
+RT_PATCH_REV="rt23"
 GIT_KERNEL_VERSION="4.1.22"
 GIT_KERNEL_REV="ltsi-rt"
 
@@ -96,7 +96,7 @@ FUNC_SCRIPT_DIR=${MAIN_SCRIPT_DIR}/functions
 PATCH_SCRIPT_DIR=${MAIN_SCRIPT_DIR}/patches
 DTS_DIR=${MAIN_SCRIPT_DIR}/../dts
 
-CURRENT_DIR=$(pwd)
+CURRENT_DIR=`pwd`
 ROOTFS_MNT="/tmp/myimage"
 
 ROOTFS_IMG="${CURRENT_DIR}/${ROOTFS_LABEL}.img"
@@ -291,7 +291,7 @@ build_rt_ltsi_kernel() {
 		extract_xz ${RT_KERNEL_FILE_NAME}
     else
 		mkdir -p ${RT_KERNEL_PARENT_DIR}
-		cd ${KERNEL_PARENT_DIR}
+		cd ${RT_KERNEL_PARENT_DIR}
 		get_and_extract ${RT_KERNEL_PARENT_DIR} ${KERNEL_URL} ${RT_KERNEL_FILE_NAME}
 	fi
 	rt_patch_kernel

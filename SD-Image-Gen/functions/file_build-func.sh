@@ -14,12 +14,10 @@ extract_xz() {
 
 ## parameters: 1: folder name, 2: url, 3: file name
 get_and_extract() {
-# download linaro cross compiler toolchain
-    if [ ! -f ${1} ]; then
+    if [ ! -f ${3} ]; then
         echo "MSG: downloading ${2}"
     	wget -c ${2}
     fi
-# extract linaro cross compiler toolchain
     echo "MSG: extracting ${3}"
     extract_xz ${3}
 }
@@ -45,8 +43,9 @@ install_rootfs_dep() {
 
 uiomod_kernel() {
 cd ${RT_KERNEL_BUILD_DIR}
-patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.30_uio-fb_patch.txt
-patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.30_holomidi_patch.txt
+patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_uio-fb_patch.txt
+patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_socsynth-de1-audio_patch.txt
+patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_add-de1-soc-socsynth_patch.txt
 echo "Kernel Custom Patch added"
 
 #cd ${RT_KERNEL_BUILD_DIR}
@@ -205,7 +204,7 @@ CONFIG_SND_DUMMY=m
 CONFIG_SND_SERIAL_U16550=m
 CONFIG_SND_SPI=y
 CONFIG_SND_USB=y
-CONFIG_SND_USB_AUDIO=y
+CONFIG_SND_USB_AUDIO=m
 CONFIG_SND_SOC=y
 CONFIG_SND_SOC_I2C_AND_SPI=y
 CONFIG_SND_SOC_SIGMADSP=m
@@ -213,8 +212,41 @@ CONFIG_SND_SOC_SIGMADSP_I2C=m
 CONFIG_SND_SOC_SSM2602=m
 CONFIG_SND_SOC_SSM2602_I2C=m
 CONFIG_SND_SOC_WM8731=m
+CONFIG_SND_ALOOP=m
 CONFIG_SND_VIRMIDI=m
-CONFIG_SND_HOLOMIDI=m
+CONFIG_SND_SOC_SYNTH=m
+CONFIG_SND_SOC_DE1_WM8731=m
+CONFIG_FPGADMA=m
+CONFIG_I2C=y
+CONFIG_I2C_BOARDINFO=y
+CONFIG_I2C_COMPAT=y
+CONFIG_I2C_CHARDEV=y
+CONFIG_I2C_HELPER_AUTO=y
+CONFIG_I2C_DESIGNWARE_CORE=y
+CONFIG_I2C_DESIGNWARE_PLATFORM=y
+CONFIG_I2C_OCORES=y
+CONFIG_REGULATOR=y
+CONFIG_REGULATOR_DEBUG=y
+CONFIG_REGULATOR_GPIO=y
+CONFIG_SND_ARM=y
+CONFIG_SND_SPI=y
+CONFIG_SND_USB=y
+CONFIG_SND_SOC=y
+CONFIG_SND_SOC_GENERIC_DMAENGINE_PCM=y
+CONFIG_SND_ATMEL_SOC=m
+CONFIG_SND_DESIGNWARE_I2S=m
+CONFIG_SND_SOC_FSL_ASRC=m
+CONFIG_SND_SOC_FSL_SAI=m
+CONFIG_SND_SOC_FSL_SSI=m
+CONFIG_SND_SOC_FSL_SPDIF=m
+CONFIG_SND_SOC_FSL_ESAI=m
+CONFIG_SND_SOC_IMX_AUDMUX=m
+CONFIG_SND_SOC_I2C_AND_SPI=y
+CONFIG_HZ_1000=y
+#CONFIG_SND_SOC_GENERIC_DMAENGINE_PCM=y
+#CONFIG_REGMAP_MMIO=y
+#CONFIG_SND_SOC_ADI_AXI_I2S=m
+#CONFIG_SND_SOC_ADI_AXI_SPDIF=m
 #
 # CONFIG_IP_ADVANCED_ROUTER=y
 # CONFIG_IP_MULTIPLE_TABLES=y
@@ -265,6 +297,8 @@ xzcat ../${RT_PATCH_FILE} | patch -p1
 echo "rt-Patch applied"
 ## Uio Patch:
 uiomod_kernel
+#cp /home/mib/intelFPGA/QuartusProjects/DE1-Soc/DE1-SoC-Sound/socfpga_cyclone5_DE1-SoC-FB.dts /home/mib/Development/HolosynthV-Image-gen/arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts
+#cp /home/mib/intelFPGA/QuartusProjects/DE1-Soc/DE1-SoC-Sound/Makefile-dtb /home/mib/Development/HolosynthV-Image-gen/arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts/Makefile
 }
 
 ## parameters: 1: folder name, 2: patch file name
