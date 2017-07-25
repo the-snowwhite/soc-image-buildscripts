@@ -1,0 +1,30 @@
+From 20e167804a0bb59f50b79d8f38463bc7fb0c7ceb Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sat, 23 Jul 2016 19:52:59 +0200
+Subject: [PATCH 09/13] change uio_pdrv_genirq to module
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index d6cb406a48be..49399e420631 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -161,9 +161,9 @@ CONFIG_FUNCTION_TRACER=y
+ CONFIG_DEBUG_USER=y
+ CONFIG_XZ_DEC=y
+ CONFIG_LOCALVERSION_AUTO=n
+-CONFIG_UIO=y
+-CONFIG_UIO_PDRV=y
+-CONFIG_UIO_PDRV_GENIRQ=y
++CONFIG_UIO=m
++CONFIG_UIO_PDRV=m
++CONFIG_UIO_PDRV_GENIRQ=m
+ CONFIG_CONFIGFS_FS=y
+ CONFIG_OF_OVERLAY=y
+ CONFIG_EXT4_FS_POSIX_ACL=y
+-- 
+2.11.0
+

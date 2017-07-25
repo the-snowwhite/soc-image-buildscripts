@@ -1,0 +1,502 @@
+diff -Naur arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/arch/arm/boot/dts/socfpga.dtsi arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts/socfpga.dtsi
+--- arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/arch/arm/boot/dts/socfpga.dtsi	2017-05-25 15:45:05.000000000 +0200
++++ arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts/socfpga.dtsi	2017-06-04 23:19:27.616940012 +0200
+@@ -754,6 +754,106 @@
+ 			compatible = "altr,sys-mgr", "syscon";
+ 			reg = <0xffd08000 0x4000>;
+ 		};
++        bridge@0xc0000000 {
++               compatible = "altr,bridge-16.1", "simple-bus";
++               reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
++               #address-cells = <0x2>;
++               #size-cells = <0x1>;
++               ranges = <0x1 0x2000 0xff202000 0x8>,
++                               <0x1 0x30000 0xff230000 0x100>,
++                               <0x1 0x31000 0xff231000 0x80>,
++                               <0x1 0x1000 0xff201000 0x8>,
++                               <0x1 0x3000 0xff203000 0x10>,
++                               <0x1 0x4000 0xff204000 0x10>,
++                               <0x1 0x5000 0xff205000 0x10>;
++
++               serial@0x100002000 {
++                       compatible = "altr,juart-16.1", "altr,juart-1.0";
++                       reg = <0x1 0x2000 0x8>;
++                       interrupt-parent = <0x3>;
++                       interrupts = <0x0 0x2a 0x4>;
++                       clocks = <0x2>;
++               };
++
++               ilc@0x100030000 {
++                       compatible = "altr,altera_ilc-16.1", "altr,ilc-1.0";
++                       reg = <0x1 0x30000 0x100>;
++                       interrupt-controller;
++                       #interrupt-cells = <0x1>;
++                       altr,sw-fifo-depth = <0x20>;
++               };
++
++               vip@0x100031000 {
++                       compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
++                       reg = <0x1 0x31000 0x80>;
++                       max-width = <0x556>;
++                       max-height = <0x300>;
++                       bits-per-color = <0x8>;
++                       colors-per-beat = <0x4>;
++                       beats-per-pixel = <0x1>;
++                       mem-word-width = <0x80>;
++               };
++
++               sysid@0x100001000 {
++                       compatible = "altr,sysid-16.1", "altr,sysid-1.0";
++                       reg = <0x1 0x1000 0x8>;
++                       id = <0xacd51302>;
++                       timestamp = <0x5929e204>;
++               };
++
++               gpio@0x100003000 {
++                       compatible = "altr,pio-16.1", "altr,pio-1.0";
++                       reg = <0x1 0x3000 0x10>;
++                       altr,gpio-bank-width = <0x8>;
++                       resetvalue = <0xff>;
++                       #gpio-cells = <0x2>;
++                       gpio-controller;
++               };
++
++               gpio@0x100004000 {
++                       compatible = "altr,pio-16.1", "altr,pio-1.0";
++                       reg = <0x1 0x4000 0x10>;
++                       altr,gpio-bank-width = <0x4>;
++                       altr,interrupt-type = <0x3>;
++                       altr,interrupt_type = <0x3>;
++                       edge_type = <0x2>;
++                       level_trigger = <0x0>;
++                       resetvalue = <0x0>;
++                       #gpio-cells = <0x2>;
++                       gpio-controller;
++               };
++
++               gpio@0x100005000 {
++                       compatible = "altr,pio-16.1", "altr,pio-1.0";
++                       reg = <0x1 0x5000 0x10>;
++                       altr,gpio-bank-width = <0x2>;
++                       altr,interrupt-type = <0x2>;
++                       altr,interrupt_type = <0x2>;
++                       edge_type = <0x1>;
++                       level_trigger = <0x0>;
++                       resetvalue = <0x0>;
++                       #gpio-cells = <0x2>;
++                       gpio-controller;
++               };
++        };
++
++        hps_0_h2f_lw: bridge@0xff200000 {
++               compatible = "altr,h2f_lw_bridge-1.0", "simple-bus";
++               reg = <0xff200000 0x050000>;
++               #address-cells = <0x1>;
++               #size-cells = <0x1>;
++               ranges = <0x40000 0xff240000 0x10000>;
++
++               uioreg_io_0: uio-socfpg0@0x40000 {
++                       compatible = "uioreg_io,generic-uio,ui_pdrv";
++                       reg = <0x40000 0x10000>;
++                       interrupt-parent = <0x2>;
++                       interrupts = <0 43 4>;
++                       address_width = <14>;
++                       data_width = <32>;
++               };
++        };
++
+
+ 		/* Local timer */
+ 		timer@fffec600 {
+diff -Naur arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/arch/arm/Kconfig arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/Kconfig
+--- arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/scripts/package/builddeb	2017-06-17 06:43:47.000000000 +0200
++++ arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/scripts/package/builddeb	2017-07-05 01:06:49.860113402 +0200
+@@ -128,7 +128,7 @@
+ # Setup the directory structure
+ rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" $objtree/debian/files
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+-mkdir -p "$tmpdir/lib" "$tmpdir/boot"
++mkdir -p "$tmpdir/lib" "$tmpdir/boot/dtb"
+ mkdir -p "$fwdir/lib/firmware/$version/"
+ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+ 
+@@ -146,8 +146,10 @@
+ # Not all arches include the boot path in KBUILD_IMAGE
+ if [ -e $KBUILD_IMAGE ]; then
+ 	cp $KBUILD_IMAGE "$tmpdir/$installed_image_path"
++	cp dts/*.dtb "$tmpdir/boot/dtb"
+ else
+ 	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
++	cp arch/$ARCH/boot/dts/*.dtb "$tmpdir/boot/dtb"
+ fi
+ 
+ if grep -q "^CONFIG_OF=y" $KCONFIG_CONFIG ; then
+@@ -201,6 +203,29 @@
+ else
+ 	want_initrd=No
+ fi
++# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
++cat <<EOF > "$tmpdir/boot/uEnv.txt"
++kver=${version}
++initrd_installed=$want_initrd
++EOF
++cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
++hostname=holosynthv
++bitimage=/boot/DE10_NANO_SOC_FB.rbf
++fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
++fpgaintf=ffd08028
++fpgaintf_handoff=0x00000000
++fpga2sdram_apply=3ff795a4
++fpga2sdram=ffc25080
++fpga2sdram_handoff=0x00000000
++axibridge=ffd0501c
++axibridge_handoff=0x00000000
++l3remap=ff800000
++l3remap_handoff=0x00000019
++bridge_enable_handoff=mw ${fpgaintf} ${fpgaintf_handoff}; mw ${fpga2sdram} ${fpga2sdram_handoff}; mw \${axibridge} ${axibridge_handoff}; mw ${l3remap} ${l3remap_handoff}
++loadimage=run fpgaload; run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++mmcboot=setenv bootargs console=ttyS0,115200 root=${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz ${loadaddr} - ${fdt_addr}
++EOF
++
+ for script in postinst postrm preinst prerm ; do
+ 	mkdir -p "$tmpdir$debhookdir/$script.d"
+ 	cat <<EOF > "$tmpdir/DEBIAN/$script"
+
+diff -Naur arm-linux-4.9.33-gnueabifh-kernel_rt-patched/linux-4.9.33/drivers/video/fbdev/Kconfig arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/drivers/video/fbdev/Kconfig
+--- arm-linux-4.9.33-gnueabifh-kernel_rt-patched/linux-4.9.33/drivers/video/fbdev/Kconfig       2017-05-25 15:45:05.000000000 +0200
++++ arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/drivers/video/fbdev/Kconfig  2017-06-19 16:29:45.798387667 +0200
+@@ -228,6 +228,16 @@
+ comment "Frame buffer hardware drivers"
+        depends on FB
+ 
++config FB_ALTERA_VIP
++       tristate "Altera VIP Frame Reader framebuffer support"
++       depends on FB
++       select FB_CFB_FILLRECT
++       select FB_CFB_COPYAREA
++       select FB_CFB_IMAGEBLIT
++       help
++         This driver supports the Altera Video and Image Processing(VIP)
++         Frame Reader
++
+ config FB_GRVGA
+        tristate "Aeroflex Gaisler framebuffer support"
+        depends on FB && SPARC
+ diff -Naur arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/drivers/video/fbdev/Makefile arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/drivers/video/fbdev/Makefile
+--- arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/drivers/video/fbdev/Makefile    2017-05-25 15:45:05.000000000 +0200
++++ arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/drivers/video/fbdev/Makefile 2017-06-15 18:16:58.499193269 +0200
+@@ -10,6 +10,7 @@
+ obj-$(CONFIG_FB_WMT_GE_ROPS)   += wmt_ge_rops.o
+
+ # Hardware specific drivers go first
++obj-$(CONFIG_FB_ALTERA_VIP)      += altvipfb.o
+ obj-$(CONFIG_FB_AMIGA)            += amifb.o c2p_planar.o
+ obj-$(CONFIG_FB_ARC)              += arcfb.o
+ obj-$(CONFIG_FB_CLPS711X)        += clps711x-fb.o
+diff -Naur arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/drivers/video/fbdev/altvipfb.c arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/drivers/video/fbdev/altvipfb.c
+--- arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/drivers/video/fbdev/altvipfb.c  1970-01-01 01:00:00.000000000 +0100
++++ arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/drivers/video/fbdev/altvipfb.c       2017-06-15 17:42:19.000000000 +0200
+@@ -0,0 +1,303 @@
++/*
++ *  altvipfb.c -- Altera Video and Image Processing(VIP) Frame Reader driver
++ *
++ *  This is based on a driver made by Thomas Chou <thomas@wytron.com.tw> and
++ *  Walter Goossens <waltergoossens@home.nl> This driver supports the Altera VIP
++ *  Frame Reader component.  More info on the hardware can be found in
++ *  the Altera Video and Image Processing Suite User Guide at this address
++ *  http://www.altera.com/literature/ug/ug_vip.pdf.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ */
++
++#include <linux/dma-mapping.h>
++#include <linux/fb.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++
++#define PALETTE_SIZE   256
++#define DRIVER_NAME    "altvipfb"
++
++/* control registers */
++#define ALTVIPFB_CONTROL       0
++#define ALTVIPFB_FRAME_SELECT    12
++#define ALTVIPFB_FRAME0_BASE_ADDRESS   16
++#define ALTVIPFB_FRAME0_NUM_WORDS      20
++#define ALTVIPFB_FRAME0_SAMPLES        24
++#define ALTVIPFB_FRAME0_WIDTH    32
++#define ALTVIPFB_FRAME0_HEIGHT   36
++#define ALTVIPFB_FRAME0_INTERLACED     40
++
++struct altvipfb_type;
++
++struct altvipfb_dev {
++       struct platform_device *pdev;
++       struct fb_info info;
++       struct resource *reg_res;
++       void __iomem *base;
++       int mem_word_width;
++       u32 pseudo_palette[PALETTE_SIZE];
++};
++
++static int altvipfb_setcolreg(unsigned regno, unsigned red, unsigned green,
++                          unsigned blue, unsigned transp, struct fb_info *info)
++{
++       /*
++        *  Set a single color register. The values supplied have a 32 bit
++        *  magnitude.
++        *  Return != 0 for invalid regno.
++        */
++
++       if (regno > 255)
++               return 1;
++
++       red >>= 8;
++       green >>= 8;
++       blue >>= 8;
++
++       if (regno < 255) {
++               ((u32 *)info->pseudo_palette)[regno] =
++               ((red & 255) << 16) | ((green & 255) << 8) | (blue & 255);
++       }
++
++       return 0;
++}
++
++static struct fb_ops altvipfb_ops = {
++       .owner = THIS_MODULE,
++       .fb_fillrect = cfb_fillrect,
++       .fb_copyarea = cfb_copyarea,
++       .fb_imageblit = cfb_imageblit,
++       .fb_setcolreg = altvipfb_setcolreg,
++};
++
++static int altvipfb_of_setup(struct altvipfb_dev *fbdev)
++{
++       struct device_node *np = fbdev->pdev->dev.of_node;
++       int ret;
++       u32 bits_per_color;
++
++       ret = of_property_read_u32(np, "max-width", &fbdev->info.var.xres);
++       if (ret) {
++               dev_err(&fbdev->pdev->dev,
++                       "Missing required parameter 'max-width'");
++               return ret;
++       }
++       fbdev->info.var.xres_virtual = fbdev->info.var.xres,
++
++       ret = of_property_read_u32(np, "max-height", &fbdev->info.var.yres);
++       if (ret) {
++               dev_err(&fbdev->pdev->dev,
++                       "Missing required parameter 'max-height'");
++               return ret;
++       }
++       fbdev->info.var.yres_virtual = fbdev->info.var.yres;
++
++       ret = of_property_read_u32(np, "bits-per-color", &bits_per_color);
++       if (ret) {
++               dev_err(&fbdev->pdev->dev,
++                       "Missing required parameter 'bits-per-color'");
++               return ret;
++       }
++       if (bits_per_color != 8) {
++               dev_err(&fbdev->pdev->dev,
++                       "bits-per-color is set to %i.  Curently only 8 is supported.",
++                       bits_per_color);
++               return -ENODEV;
++       }
++       fbdev->info.var.bits_per_pixel = 32;
++
++       ret = of_property_read_u32(np, "mem-word-width",
++                            &fbdev->mem_word_width);
++       if (ret) {
++               dev_err(&fbdev->pdev->dev,
++                       "Missing required parameter 'mem-word-width'");
++               return ret;
++       }
++       if (!(fbdev->mem_word_width >= 32 && fbdev->mem_word_width % 32 == 0)) {
++               dev_err(&fbdev->pdev->dev,
++                       "mem-word-width is set to %i.  must be >= 32 and multiple of 32.",
++                       fbdev->mem_word_width);
++               return -ENODEV;
++       }
++
++       return 0;
++}
++
++static void altvipfb_start_hw(struct altvipfb_dev *fbdev)
++{
++       writel(fbdev->info.fix.smem_start, fbdev->base +
++              ALTVIPFB_FRAME0_BASE_ADDRESS);
++       writel(fbdev->info.var.xres * fbdev->info.var.yres /
++              (fbdev->mem_word_width/32),
++              fbdev->base + ALTVIPFB_FRAME0_NUM_WORDS);
++       writel(fbdev->info.var.xres * fbdev->info.var.yres,
++              fbdev->base + ALTVIPFB_FRAME0_SAMPLES);
++       writel(fbdev->info.var.xres, fbdev->base + ALTVIPFB_FRAME0_WIDTH);
++       writel(fbdev->info.var.yres, fbdev->base + ALTVIPFB_FRAME0_HEIGHT);
++       writel(3, fbdev->base + ALTVIPFB_FRAME0_INTERLACED);
++       writel(0, fbdev->base + ALTVIPFB_FRAME_SELECT);
++
++       /* Finally set the control register to 1 to start streaming */
++       writel(1, fbdev->base + ALTVIPFB_CONTROL);
++}
++
++static void altvipfb_disable_hw(struct altvipfb_dev *fbdev)
++{
++       /* set the control register to 0 to stop streaming */
++       writel(0, fbdev->base + ALTVIPFB_CONTROL);
++}
++
++
++static int altvipfb_setup_fb_info(struct altvipfb_dev *fbdev)
++{
++       struct fb_info *info = &fbdev->info;
++       int ret;
++
++       strcpy(info->fix.id, DRIVER_NAME);
++       info->fix.type = FB_TYPE_PACKED_PIXELS;
++       info->fix.visual = FB_VISUAL_TRUECOLOR;
++       info->fix.accel = FB_ACCEL_NONE;
++
++       info->fbops = &altvipfb_ops;
++       info->var.activate = FB_ACTIVATE_NOW;
++       info->var.height = -1;
++       info->var.width = -1;
++       info->var.vmode = FB_VMODE_NONINTERLACED;
++
++       ret = altvipfb_of_setup(fbdev);
++       if (ret)
++               return ret;
++
++       /* settings for 32bit pixels */
++       info->var.red.offset = 16;
++       info->var.red.length = 8;
++       info->var.red.msb_right = 0;
++       info->var.green.offset = 8;
++       info->var.green.length = 8;
++       info->var.green.msb_right = 0;
++       info->var.blue.offset = 0;
++       info->var.blue.length = 8;
++       info->var.blue.msb_right = 0;
++
++       info->fix.line_length = (info->var.xres *
++               (info->var.bits_per_pixel >> 3));
++       info->fix.smem_len = info->fix.line_length * info->var.yres;
++
++       info->pseudo_palette = fbdev->pseudo_palette;
++       info->flags = FBINFO_FLAG_DEFAULT;
++
++       return 0;
++}
++
++static int altvipfb_probe(struct platform_device *pdev)
++{
++       int retval;
++       void *fbmem_virt;
++       struct altvipfb_dev *fbdev;
++
++       fbdev = devm_kzalloc(&pdev->dev, sizeof(*fbdev), GFP_KERNEL);
++       if (!fbdev)
++               return -ENOMEM;
++
++       fbdev->pdev = pdev;
++       fbdev->reg_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++       if (!fbdev->reg_res)
++               return -ENODEV;
++
++       retval = altvipfb_setup_fb_info(fbdev);
++
++       fbmem_virt = dma_alloc_coherent(NULL,
++                               fbdev->info.fix.smem_len,
++                               (void *)&(fbdev->info.fix.smem_start),
++                               GFP_KERNEL);
++       if (!fbmem_virt) {
++               dev_err(&pdev->dev,
++                       "altvipfb: unable to allocate %d Bytes fb memory\n",
++                       fbdev->info.fix.smem_len);
++               return retval;
++       }
++
++       fbdev->info.screen_base = fbmem_virt;
++
++       retval = fb_alloc_cmap(&fbdev->info.cmap, PALETTE_SIZE, 0);
++       if (retval < 0)
++               goto err_dma_free;
++
++       platform_set_drvdata(pdev, fbdev);
++
++       fbdev->base = devm_ioremap_resource(&pdev->dev, fbdev->reg_res);
++       if (IS_ERR(fbdev->base)) {
++               dev_err(&pdev->dev, "devm_ioremap_resource failed\n");
++               retval = PTR_ERR(fbdev->base);
++               goto err_dealloc_cmap;
++       }
++
++       altvipfb_start_hw(fbdev);
++
++       retval = register_framebuffer(&fbdev->info);
++       if (retval < 0)
++               goto err_dealloc_cmap;
++
++       dev_info(&pdev->dev, "fb%d: %s frame buffer device at 0x%x+0x%x\n",
++                fbdev->info.node, fbdev->info.fix.id,
++                (unsigned)fbdev->info.fix.smem_start,
++                fbdev->info.fix.smem_len);
++
++       return 0;
++
++err_dealloc_cmap:
++       fb_dealloc_cmap(&fbdev->info.cmap);
++err_dma_free:
++       dma_free_coherent(NULL, fbdev->info.fix.smem_len, fbmem_virt,
++                         fbdev->info.fix.smem_start);
++       return retval;
++}
++
++static int altvipfb_remove(struct platform_device *dev)
++{
++       struct altvipfb_dev *fbdev = platform_get_drvdata(dev);
++
++       if (fbdev) {
++               unregister_framebuffer(&fbdev->info);
++               fb_dealloc_cmap(&fbdev->info.cmap);
++               dma_free_coherent(NULL, fbdev->info.fix.smem_len,
++                           fbdev->info.screen_base,
++                           fbdev->info.fix.smem_start);
++               altvipfb_disable_hw(fbdev);
++       }
++       return 0;
++}
++
++
++static struct of_device_id altvipfb_match[] = {
++       { .compatible = "altr,vip-frame-reader-1.0" },
++       { .compatible = "altr,vip-frame-reader-9.1" },
++       {},
++};
++MODULE_DEVICE_TABLE(of, altvipfb_match);
++
++static struct platform_driver altvipfb_driver = {
++       .probe = altvipfb_probe,
++       .remove = altvipfb_remove,
++       .driver = {
++               .owner = THIS_MODULE,
++               .name = DRIVER_NAME,
++               .of_match_table = altvipfb_match,
++       },
++};
++module_platform_driver(altvipfb_driver);
++
++MODULE_DESCRIPTION("Altera VIP Frame Reader framebuffer driver");
++MODULE_AUTHOR("Chris Rauer <crauer@altera.com>");
++MODULE_LICENSE("GPL v2");
