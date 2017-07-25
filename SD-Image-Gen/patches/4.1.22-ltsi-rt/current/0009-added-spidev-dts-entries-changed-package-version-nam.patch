@@ -1,0 +1,100 @@
+From 12be8920830db962bb42b8301e3320b47266d80a Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 24 Jul 2017 21:59:29 +0200
+Subject: [PATCH 9/9] added spidev dts entries, changed package version names
+ to socfpga-rt-ltsi,and missing config param
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga.dtsi     | 29 +++++++++++++++++++++++++++--
+ arch/arm/configs/socfpga_defconfig |  7 +++++++
+ scripts/package/builddeb           | 10 +++++-----
+ 3 files changed, 39 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index 5e2b9b06f279..e13bd488bfe2 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -793,16 +793,41 @@
+ 		};
+ 
+ 		spi1: spi@fff01000 {
+-			compatible = "snps,dw-apb-ssi";
++			compatible = "snps,dw-spi-mmio-16.1", "snps,dw-spi-mmio", "snps,dw-apb-ssi";
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <0xfff01000 0x1000>;
++            interrupt-parent = <&intc>;
+ 			interrupts = <0 155 4>;
+ 			num-cs = <4>;
+ 			tx-dma-channel = <&pdma 20>;
+ 			rx-dma-channel = <&pdma 21>;
+ 			clocks = <&per_base_clk>;
+-			status = "disabled";
++			status = "okay";
++			spidev@0 {
++				compatible = "spidev";
++				reg = <0>;
++				spi-max-frequency = <100000000>;
++				enable-dma = <1>;
++			};
++			spidev@1 {
++				compatible = "spidev";
++				reg = <1>;
++				spi-max-frequency = <100000000>;
++				enable-dma = <1>;
++			};
++			spidev@2 {
++				compatible = "spidev";
++				reg = <2>;
++				spi-max-frequency = <100000000>;
++				enable-dma = <1>;
++			};
++			spidev@3 {
++				compatible = "spidev";
++				reg = <3>;
++				spi-max-frequency = <100000000>;
++				enable-dma = <1>;
++			};
+ 		};
+ 
+ 		/* Local timer */
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 290fbe62c01c..23e770923300 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -176,3 +176,10 @@ CONFIG_RD_LZMA=y
+ CONFIG_RD_XZ=y
+ CONFIG_RD_LZO=y
+ CONFIG_RD_LZ4=y
++CONFIG_MEMORY_ISOLATION=y
++CONFIG_CMA=y
++CONFIG_CMA_DEBUG=y
++CONFIG_CMA_AREAS=7
++CONFIG_CMA_SIZE_MBYTES=512
++CONFIG_CMA_SIZE_SEL_MBYTES=y
++CONFIG_CMA_ALIGNMENT=8
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index c6e4d53e4d91..f76591ae4e62 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -81,11 +81,11 @@ fwdir="$objtree/debian/fwtmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
+ dbg_dir="$objtree/debian/dbgtmp"
+-packagename=linux-image-$version
+-fwpackagename=linux-firmware-image-$version
+-kernel_headers_packagename=linux-headers-$version
+-libc_headers_packagename=linux-libc-dev
+-dbg_packagename=$packagename-dbg
++packagename=linux-image-socfpga-rt-ltsi
++fwpackagename=linux-firmware-image-socfpga-rt-ltsi
++kernel_headers_packagename=linux-headers-socfpga-rt-ltsi
++libc_headers_packagename=linux-libc-dev-socfpga-rt-ltsi
++dbg_packagename=$packagename-dbg-socfpga-rt-ltsi
+ 
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+-- 
+2.11.0
+

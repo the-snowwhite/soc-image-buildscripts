@@ -358,23 +358,22 @@ armhf_build() {
 	echo "MSG: configuring ${1}"
 	echo "MSG: as ${2}"
 	make -j${NCORES} mrproper
-#	make -j${NCORES} ${KERNEL_CONF} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk" KBUILD_DEBARCH=armhf
-#	make -j${NCORES} ${2} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk"
 	if [ ! -z "${3}" ]; then
 		echo "MSG: compiling ${1}"
-#		make -j$NCORES ${3} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk" KBUILD_DEBARCH=armhf
-#		make -j$NCORES ${3} ARCH=arm NAME="Michael Brown" EMAIL="producer@holotronic.dk"
-#		make -j$NCORES "${2}" "${3}"
-#    else
-#        make -j${NCORES} "${2}"
-        make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="${GIT_KERNEL_VERSION}" deb-pkg
+        if [ "${3}" == "deb-pkg" ]; then
+            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="${GIT_KERNEL_VERSION}" deb-pkg
+        else
+            make -j${NCORES} "${2}"
+            echo "MSG: building ${1}"
+            make -j$NCORES "${3}"
+        fi
     else
         make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION=2 deb-pkg
     fi
 }
 
-## parameters: 1: distro name, 2: kernel dir
-add_kernel2repo(){
+## parameters: 1: distro name, 2: kernel dir, 3: file filter
+add2repo(){
 #sudo systemctl stop apache2
 
 echo ""
@@ -455,22 +454,25 @@ sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
 sudo rm -f ${1}/etc/resolv.conf
 sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
 
-#${apt_cmd} -y install hm2reg-uio-dkms
-
 #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y install apt-transport-https
 
 #sudo sh -c 'echo "deb [arch=armhf] https://deb.mah.priv.at/ jessie socfpga" > '${1}'/etc/apt/sources.list.d/debmah.list'
-#sudo sh -c 'echo "deb [arch=armhf] http://kubuntu16-ws.holotronic.lan/debian '${distro}' main" > '${1}'/etc/apt/sources.list.d/mibsocdeb.list'
+#sudo sh -c 'echo "deb [arch=armhf] http://${local_ws}.holotronic.lan/debian '${distro}' main" > '${1}'/etc/apt/sources.list.d/mibsocdeb.list'
 echo ""
-echo "Script_MSG: Will now add key to kubuntu16-ws"
-echo ""
-
-sudo sh -c 'wget -O - http://kubuntu16-ws.holotronic.lan/debian/socfpgakernels.gpg.key|apt-key add -'
-sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update --allow-unauthenticated
+# echo "Script_MSG: Will now add key to ${local_ws}"
+# echo ""
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir -p /var/tmp
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /var/tmp
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
+# 
+# sudo chroot --userspec=root:root ${ROOTFS_MNT} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
+#sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update --allow-unauthenticated
+sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 
 # #sudo chroot --userspec=root:root ${1} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 4FD9D713
 # #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
-sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes --allow-unauthenticated upgrade
+#sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes --allow-unauthenticated upgrade
+sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes upgrade
 
 # echo ""
 # echo "# --------->       Removing qemu policy file          <--------------- ---------"
@@ -483,7 +485,7 @@ sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes --allo
 echo ""
 echo "Script_MSG: Will now install kernel packages"
 echo ""
-sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes --allow-unauthenticated install --reinstall linux-headers-${2} linux-image-${2} linux-libc-dev
+sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} install -y --assume-yes --reinstall linux-headers-${2} linux-image-${2} linux-libc-dev
 
 
 cd ${CURRENT_DIR}
@@ -739,7 +741,8 @@ compress_rootfs(){
 	echo " ${1}/${COMPNAME}_rootfs.tar.bz2"
 	echo "----------------------------------------------------------------------------#"
 	cd ${2}
-	sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 . --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys --exclude=tmp
+#	sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys --exclude=tmp .
+	sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys .
 	cd ${1}
 	echo "#                                                                           #"
 	echo "#Scr_MSG:                                                                   #"
@@ -778,7 +781,7 @@ make_bmap_image() {
 	echo ""
 	cd ${1}
 	bmaptool create -o ${2}.bmap ${2}
-	tar -cjSf ${2}-bmap.tar.bz2 ${2} ${2}.bmap
+	tar -cjSf ${2}.tar.bz2 ${2}
 	echo ""
 	echo "NOTE:  Bmap image created"
 	echo ""

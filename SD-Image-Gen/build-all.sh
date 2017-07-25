@@ -24,16 +24,21 @@
 ## Select distro:
 ### Debian based:
 #distro=sid
-#distro=jessie
-distro="stretch"
+distro=jessie
+#distro="stretch"
 ### Ubuntu based:
 #distro=zesty
 #distro=xenial
-
 HOME_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
-ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
 #ROOT_REPO_URL=http://ports.ubuntu.com
 #ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
+ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
+final_repo="http://ftp.dk.debian.org/debian/"
+local_repo=${HOME_MIRR_REPO_URL}
+#local_ws=kubuntu16-ws
+local_ws="debian9-ws"
+local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
+
 
 ## 3 part Expandable image with swap in p2
 ROOTFS_TYPE=ext4
@@ -42,9 +47,9 @@ mkfs="mkfs.${ROOTFS_TYPE}"
 media_swap_partition=p2
 media_rootfs_partition=p3
 
-#ext4_options="-O ^metadata_csum,^64bit"
-#mkfs_options="${ext4_options}"
-mkfs_options=""
+ext4_options="-O ^metadata_csum,^64bit"
+mkfs_options="${ext4_options}"
+#mkfs_options=""
 
 
 ## Select board
@@ -58,16 +63,16 @@ UBOOT_VERSION="v2016.09"
 UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
 ## Select user name / function
-#USER_NAME=machinekit;
-USER_NAME=holosynth;
+USER_NAME=machinekit;
+#USER_NAME=holosynth;
 
 RT_KERNEL_VERSION="4.9.33"
 RT_PATCH_REV="rt23"
 GIT_KERNEL_VERSION="4.1.22"
 GIT_KERNEL_REV="ltsi-rt"
 
-#SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
-SD_KERNEL_VERSION=${RT_KERNEL_VERSION}
+SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
+#SD_KERNEL_VERSION=${RT_KERNEL_VERSION}
 
 #RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
 #RT_PATCH_REV="ltsi-rt23"
@@ -105,10 +110,6 @@ CURRENT_DATE=`date -I`
 REL_DATE=${CURRENT_DATE}
 #REL_DATE=2016-03-07
 
-final_repo="http://ftp.dk.debian.org/debian/"
-local_repo="http://kubuntu16-srv.holotronic.lan/debian/"
-local_kernel_repo="http://kubuntu16-ws.holotronic.lan/debian/"
-
 DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev"
 
 ## ----------------------------  Toolchain   -----------------------------##
@@ -135,7 +136,8 @@ RT_KERNEL_TAG="${RT_KERNEL_VERSION}-${RT_PATCH_REV}"
 RT_KERNEL_LOCALVERSION="socfpga-${RT_KERNEL_TAG}"
 GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}"
 GIT_KERNEL_LOCALVERSION="socfpga-${GIT_KERNEL_TAG}"
-SD_KERNEL_TAG="${GIT_KERNEL_TAG}"
+#SD_KERNEL_TAG="${GIT_KERNEL_TAG}"
+SD_KERNEL_TAG="socfpga-rt-ltsi"
 
 KERNEL_PKG_VERSION="0.1"
 
@@ -236,6 +238,7 @@ usage()
     echo "    --build_git-kernel   Will clone and build kernel from git"
     echo "    --build_rt-ltsi-kernel   Will download rt-ltsi patch and build kernel"
     echo "    --kernel2repo   Will add kernel .debs to local repo"
+    echo "    --mk2repo   Will add machinekit .debs to local repo"
     echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs"
     echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience"
     echo "    --bindmount_rootfsimg    Will mount rootfs image"
@@ -280,7 +283,9 @@ build_uboot() {
 
 build_git_kernel() {
 	git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "${ALT_GIT_KERNEL_BRANCH}" ${ALT_GIT_KERNEL_PATCH_FILE} ${GIT_KERNEL_DIR}
-	armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
+	if [ "${1}" != "c" ]; then
+	   armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
+    fi
 }
 
 build_rt_ltsi_kernel() {
@@ -295,23 +300,27 @@ build_rt_ltsi_kernel() {
 		get_and_extract ${RT_KERNEL_PARENT_DIR} ${KERNEL_URL} ${RT_KERNEL_FILE_NAME}
 	fi
 	rt_patch_kernel
-	if [ "${VALUE}" != "c" ]; then
+	if [ "${1}" != "c" ]; then
     	armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}" 2>&1 | tee ${CURRENT_DIR}/Logs/kernel_deb_rt-log.txt
     fi
 }
 
 ## parameters: 1: mount dev name, 2: image name, 3: distro name
 gen_rootfs_image() {
+    zero=0;
 	create_img 1 ${2} ""
 	mount_imagefile ${2} ${1}
 	. ${FUNC_SCRIPT_DIR}/rootfs-func.sh
+	echo ""
 	if [ "${USER_NAME}" = "holosynth" ]; then
 		run_qt_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
+	echo "Scr_MSG: run_qt_qemu_debootstrap function return value was --> ${output}"
+    else
+         run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
+	echo "Scr_MSG: run_qemu_debootstrap function return value was --> ${output}"
 	fi
 	echo ""
-	echo "Scr_MSG: run_qt_qemu_debootstrap function return value was --> ${output}"
-	echo ""
-	if [ ${output} -gt 0 ]; then
+	if [[ $output -gt $zero ]]; then
 		echo "Scr_MSG: run_qt_qemu_debootstrap failed"
 		unmount_binded ${1}
 		exit 1
@@ -394,16 +403,19 @@ while [ "$1" != "" ]; do
             build_uboot
             ;;
         --build_git-kernel)
-            build_git_kernel
+            build_git_kernel ${VALUE}
             ;;
         --build_rt-ltsi-kernel)
             build_rt_ltsi_kernel ${VALUE}
             ;;
         --kernel2repo)
-            add_kernel2repo ${distro} ${SD_KERNEL_PARANT_DIR} ${SD_KERNEL_VERSION}
+            add2repo ${distro} ${SD_KERNEL_PARANT_DIR} ${SD_KERNEL_TAG}
+            ;;
+        --mk2repo)
+            add2repo ${distro} "/home/mib/Development/Docker/test" "machinekit"
             ;;
         --inst_repo_kernel)
-        inst_repo_kernel "finalized-fully-configured-with-kernel-and-qt-installed"
+        inst_repo_kernel "finalized-fully-configured-with-kernel"
             ;;
         --gen-base-qemu-rootfs)
             gen_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt

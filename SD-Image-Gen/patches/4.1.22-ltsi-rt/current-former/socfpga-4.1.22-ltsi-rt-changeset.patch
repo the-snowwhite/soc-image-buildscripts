@@ -1,7 +1,7 @@
-From b3c11344418a75913fdc1dfdf990352dc2e427dd Mon Sep 17 00:00:00 2001
+From ce61a353946c3afb9a3fac61413908ce2639787a Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 16 Jul 2016 22:21:55 +0200
-Subject: [PATCH 01/12] disable CONFIG_LOCALVERSION_AUTO for consistant
+Subject: [PATCH 01/13] disable CONFIG_LOCALVERSION_AUTO for consistant
  apt-updatable kernelversion name
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -22,10 +22,10 @@ index d4c662945e26..7eaa3a0a7a39 100644
 2.11.0
 
 
-From 6f99e063c6684a36cb08a6252807bde79a5bde8b Mon Sep 17 00:00:00 2001
+From b8c81ebfd2c15785491bb84fa4422c9798d557db Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 16 Jul 2016 22:25:32 +0200
-Subject: [PATCH 02/12] enable jumboframes maxmtu=9000
+Subject: [PATCH 02/13] enable jumboframes maxmtu=9000
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -49,10 +49,10 @@ index 555e9caf21e1..5b79c0c7c5be 100644
 2.11.0
 
 
-From 44b7f117bce681a4810e28c4c1542bc3493ef1be Mon Sep 17 00:00:00 2001
+From 856061bf2eea98d088aac42f0a16f750f4be1067 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 00:41:30 +0200
-Subject: [PATCH 03/12] add uio driver support
+Subject: [PATCH 03/13] add uio driver support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -74,10 +74,10 @@ index 7eaa3a0a7a39..717954e8c73c 100644
 2.11.0
 
 
-From 8dc19d4463a0c80ff118f2b834fdd05796644ff3 Mon Sep 17 00:00:00 2001
+From 9b7e811acaba6e94ad397dbed50ccec52ce20c3b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 01:20:55 +0200
-Subject: [PATCH 04/12] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 04/13] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -99,10 +99,10 @@ index 717954e8c73c..71daf98634e1 100644
 2.11.0
 
 
-From 57a39ccf757801daa6f2a55267a17c6802753c88 Mon Sep 17 00:00:00 2001
+From 6ec490ab7836d58c5b006601663fcf3623b05ab6 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 01:31:34 +0200
-Subject: [PATCH 05/12] add ext4 root fs support and autofs4 module
+Subject: [PATCH 05/13] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -133,10 +133,10 @@ index 71daf98634e1..d758be59de8c 100644
 2.11.0
 
 
-From cffbfe70d68e96860a920a8574cbbd2ec8754811 Mon Sep 17 00:00:00 2001
+From 43825075ae1c6f9e631e6dedb5a4c37879436397 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 01:38:04 +0200
-Subject: [PATCH 06/12] enable initramfs
+Subject: [PATCH 06/13] enable initramfs
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -165,10 +165,10 @@ index d758be59de8c..d6cb406a48be 100644
 2.11.0
 
 
-From 0ba5b9c93a3dd8f50c074833e9c906268870c38c Mon Sep 17 00:00:00 2001
+From 12928c744efb69226089e7b42040274e8cb40b65 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 14:10:56 +0200
-Subject: [PATCH 07/12] add .dtd files to kernel-image .deb
+Subject: [PATCH 07/13] add .dtd files to kernel-image .deb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -203,10 +203,10 @@ index 88dbf23b6970..67770e9eaa97 100755
 2.11.0
 
 
-From 1bb90ba5bd1efdafa108050aca12697c1398b1df Mon Sep 17 00:00:00 2001
+From 0fbca1c36ec7e49a726c48fc39bebcbce2b0794a Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 18 Jul 2016 16:21:56 +0200
-Subject: [PATCH 08/12] add generate /boot/uEnv.txt containing kernel info for
+Subject: [PATCH 08/13] add generate /boot/uEnv.txt containing kernel info for
  uboot probing
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -252,10 +252,10 @@ index 67770e9eaa97..4ee6f6e0f2bf 100755
 2.11.0
 
 
-From 0134a370cf1eed3ed678d7141f5662efe4edab40 Mon Sep 17 00:00:00 2001
+From 20e167804a0bb59f50b79d8f38463bc7fb0c7ceb Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 23 Jul 2016 19:52:59 +0200
-Subject: [PATCH 09/12] change uio_pdrv_genirq to module
+Subject: [PATCH 09/13] change uio_pdrv_genirq to module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -283,10 +283,10 @@ index d6cb406a48be..49399e420631 100644
 2.11.0
 
 
-From cca91042d853a2692223a38ca43ae48159c868c3 Mon Sep 17 00:00:00 2001
+From c2173e635ca3b08ccce2ab950a48db53257b846e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 1 Aug 2016 00:17:44 +0200
-Subject: [PATCH 10/12] disable debug package gen
+Subject: [PATCH 10/13] disable debug package gen
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -310,10 +310,10 @@ index 49399e420631..950821cdafb4 100644
 2.11.0
 
 
-From 3f456a0e54bfe6b544709040a0d46907f2cefee5 Mon Sep 17 00:00:00 2001
+From d5c8bd1c9a35562628504d45428d28ac0c0b275e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 13 Nov 2016 16:04:04 +0100
-Subject: [PATCH 11/12] Add framebuffer to devicetree Add kernel alt vip fb and
+Subject: [PATCH 11/13] Add framebuffer to devicetree Add kernel alt vip fb and
  video options Enable cma and Increase max framebuffersize twice above 4MB
  (fixes more than 1024x768x8 resolution) Add UInput module and usb hid
 
@@ -520,10 +520,10 @@ index 950821cdafb4..b1fb395d466d 100644
 2.11.0
 
 
-From 05179ff85d1ca65ed4fe4d643c47b5470edc5e29 Mon Sep 17 00:00:00 2001
+From 672a5135269c5787f2fd2c646eaef293a9dc319f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 28 May 2017 21:12:17 +0200
-Subject: [PATCH 12/12] Add ALSA Sound/midi modules
+Subject: [PATCH 12/13] Add ALSA Sound/midi modules
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -683,6 +683,336 @@ index b1fb395d466d..328a62d4d81a 100644
 +# CONFIG_SND_SOC_TPA6130A2 is not set
 +# CONFIG_SND_SIMPLE_CARD is not set
 +# CONFIG_SOUND_PRIME is not set
+-- 
+2.11.0
+
+
+From 6828c3b86320dc7fcad215b9a1657450b4be9a09 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 24 Jul 2017 16:28:15 +0200
+Subject: [PATCH 13/13] Remove Sound/midi modules and compability changes,
+ rename kernel, add spidev
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga.dtsi     |  63 +++++++--------
+ arch/arm/configs/socfpga_defconfig | 156 +++----------------------------------
+ scripts/package/builddeb           |  14 ++--
+ 3 files changed, 43 insertions(+), 190 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index 125e8389ef38..e13bd488bfe2 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -793,16 +793,41 @@
+ 		};
+ 
+ 		spi1: spi@fff01000 {
+-			compatible = "snps,dw-apb-ssi";
++			compatible = "snps,dw-spi-mmio-16.1", "snps,dw-spi-mmio", "snps,dw-apb-ssi";
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <0xfff01000 0x1000>;
++            interrupt-parent = <&intc>;
+ 			interrupts = <0 155 4>;
+ 			num-cs = <4>;
+ 			tx-dma-channel = <&pdma 20>;
+ 			rx-dma-channel = <&pdma 21>;
+ 			clocks = <&per_base_clk>;
+-			status = "disabled";
++			status = "okay";
++			spidev@0 {
++				compatible = "spidev";
++				reg = <0>;
++				spi-max-frequency = <100000000>;
++				enable-dma = <1>;
++			};
++			spidev@1 {
++				compatible = "spidev";
++				reg = <1>;
++				spi-max-frequency = <100000000>;
++				enable-dma = <1>;
++			};
++			spidev@2 {
++				compatible = "spidev";
++				reg = <2>;
++				spi-max-frequency = <100000000>;
++				enable-dma = <1>;
++			};
++			spidev@3 {
++				compatible = "spidev";
++				reg = <3>;
++				spi-max-frequency = <100000000>;
++				enable-dma = <1>;
++			};
+ 		};
+ 
+ 		/* Local timer */
+@@ -925,38 +950,4 @@
+ 			reg = <0xffd08000 0x4000>;
+ 		};
+ 	};
+-
+-	hps_0_h2f_lw: bridge@0xff200000 {
+-		compatible = "altr,h2f_lw_bridge-1.0", "simple-bus";
+-		reg = <0xff200000 0x050000>;
+-		#address-cells = <0x1>;
+-		#size-cells = <0x1>;
+-		ranges = <0x00100 0xff200100 0x00080>,
+-					<0x40000 0xff240000 0x10000>;
+-
+-		alt_vip_vfr: vip2@0x100 {
+-			compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
+-			reg = <0x00100 0x00080>;
+-			max-width = <1366>;	/* MAX_IMAGE_WIDTH type NUMBER */
+-			max-height = <768>;	/* MAX_IMAGE_HEIGHT type NUMBER */
+-			mem-word-width = <128>;	/* MEM_PORT_WIDTH type NUMBER */
+-			bits-per-color = <8>;	/* BITS_PER_PIXEL_PER_COLOR_PLANE type NUMBER */
+-		};
+-
+-		uioreg_io_0: uio-socfpg0@0x40000 {
+-			compatible = "uioreg_io,generic-uio,ui_pdrv";
+-			reg = <0x40000 0x10000>;
+-			interrupt-parent = <0x2>;
+-			interrupts = <0 43 4>;
+-			address_width = <14>;
+-			data_width = <32>;
+-		};
+-
+-		socmidi_0: socmidi@0x50000 {
+-			compatible = "holotr,socmidi-1.0";
+-			reg = <0x50000 0x10000>;
+-			address_width = <3>;	/* embeddedsw.dts.params.address_width type NUMBER */
+-			data_width = <8>;	/* embeddedsw.dts.params.data_width type NUMBER */
+-		}; //end interfaces@0x100050000 (socmidi_0)
+-	};
+ };
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 328a62d4d81a..777412c69f82 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -94,7 +94,7 @@ CONFIG_I2C_DESIGNWARE_PLATFORM=y
+ CONFIG_SPI=y
+ CONFIG_SPI_DESIGNWARE=y
+ CONFIG_SPI_DW_MMIO=y
+-CONFIG_SPI_SPIDEV=y
++CONFIG_SPI_SPIDEV=m
+ CONFIG_GPIOLIB=y
+ CONFIG_GPIO_SYSFS=y
+ CONFIG_GPIO_ALTERA=y
+@@ -158,7 +158,7 @@ CONFIG_ROOT_NFS=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_PRINTK_TIME=y
+-CONFIG_DEBUG_INFO=n
++#CONFIG_DEBUG_INFO=n
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_SCHED_DEBUG is not set
+@@ -171,9 +171,16 @@ CONFIG_UIO_PDRV=m
+ CONFIG_UIO_PDRV_GENIRQ=m
+ CONFIG_CONFIGFS_FS=y
+ CONFIG_OF_OVERLAY=y
++CONFIG_KPROBES=y
++￼CONFIG_UPROBES=y
++￼CONFIG_RELAY=y
++￼CONFIG_DEBUG_FS=y
++￼CONFIG_DEBUG_INFO_SPLIT=y
++￼CONFIG_DEBUG_INFO=y
++￼CONFIG_DEBUG_INFO_DWARF4=y 
+ CONFIG_EXT4_FS_POSIX_ACL=y
+ CONFIG_EXT4_FS_SECURITY=y
+-CONFIG_AUTOFS4_FS=y
++CONFIG_AUTOFS4_FS=m
+ CONFIG_BLK_DEV_INITRD=y
+ CONFIG_INITRAMFS_SOURCE=""
+ CONFIG_INITRAMFS_ROOT_UID=0
+@@ -296,146 +303,3 @@ CONFIG_USB_HID=y
+ CONFIG_HID_MULTITOUCH=y
+ CONFIG_REGMAP_I2C=y
+ CONFIG_REGMAP_SPI=y
+-CONFIG_SOUND=y
+-CONFIG_SOUND_OSS_CORE=y
+-CONFIG_SOUND_OSS_CORE_PRECLAIM=y
+-CONFIG_SND=y
+-CONFIG_SND_TIMER=y
+-CONFIG_SND_PCM=y
+-CONFIG_SND_HWDEP=y
+-CONFIG_SND_RAWMIDI=y
+-CONFIG_SND_COMPRESS_OFFLOAD=y
+-CONFIG_SND_JACK=y
+-CONFIG_SND_SEQUENCER=y
+-CONFIG_SND_SEQ_DUMMY=y
+-CONFIG_SND_OSSEMUL=y
+-# CONFIG_SND_MIXER_OSS is not set
+-# CONFIG_SND_PCM_OSS is not set
+-CONFIG_SND_SEQUENCER_OSS=y
+-# CONFIG_SND_HRTIMER is not set
+-# CONFIG_SND_DYNAMIC_MINORS is not set
+-CONFIG_SND_SUPPORT_OLD_API=y
+-CONFIG_SND_VERBOSE_PROCFS=y
+-CONFIG_SND_VERBOSE_PRINTK=y
+-CONFIG_SND_DEBUG=y
+-CONFIG_SND_DEBUG_VERBOSE=y
+-# CONFIG_SND_PCM_XRUN_DEBUG is not set
+-CONFIG_SND_DMA_SGBUF=y
+-# CONFIG_SND_RAWMIDI_SEQ is not set
+-# CONFIG_SND_OPL3_LIB_SEQ is not set
+-# CONFIG_SND_OPL4_LIB_SEQ is not set
+-# CONFIG_SND_SBAWE_SEQ is not set
+-# CONFIG_SND_EMU10K1_SEQ is not set
+-CONFIG_SND_DRIVERS=y
+-# CONFIG_SND_PCSP is not set
+-CONFIG_SND_DUMMY=m
+-# CONFIG_SND_ALOOP is not set
+-# CONFIG_SND_MTPAV is not set
+-CONFIG_SND_SERIAL_U16550=m
+-# CONFIG_SND_MPU401 is not set
+-# CONFIG_SND_PCI is not set
+-
+-#
+-# HD-Audio
+-#
+-CONFIG_SND_SPI=y
+-CONFIG_SND_USB=y
+-CONFIG_SND_USB_AUDIO=y
+-# CONFIG_SND_USB_UA101 is not set
+-# CONFIG_SND_USB_USX2Y is not set
+-# CONFIG_SND_USB_CAIAQ is not set
+-# CONFIG_SND_USB_US122L is not set
+-# CONFIG_SND_USB_6FIRE is not set
+-# CONFIG_SND_USB_HIFACE is not set
+-# CONFIG_SND_BCD2000 is not set
+-# CONFIG_SND_USB_POD is not set
+-# CONFIG_SND_USB_PODHD is not set
+-# CONFIG_SND_USB_TONEPORT is not set
+-# CONFIG_SND_USB_VARIAX is not set
+-CONFIG_SND_SOC=y
+-# CONFIG_SND_ATMEL_SOC is not set
+-
+-#
+-# SoC Audio for Freescale CPUs
+-#
+-
+-#
+-# Common SoC Audio options for Freescale CPUs:
+-#
+-# CONFIG_SND_SOC_FSL_ASRC is not set
+-# CONFIG_SND_SOC_FSL_SAI is not set
+-# CONFIG_SND_SOC_FSL_SSI is not set
+-# CONFIG_SND_SOC_FSL_SPDIF is not set
+-# CONFIG_SND_SOC_FSL_ESAI is not set
+-# CONFIG_SND_SOC_IMX_AUDMUX is not set
+-# CONFIG_SND_SOC_INTEL_BYTCR_RT5640_MACH is not set
+-# CONFIG_SND_SOC_QCOM is not set
+-# CONFIG_SND_SOC_XTFPGA_I2S is not set
+-CONFIG_SND_SOC_I2C_AND_SPI=y
+-
+-#
+-# CODEC drivers
+-#
+-CONFIG_SND_SOC_ADAU1701=m
+-# CONFIG_SND_SOC_AK4104 is not set
+-# CONFIG_SND_SOC_AK4554 is not set
+-# CONFIG_SND_SOC_AK4642 is not set
+-# CONFIG_SND_SOC_AK5386 is not set
+-# CONFIG_SND_SOC_ALC5623 is not set
+-# CONFIG_SND_SOC_CS35L32 is not set
+-# CONFIG_SND_SOC_CS42L51_I2C is not set
+-# CONFIG_SND_SOC_CS42L52 is not set
+-# CONFIG_SND_SOC_CS42L56 is not set
+-# CONFIG_SND_SOC_CS42L73 is not set
+-# CONFIG_SND_SOC_CS4265 is not set
+-# CONFIG_SND_SOC_CS4270 is not set
+-# CONFIG_SND_SOC_CS4271_I2C is not set
+-# CONFIG_SND_SOC_CS4271_SPI is not set
+-# CONFIG_SND_SOC_CS42XX8_I2C is not set
+-# CONFIG_SND_SOC_HDMI_CODEC is not set
+-# CONFIG_SND_SOC_ES8328 is not set
+-# CONFIG_SND_SOC_PCM1681 is not set
+-# CONFIG_SND_SOC_PCM1792A is not set
+-# CONFIG_SND_SOC_PCM512x_I2C is not set
+-# CONFIG_SND_SOC_PCM512x_SPI is not set
+-# CONFIG_SND_SOC_RT5631 is not set
+-# CONFIG_SND_SOC_RT5677_SPI is not set
+-# CONFIG_SND_SOC_SGTL5000 is not set
+-CONFIG_SND_SOC_SIGMADSP=m
+-CONFIG_SND_SOC_SIGMADSP_I2C=m
+-# CONFIG_SND_SOC_SIRF_AUDIO_CODEC is not set
+-# CONFIG_SND_SOC_SPDIF is not set
+-CONFIG_SND_SOC_SSM2602=m
+-# CONFIG_SND_SOC_SSM2602_SPI is not set
+-CONFIG_SND_SOC_SSM2602_I2C=m
+-# CONFIG_SND_SOC_SSM4567 is not set
+-# CONFIG_SND_SOC_STA32X is not set
+-# CONFIG_SND_SOC_STA350 is not set
+-# CONFIG_SND_SOC_TAS2552 is not set
+-# CONFIG_SND_SOC_TAS5086 is not set
+-# CONFIG_SND_SOC_TFA9879 is not set
+-# CONFIG_SND_SOC_TLV320AIC23_I2C is not set
+-# CONFIG_SND_SOC_TLV320AIC23_SPI is not set
+-# CONFIG_SND_SOC_TLV320AIC31XX is not set
+-# CONFIG_SND_SOC_TLV320AIC3X is not set
+-# CONFIG_SND_SOC_TS3A227E is not set
+-# CONFIG_SND_SOC_WM8510 is not set
+-# CONFIG_SND_SOC_WM8523 is not set
+-# CONFIG_SND_SOC_WM8580 is not set
+-# CONFIG_SND_SOC_WM8711 is not set
+-# CONFIG_SND_SOC_WM8728 is not set
+-CONFIG_SND_SOC_WM8731=m
+-# CONFIG_SND_SOC_WM8737 is not set
+-# CONFIG_SND_SOC_WM8741 is not set
+-# CONFIG_SND_SOC_WM8750 is not set
+-# CONFIG_SND_SOC_WM8753 is not set
+-# CONFIG_SND_SOC_WM8770 is not set
+-# CONFIG_SND_SOC_WM8776 is not set
+-# CONFIG_SND_SOC_WM8804_I2C is not set
+-# CONFIG_SND_SOC_WM8804_SPI is not set
+-# CONFIG_SND_SOC_WM8903 is not set
+-# CONFIG_SND_SOC_WM8962 is not set
+-# CONFIG_SND_SOC_WM8978 is not set
+-# CONFIG_SND_SOC_TPA6130A2 is not set
+-# CONFIG_SND_SIMPLE_CARD is not set
+-# CONFIG_SOUND_PRIME is not set
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 4ee6f6e0f2bf..983ca02dc06b 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -81,11 +81,11 @@ fwdir="$objtree/debian/fwtmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
+ dbg_dir="$objtree/debian/dbgtmp"
+-packagename=linux-image-$version
+-fwpackagename=linux-firmware-image-$version
+-kernel_headers_packagename=linux-headers-$version
+-libc_headers_packagename=linux-libc-dev
+-dbg_packagename=$packagename-dbg
++packagename=linux-image-socfpga-rt-ltsi
++fwpackagename=linux-firmware-image-socfpga-rt-ltsi
++kernel_headers_packagename=linux-headers-socfpga-rt-ltsi
++libc_headers_packagename=linux-libc-dev-socfpga-rt-ltsi
++dbg_packagename=$packagename-dbg-socfpga-rt-ltsi
+ 
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+@@ -190,8 +190,6 @@ kver=${version}
+ initrd_installed=$want_initrd
+ EOF
+ 	cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
+-hostname=holosynthv
+-bitimage=/boot/DE1_SOC_Linux_FB.rbf
+ fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
+ fpgaintf=ffd08028
+ fpgaintf_handoff=0x00000000
+@@ -203,7 +201,7 @@ axibridge_handoff=0x00000000
+ l3remap=ff800000
+ l3remap_handoff=0x00000019
+ bridge_enable_handoff=mw ${fpgaintf} ${fpgaintf_handoff}; mw ${fpga2sdram} ${fpga2sdram_handoff}; mw \${axibridge} ${axibridge_handoff}; mw ${l3remap} ${l3remap_handoff}
+-loadimage=run fpgaload; run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++loadimage=load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
+ EOF
+ 
+ for script in postinst postrm preinst prerm ; do
 -- 
 2.11.0
 
