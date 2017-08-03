@@ -639,7 +639,7 @@ echo "Europe/Copenhagen" > /etc/timezone && \
     sed -i -e '"'"'s/# da_DK.UTF-8 UTF-8/da_DK.UTF-8 UTF-8/'"'"' /etc/locale.gen && \
     echo '"'"'LANG="en_US.UTF-8"'"'"'>/etc/default/locale && \
     dpkg-reconfigure --frontend=noninteractive locales && \
-    update-locale LANG=en_US.UTF-8}
+    update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
 exit
 EOF'
@@ -663,7 +663,7 @@ export DEFGROUPS="sudo,kmem,adm,dialout,'${USER_NAME}',video,plugdev,netdev"
 export LANG=C
 
 '${apt_cmd}' -y update
-'${apt_cmd}' -y --assume-yes --allow-unauthenticated upgrade
+'${apt_cmd}' -y --assume-yes upgrade
 echo "root:'${USER_NAME}'" | chpasswd
 
 echo "ECHO: " "Will add user '${USER_NAME}' pw: '${USER_NAME}'"
@@ -710,10 +710,10 @@ EOT
 exit
 EOF'
 
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} install --reinstall debconf
 sudo chmod +x ${ROOTFS_MNT}/home/add_user.sh
 
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/sbin/locale-gen en_GB.UTF-8 en_US.UTF-8,da_DK.UTF-8
+
 }
 
 gen_initial_sh() {
@@ -745,7 +745,7 @@ EOT
 
 echo "ECHO: Will now run '${apt_cmd}' update, upgrade"
 '${apt_cmd}' -y update
-'${apt_cmd}' -y --assume-yes --allow-unauthenticated upgrade
+'${apt_cmd}' -y --assume-yes upgrade
 
 rm -f /etc/resolv.conf
 
@@ -790,22 +790,26 @@ sudo rm -f ${ROOTFS_MNT}/etc/resolv.conf
 sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
 echo "Script_MSG: Now adding user: ${USER_NAME}"
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir -p /tmp
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /tmp
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir -p /var/tmp
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /var/tmp
+sudo chroot --userspec=root:root ${ROOTFS_MNT} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
 gen_add_user_sh
 echo "Script_MSG: gen_add_user_sh finished ... will now run in chroot"
 
 sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/add_user.sh
 
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} install --reinstall debconf
+
 echo ""
 echo "Scr_MSG: fix no sudo user ping:"
 echo ""
 sudo chmod u+s ${ROOTFS_MNT}/bin/ping ${ROOTFS_MNT}/bin/ping6
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir /tmp
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /tmp
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
-sudo chroot --userspec=root:root ${ROOTFS_MNT} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
 echo "Script_MSG: installing apt-transport-https"
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y --assume-yes --allow-unauthenticated upgrade
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y --assume-yes upgrade
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install apt-transport-https
 #sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y --assume-yes install systemd-sysv
 #sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y --assume-yes install task-lxde-desktop
@@ -838,7 +842,7 @@ if [[ "${USER_NAME}" == "holosynth" ]]; then
 mmcboot=setenv bootargs console=ttyS0,115200 root=\${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz \${loadaddr} - \${fdt_addr}
 EOF'
 
-sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/etc/X11/xorg.conf
+    sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/etc/X11/xorg.conf
 Section "Device"
     Identifier      "Frame Buffer"
     Driver  "fbdev"
@@ -854,59 +858,59 @@ Section "ServerLayout"
 EndSection
 
 EOF'
-if [[ "${distro}" == "stretch" ]]; then
-sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/.xsessionrc
+    if [[ "${distro}" == "stretch" ]]; then
+        sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/.xsessionrc
 xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
 EOF'
 
-sudo mkdir -p ${ROOTFS_MNT}/home/holosynth/Desktop
-sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/Desktop/HolosynthVEd.sh
+        sudo mkdir -p ${ROOTFS_MNT}/home/holosynth/Desktop
+        sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/Desktop/HolosynthVEd.sh
 #xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
 /home/holosynth/prg/HolosynthVEd -nograb -platform xcb
 
 EOF'
 
-else
-sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/.xsessionrc
+    else
+        sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/.xsessionrc
 xinput set-prop 6 "Evdev Axis Inversion" 1,1
 xinput set-prop 6 "Evdev Axes Swap" 0
 
 EOF'
 
-sudo mkdir -p ${ROOTFS_MNT}/home/holosynth/Desktop
-sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/Desktop/HolosynthVEd.sh
+        sudo mkdir -p ${ROOTFS_MNT}/home/holosynth/Desktop
+        sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/Desktop/HolosynthVEd.sh
 #xinput set-prop 6 "Evdev Axis Inversion" 1,1
 #xinput set-prop 6 "Evdev Axes Swap" 0
 /home/holosynth/prg/HolosynthVEd -nograb -platform xcb
 
 EOF'
-fi
+    fi
 	sudo chmod +x ${ROOTFS_MNT}/home/holosynth/Desktop/HolosynthVEd.sh
 	sudo chown -R mib:mib ${ROOTFS_MNT}/home/holosynth/Desktop
 
 fi
-	sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '$ROOTFS_MNT'/etc/modprobe.d/uioreg.conf'
-	sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '$ROOTFS_MNT'/etc/udev/rules.d/10-local.rules'
+sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '$ROOTFS_MNT'/etc/modprobe.d/uioreg.conf'
+sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '$ROOTFS_MNT'/etc/udev/rules.d/10-local.rules'
 
-	echo ""
-	echo "# --------->       Removing qemu policy file          <--------------- ---------"
-	echo ""
+echo ""
+echo "# --------->       Removing qemu policy file          <--------------- ---------"
+echo ""
 
-	if [ -f ${POLICY_FILE} ]; then
-		echo "removing ${POLICY_FILE}"
-		sudo rm -f ${POLICY_FILE}
-	fi
-	echo ""
-	echo "# --------->       Restoring resolv.conf link         <--------------- ---------"
-	echo ""
-	sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/rm -f /etc/resolv.conf
-	sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /lib/systemd/system/systemd-resolved.service /etc/resolv.conf
+if [ -f ${POLICY_FILE} ]; then
+	echo "removing ${POLICY_FILE}"
+	sudo rm -f ${POLICY_FILE}
+fi
+echo ""
+echo "# --------->       Restoring resolv.conf link         <--------------- ---------"
+echo ""
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/rm -f /etc/resolv.conf
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /lib/systemd/system/systemd-resolved.service /etc/resolv.conf
 
-	echo ""
-	echo "Script_MSG:  All Config files genetated"
-	echo ""
-	echo ""
-	echo "# --------- ------------>   Finalized    --- --------- --------------- ---------"
+echo ""
+echo "Script_MSG:  All Config files genetated"
+echo ""
+echo ""
+echo "# --------- ------------>   Finalized    --- --------- --------------- ---------"
 echo ""
 }
 
