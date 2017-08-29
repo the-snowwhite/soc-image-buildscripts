@@ -1,7 +1,7 @@
-From 1519185e98af583395163e40c164fb50ad87e888 Mon Sep 17 00:00:00 2001
+From 6ec490ab7836d58c5b006601663fcf3623b05ab6 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 01:31:34 +0200
-Subject: [PATCH 04/10] add ext4 root fs support and autofs4 module
+Subject: [PATCH 05/13] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 80ebf6bb03a9..a36ddb460164 100644
+index 71daf98634e1..d758be59de8c 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -11,7 +11,7 @@ CONFIG_EMBEDDED=y
@@ -21,8 +21,8 @@ index 80ebf6bb03a9..a36ddb460164 100644
  # CONFIG_BLK_DEV_BSG is not set
  # CONFIG_IOSCHED_DEADLINE is not set
  # CONFIG_IOSCHED_CFQ is not set
-@@ -165,3 +165,6 @@ CONFIG_UIO=m
- CONFIG_UIO_PDRV_GENIRQ=m
+@@ -166,3 +166,6 @@ CONFIG_UIO_PDRV=y
+ CONFIG_UIO_PDRV_GENIRQ=y
  CONFIG_CONFIGFS_FS=y
  CONFIG_OF_OVERLAY=y
 +CONFIG_EXT4_FS_POSIX_ACL=y

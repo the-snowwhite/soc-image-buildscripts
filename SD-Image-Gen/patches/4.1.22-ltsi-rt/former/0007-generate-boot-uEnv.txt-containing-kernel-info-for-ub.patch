@@ -1,19 +1,19 @@
-From ccd57b6e157e0dfae539dd3555d174ab77098dba Mon Sep 17 00:00:00 2001
+From 90460f35d8a257ec529022fad1d5f1461015e868 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 18 Jul 2016 16:21:56 +0200
-Subject: [PATCH 07/10] generate /boot/uEnv.txt containing kernel info for
- uboot probing
+Subject: [PATCH 7/9] generate /boot/uEnv.txt containing kernel info for uboot
+ probing
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- scripts/package/builddeb | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ scripts/package/builddeb | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 67770e9eaa97..f516fdce2b7d 100755
+index 67770e9eaa97..c6e4d53e4d91 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -183,6 +183,28 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
+@@ -183,6 +183,27 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
  else
  	want_initrd=No
  fi
@@ -24,7 +24,6 @@ index 67770e9eaa97..f516fdce2b7d 100755
 +initrd_installed=$want_initrd
 +EOF
 +cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
-+bitimage=/lib/firmware/socfpga/DE10_Nano_FB_Cramps.3x24_cap.rbf
 +fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
 +fpgaintf=ffd08028
 +fpgaintf_handoff=0x00000000
@@ -36,7 +35,7 @@ index 67770e9eaa97..f516fdce2b7d 100755
 +l3remap=ff800000
 +l3remap_handoff=0x00000019
 +bridge_enable_handoff=mw ${fpgaintf} ${fpgaintf_handoff}; mw ${fpga2sdram} ${fpga2sdram_handoff}; mw ${axibridge} ${axibridge_handoff}; mw ${l3remap} ${l3remap_handoff}
-+loadimage=if test ${fpgatype} = cv_se_a6; then run fpgaload; fi; run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++loadimage=run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
 +EOF
 +
  for script in postinst postrm preinst prerm ; do
