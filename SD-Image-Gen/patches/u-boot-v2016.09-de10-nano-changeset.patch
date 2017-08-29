@@ -1,4 +1,4 @@
-From 18d39f91e8648ad093bc2351f7258a3c026410bd Mon Sep 17 00:00:00 2001
+From 8e5ce3ad061646c30571ba2028840f054b5b624e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 22 Oct 2016 00:04:55 +0200
 Subject: [PATCH 1/3] Add ext4 support and uEnv.txt support in boot folder
@@ -11,7 +11,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  3 files changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/include/config_cmd_all.h b/include/config_cmd_all.h
-index b5fd6c6..94b6273 100644
+index b5fd6c68e8..94b6273b45 100644
 --- a/include/config_cmd_all.h
 +++ b/include/config_cmd_all.h
 @@ -53,5 +53,8 @@
@@ -24,7 +24,7 @@ index b5fd6c6..94b6273 100644
  
  #endif	/* _CONFIG_CMD_ALL_H */
 diff --git a/include/configs/socfpga_common.h b/include/configs/socfpga_common.h
-index b3fb245..97d9d08 100644
+index b3fb245fea..97d9d08dfc 100644
 --- a/include/configs/socfpga_common.h
 +++ b/include/configs/socfpga_common.h
 @@ -265,6 +265,11 @@ unsigned int cm_get_qspi_controller_clk_hz(void);
@@ -40,7 +40,7 @@ index b3fb245..97d9d08 100644
  #define CONFIG_ENV_OFFSET		512	/* just after the MBR */
  #endif
 diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
-index 6b9546e..2e55a4e 100644
+index 6b9546e8f7..2e55a4e4aa 100644
 --- a/include/configs/socfpga_de0_nano_soc.h
 +++ b/include/configs/socfpga_de0_nano_soc.h
 @@ -11,7 +11,7 @@
@@ -62,10 +62,10 @@ index 6b9546e..2e55a4e 100644
  		" root=${mmcroot} rw rootwait;" \
  		"bootz ${loadaddr} - ${fdt_addr}\0" \
 -- 
-2.7.4
+2.11.0
 
 
-From 03c6fc859a975c6da03202948844b626892b4b75 Mon Sep 17 00:00:00 2001
+From 9e115da5f2faab44f79c2ac5332b036ce7f58ed4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 22 Oct 2016 01:03:25 +0200
 Subject: [PATCH 2/3] Add env file and bootscript select support based upon
@@ -73,11 +73,11 @@ Subject: [PATCH 2/3] Add env file and bootscript select support based upon
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- include/configs/socfpga_de0_nano_soc.h | 58 +++++++++++++++++++++++++++++++---
- 1 file changed, 53 insertions(+), 5 deletions(-)
+ include/configs/socfpga_de0_nano_soc.h | 60 +++++++++++++++++++++++++++++++---
+ 1 file changed, 55 insertions(+), 5 deletions(-)
 
 diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
-index 2e55a4e..2181296 100644
+index 2e55a4e4aa..59e687def9 100644
 --- a/include/configs/socfpga_de0_nano_soc.h
 +++ b/include/configs/socfpga_de0_nano_soc.h
 @@ -20,7 +20,29 @@
@@ -111,7 +111,7 @@ index 2e55a4e..2181296 100644
  #define CONFIG_LOADADDR		0x01000000
  #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
  
-@@ -34,20 +56,46 @@
+@@ -34,20 +56,48 @@
  
  /* Extra Environment */
  #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -157,16 +157,18 @@ index 2e55a4e..2181296 100644
 +			"setenv fdtimage ${dtbfolder}socfpga_cyclone5_de0_sockit.dtb; fi; " \
 +		"if test ${fpgatype} = cv_se_a5; then " \
 +			"setenv fdtimage ${dtbfolder}socfpga_cyclone5_de0_sockit.dtb; fi; " \
++		"if test ${fpgatype} = cv_se_a6; then " \
++			"setenv fdtimage ${dtbfolder}socfpga_cyclone5_de10_fb.dtb; fi; " \
 +		"if test ${fdtimage} = undefined; then " \
 +			"echo WARNING: Could not determine device tree to use; fi; \0" \
  
  /* The rest of the configuration is shared */
  #include <configs/socfpga_common.h>
 -- 
-2.7.4
+2.11.0
 
 
-From 6b6cad02f8ffd9897c0384e93aa330547e58a9d3 Mon Sep 17 00:00:00 2001
+From 2bac31e3f212856a8aca5146bbb3961fd06d9125 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 28 Nov 2016 01:44:50 +0100
 Subject: [PATCH 3/3] Add framebuffer to dtb
@@ -178,7 +180,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  2 files changed, 18 insertions(+)
 
 diff --git a/arch/arm/dts/socfpga.dtsi b/arch/arm/dts/socfpga.dtsi
-index 8588221..a15f0b1 100644
+index 8588221e57..a15f0b18ff 100644
 --- a/arch/arm/dts/socfpga.dtsi
 +++ b/arch/arm/dts/socfpga.dtsi
 @@ -791,4 +791,21 @@
@@ -204,7 +206,7 @@ index 8588221..a15f0b1 100644
 +	};
  };
 diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
-index 2181296..93c9999 100644
+index 59e687def9..0b6c3b58d3 100644
 --- a/include/configs/socfpga_de0_nano_soc.h
 +++ b/include/configs/socfpga_de0_nano_soc.h
 @@ -10,6 +10,7 @@
@@ -216,5 +218,5 @@ index 2181296..93c9999 100644
  #define CONFIG_EXT4_WRITE
  #define CONFIG_HW_WATCHDOG
 -- 
-2.7.4
+2.11.0
 

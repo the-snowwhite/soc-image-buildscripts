@@ -1,7 +1,7 @@
-From 17a865fc8ef8c88109777c04232018739274ed1b Mon Sep 17 00:00:00 2001
+From 72b07a26b47dbe72896e61a3878f558e43898e41 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 01:38:04 +0200
-Subject: [PATCH 05/10] enable initramfs module
+Subject: [PATCH 5/9] enable initramfs module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

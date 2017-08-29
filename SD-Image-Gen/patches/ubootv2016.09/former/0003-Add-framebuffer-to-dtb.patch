@@ -1,4 +1,4 @@
-From 2bac31e3f212856a8aca5146bbb3961fd06d9125 Mon Sep 17 00:00:00 2001
+From 6b6cad02f8ffd9897c0384e93aa330547e58a9d3 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 28 Nov 2016 01:44:50 +0100
 Subject: [PATCH 3/3] Add framebuffer to dtb
@@ -10,7 +10,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  2 files changed, 18 insertions(+)
 
 diff --git a/arch/arm/dts/socfpga.dtsi b/arch/arm/dts/socfpga.dtsi
-index 8588221e57..a15f0b18ff 100644
+index 8588221..a15f0b1 100644
 --- a/arch/arm/dts/socfpga.dtsi
 +++ b/arch/arm/dts/socfpga.dtsi
 @@ -791,4 +791,21 @@
@@ -36,7 +36,7 @@ index 8588221e57..a15f0b18ff 100644
 +	};
  };
 diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
-index 59e687def9..0b6c3b58d3 100644
+index 2181296..93c9999 100644
 --- a/include/configs/socfpga_de0_nano_soc.h
 +++ b/include/configs/socfpga_de0_nano_soc.h
 @@ -10,6 +10,7 @@
@@ -48,5 +48,5 @@ index 59e687def9..0b6c3b58d3 100644
  #define CONFIG_EXT4_WRITE
  #define CONFIG_HW_WATCHDOG
 -- 
-2.11.0
+2.7.4
 

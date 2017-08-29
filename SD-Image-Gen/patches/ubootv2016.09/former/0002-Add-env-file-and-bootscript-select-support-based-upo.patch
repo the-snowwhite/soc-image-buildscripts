@@ -1,7 +1,7 @@
-From 7e42a39cbb80d4272729a95670caa5e5d0c5050a Mon Sep 17 00:00:00 2001
+From 03c6fc859a975c6da03202948844b626892b4b75 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 22 Oct 2016 01:03:25 +0200
-Subject: [PATCH 2/2] Add env file and bootscript select support based upon
+Subject: [PATCH 2/3] Add env file and bootscript select support based upon
  chip model and installed kernel (bb style)
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>

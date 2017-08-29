@@ -1,8 +1,13 @@
 #!/bin/bash
 
 ## parameters: 1: mount dev name, 2: distro name, 3: repo url
+run_desktop_qemu_debootstrap() {
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,fuse,policykit-1,gtk2-engines-pixbuf,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,task-lxde-desktop,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,wget,fontconfig,fontconfig-config ${2} ${1} ${3}
+output=${?}
+}
+
 run_qt_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,policykit-1,gtk2-engines-pixbuf,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,task-lxde-desktop,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge,fontconfig,fontconfig-config ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,fuse,policykit-1,gtk2-engines-pixbuf,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,task-lxde-desktop,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,wget,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge,fontconfig,fontconfig-config ${2} ${1} ${3}
 output=${?}
 }
 
@@ -606,7 +611,8 @@ en_US.UTF-8 UTF-8
 # wal_ET UTF-8
 # wo_SN UTF-8
 # xh_ZA ISO-8859-1
-# xh_ZA.UTF-8 UTF-8
+# xh_ZA.UTF-8 UTF-8sudo chroot --userspec=root:root ${ROOTFS_MNT} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
+
 # yi_US CP1255
 # yi_US.UTF-8 UTF-8
 # yo_NG UTF-8
@@ -889,6 +895,7 @@ EOF'
 	sudo chown -R mib:mib ${ROOTFS_MNT}/home/holosynth/Desktop
 
 fi
+
 sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '$ROOTFS_MNT'/etc/modprobe.d/uioreg.conf'
 sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '$ROOTFS_MNT'/etc/udev/rules.d/10-local.rules'
 
@@ -943,6 +950,25 @@ LC_TIME=en_GB.UTF-8
 EOT'
 
 if [ "${USER_NAME}" == "machinekit" ]; then
+
+if [ "${DESKTOP}" == "yes" ]; then
+    sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/etc/X11/xorg.conf
+Section "Device"
+    Identifier      "Frame Buffer"
+    Driver  "fbdev"
+    Option "Rotate" "off"
+EndSection
+
+Section "ServerLayout"
+    Identifier "ServerLayout0"
+    Option "BlankTime"   "0"
+    Option "StandbyTime" "0"
+    Option "SuspendTime" "0"
+    Option "OffTime" "0"
+EndSection
+
+EOF'
+else
 sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/X11/xorg.conf
 
 Section "Screen"
@@ -958,5 +984,6 @@ Section "Device"
     Option "NoDDC" "true"
 EndSection
 EOT'
+fi
 fi
 }

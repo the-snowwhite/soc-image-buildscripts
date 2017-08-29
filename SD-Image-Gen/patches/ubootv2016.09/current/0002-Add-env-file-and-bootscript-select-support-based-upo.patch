@@ -1,4 +1,4 @@
-From 03c6fc859a975c6da03202948844b626892b4b75 Mon Sep 17 00:00:00 2001
+From 9e115da5f2faab44f79c2ac5332b036ce7f58ed4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 22 Oct 2016 01:03:25 +0200
 Subject: [PATCH 2/3] Add env file and bootscript select support based upon
@@ -6,11 +6,11 @@ Subject: [PATCH 2/3] Add env file and bootscript select support based upon
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- include/configs/socfpga_de0_nano_soc.h | 58 +++++++++++++++++++++++++++++++---
- 1 file changed, 53 insertions(+), 5 deletions(-)
+ include/configs/socfpga_de0_nano_soc.h | 60 +++++++++++++++++++++++++++++++---
+ 1 file changed, 55 insertions(+), 5 deletions(-)
 
 diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
-index 2e55a4e..2181296 100644
+index 2e55a4e4aa..59e687def9 100644
 --- a/include/configs/socfpga_de0_nano_soc.h
 +++ b/include/configs/socfpga_de0_nano_soc.h
 @@ -20,7 +20,29 @@
@@ -44,7 +44,7 @@ index 2e55a4e..2181296 100644
  #define CONFIG_LOADADDR		0x01000000
  #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
  
-@@ -34,20 +56,46 @@
+@@ -34,20 +56,48 @@
  
  /* Extra Environment */
  #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -90,11 +90,13 @@ index 2e55a4e..2181296 100644
 +			"setenv fdtimage ${dtbfolder}socfpga_cyclone5_de0_sockit.dtb; fi; " \
 +		"if test ${fpgatype} = cv_se_a5; then " \
 +			"setenv fdtimage ${dtbfolder}socfpga_cyclone5_de0_sockit.dtb; fi; " \
++		"if test ${fpgatype} = cv_se_a6; then " \
++			"setenv fdtimage ${dtbfolder}socfpga_cyclone5_de10_fb.dtb; fi; " \
 +		"if test ${fdtimage} = undefined; then " \
 +			"echo WARNING: Could not determine device tree to use; fi; \0" \
  
  /* The rest of the configuration is shared */
  #include <configs/socfpga_common.h>
 -- 
-2.7.4
+2.11.0
 

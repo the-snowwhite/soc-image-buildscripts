@@ -1,7 +1,7 @@
-From a9c4f2df9186bf436debedbf7338b76283b08215 Mon Sep 17 00:00:00 2001
+From 5a1348c7f864a98290ba1a31b44fc4309b4c4f4b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 17 Jul 2016 00:41:30 +0200
-Subject: [PATCH 03/10] add uio driver module support
+Subject: [PATCH 3/9] add uio driver module support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

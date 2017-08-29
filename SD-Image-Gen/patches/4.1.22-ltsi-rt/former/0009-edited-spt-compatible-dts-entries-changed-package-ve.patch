@@ -1,26 +1,26 @@
-From 12be8920830db962bb42b8301e3320b47266d80a Mon Sep 17 00:00:00 2001
+From 729c6ed1b6fd0ebca4cd02ecd9b4f50eae8d5ad9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 24 Jul 2017 21:59:29 +0200
-Subject: [PATCH 9/9] added spidev dts entries, changed package version names
- to socfpga-rt-ltsi,and missing config param
+Subject: [PATCH 9/9] edited spt compatible dts entries, changed package
+ version names to socfpga-rt-ltsi, added missing cma config param
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/boot/dts/socfpga.dtsi     | 29 +++++++++++++++++++++++++++--
+ arch/arm/boot/dts/socfpga.dtsi     | 11 +++++++++--
  arch/arm/configs/socfpga_defconfig |  7 +++++++
  scripts/package/builddeb           | 10 +++++-----
- 3 files changed, 39 insertions(+), 7 deletions(-)
+ 3 files changed, 21 insertions(+), 7 deletions(-)
 
 diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
-index 5e2b9b06f279..e13bd488bfe2 100644
+index 5e2b9b06f279..bd4337f1b1a4 100644
 --- a/arch/arm/boot/dts/socfpga.dtsi
 +++ b/arch/arm/boot/dts/socfpga.dtsi
-@@ -793,16 +793,41 @@
+@@ -793,16 +793,23 @@
  		};
  
  		spi1: spi@fff01000 {
 -			compatible = "snps,dw-apb-ssi";
-+			compatible = "snps,dw-spi-mmio-16.1", "snps,dw-spi-mmio", "snps,dw-apb-ssi";
++			compatible = "snps,dw-spi-mmio", "snps,dw-apb-ssi";
  			#address-cells = <1>;
  			#size-cells = <0>;
  			reg = <0xfff01000 0x1000>;
@@ -33,26 +33,8 @@ index 5e2b9b06f279..e13bd488bfe2 100644
 -			status = "disabled";
 +			status = "okay";
 +			spidev@0 {
-+				compatible = "spidev";
++				compatible = "linux,spidev";
 +				reg = <0>;
-+				spi-max-frequency = <100000000>;
-+				enable-dma = <1>;
-+			};
-+			spidev@1 {
-+				compatible = "spidev";
-+				reg = <1>;
-+				spi-max-frequency = <100000000>;
-+				enable-dma = <1>;
-+			};
-+			spidev@2 {
-+				compatible = "spidev";
-+				reg = <2>;
-+				spi-max-frequency = <100000000>;
-+				enable-dma = <1>;
-+			};
-+			spidev@3 {
-+				compatible = "spidev";
-+				reg = <3>;
 +				spi-max-frequency = <100000000>;
 +				enable-dma = <1>;
 +			};

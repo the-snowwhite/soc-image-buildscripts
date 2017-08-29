@@ -240,11 +240,15 @@ usage()
     echo "    --kernel2repo   Will add kernel .debs to local repo"
     echo "    --mk2repo   Will add machinekit .debs to local repo"
     echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs"
+    echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs"
     echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience"
+    echo "    --finalize-desktop-rootfs   Will create user and configure  rootfs with desktop for fully working out of the box experience"
     echo "    --bindmount_rootfsimg    Will mount rootfs image"
     echo "    --bindunmount_rootfsimg    Will unmount rootfs image"
     echo "    --inst_repo_kernel   Will install kernel from local repo"
+    echo "    --inst_repo_kernel-desktop   Will install kernel from local repo in desktop version"
     echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file"
+    echo "    --assemble_desktop_sd_img   Will generate full populated fb sd imagefile and bmap file"
     echo "    --inst_qt_img_deps  Will install qt build depedencies in rootfs image"
     echo "    --build_qt  Will build qt in rootfs image"
     echo "    --assemble_qt_dev_sd_img   Will generate full populated sd imagefile with QT-dev and bmap file"
@@ -316,8 +320,12 @@ gen_rootfs_image() {
 		run_qt_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
 	echo "Scr_MSG: run_qt_qemu_debootstrap function return value was --> ${output}"
     else
-         run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-	echo "Scr_MSG: run_qemu_debootstrap function return value was --> ${output}"
+    	if [ "${DESKTOP}" == "yes" ]; then
+            run_desktop_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
+    	   echo "Scr_MSG: run_qemu_debootstrap function return value was --> ${output}"
+        else
+            run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
+        fi
 	fi
 	echo ""
 	if [[ $output -gt $zero ]]; then
@@ -325,10 +333,12 @@ gen_rootfs_image() {
 		unmount_binded ${1}
 		exit 1
 	else
-		compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
+    	if [ "${DESKTOP}" == "yes" ]; then
+	       	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only-desktop"
+        else
+    		compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
+        fi
 		echo "Script_MSG: finished qemu_debootstrap-only with success ... !"
-# 		setup_configfiles
-# 		compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "fully_configured_rootfs"
 		unmount_binded ${1}
 		cp ${2} "${2}-base-qemu"
 		echo "Script_MSG: copied ${2} to --> ${2}-base-qemu as a backup"
@@ -337,8 +347,8 @@ gen_rootfs_image() {
 
 ## parameters: 1: mount dev name, 2: image name, 3: distro name
 finalize_rootfs_image() {
-	create_img 1 ${2} ""
-	mount_imagefile ${2} ${1}
+	create_img 1 "${2}" ""
+	mount_imagefile "${2}" ${1}
 	bind_mounted ${ROOTFS_MNT}
 	. ${FUNC_SCRIPT_DIR}/rootfs-func.sh
 # 	if [ ${output} -gt 0 ]; then
@@ -346,20 +356,28 @@ finalize_rootfs_image() {
 # 		unmount_binded ${1}
 # 		exit 1
 # 	else
-	extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
-	echo "Script_MSG: will now run final setup_configfiles"
+	if [ "${DESKTOP}" == "yes" ]; then
+    	extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only-desktop"
+    else
+    	extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
+    fi
+    echo "Script_MSG: will now run final setup_configfiles"
 	setup_configfiles
 	initial_rootfs_user_setup_sh
 	finalize
-	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured"
+	if [ "${DESKTOP}" == "yes" ]; then
+    	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-desktop"
+    else
+    	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured"
+    fi
 	unmount_binded ${1}
 	cp ${2} "${2}-fin-conf"
 #	fi
 }
 
-## parameters: 1: kernel image tag
+## parameters: 1: kernel image tag, 2: rootfs image name
 inst_repo_kernel() {
-	mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
+	mount_imagefile "${2}" ${ROOTFS_MNT}
 	inst_kernel_from_local_repo ${ROOTFS_MNT} ${SD_KERNEL_TAG}
 	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
 	unmount_binded ${ROOTFS_MNT}
@@ -415,13 +433,25 @@ while [ "$1" != "" ]; do
             add2repo ${distro} "/home/mib/Development/Docker/test" "machinekit"
             ;;
         --inst_repo_kernel)
-        inst_repo_kernel "finalized-fully-configured-with-kernel"
+            inst_repo_kernel "finalized-fully-configured-with-kernel" ${ROOTFS_IMG}
+            ;;
+        --inst_repo_kernel-desktop)
+            DESKTOP="yes"
+            inst_repo_kernel "finalized-fully-configured-with-kernel-and-desktop" "${ROOTFS_IMG}-desktop"
             ;;
         --gen-base-qemu-rootfs)
             gen_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
             ;;
+        --gen-base-qemu-rootfs-desktop)
+            DESKTOP="yes"
+            gen_rootfs_image ${ROOTFS_MNT} "${ROOTFS_IMG}-desktop" ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
+            ;;
         --finalize-rootfs)
             finalize_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            ;;
+        --finalize-desktop-rootfs)
+            DESKTOP="yes"
+            finalize_rootfs_image ${ROOTFS_MNT} "${ROOTFS_IMG}-desktop" ${distro} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
             ;;
         --bindmount_rootfsimg)
             mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
@@ -432,6 +462,10 @@ while [ "$1" != "" ]; do
             ;;
         --assemble_sd_img)
             assemble_full_sd_img "finalized-fully-configured-with-kernel"
+            ;;
+        --assemble_desktop_sd_img)
+            DESKTOP="yes"
+            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-desktop"
             ;;
         --inst_qt_img_deps)
         	mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}

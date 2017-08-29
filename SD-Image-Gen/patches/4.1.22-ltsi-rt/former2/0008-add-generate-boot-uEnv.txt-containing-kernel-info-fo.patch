@@ -1,30 +1,31 @@
-From ccd57b6e157e0dfae539dd3555d174ab77098dba Mon Sep 17 00:00:00 2001
+From 0fbca1c36ec7e49a726c48fc39bebcbce2b0794a Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 18 Jul 2016 16:21:56 +0200
-Subject: [PATCH 07/10] generate /boot/uEnv.txt containing kernel info for
+Subject: [PATCH 08/13] add generate /boot/uEnv.txt containing kernel info for
  uboot probing
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- scripts/package/builddeb | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ scripts/package/builddeb | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 67770e9eaa97..f516fdce2b7d 100755
+index 67770e9eaa97..4ee6f6e0f2bf 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -183,6 +183,28 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
+@@ -183,6 +183,29 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
  else
  	want_initrd=No
  fi
-+
++ 
 +# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
-+cat <<EOF > "$tmpdir/boot/uEnv.txt"
++	cat <<EOF > "$tmpdir/boot/uEnv.txt"
 +kver=${version}
 +initrd_installed=$want_initrd
 +EOF
-+cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
-+bitimage=/lib/firmware/socfpga/DE10_Nano_FB_Cramps.3x24_cap.rbf
++	cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
++hostname=holosynthv
++bitimage=/boot/DE1_SOC_Linux_FB.rbf
 +fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
 +fpgaintf=ffd08028
 +fpgaintf_handoff=0x00000000
@@ -35,8 +36,8 @@ index 67770e9eaa97..f516fdce2b7d 100755
 +axibridge_handoff=0x00000000
 +l3remap=ff800000
 +l3remap_handoff=0x00000019
-+bridge_enable_handoff=mw ${fpgaintf} ${fpgaintf_handoff}; mw ${fpga2sdram} ${fpga2sdram_handoff}; mw ${axibridge} ${axibridge_handoff}; mw ${l3remap} ${l3remap_handoff}
-+loadimage=if test ${fpgatype} = cv_se_a6; then run fpgaload; fi; run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++bridge_enable_handoff=mw ${fpgaintf} ${fpgaintf_handoff}; mw ${fpga2sdram} ${fpga2sdram_handoff}; mw \${axibridge} ${axibridge_handoff}; mw ${l3remap} ${l3remap_handoff}
++loadimage=run fpgaload; run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
 +EOF
 +
  for script in postinst postrm preinst prerm ; do
