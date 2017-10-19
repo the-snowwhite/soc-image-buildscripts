@@ -1,0 +1,51 @@
+From 0ac8a3f660b630ec537c483fd5bd6917420bda24 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 1 Oct 2017 11:02:02 +0200
+Subject: [PATCH 09/11] edited spi compatible dts entries to load driver,
+ changed package version names to socfpga-rt-ltsi
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga.dtsi | 8 +++++++-
+ scripts/package/builddeb       | 6 +++---
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index 5cee564..33e52c4 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -808,7 +808,13 @@
+ 			tx-dma-channel = <&pdma 20>;
+ 			rx-dma-channel = <&pdma 21>;
+ 			clocks = <&per_base_clk>;
+-			status = "disabled";
++            status = "okay";
++            spidev@0 {
++                compatible = "linux,spidev";
++                reg = <0>;
++                spi-max-frequency = <100000000>;
++                enable-dma = <1>;
++            };
+ 		};
+ 
+ 		/* Local timer */
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 9df7fbc..76caea1 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -81,9 +81,9 @@ fwdir="$objtree/debian/fwtmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
+ dbg_dir="$objtree/debian/dbgtmp"
+-packagename=linux-image-$version
+-fwpackagename=linux-firmware-image-$version
+-kernel_headers_packagename=linux-headers-$version
++packagename=linux-image-socfpga-rt-ltsi
++fwpackagename=linux-firmware-image-socfpga-rt-ltsi
++kernel_headers_packagename=linux-headers-socfpga-rt-ltsi
+ libc_headers_packagename=linux-libc-dev
+ dbg_packagename=$packagename-dbg
+ 
+-- 
+2.7.4
+

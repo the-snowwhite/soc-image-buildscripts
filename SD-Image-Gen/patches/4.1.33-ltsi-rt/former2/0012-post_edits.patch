@@ -1,0 +1,35 @@
+From ad847964cfbae4691890671868976aaeb5d446e5 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 2 Oct 2017 15:39:58 +0200
+Subject: [PATCH 12/12] post_edits
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga_pr.dtsi | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_pr.dtsi b/arch/arm/boot/dts/socfpga_pr.dtsi
+index 3c03b55..d3fdc6d 100644
+--- a/arch/arm/boot/dts/socfpga_pr.dtsi
++++ b/arch/arm/boot/dts/socfpga_pr.dtsi
+@@ -94,7 +94,7 @@
+ 
+ 		base_fpga_region: base-fpga-region {
+ 			compatible = "fpga-region";
+-			fpga-mgr = <&fpga_mgr1>;
++            fpga-mgr = <&fpga_mgr1>;
+ 
+ 			#address-cells = <0x1>;
+ 			#size-cells = <0x1>;
+@@ -520,7 +520,7 @@
+ 		};
+ 
+ 		fpga_mgr: fpga-mgr@ff706000 {
+-            compatible = "altr,pr-ip-core";
++            compatible = "altr,socfpga-fpga-mgr";
+ 			reg = <0xff706000 0x1000
+ 			       0xffb90000 0x20>;
+ 			interrupts = <0 175 4>;
+-- 
+2.7.4
+
