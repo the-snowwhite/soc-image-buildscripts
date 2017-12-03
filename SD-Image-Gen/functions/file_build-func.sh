@@ -214,7 +214,7 @@ CONFIG_SND_SOC_SSM2602_I2C=m
 CONFIG_SND_SOC_WM8731=m
 CONFIG_SND_ALOOP=m
 CONFIG_SND_VIRMIDI=m
-CONFIG_SND_SOC_SYNTH=m
+# CONFIG_SND_SOC_SYNTH=m
 CONFIG_SND_SOC_DE1_WM8731=m
 CONFIG_FPGADMA=m
 CONFIG_I2C=y
@@ -381,21 +381,21 @@ echo "Scr_MSG: Repo content before -->"
 echo ""
 LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1} | { grep ${3} || true; }`
 echo "Got list1"
-JESSIE_LIST1=$"${LIST1}"
+REPO_LIST1=$"${LIST1}"
 
-echo "JESSIE_LIST1"
+echo "REPO_LIST1"
 
-echo "${JESSIE_LIST1}"
-echo "Scr_MSG: Contents of JESSIE_LIST1 -->"
-echo "${JESSIE_LIST1}"
+echo "${REPO_LIST1}"
+echo "Scr_MSG: Contents of REPO_LIST1 -->"
+echo "${REPO_LIST1}"
 
 echo ""
 
-if [ ! -z "${JESSIE_LIST1}" ]; then
+if [ ! -z "${REPO_LIST1}" ]; then
 	echo ""
 	echo "Scr_MSG: Will remove former version from repo"
 	echo ""
-	reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${JESSIE_LIST1}
+	reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${REPO_LIST1}
 	reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} linux-libc-dev
 	reprepro -b ${HOME_REPO_DIR} export ${1}
 	echo "Scr_MSG: Restarting web server"
@@ -436,12 +436,12 @@ reprepro -b ${HOME_REPO_DIR} export ${1}
 reprepro -b ${HOME_REPO_DIR} list ${1}
 
 LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1}`
-JESSIE_LIST2=$"${LIST2}"
-echo  "${JESSIE_LIST2}"
+REPO_LIST2=$"${LIST2}"
+echo  "${REPO_LIST2}"
 echo ""
 echo "Scr_MSG: Repo content After: -->"
 echo ""
-echo  "${JESSIE_LIST2}"
+echo  "${REPO_LIST2}"
 echo ""
 echo "#--->       Repo updated                                                  <---#"
 }
@@ -464,7 +464,7 @@ echo ""
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir -p /var/tmp
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /var/tmp
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
-# 
+#
 # sudo chroot --userspec=root:root ${ROOTFS_MNT} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
 #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update --allow-unauthenticated
 sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update

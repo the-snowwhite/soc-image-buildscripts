@@ -13,7 +13,7 @@
 # Initially developed for the Terasic De0 Nano / Altera Atlas Soc-Fpga dev board
 
 # v.03 New rev.
-#set -v -e
+# set -v -e
 # 1.initial source: make minimal rootfs on amd64 Debian Jessie, according to "How to create bare minimum Debian Wheezy rootfs from scratch"
 # http://olimex.wordpress.com/2014/07/21/how-to-create-bare-minimum-debian-wheezy-rootfs-from-scratch/
 #
@@ -24,8 +24,8 @@
 ## Select distro:
 ### Debian based:
 #distro=sid
-distro=jessie
-#distro="stretch"
+#distro=jessie
+distro="stretch"
 ### Ubuntu based:
 #distro=zesty
 #distro=xenial
@@ -137,7 +137,7 @@ RT_KERNEL_LOCALVERSION="socfpga-${RT_KERNEL_TAG}"
 GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}"
 GIT_KERNEL_LOCALVERSION="socfpga-${GIT_KERNEL_TAG}"
 #SD_KERNEL_TAG="${GIT_KERNEL_TAG}"
-SD_KERNEL_TAG="socfpga-rt-ltsi"
+#SD_KERNEL_TAG="socfpga-rt-ltsi"
 
 KERNEL_PKG_VERSION="0.1"
 
@@ -237,7 +237,8 @@ usage()
     echo "    --uboot   Will clone and build uboot"
     echo "    --build_git-kernel   Will clone and build kernel from git"
     echo "    --build_rt-ltsi-kernel   Will download rt-ltsi patch and build kernel"
-    echo "    --kernel2repo   Will add kernel .debs to local repo"
+    echo "    --gitkernel2repo   Will add kernel .debs to local repo"
+    echo "    --rtkernel2repo   Will add kernel .debs to local repo"
     echo "    --mk2repo   Will add machinekit .debs to local repo"
     echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs"
     echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs"
@@ -378,7 +379,7 @@ finalize_rootfs_image() {
 ## parameters: 1: kernel image tag, 2: rootfs image name
 inst_repo_kernel() {
 	mount_imagefile "${2}" ${ROOTFS_MNT}
-	inst_kernel_from_local_repo ${ROOTFS_MNT} ${SD_KERNEL_TAG}
+	inst_kernel_from_local_repo ${ROOTFS_MNT} ${GIT_KERNEL_TAG}
 	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
 	unmount_binded ${ROOTFS_MNT}
 }
@@ -426,8 +427,11 @@ while [ "$1" != "" ]; do
         --build_rt-ltsi-kernel)
             build_rt_ltsi_kernel ${VALUE}
             ;;
-        --kernel2repo)
-            add2repo ${distro} ${SD_KERNEL_PARANT_DIR} ${SD_KERNEL_TAG}
+        --gitkernel2repo)
+            add2repo ${distro} ${GIT_KERNEL_PARENT_DIR} ${GIT_KERNEL_TAG}
+            ;;
+        --rtkernel2repo)
+            add2repo ${distro} ${RT_KERNEL_PARENT_DIR} ${RT_KERNEL_TAG}
             ;;
         --mk2repo)
             add2repo ${distro} "/home/mib/Development/Docker/test" "machinekit"

@@ -25,7 +25,7 @@ index e16a259..253bae4 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
 @@ -1687,10 +1687,10 @@ source "mm/Kconfig"
- 
+
  config FORCE_MAX_ZONEORDER
  	int "Maximum zone order" if ARCH_SHMOBILE_LEGACY
 -	range 11 64 if ARCH_SHMOBILE_LEGACY
@@ -58,8 +58,8 @@ index 33e52c4..619a472 100644
 @@ -519,6 +519,14 @@
  			compatible = "altr,socfpga-fpga2sdram-bridge";
  		};
- 
-+        uio_bridge: uio_bridge@0xff240000 {
+
++        uio_bridge: uio-bridge@0xff240000 {
 +            compatible = "altr,h2f_lw_bridge-1.0", "simple-bus";
 +            reg = <0xff240000 0x10000>;
 +            resets = <&rst LWHPS2FPGA_RESET>;
@@ -85,7 +85,7 @@ index 33e52c4..619a472 100644
              };
 -		};
 +        };
- 
+
  		/* Local timer */
  		timer@fffec600 {
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_fb.dts
@@ -654,7 +654,7 @@ index 0000000..f77b0b4
 +            #size-cells = <0x1>;
 +        };
 +
-+		fpga_region_pr: fpga-region_pr {
++		pr_fpga_region: pr-fpga-region {
 +			compatible = "fpga-region";
 +			fpga-mgr = <&fpga_mgr_pr>;
 +
@@ -1081,7 +1081,7 @@ index 0000000..f77b0b4
 +			compatible = "altr,socfpga-fpga2sdram-bridge";
 +		};
 +
-+        uio_bridge: uio_bridge@0xff240000 {
++        uio_bridge: uio-bridge@0xff240000 {
 +            compatible = "altr,h2f_lw_bridge-1.0", "simple-bus";
 +            reg = <0xff240000 0x10000>;
 +            resets = <&rst LWHPS2FPGA_RESET>;
@@ -1096,9 +1096,9 @@ index 0000000..f77b0b4
 +            interrupts = <0 175 4>;
 +        };
 +
-+        fpga_mgr_pr: fpga-mgr_pr@ff20c000 {
++        fpga_mgr_pr: fpga-mgr-pr@ff20c000 {
 +            compatible = "altr,pr-ip-core";
-+            reg = <0xff20c000 0x4>;
++            reg = <0xff20c000 0x8>;
 +        };
 +
 +		gmac0: ethernet@ff700000 {
@@ -1523,7 +1523,7 @@ index 7deaa2c..be29020 100644
  CONFIG_FPGA_REGION=y
  CONFIG_FPGA_MGR_SOCFPGA=y
 -CONFIG_FPGA_MGR_SOCFPGA_A10=y
-+# CONFIG_FPGA_MGR_SOCFPGA_A10=y
++CONFIG_FPGA_MGR_SOCFPGA_A10=y
  CONFIG_FPGA_BRIDGE=y
  CONFIG_SOCFPGA_FPGA_BRIDGE=y
  CONFIG_ALTERA_FREEZE_BRIDGE=y
@@ -1647,6 +1647,6 @@ index 7deaa2c..be29020 100644
 +CONFIG_CMA_AREAS=7
 +CONFIG_ALTERA_PR_IP_CORE=y
 +CONFIG_ALTERA_PR_IP_CORE_PLAT=y
--- 
+--
 2.7.4
 
