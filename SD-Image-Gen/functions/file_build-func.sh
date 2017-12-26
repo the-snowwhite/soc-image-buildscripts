@@ -43,11 +43,14 @@ install_rootfs_dep() {
 
 uiomod_kernel() {
 cd ${RT_KERNEL_BUILD_DIR}
-patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_uio-fb_patch.txt
-patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_socsynth-de1-audio_patch.txt
-patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_add-de1-soc-socsynth_patch.txt
+if [ "${KERNEL_PKG_VERSION}" == "0.1" ]; then
+    patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_uio_patch.txt
+else
+    patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_uio-fb_patch.txt
+    patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_socsynth-de1-audio_patch.txt
+    patch  -p2 < ${PATCH_SCRIPT_DIR}/arm-linux-4.9.33_add-de1-soc-socsynth_patch.txt
+fi
 echo "Kernel Custom Patch added"
-
 #cd ${RT_KERNEL_BUILD_DIR}
 #Uio Config additions:
 cat <<EOT >> ${RT_KERNEL_BUILD_DIR}/arch/arm/configs/${KERNEL_CONF}
@@ -89,12 +92,6 @@ CONFIG_MEDIA_SUPPORT=y
 CONFIG_MEDIA_CAMERA_SUPPORT=y
 CONFIG_MEDIA_CONTROLLER=y
 CONFIG_MEDIA_CONTROLLER_DVB=y
-CONFIG_VIDEO_DEV=y
-CONFIG_VIDEO_V4L2_SUBDEV_API=y
-CONFIG_VIDEO_V4L2=y
-CONFIG_VIDEOBUF_GEN=y
-CONFIG_VIDEOBUF2_CORE=y
-CONFIG_VIDEOBUF2_MEMOPS=y
 CONFIG_VIDEOBUF2_VMALLOC=y
 CONFIG_MEDIA_USB_SUPPORT=y
 CONFIG_MEDIA_USB_SUPPORT=y
@@ -153,6 +150,54 @@ CONFIG_USB_GSPCA_ZC3XX=y
 CONFIG_V4L_PLATFORM_DRIVERS=y
 CONFIG_SOC_CAMERA=y
 CONFIG_SOC_CAMERA_PLATFORM=y
+if [ "${KERNEL_PKG_VERSION}" == "0.1" ]; then
+# CONFIG_VIDEO_DEV=y
+# CONFIG_VIDEO_V4L2_SUBDEV_API=y
+# CONFIG_VIDEO_V4L2=y
+# CONFIG_VIDEOBUF_GEN=y
+# CONFIG_VIDEOBUF2_CORE=y
+# CONFIG_VIDEOBUF2_MEMOPS=y
+# CONFIG_FB=y
+# CONFIG_FB_ALTERA_VIP=y
+# CONFIG_FB_CMDLINE=y
+# CONFIG_FB_NOTIFY=y
+# CONFIG_FB_CFB_FILLRECT=y
+# CONFIG_FB_CFB_COPYAREA=y
+# CONFIG_FB_CFB_IMAGEBLIT=y
+# CONFIG_DUMMY_CONSOLE=y
+# CONFIG_FRAMEBUFFER_CONSOLE=y
+# CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
+# CONFIG_FRAMEBUFFER_CONSOLE_ROTATION=y
+# CONFIG_LOGO=y
+# CONFIG_LOGO_LINUX_MONO=y
+# CONFIG_LOGO_LINUX_VGA16=y
+# CONFIG_LOGO_LINUX_CLUT224=y
+# CONFIG_MEDIA_SUBDRV_AUTOSELECT=y
+# CONFIG_LIBCRC32C=y
+# CONFIG_INPUT_EVDEV=y
+# CONFIG_INPUT_UINPUT=y
+# CONFIG_INPUT_TOUCHSCREEN=y
+# CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
+# CONFIG_SND_USB_AUDIO=m
+# CONFIG_SND_SOC=y
+# CONFIG_SND_SOC_I2C_AND_SPI=y
+# CONFIG_SND_SOC_SIGMADSP=m
+# CONFIG_SND_SOC_SIGMADSP_I2C=m
+# CONFIG_SND_SOC_SSM2602=m
+# CONFIG_SND_SOC_SSM2602_I2C=m
+# CONFIG_SND_SOC_WM8731=m
+# CONFIG_SND_ALOOP=m
+# CONFIG_SND_VIRMIDI=m
+# CONFIG_SND_SOC_HOLOSYNTHV=m
+# CONFIG_SND_SOC_DE1_WM8731=m
+# CONFIG_FPGADMA=m
+else
+CONFIG_VIDEO_DEV=y
+CONFIG_VIDEO_V4L2_SUBDEV_API=y
+CONFIG_VIDEO_V4L2=y
+CONFIG_VIDEOBUF_GEN=y
+CONFIG_VIDEOBUF2_CORE=y
+CONFIG_VIDEOBUF2_MEMOPS=y
 CONFIG_FB=y
 CONFIG_FB_ALTERA_VIP=y
 CONFIG_FB_CMDLINE=y
@@ -174,6 +219,20 @@ CONFIG_INPUT_EVDEV=y
 CONFIG_INPUT_UINPUT=y
 CONFIG_INPUT_TOUCHSCREEN=y
 CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
+CONFIG_SND_USB_AUDIO=m
+CONFIG_SND_SOC=y
+CONFIG_SND_SOC_I2C_AND_SPI=y
+CONFIG_SND_SOC_SIGMADSP=m
+CONFIG_SND_SOC_SIGMADSP_I2C=m
+CONFIG_SND_SOC_SSM2602=m
+CONFIG_SND_SOC_SSM2602_I2C=m
+CONFIG_SND_SOC_WM8731=m
+CONFIG_SND_ALOOP=m
+CONFIG_SND_VIRMIDI=m
+CONFIG_SND_SOC_HOLOSYNTHV=m
+CONFIG_SND_SOC_DE1_WM8731=m
+CONFIG_FPGADMA=m
+fi
 CONFIG_HID=y
 CONFIG_USB_HID=y
 CONFIG_HID_MULTITOUCH=y
@@ -204,19 +263,6 @@ CONFIG_SND_DUMMY=m
 CONFIG_SND_SERIAL_U16550=m
 CONFIG_SND_SPI=y
 CONFIG_SND_USB=y
-CONFIG_SND_USB_AUDIO=m
-CONFIG_SND_SOC=y
-CONFIG_SND_SOC_I2C_AND_SPI=y
-CONFIG_SND_SOC_SIGMADSP=m
-CONFIG_SND_SOC_SIGMADSP_I2C=m
-CONFIG_SND_SOC_SSM2602=m
-CONFIG_SND_SOC_SSM2602_I2C=m
-CONFIG_SND_SOC_WM8731=m
-CONFIG_SND_ALOOP=m
-CONFIG_SND_VIRMIDI=m
-# CONFIG_SND_SOC_SYNTH=m
-CONFIG_SND_SOC_DE1_WM8731=m
-CONFIG_FPGADMA=m
 CONFIG_I2C=y
 CONFIG_I2C_BOARDINFO=y
 CONFIG_I2C_COMPAT=y
@@ -253,9 +299,10 @@ CONFIG_HZ_1000=y
 # CONFIG_SYSFS_DEPRECATED=n
 # CONFIG_AUDIT=n
 # #CONFIG_FW_LOADER_USER_HELPER=n
-# CONFIG_PREEMPT_RT=y
-# CONFIG_PREEMPT_RT_FULL=y
-# CONFIG_PREEMPT=y
+CONFIG_PREEMPT=y
+CONFIG_PREEMPT_RT_BASE=y
+CONFIG_PREEMPT_RT_FULL=y
+CONFIG_HIGH_RES_TIMERS=y
 # CONFIG_MARVELL_PHY=y
 # CONFIG_GPIO_ALTERA=m
 # #CONFIG_GPIO_A10SYCON=y
@@ -472,7 +519,7 @@ sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 # #sudo chroot --userspec=root:root ${1} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 4FD9D713
 # #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes --allow-unauthenticated upgrade
-sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes upgrade
+sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y upgrade
 
 # echo ""
 # echo "# --------->       Removing qemu policy file          <--------------- ---------"
@@ -485,7 +532,7 @@ sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes upgrad
 echo ""
 echo "Script_MSG: Will now install kernel packages"
 echo ""
-sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} install -y --assume-yes --reinstall linux-headers-${2} linux-image-${2} linux-libc-dev
+sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} install -y linux-headers-${2} linux-image-${2}
 
 
 cd ${CURRENT_DIR}
@@ -703,7 +750,7 @@ unmount_binded(){
 		echo ""
 		echo "Scr_MSG: Unmont result = ${RES}"
 		echo "Scr_MSG: Unmont return value = ${?}"
-	if [ -d "${1}/dev" ]; then
+	if [ ! -d "${1}/dev" ]; then
 		echo ""
 		echo "Scr_MSG: umount -R failed"
 		echo "Scr_MSG: Will now run  kill_ch_proc ${1}"

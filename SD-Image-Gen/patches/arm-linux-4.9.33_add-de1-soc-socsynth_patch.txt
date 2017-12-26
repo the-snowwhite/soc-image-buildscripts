@@ -151,7 +151,7 @@ diff -Naur arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/arch/arm/boot/dts
 +	rxdv-skew-ps = <420>; /* 0ps */
 +	rxc-skew-ps = <1680>; /* 780ps */
 +
-+	max-frame-size = <3800>;
++	max-frame-size = <9000>;
 +};
 +
 +&gpio0 {
