@@ -2,18 +2,18 @@
 
 ## parameters: 1: mount dev name, 2: distro name, 3: repo url
 run_desktop_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,fuse,policykit-1,gtk2-engines-pixbuf,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,task-lxde-desktop,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,wget,fontconfig,fontconfig-config ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,fuse,policykit-1,gtk2-engines-pixbuf,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,task-lxde-desktop,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,fontconfig,fontconfig-config ${2} ${1} ${3}
 output=${?}
 }
 
 run_qt_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,fuse,policykit-1,gtk2-engines-pixbuf,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,task-lxde-desktop,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,wget,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge,fontconfig,fontconfig-config ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,fuse,policykit-1,gtk2-engines-pixbuf,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,task-lxde-desktop,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge,fontconfig,fontconfig-config ${2} ${1} ${3}
 output=${?}
 }
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url
 run_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,cgroupfs-mount,ntp,autofs,u-boot-tools,initramfs-tools,open-iscsi,gnupg2,wget ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,cgroupfs-mount,ntp,autofs,u-boot-tools,initramfs-tools,open-iscsi,gnupg2,dirmngr,wget ${2} ${1} ${3}
 output=${?}
 }
 
@@ -739,13 +739,13 @@ ln -s /proc/mounts /etc/mtab
 cat << EOT >/etc/fstab
 # /etc/fstab: static file system information.
 #
-# <file system>    <mount point>   <type>  <options>       <dump>  <pass>
-/dev/root          /               ext4    noatime,errors=remount-ro 0 1
-tmpfs              /tmp            tmpfs   defaults                  0 0
-none               /dev/shm        tmpfs   rw,nosuid,nodev,noexec    0 0
-/sys/kernel/config /config         none    bind                      0 0
-/dev/mmcblk0p2     swap            swap    defaults                  0 0
-debugfs            /sys/kernel/debug  debugfs  defaults              0 0
+# <file system>		<mount point>		<type>	<options>				<dump>	<pass>
+/dev/root			/					ext4	noatime,errors=remount-ro	0 1
+tmpfs				/tmp				tmpfs	defaults					0 0
+none				/dev/shm			tmpfs	rw,nosuid,nodev,noexec		0 0
+/sys/kernel/config	/config				none	bind						0 0
+/dev/mmcblk0p2		swap				swap	defaults					0 0
+debugfs				/sys/kernel/debug	debugfs	defaults					0 0
 EOT
 
 
@@ -782,7 +782,7 @@ sudo chmod +x ${ROOTFS_MNT}/home/initial.sh
 add_mk_repo(){
 echo "ECHO: adding mk sources.list"
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 43DDF224
-sudo sh -c 'echo "deb http://deb.machinekit.io/debian jessie main" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/'${USER_NAME}'.list'
+sudo sh -c 'echo "deb http://deb.machinekit.io/debian '${distro}' main" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/'${USER_NAME}'.list'
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
 }
 
@@ -911,7 +911,7 @@ echo ""
 echo "# --------->       Restoring resolv.conf link         <--------------- ---------"
 echo ""
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/rm -f /etc/resolv.conf
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /lib/systemd/system/systemd-resolved.service /etc/resolv.conf
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf
 
 echo ""
 echo "Script_MSG:  All Config files genetated"

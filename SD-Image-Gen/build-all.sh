@@ -24,7 +24,7 @@
 ## Select distro:
 ### Debian based:
 #distro=sid
-#distro=jessie
+#distro="jessie"
 distro="stretch"
 ### Ubuntu based:
 #distro=zesty
@@ -35,8 +35,8 @@ HOME_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
 ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
 final_repo="http://ftp.dk.debian.org/debian/"
 local_repo=${HOME_MIRR_REPO_URL}
-#local_ws=kubuntu16-ws
-local_ws="debian9-ws"
+local_ws=kubuntu16-ws
+#local_ws="debian9-ws"
 local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
 
 
@@ -48,31 +48,35 @@ media_swap_partition=p2
 media_rootfs_partition=p3
 
 ext4_options="-O ^metadata_csum,^64bit"
-mkfs_options="${ext4_options}"
-#mkfs_options=""
+#mkfs_options="${ext4_options}"
+mkfs_options=""
 
 
 ## Select board
-BOARD=de10-nano
-#BOARD=de0-nano-soc
+#BOARD=de10-nano
+BOARD=de0-nano-soc
 #BOARD=de1-soc
-#BOARD=sockit
+#BOARD=sockitoc-
 
 ## Select u-boot version:
-UBOOT_VERSION="v2016.09"
+#UBOOT_VERSION="v2016.09"
+UBOOT_VERSION="v2018.01"
 UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
 ## Select user name / function
 USER_NAME=machinekit;
 #USER_NAME=holosynth;
 
-RT_KERNEL_VERSION="4.9.33"
-RT_PATCH_REV="rt23"
-GIT_KERNEL_VERSION="4.1.33"
+#RT_KERNEL_VERSION="4.9.33"
+#RT_PATCH_REV="rt23"
+RT_KERNEL_VERSION="4.9.68"
+RT_PATCH_REV="rt60"
+#GIT_KERNEL_VERSION="4.1.33"
+GIT_KERNEL_VERSION="4.9.76"
 GIT_KERNEL_REV="ltsi-rt"
 
-SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
-#SD_KERNEL_VERSION=${RT_KERNEL_VERSION}
+#SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
+SD_KERNEL_VERSION=${RT_KERNEL_VERSION}
 
 #RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
 #RT_PATCH_REV="ltsi-rt23"
@@ -92,7 +96,8 @@ apt_cmd="apt-get"
 #------------------------------------------------------------------------------------------------------
 WORK_DIR=${1}
 
-HOME_REPO_DIR="/var/www/repos/apt/debian"
+#HOME_REPO_DIR="/var/www/repos/apt/debian"
+HOME_REPO_DIR="/var/www/debian"
 
 #MAIN_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 MAIN_SCRIPT_DIR="$(cd $(dirname $0) && pwd)"
@@ -115,6 +120,17 @@ DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev"
 ## ----------------------------  Toolchain   -----------------------------##
 CROSS_GNU_ARCH="arm-linux-gnueabihf"
 
+#GCC v6
+#http://releases.linaro.org/components/toolchain/binaries/6.3-2017.05/arm-linux-gnueabihf/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf.tar.xz
+GCC_REL="6.3"
+GCC_VER="1"
+GCC_REV="2017.05"
+PCH63_CC_FOLDER_NAME="gcc-linaro-${GCC_REL}.${GCC_VER}-${GCC_REV}-x86_64_${CROSS_GNU_ARCH}"
+PCH63_CC_FILE="${PCH63_CC_FOLDER_NAME}.tar.xz"
+PCH63_CC_URL="http://releases.linaro.org/components/toolchain/binaries/${GCC_REL}-${GCC_REV}/${CROSS_GNU_ARCH}/${PCH63_CC_FILE}"
+
+
+#GCC v5
 PCH52_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_${CROSS_GNU_ARCH}"
 PCH52_CC_FILE="${PCH52_CC_FOLDER_NAME}.tar.xz"
 PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/${CROSS_GNU_ARCH}/${PCH52_CC_FILE}"
@@ -132,14 +148,19 @@ QT_CC_DIR="${TOOLCHAIN_DIR}/${QT_CC_FOLDER_NAME}"
 QT_CC="${QT_CC_DIR}/bin/${CROSS_GNU_ARCH}-"
 
 ## ------------------------------  Kernel  -------------------------------##
+if [ "${USER_NAME}" == "machinekit" ]; then
+    KERNEL_PKG_VERSION="0.1"
+elif [ "${USER_NAME}" == "holosynth" ]; then
+    KERNEL_PKG_VERSION="1.1"
+fi
+
 RT_KERNEL_TAG="${RT_KERNEL_VERSION}-${RT_PATCH_REV}"
 RT_KERNEL_LOCALVERSION="socfpga-${RT_KERNEL_TAG}"
 GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}"
 GIT_KERNEL_LOCALVERSION="socfpga-${GIT_KERNEL_TAG}"
-#SD_KERNEL_TAG="${GIT_KERNEL_TAG}"
+SD_KERNEL_TAG="${GIT_KERNEL_TAG}"
+#SD_KERNEL_TAG="${RT_KERNEL_VERSION}-socfpga-${KERNEL_PKG_VERSION}"
 #SD_KERNEL_TAG="socfpga-rt-ltsi"
-
-KERNEL_PKG_VERSION="0.1"
 
 RT_KERNEL_FOLDER="linux-${RT_KERNEL_VERSION}"
 RT_KERNEL_FILE_NAME="${RT_KERNEL_FOLDER}.tar.xz"
@@ -148,13 +169,14 @@ RT_PATCH_FILE="patch-${RT_KERNEL_TAG}.patch.xz"
 RT_PATCH_URL="https://cdn.kernel.org/pub/linux/kernel/projects/rt/4.9/${RT_PATCH_FILE}"
 
 
-GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${GIT_KERNEL_VERSION}-gnueabifh-kernel"
+GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${ALT_GIT_KERNEL_VERSION}-gnueabifh-kernel"
 RT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${RT_KERNEL_VERSION}-gnueabifh-kernel"
 RT_KERNEL_BUILD_DIR="${RT_KERNEL_PARENT_DIR}/${RT_KERNEL_FOLDER}"
 GIT_KERNEL_BUILD_DIR="${GIT_KERNEL_PARENT_DIR}/linux"
 SD_KERNEL_PARANT_DIR="${CURRENT_DIR}/arm-linux-${SD_KERNEL_VERSION}-gnueabifh-kernel"
 
-ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
+#ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
+ALT_GIT_KERNEL_URL="https://github.com/the-snowwhite/linux-socfpga.git"
 ALT_GIT_KERNEL_BRANCH="socfpga-${GIT_KERNEL_TAG}"
 ALT_GIT_KERNEL_PATCH_FILE="${ALT_GIT_KERNEL_BRANCH}-changeset.patch"
 GIT_KERNEL_DIR=linux
@@ -163,21 +185,23 @@ GIT_KERNEL_DIR=linux
 
 UBOOT_GIT_URL="git://git.denx.de/u-boot.git"
 UBOOT_DIR=uboot
-#UBOOT_CHKOUT_OPTIONS='-b tmp'
-UBOOT_CHKOUT_OPTIONS=""
+UBOOT_PARENT_DIR="${CURRENT_DIR}/${UBOOT_DIR}"
+UBOOT_BUILD_DIR="$UBOOT_PARENT_DIR/${UBOOT_VERSION}"
+UBOOT_CHKOUT_OPTIONS='-b tmp'
+#UBOOT_CHKOUT_OPTIONS=""
 
 if [ "${BOARD}" = "de10-nano" ]; then
-   UBOOT_CONFIG='de0_nano_soc'
-   BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${nanofolder}
+UBOOT_CONFIG='de10_nano'
+BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${nanofolder}
 elif [ "${BOARD}" = "de0-nano-soc" ]; then
-   UBOOT_CONFIG='de0-nano-soc'
-   BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${de1folder}
+UBOOT_CONFIG='de0_nano_soc'
+BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${de1folder}
 elif [ "${BOARD}" = "de1-soc" ]; then
-   UBOOT_CONFIG='de0_nano_soc'
-   BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${de1folder}
+UBOOT_CONFIG='de1_soc'
+BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${de1folder}
 elif [ "${BOARD}" = "sockit" ]; then
-   UBOOT_CONFIG='sockit'
-   BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${sockitfolder}
+UBOOT_CONFIG='sockit'
+BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${sockitfolder}
 fi
 
 # 2016.0X patches:
@@ -189,16 +213,16 @@ HOLOSYNTH_QUAR_PROJ_FOLDER="/home/mib/Developer/the-snowwhite_git/HolosynthV/Qua
 
 #-----  select global toolchain  ------#
 
-CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
-CC_URL=$PCH52_CC_URL
+CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
+CC_URL=${PCH63_CC_URL}
 
 #------------------------------------------------------------------------------------------------------
 # Variables Postrequsites
 #------------------------------------------------------------------------------------------------------
 if [ "${USER_NAME}" == "machinekit" ]; then
-	HOST_NAME="mksocfpga-nano-soc"
+    HOST_NAME="mksocfpga-nano-soc"
 elif [ "${USER_NAME}" == "holosynth" ]; then
-	HOST_NAME="holosynthv"
+    HOST_NAME="holosynthv"
 fi
 
 SD_FILE_PRELUDE=mksocfpga_${distro}_${USER_NAME}_${SD_KERNEL_VERSION}-${REL_DATE}
@@ -216,7 +240,7 @@ NCORES=`nproc`
 #--------------  Kernel  --------------#
 
 KERNEL_PRE_CONFIGSTRING="${KERNEL_CONF}"
-GIT_KERNEL_PRE_CONFIGSTRING=" NAME=\"Michael Brown\" EMAIL=\"producer@holotronic.dk\" KBUILD_DEBARCH=armhf LOCALVERSION=-${GIT_KERNEL_LOCALVERSION} KDEB_PKGVERSION=${GIT_KERNEL_VERSION}-${KERNEL_PKG_VERSION}"
+GIT_KERNEL_PRE_CONFIGSTRING=" NAME=\"Michael Brown\" EMAIL=\"producer@holotronic.dk\" KBUILD_DEBARCH=armhf LOCALVERSION=-${GIT_KERNEL_LOCALVERSION} KDEB_PKGVERSION=${ALT_GIT_KERNEL_VERSION}-${KERNEL_PKG_VERSION}"
 
 POLICY_FILE=${ROOTFS_MNT}/usr/sbin/policy-rc.d
 
@@ -258,143 +282,152 @@ usage()
 
 install_deps() {
 ## toolchain:
-	if [ ! -d ${CC_DIR} ]; then
-		echo ""
-		echo "Script_MSG: Toolchain not preinstalled .!"
-		echo "Script_MSG: ${CC_DIR}"
-		echo ""
-		cd ${TOOLCHAIN_DIR}
-		get_and_extract ${CC_DIR} ${CC_URL} ${CC_FILE}
-		# install linaro gcc crosstoolchain dependency:
-		sudo ${apt_cmd} -y install lib32stdc++6
-	else
-		echo ""
-		echo "Script_MSG: Toolchain allready installed in -->"
-		echo "Script_MSG: ${CC_DIR}"
-		echo ""
-	fi
-#	install_uboot_dep
-#	install_kernel_dep
-#	#sudo ${apt_cmd} install kpartx
-	install_rootfs_dep
-#	sudo ${apt_cmd} install -y bmap-tools pbzip2 pigz
-	echo "MSG: deps installed"
+    if [ ! -d ${CC_DIR} ]; then
+        echo ""
+        echo "Script_MSG: Toolchain not preinstalled .!"
+        echo "Script_MSG: ${CC_DIR}"
+        echo ""
+        cd ${TOOLCHAIN_DIR}
+        get_and_extract ${CC_DIR} ${CC_URL} ${CC_FILE}
+        # install linaro gcc crosstoolchain dependency:
+        sudo ${apt_cmd} -y install lib32stdc++6
+    else
+        echo ""
+        echo "Script_MSG: Toolchain allready installed in -->"
+        echo "Script_MSG: ${CC_DIR}"
+        echo ""
+    fi
+	install_uboot_dep
+	install_kernel_dep
+    sudo ${apt_cmd} install kpartx
+    install_rootfs_dep
+	sudo ${apt_cmd} install -y bmap-tools pbzip2 pigz
+    echo "MSG: deps installed"
 }
 
 build_uboot() {
-	git_fetch ${UBOOT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} "${UBOOT_CHKOUT_OPTIONS}" ${UBOOT_PATCH_FILE}
-	armhf_build ${UBOOT_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}"
+    git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
+    if [ "${1}" != "c" ]; then
+        armhf_build ${UBOOT_BUILD_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}"
+    fi
 }
 
 build_git_kernel() {
-	git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "${ALT_GIT_KERNEL_BRANCH}" ${ALT_GIT_KERNEL_PATCH_FILE} ${GIT_KERNEL_DIR}
-	if [ "${1}" != "c" ]; then
-	   armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
+#    distro="jessie"
+    git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
+    if [ "${1}" != "c" ]; then
+#	   armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
+    armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
     fi
 }
 
 build_rt_ltsi_kernel() {
-	if [ -d ${RT_KERNEL_BUILD_DIR} ]; then
-		echo the kernel target directory ${RT_KERNEL_BUILD_DIR} already exists cleaning ...
-		rm -R ${RT_KERNEL_BUILD_DIR}
-		cd ${RT_KERNEL_PARENT_DIR}
-		extract_xz ${RT_KERNEL_FILE_NAME}
+    distro="stretch"
+    if [ -d ${RT_KERNEL_BUILD_DIR} ]; then
+        echo the kernel target directory ${RT_KERNEL_BUILD_DIR} already exists cleaning ...
+        rm -R ${RT_KERNEL_BUILD_DIR}
+        cd ${RT_KERNEL_PARENT_DIR}
+        extract_xz ${RT_KERNEL_FILE_NAME}
     else
-		mkdir -p ${RT_KERNEL_PARENT_DIR}
-		cd ${RT_KERNEL_PARENT_DIR}
-		get_and_extract ${RT_KERNEL_PARENT_DIR} ${KERNEL_URL} ${RT_KERNEL_FILE_NAME}
-	fi
-	rt_patch_kernel
-	if [ "${1}" != "c" ]; then
-    	armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}" 2>&1 | tee ${CURRENT_DIR}/Logs/kernel_deb_rt-log.txt
+        mkdir -p ${RT_KERNEL_PARENT_DIR}
+        cd ${RT_KERNEL_PARENT_DIR}
+        get_and_extract ${RT_KERNEL_PARENT_DIR} ${KERNEL_URL} ${RT_KERNEL_FILE_NAME}
+    fi
+    rt_patch_kernel
+    if [ "${1}" != "c" ]; then
+#    	armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}" 2>&1 | tee ${CURRENT_DIR}/Logs/kernel_deb_rt-log.txt
+#	armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}" |& tee ${CURRENT_DIR}/Logs/kernel_deb_rt-log.txt
+    armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}"
     fi
 }
 
 ## parameters: 1: mount dev name, 2: image name, 3: distro name
 gen_rootfs_image() {
     zero=0;
-	create_img 1 ${2} ""
-	mount_imagefile ${2} ${1}
-	. ${FUNC_SCRIPT_DIR}/rootfs-func.sh
-	echo ""
-	if [ "${USER_NAME}" = "holosynth" ]; then
-		run_qt_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-	echo "Scr_MSG: run_qt_qemu_debootstrap function return value was --> ${output}"
+    create_img 1 ${2} ""
+    mount_imagefile ${2} ${1}
+    . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
+    echo ""
+    if [ "${USER_NAME}" = "holosynth" ]; then
+        run_qt_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
+    echo "Scr_MSG: run_qt_qemu_debootstrap function return value was --> ${output}"
     else
-    	if [ "${DESKTOP}" == "yes" ]; then
+        if [ "${DESKTOP}" == "yes" ]; then
             run_desktop_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-    	   echo "Scr_MSG: run_qemu_debootstrap function return value was --> ${output}"
+        echo "Scr_MSG: run_qemu_debootstrap function return value was --> ${output}"
         else
             run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
         fi
-	fi
-	echo ""
-	if [[ $output -gt $zero ]]; then
-		echo "Scr_MSG: run_qt_qemu_debootstrap failed"
-		unmount_binded ${1}
-		exit 1
-	else
-    	if [ "${DESKTOP}" == "yes" ]; then
-	       	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only-desktop"
+    fi
+    echo ""
+    if [[ $output -gt $zero ]]; then
+        echo "Scr_MSG: run_qt_qemu_debootstrap failed"
+        unmount_binded ${1}
+        exit 1
+    else
+        if [ "${DESKTOP}" == "yes" ]; then
+            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only-desktop"
         else
-    		compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
+            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
         fi
-		echo "Script_MSG: finished qemu_debootstrap-only with success ... !"
-		unmount_binded ${1}
-		cp ${2} "${2}-base-qemu"
-		echo "Script_MSG: copied ${2} to --> ${2}-base-qemu as a backup"
-	fi
+        echo "Script_MSG: finished qemu_debootstrap-only with success ... !"
+        unmount_binded ${1}
+        cp ${2} "${2}-base-qemu"
+        echo "Script_MSG: copied ${2} to --> ${2}-base-qemu as a backup"
+    fi
 }
 
 ## parameters: 1: mount dev name, 2: image name, 3: distro name
 finalize_rootfs_image() {
-	create_img 1 "${2}" ""
-	mount_imagefile "${2}" ${1}
-	bind_mounted ${ROOTFS_MNT}
-	. ${FUNC_SCRIPT_DIR}/rootfs-func.sh
+    create_img 1 "${2}" ""
+    mount_imagefile "${2}" ${1}
+    bind_mounted ${ROOTFS_MNT}
+    . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
 # 	if [ ${output} -gt 0 ]; then
 # 		echo "Scr_MSG: run_qt_qemu_debootstrap failed"
 # 		unmount_binded ${1}
 # 		exit 1
 # 	else
-	if [ "${DESKTOP}" == "yes" ]; then
-    	extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only-desktop"
+    if [ "${DESKTOP}" == "yes" ]; then
+        extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only-desktop"
     else
-    	extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
+        extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only"
     fi
     echo "Script_MSG: will now run final setup_configfiles"
-	setup_configfiles
-	initial_rootfs_user_setup_sh
-	finalize
-	if [ "${DESKTOP}" == "yes" ]; then
-    	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-desktop"
+    setup_configfiles
+    initial_rootfs_user_setup_sh
+    finalize
+    if [ "${DESKTOP}" == "yes" ]; then
+        compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-desktop"
     else
-    	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured"
+        compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured"
     fi
-	unmount_binded ${1}
-	cp ${2} "${2}-fin-conf"
+    set +e
+    unmount_binded ${1}
+    cp ${2} "${2}-fin-conf"
 #	fi
 }
 
 ## parameters: 1: kernel image tag, 2: rootfs image name
 inst_repo_kernel() {
-	mount_imagefile "${2}" ${ROOTFS_MNT}
-	inst_kernel_from_local_repo ${ROOTFS_MNT} ${GIT_KERNEL_TAG}
-	compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
-	unmount_binded ${ROOTFS_MNT}
+    mount_imagefile "${2}" ${ROOTFS_MNT}
+    bind_mounted ${ROOTFS_MNT}
+    inst_kernel_from_local_repo ${ROOTFS_MNT} ${SD_KERNEL_TAG}
+    compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
+    unmount_binded ${ROOTFS_MNT}
 }
 
 ## parameters: 1: kernel image tag
 assemble_full_sd_img() {
-	echo "step 1 create image:"
-	create_img "3" "${SD_IMG_FILE}" "${ROOTFS_MNT}" "${media_rootfs_partition}"
-	echo "step 2 mount:"
-	mount_sd_imagefile ${SD_IMG_FILE} ${ROOTFS_MNT} ${media_rootfs_partition}
-	extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
-	unmount_binded ${ROOTFS_MNT}
-	unmount_loopdev
-	install_uboot ${CURRENT_DIR} ${UBOOT_DIR} ${UBOOT_MAKE_CONFIG} ${SD_IMG_FILE}
-	make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
+    echo "step 1 create image:"
+    create_img "3" "${SD_IMG_FILE}" "${ROOTFS_MNT}" "${media_rootfs_partition}"
+    echo "step 2 mount:"
+    mount_sd_imagefile ${SD_IMG_FILE} ${ROOTFS_MNT} ${media_rootfs_partition}
+    extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
+    unmount_binded ${ROOTFS_MNT}
+    unmount_loopdev
+    install_uboot ${CURRENT_DIR} ${UBOOT_DIR} ${UBOOT_MAKE_CONFIG} ${SD_IMG_FILE}
+    make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
 }
 
 #------------------------------------------------------------------------------------------------------
@@ -428,10 +461,12 @@ while [ "$1" != "" ]; do
             build_rt_ltsi_kernel ${VALUE}
             ;;
         --gitkernel2repo)
-            add2repo ${distro} ${GIT_KERNEL_PARENT_DIR} ${GIT_KERNEL_TAG}
+            add2repo ${distro} ${GIT_KERNEL_PARENT_DIR} "linux-"
+#            add2repo ${distro} ${GIT_KERNEL_PARENT_DIR} ${GIT_KERNEL_TAG}
             ;;
         --rtkernel2repo)
-            add2repo ${distro} ${RT_KERNEL_PARENT_DIR} ${RT_KERNEL_TAG}
+#            add2repo ${distro} ${RT_KERNEL_PARENT_DIR} ${RT_KERNEL_TAG}
+            add2repo "stretch" ${RT_KERNEL_PARENT_DIR} "${RT_KERNEL_TAG}-socfpga-${KERNEL_PKG_VERSION}"
             ;;
         --mk2repo)
             add2repo ${distro} "/home/mib/Development/Docker/test" "machinekit"
@@ -472,23 +507,23 @@ while [ "$1" != "" ]; do
             assemble_full_sd_img "finalized-fully-configured-with-kernel-and-desktop"
             ;;
         --inst_qt_img_deps)
-        	mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
-        	bind_mounted ${ROOTFS_MNT}
+            mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
+            bind_mounted ${ROOTFS_MNT}
             inst_qt_build_deps
-			compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-qt-deps"
-			unmount_binded ${ROOTFS_MNT}
-			cp ${ROOTFS_IMG} "${ROOTFS_IMG}-fin-qt-dep"
+            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-qt-deps"
+            unmount_binded ${ROOTFS_MNT}
+            cp ${ROOTFS_IMG} "${ROOTFS_IMG}-fin-qt-dep"
             ;;
         --build_qt)
-			mount_imagefile ${ROOTFS_IMG} ${QT_ROOTFS_MNT}
-			qt_build
-			unmount_binded ${QT_ROOTFS_MNT}
-			cp ${ROOTFS_IMG} "${ROOTFS_IMG}-fin-qt-built"
+            mount_imagefile ${ROOTFS_IMG} ${QT_ROOTFS_MNT}
+            qt_build
+            unmount_binded ${QT_ROOTFS_MNT}
+            cp ${ROOTFS_IMG} "${ROOTFS_IMG}-fin-qt-built"
             ;;
-         --assemble_qt_dev_sd_img)
+        --assemble_qt_dev_sd_img)
             assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-installed"
             ;;
-       *)
+    *)
             echo "ERROR: unknown parameter \"$PARAM\""
             usage
             exit 1

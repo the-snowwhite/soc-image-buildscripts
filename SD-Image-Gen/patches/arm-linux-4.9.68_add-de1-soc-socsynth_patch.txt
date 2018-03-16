@@ -1,4 +1,4 @@
-diff -Naur arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/arch/arm/boot/dts/Makefile arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts/Makefile > patch.txt
+diff -Naur arm-linux-4.9.68-gnueabifh-kernel-orig/linux-4.9.68/arch/arm/boot/dts/Makefile arm-linux-4.9.68-gnueabifh-kernel/linux-4.9.68/arch/arm/boot/dts/Makefile > patch.txt
 --- arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/arch/arm/boot/dts/Makefile	2017-07-07 19:02:53.431819844 +0200
 +++ arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts/Makefile	2017-07-07 19:04:12.325600258 +0200
 @@ -697,6 +697,7 @@
@@ -11,7 +11,7 @@ diff -Naur arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/arch/arm/boot/dts
  	socfpga_cyclone5_vining_fpga.dtb \
 
 
-diff -Naur arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/arch/arm/boot/dts/socfpga_cyclone5_de1_socsynth.dts arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts/socfpga_cyclone5_de1_socsynth.dts > patch.txt
+diff -Naur arm-linux-4.9.68-gnueabifh-kernel-orig/linux-4.9.68/arch/arm/boot/dts/socfpga_cyclone5_de1_socsynth.dts arm-linux-4.9.68-gnueabifh-kernel/linux-4.9.68/arch/arm/boot/dts/socfpga_cyclone5_de1_socsynth.dts > patch.txt
 --- arm-linux-4.9.33-gnueabifh-kernel-orig/linux-4.9.33/arch/arm/boot/dts/socfpga_cyclone5_de1_socsynth.dts	1970-01-01 01:00:00.000000000 +0100
 +++ arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts/socfpga_cyclone5_de1_socsynth.dts	2017-07-09 22:56:00.000000000 +0200
 @@ -0,0 +1,183 @@
