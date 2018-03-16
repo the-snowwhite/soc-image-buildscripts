@@ -54,23 +54,25 @@ mkfs_options=""
 
 ## Select board
 #BOARD=de10-nano
-#BOARD=de0-nano-soc
-BOARD=de1-soc
+BOARD=de0-nano-soc
+#BOARD=de1-soc
 #BOARD=sockitoc-
 
 ## Select u-boot version:
-UBOOT_VERSION="v2016.09"
+#UBOOT_VERSION="v2016.09"
+UBOOT_VERSION="v2018.01"
 UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
 
 ## Select user name / function
-#USER_NAME=machinekit;
-USER_NAME=holosynth;
+USER_NAME=machinekit;
+#USER_NAME=holosynth;
 
 #RT_KERNEL_VERSION="4.9.33"
 #RT_PATCH_REV="rt23"
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
-GIT_KERNEL_VERSION="4.1.33"
+#GIT_KERNEL_VERSION="4.1.33"
+GIT_KERNEL_VERSION="4.9.76"
 GIT_KERNEL_REV="ltsi-rt"
 
 #SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
@@ -94,7 +96,8 @@ apt_cmd="apt-get"
 #------------------------------------------------------------------------------------------------------
 WORK_DIR=${1}
 
-HOME_REPO_DIR="/var/www/repos/apt/debian"
+#HOME_REPO_DIR="/var/www/repos/apt/debian"
+HOME_REPO_DIR="/var/www/debian"
 
 #MAIN_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 MAIN_SCRIPT_DIR="$(cd $(dirname $0) && pwd)"
@@ -117,6 +120,17 @@ DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev"
 ## ----------------------------  Toolchain   -----------------------------##
 CROSS_GNU_ARCH="arm-linux-gnueabihf"
 
+#GCC v6
+#http://releases.linaro.org/components/toolchain/binaries/6.3-2017.05/arm-linux-gnueabihf/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf.tar.xz
+GCC_REL="6.3"
+GCC_VER="1"
+GCC_REV="2017.05"
+PCH63_CC_FOLDER_NAME="gcc-linaro-${GCC_REL}.${GCC_VER}-${GCC_REV}-x86_64_${CROSS_GNU_ARCH}"
+PCH63_CC_FILE="${PCH63_CC_FOLDER_NAME}.tar.xz"
+PCH63_CC_URL="http://releases.linaro.org/components/toolchain/binaries/${GCC_REL}-${GCC_REV}/${CROSS_GNU_ARCH}/${PCH63_CC_FILE}"
+
+
+#GCC v5
 PCH52_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_${CROSS_GNU_ARCH}"
 PCH52_CC_FILE="${PCH52_CC_FOLDER_NAME}.tar.xz"
 PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/${CROSS_GNU_ARCH}/${PCH52_CC_FILE}"
@@ -144,8 +158,8 @@ RT_KERNEL_TAG="${RT_KERNEL_VERSION}-${RT_PATCH_REV}"
 RT_KERNEL_LOCALVERSION="socfpga-${RT_KERNEL_TAG}"
 GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}"
 GIT_KERNEL_LOCALVERSION="socfpga-${GIT_KERNEL_TAG}"
-#SD_KERNEL_TAG="${GIT_KERNEL_TAG}"
-SD_KERNEL_TAG="${RT_KERNEL_VERSION}-socfpga-${KERNEL_PKG_VERSION}"
+SD_KERNEL_TAG="${GIT_KERNEL_TAG}"
+#SD_KERNEL_TAG="${RT_KERNEL_VERSION}-socfpga-${KERNEL_PKG_VERSION}"
 #SD_KERNEL_TAG="socfpga-rt-ltsi"
 
 RT_KERNEL_FOLDER="linux-${RT_KERNEL_VERSION}"
@@ -155,13 +169,14 @@ RT_PATCH_FILE="patch-${RT_KERNEL_TAG}.patch.xz"
 RT_PATCH_URL="https://cdn.kernel.org/pub/linux/kernel/projects/rt/4.9/${RT_PATCH_FILE}"
 
 
-GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${GIT_KERNEL_VERSION}-gnueabifh-kernel"
+GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${ALT_GIT_KERNEL_VERSION}-gnueabifh-kernel"
 RT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${RT_KERNEL_VERSION}-gnueabifh-kernel"
 RT_KERNEL_BUILD_DIR="${RT_KERNEL_PARENT_DIR}/${RT_KERNEL_FOLDER}"
 GIT_KERNEL_BUILD_DIR="${GIT_KERNEL_PARENT_DIR}/linux"
 SD_KERNEL_PARANT_DIR="${CURRENT_DIR}/arm-linux-${SD_KERNEL_VERSION}-gnueabifh-kernel"
 
-ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
+#ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
+ALT_GIT_KERNEL_URL="https://github.com/the-snowwhite/linux-socfpga.git"
 ALT_GIT_KERNEL_BRANCH="socfpga-${GIT_KERNEL_TAG}"
 ALT_GIT_KERNEL_PATCH_FILE="${ALT_GIT_KERNEL_BRANCH}-changeset.patch"
 GIT_KERNEL_DIR=linux
@@ -170,17 +185,19 @@ GIT_KERNEL_DIR=linux
 
 UBOOT_GIT_URL="git://git.denx.de/u-boot.git"
 UBOOT_DIR=uboot
-#UBOOT_CHKOUT_OPTIONS='-b tmp'
-UBOOT_CHKOUT_OPTIONS=""
+UBOOT_PARENT_DIR="${CURRENT_DIR}/${UBOOT_DIR}"
+UBOOT_BUILD_DIR="$UBOOT_PARENT_DIR/${UBOOT_VERSION}"
+UBOOT_CHKOUT_OPTIONS='-b tmp'
+#UBOOT_CHKOUT_OPTIONS=""
 
 if [ "${BOARD}" = "de10-nano" ]; then
-UBOOT_CONFIG='de0_nano_soc'
+UBOOT_CONFIG='de10_nano'
 BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${nanofolder}
 elif [ "${BOARD}" = "de0-nano-soc" ]; then
-UBOOT_CONFIG='de0-nano-soc'
+UBOOT_CONFIG='de0_nano_soc'
 BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${de1folder}
 elif [ "${BOARD}" = "de1-soc" ]; then
-UBOOT_CONFIG='de0_nano_soc'
+UBOOT_CONFIG='de1_soc'
 BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${de1folder}
 elif [ "${BOARD}" = "sockit" ]; then
 UBOOT_CONFIG='sockit'
@@ -196,8 +213,8 @@ HOLOSYNTH_QUAR_PROJ_FOLDER="/home/mib/Developer/the-snowwhite_git/HolosynthV/Qua
 
 #-----  select global toolchain  ------#
 
-CC_FOLDER_NAME=$PCH52_CC_FOLDER_NAME
-CC_URL=$PCH52_CC_URL
+CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
+CC_URL=${PCH63_CC_URL}
 
 #------------------------------------------------------------------------------------------------------
 # Variables Postrequsites
@@ -223,7 +240,7 @@ NCORES=`nproc`
 #--------------  Kernel  --------------#
 
 KERNEL_PRE_CONFIGSTRING="${KERNEL_CONF}"
-GIT_KERNEL_PRE_CONFIGSTRING=" NAME=\"Michael Brown\" EMAIL=\"producer@holotronic.dk\" KBUILD_DEBARCH=armhf LOCALVERSION=-${GIT_KERNEL_LOCALVERSION} KDEB_PKGVERSION=${GIT_KERNEL_VERSION}-${KERNEL_PKG_VERSION}"
+GIT_KERNEL_PRE_CONFIGSTRING=" NAME=\"Michael Brown\" EMAIL=\"producer@holotronic.dk\" KBUILD_DEBARCH=armhf LOCALVERSION=-${GIT_KERNEL_LOCALVERSION} KDEB_PKGVERSION=${ALT_GIT_KERNEL_VERSION}-${KERNEL_PKG_VERSION}"
 
 POLICY_FILE=${ROOTFS_MNT}/usr/sbin/policy-rc.d
 
@@ -280,22 +297,24 @@ install_deps() {
         echo "Script_MSG: ${CC_DIR}"
         echo ""
     fi
-#	install_uboot_dep
-#	install_kernel_dep
-#	#sudo ${apt_cmd} install kpartx
+	install_uboot_dep
+	install_kernel_dep
+    sudo ${apt_cmd} install kpartx
     install_rootfs_dep
-#	sudo ${apt_cmd} install -y bmap-tools pbzip2 pigz
+	sudo ${apt_cmd} install -y bmap-tools pbzip2 pigz
     echo "MSG: deps installed"
 }
 
 build_uboot() {
-    git_fetch ${UBOOT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} "${UBOOT_CHKOUT_OPTIONS}" ${UBOOT_PATCH_FILE}
-    armhf_build ${UBOOT_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}"
+    git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
+    if [ "${1}" != "c" ]; then
+        armhf_build ${UBOOT_BUILD_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}"
+    fi
 }
 
 build_git_kernel() {
-    distro="jessie"
-    git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "${ALT_GIT_KERNEL_BRANCH}" ${ALT_GIT_KERNEL_PATCH_FILE} ${GIT_KERNEL_DIR}
+#    distro="jessie"
+    git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
     if [ "${1}" != "c" ]; then
 #	   armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
     armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
@@ -442,8 +461,8 @@ while [ "$1" != "" ]; do
             build_rt_ltsi_kernel ${VALUE}
             ;;
         --gitkernel2repo)
+            add2repo ${distro} ${GIT_KERNEL_PARENT_DIR} "linux-"
 #            add2repo ${distro} ${GIT_KERNEL_PARENT_DIR} ${GIT_KERNEL_TAG}
-            add2repo "jessie" ${GIT_KERNEL_PARENT_DIR} ${GIT_KERNEL_TAG}
             ;;
         --rtkernel2repo)
 #            add2repo ${distro} ${RT_KERNEL_PARENT_DIR} ${RT_KERNEL_TAG}

@@ -739,13 +739,13 @@ ln -s /proc/mounts /etc/mtab
 cat << EOT >/etc/fstab
 # /etc/fstab: static file system information.
 #
-# <file system>    <mount point>   <type>  <options>       <dump>  <pass>
-/dev/root          /               ext4    noatime,errors=remount-ro 0 1
-tmpfs              /tmp            tmpfs   defaults                  0 0
-none               /dev/shm        tmpfs   rw,nosuid,nodev,noexec    0 0
-/sys/kernel/config /config         none    bind                      0 0
-/dev/mmcblk0p2     swap            swap    defaults                  0 0
-debugfs            /sys/kernel/debug  debugfs  defaults              0 0
+# <file system>		<mount point>		<type>	<options>				<dump>	<pass>
+/dev/root			/					ext4	noatime,errors=remount-ro	0 1
+tmpfs				/tmp				tmpfs	defaults					0 0
+none				/dev/shm			tmpfs	rw,nosuid,nodev,noexec		0 0
+/sys/kernel/config	/config				none	bind						0 0
+/dev/mmcblk0p2		swap				swap	defaults					0 0
+debugfs				/sys/kernel/debug	debugfs	defaults					0 0
 EOT
 
 

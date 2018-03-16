@@ -1,0 +1,1 @@
+diff -Naur arm-linux-4.9.68-gnueabifh-kernel-orig/linux-4.9.68/arch/arm/configs/socfpga_defconfig arm-linux-4.9.68-gnueabifh-kernel/linux-4.9.68/arch/arm/configs/socfpga_defconfig
