@@ -1,4 +1,4 @@
-From 95bb7f3ec9077ede0004419686544660d5e281f5 Mon Sep 17 00:00:00 2001
+From ade51bf48b2c587fd44b61fa4f609ed3b24f68c5 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
 Subject: [PATCH 06/10] rename kernel package names to *-socfpga-rt-ltsi

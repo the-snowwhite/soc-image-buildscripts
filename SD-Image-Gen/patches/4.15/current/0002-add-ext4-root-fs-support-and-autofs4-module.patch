@@ -1,7 +1,7 @@
-From 0450b89ab9042ff33afc247756992c90119aaa07 Mon Sep 17 00:00:00 2001
+From 3ea8afa511c0f81edf4888b42dc13ee8dc33fe7d Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
-Date: Wed, 7 Mar 2018 14:21:56 +0100
-Subject: [PATCH 2/9] add ext4 root fs support and autofs4 module
+Date: Mon, 2 Apr 2018 23:42:14 +0200
+Subject: [PATCH 2/4] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index efc9ed9..a9f5f99 100644
+index 375333b..51290aa 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -12,7 +12,7 @@ CONFIG_PROFILING=y
@@ -21,15 +21,15 @@ index efc9ed9..a9f5f99 100644
  # CONFIG_BLK_DEV_BSG is not set
  # CONFIG_IOSCHED_DEADLINE is not set
  # CONFIG_IOSCHED_CFQ is not set
-@@ -150,7 +150,10 @@ CONFIG_EXT2_FS=y
+@@ -145,7 +145,10 @@ CONFIG_EXT2_FS=y
  CONFIG_EXT2_FS_XATTR=y
  CONFIG_EXT2_FS_POSIX_ACL=y
  CONFIG_EXT3_FS=y
 -CONFIG_AUTOFS4_FS=y
 +CONFIG_EXT4_FS=y
-+# CONFIG_AUTOFS4_FS=y
 +CONFIG_EXT4_FS_POSIX_ACL=y
 +CONFIG_EXT4_FS_SECURITY=y
++CONFIG_AUTOFS4_FS=m
  CONFIG_VFAT_FS=y
  CONFIG_NTFS_FS=y
  CONFIG_NTFS_RW=y

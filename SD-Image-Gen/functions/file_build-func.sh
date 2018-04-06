@@ -9,7 +9,7 @@ exit_fail() {
 
 extract_xz() {
     echo "MSG: using tar for xz extract"
-    tar xf ${1}
+    tar xfS ${1}
 }
 
 ## parameters: 1: folder name, 2: url, 3: file name
@@ -838,7 +838,7 @@ t
 2
 82
 a
-4
+3
 w
 EOF
 }
@@ -1000,18 +1000,18 @@ if [ ! -z "${3}" ]; then
 	echo "Script_MSG: Into imagefile"
 	echo "Rootfs configured ... extracting  ${COMPNAME} rootfs into image...."
 	## extract rootfs into image:
-	sudo tar xfj ${1}/${COMPNAME}_rootfs.tar.bz2 -C ${2}
+	sudo tar xfjS ${1}/${COMPNAME}_rootfs.tar.bz2 -C ${2}
 	echo "${1}/${COMPNAME}_rootfs.tar.bz2 rootfs extraction finished .."
 fi
 }
 
-# parameters: 1: work dir, 2: uboot dir, 3: uboot make config, 4: sd img file name
+# parameters: 1: uboot dir, 2: uboot make config, 3: sd img file name
 install_uboot() {
-UBOOT_SPLFILE="${1}/${2}/${3}"
+UBOOT_SPLFILE="${1}/${2}"
 echo ""
 echo "installing ${UBOOT_SPLFILE}"
 echo ""
-sudo dd bs=512 if=${UBOOT_SPLFILE} of=${4} seek=2048 conv=notrunc
+sudo dd bs=512 if=${UBOOT_SPLFILE} of=${3} seek=2048 conv=notrunc
 sudo sync
 }
 

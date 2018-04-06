@@ -1,19 +1,40 @@
 #!/bin/bash
 
-## parameters: 1: mount dev name, 2: distro name, 3: repo url
-run_desktop_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,fuse,policykit-1,gtk2-engines-pixbuf,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,task-lxde-desktop,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,fontconfig,fontconfig-config ${2} ${1} ${3}
-output=${?}
-}
-
-run_qt_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,fuse,policykit-1,gtk2-engines-pixbuf,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,task-lxde-desktop,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge,fontconfig,fontconfig-config ${2} ${1} ${3}
+# lightdm,lxqt
+# ## parameters: 1: mount dev name, 2: distro name, 3: repo url
+run_qemu_debootstrap_buster() {
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=sudo,locales,wget ${2} ${1} ${3}
 output=${?}
 }
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url
+#run_qemu_debootstrap_buster() {
+#sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,xserver-xorg-video-dummy ${2} ${1} ${3}
+#output=${?}
+#}
+
+# ## parameters: 1: mount dev name, 2: distro name, 3: repo url
+run_qemu_debootstrap_buster_lxqt() {
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid,lxqt-core,lxqt,task-lxqt-desktop ${2} ${1} ${3}
+output=${?}
+}
+
+
+# ## parameters: 1: mount dev name, 2: distro name, 3: repo url
 run_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,xorg,xserver-xorg-video-dummy,upower,rsyslog,udev,libpam-systemd,systemd-sysv,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,cgroupfs-mount,ntp,autofs,u-boot-tools,initramfs-tools,open-iscsi,gnupg2,dirmngr,wget ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}
+output=${?}
+}
+
+## parameters: 1: mount dev name, 2: distro name, 3: repo url
+run_desktop_qemu_debootstrap() {
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid ${2} ${1} ${3}
+output=${?}
+}
+#,task-lxde-desktop,lxsession,xinput
+
+run_qt_qemu_debootstrap() {
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,task-lxde-desktop,lxsession,xinput,gksu,acpid,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge ${2} ${1} ${3}
 output=${?}
 }
 
@@ -123,8 +144,8 @@ gen_hosts() {
 sudo sh -c 'echo '${HOST_NAME}' > '${ROOTFS_MNT}'/etc/hostname'
 
 sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/hosts
-127.0.0.1       localhost.localdomain       localhost   '${HOST_NAME}'
-127.0.1.1       '${HOST_NAME}'.local        '${HOST_NAME}'
+127.0.0.1   localhost.localdomain   localhost       '${HOST_NAME}'
+127.0.1.1   '${HOST_NAME}'.local    '${HOST_NAME}'
 EOT'
 
 }
@@ -137,7 +158,7 @@ Name=eth0
 
 [Network]
 DHCP=v4
-MTU=9000
+MTU=1500
 
 [DHCP]
 UseDomains=true
@@ -611,8 +632,7 @@ en_US.UTF-8 UTF-8
 # wal_ET UTF-8
 # wo_SN UTF-8
 # xh_ZA ISO-8859-1
-# xh_ZA.UTF-8 UTF-8sudo chroot --userspec=root:root ${ROOTFS_MNT} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
-
+# xh_ZA.UTF-8 UTF-8
 # yi_US CP1255
 # yi_US.UTF-8 UTF-8
 # yo_NG UTF-8
@@ -650,7 +670,7 @@ echo "Europe/Copenhagen" > /etc/timezone && \
 exit
 EOF'
 sudo chmod +x ${ROOTFS_MNT}/home/conf_timezone_locale.sh
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/bash -c /home/conf_timezone_locale.sh
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' '${shell_cmd}' -c /home/conf_timezone_locale.sh'
 
 }
 
@@ -673,10 +693,10 @@ export LANG=C
 echo "root:'${USER_NAME}'" | chpasswd
 
 echo "ECHO: " "Will add user '${USER_NAME}' pw: '${USER_NAME}'"
-/usr/sbin/useradd -s /bin/bash -d /home/'${USER_NAME}' -m '${USER_NAME}'
+/usr/sbin/useradd -s '${shell_cmd}' -d /home/'${USER_NAME}' -m '${USER_NAME}'
 echo "'${USER_NAME}':'${USER_NAME}'" | chpasswd
 adduser '${USER_NAME}' sudo
-chsh -s /bin/bash '${USER_NAME}'
+chsh -s '${shell_cmd}' '${USER_NAME}'
 
 echo "ECHO: ""User '${USER_NAME}' Added"
 
@@ -718,7 +738,7 @@ EOF'
 
 sudo chmod +x ${ROOTFS_MNT}/home/add_user.sh
 
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/sbin/locale-gen en_GB.UTF-8 en_US.UTF-8,da_DK.UTF-8
+sudo sh -c 'LANG=C.UTF-8  chroot --userspec=root:root '${ROOTFS_MNT}' /usr/sbin/locale-gen en_GB.UTF-8 en_US.UTF-8,da_DK.UTF-8'
 
 }
 
@@ -782,7 +802,11 @@ sudo chmod +x ${ROOTFS_MNT}/home/initial.sh
 add_mk_repo(){
 echo "ECHO: adding mk sources.list"
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 43DDF224
-sudo sh -c 'echo "deb http://deb.machinekit.io/debian '${distro}' main" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/'${USER_NAME}'.list'
+if [ "${distro}" == "buster" ]; then
+    sudo sh -c 'echo "deb http://deb.machinekit.io/debian stretch main" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/'${USER_NAME}'.list'
+else
+    sudo sh -c 'echo "deb http://deb.machinekit.io/debian '${distro}' main" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/'${USER_NAME}'.list'
+fi
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
 }
 
@@ -800,33 +824,44 @@ sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir -p /tmp
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /tmp
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir -p /var/tmp
 sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /var/tmp
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y update'
+if [ "${distro}" == "buster" ]; then
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install debconf gnupg2 sudo wget apt-utils kmod'
+fi
 sudo chroot --userspec=root:root ${ROOTFS_MNT} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
+sudo cp ${ROOTFS_MNT}/etc/apt/sources.list-local ${ROOTFS_MNT}/etc/apt/sources.list
 gen_add_user_sh
 echo "Script_MSG: gen_add_user_sh finished ... will now run in chroot"
 
-sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/add_user.sh
+sudo sh -c 'LANG=C.UTF-8 chroot '${ROOTFS_MNT}' '${shell_cmd}' -c /home/add_user.sh'
 
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} install --reinstall debconf
-
+if [ "${distro}" == "buster" ]; then
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install iputils-ping dhcpcd5 xorg libpam-systemd systemd-sysv'
+fi
 echo ""
 echo "Scr_MSG: fix no sudo user ping:"
 echo ""
 sudo chmod u+s ${ROOTFS_MNT}/bin/ping ${ROOTFS_MNT}/bin/ping6
 echo "Script_MSG: installing apt-transport-https"
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y --assume-yes upgrade
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install apt-transport-https
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y update'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install apt-transport-https'
 #sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y --assume-yes install systemd-sysv
 #sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y --assume-yes install task-lxde-desktop
 if [[ "${USER_NAME}" == "machinekit" ]]; then
 	add_mk_repo
 fi
 
+if [ "${DESKTOP}" == "yes" ]; then
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install lxqt'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' --no-install-recommends install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
+fi
+
 gen_initial_sh
 echo "Script_MSG: gen_initial.sh finhed ... will now run in chroot"
 
-sudo chroot ${ROOTFS_MNT} /bin/bash -c /home/initial.sh
+sudo chroot ${ROOTFS_MNT} ${shell_cmd} -c /home/initial.sh
 
 sudo sync
 
@@ -848,7 +883,7 @@ if [[ "${USER_NAME}" == "holosynth" ]]; then
 mmcboot=setenv bootargs console=ttyS0,115200 root=\${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz \${loadaddr} - \${fdt_addr}
 EOF'
 
-    sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/etc/X11/xorg.conf
+sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/etc/X11/xorg.conf
 Section "Device"
     Identifier      "Frame Buffer"
     Driver  "fbdev"
@@ -896,59 +931,6 @@ EOF'
 
 fi
 
-sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '$ROOTFS_MNT'/etc/modprobe.d/uioreg.conf'
-sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '$ROOTFS_MNT'/etc/udev/rules.d/10-local.rules'
-
-echo ""
-echo "# --------->       Removing qemu policy file          <--------------- ---------"
-echo ""
-
-if [ -f ${POLICY_FILE} ]; then
-	echo "removing ${POLICY_FILE}"
-	sudo rm -f ${POLICY_FILE}
-fi
-echo ""
-echo "# --------->       Restoring resolv.conf link         <--------------- ---------"
-echo ""
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/rm -f /etc/resolv.conf
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf
-
-echo ""
-echo "Script_MSG:  All Config files genetated"
-echo ""
-echo ""
-echo "# --------- ------------>   Finalized    --- --------- --------------- ---------"
-echo ""
-}
-
-setup_configfiles() {
-
-echo "Setting up config files "
-
-gen_policy_rc_d
-
-gen_sudoers
-
-gen_final_sources_list
-gen_local_sources_list
-sudo cp ${ROOTFS_MNT}/etc/apt/sources.list-local ${ROOTFS_MNT}/etc/apt/sources.list
-
-gen_hosts
-
-sudo mkdir -p ${ROOTFS_MNT}/etc/systemd/network
-
-gen_network_interface_setup
-
-sudo sh -c 'echo T0:2345:respawn:rootfs/sbin/getty -L ttyS0 115200 vt100 >> '${ROOTFS_MNT}'/etc/inittab'
-
-conf_timezone_locale
-
-sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/locale.conf
-LANG=en_US.UTF-8 UTF-8
-LC_COLLATE=C
-LC_TIME=en_GB.UTF-8
-EOT'
-
 if [ "${USER_NAME}" == "machinekit" ]; then
 
 if [ "${DESKTOP}" == "yes" ]; then
@@ -986,4 +968,57 @@ EndSection
 EOT'
 fi
 fi
+
+sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '$ROOTFS_MNT'/etc/modprobe.d/uioreg.conf'
+sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '$ROOTFS_MNT'/etc/udev/rules.d/10-local.rules'
+
+echo ""
+echo "# --------->       Removing qemu policy file          <--------------- ---------"
+echo ""
+
+if [ -f ${POLICY_FILE} ]; then
+	echo "removing ${POLICY_FILE}"
+	sudo rm -f ${POLICY_FILE}
+fi
+echo ""
+echo "# --------->       Restoring resolv.conf link         <--------------- ---------"
+echo ""
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/rm -f /etc/resolv.conf
+sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf
+
+echo ""
+echo "Script_MSG:  All Config files genetated"
+echo ""
+echo ""
+echo "# --------- ------------>   Finalized    --- --------- --------------- ---------"
+echo ""
+}
+
+setup_configfiles() {
+
+echo "Setting up config files "
+
+gen_policy_rc_d
+
+gen_sudoers
+
+gen_final_sources_list
+gen_local_sources_list
+sudo cp ${ROOTFS_MNT}/etc/apt/sources.list-final ${ROOTFS_MNT}/etc/apt/sources.list
+
+gen_hosts
+
+sudo mkdir -p ${ROOTFS_MNT}/etc/systemd/network
+
+gen_network_interface_setup
+
+sudo sh -c 'echo T0:2345:respawn:rootfs/sbin/getty -L ttyS0 115200 vt100 >> '${ROOTFS_MNT}'/etc/inittab'
+
+conf_timezone_locale
+
+sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/locale.conf
+LANG=en_US.UTF-8 UTF-8
+LC_COLLATE=C
+LC_TIME=en_GB.UTF-8
+EOT'
 }

@@ -1,0 +1,28 @@
+From ef568dc8758421d5706dc6367a627970d86c226e Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Tue, 3 Apr 2018 00:05:56 +0200
+Subject: [PATCH 4/4] rename kernel package names to *-socfpga
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 1c2f095..713a42e 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -95,8 +95,8 @@ tmpdir="$objtree/debian/tmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
+ dbg_dir="$objtree/debian/dbgtmp"
+-packagename=linux-image-$version
+-kernel_headers_packagename=linux-headers-$version
++packagename=linux-image-socfpga
++kernel_headers_packagename=linux-headers-socfpga
+ libc_headers_packagename=linux-libc-dev
+ dbg_packagename=$packagename-dbg
+ debarch=
+-- 
+2.7.4
+
