@@ -1,7 +1,7 @@
-From e0b559bdca8188a9c637742ccaaea9fa3b113b0f Mon Sep 17 00:00:00 2001
+From 41b33b50cab32ea17d23ee554ecd6df351236e28 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
-Subject: [PATCH 1/9] disable debug package gen
+Subject: [PATCH 01/10] disable debug package gen
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -25,10 +25,10 @@ index 98b007e..efc9ed9 100644
 2.7.4
 
 
-From 0450b89ab9042ff33afc247756992c90119aaa07 Mon Sep 17 00:00:00 2001
+From f4e52fdc31d5ea7fbc017a40196bc38a30ad9a18 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
-Subject: [PATCH 2/9] add ext4 root fs support and autofs4 module
+Subject: [PATCH 02/10] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -64,10 +64,10 @@ index efc9ed9..a9f5f99 100644
 2.7.4
 
 
-From 04aa914c28053267996fb8457f6ea88456a690e0 Mon Sep 17 00:00:00 2001
+From 4427cc0aa826bdfd4e44f88f9d2add909a2dcbda Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
-Subject: [PATCH 3/9] add .dtd files to kernel-image .deb
+Subject: [PATCH 03/10] add .dtd files to kernel-image .deb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -102,10 +102,10 @@ index 3c575cd0..d67c791 100755
 2.7.4
 
 
-From accfafbed3447e9f3fadffbc14faea1b599787f4 Mon Sep 17 00:00:00 2001
+From aa504f8299efc173c559fe6df9b4371ffcde3c1b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
-Subject: [PATCH 4/9] add generate /boot/extlinux/extlinux.conf to boot with
+Subject: [PATCH 04/10] add generate /boot/extlinux/extlinux.conf to boot with
  uboot
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -138,10 +138,10 @@ index d67c791..d8cbeec 100755
 2.7.4
 
 
-From 05722e65659f1056402584b34d61d9ad758fdc91 Mon Sep 17 00:00:00 2001
+From 263e899b00ea2e138c397f1ea83e420358ef4237 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
-Subject: [PATCH 5/9] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 05/10] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -178,10 +178,10 @@ index a9f5f99..c17d698 100644
 2.7.4
 
 
-From 813227f651836ca63521c65ee6c4db51087f02d9 Mon Sep 17 00:00:00 2001
+From ade51bf48b2c587fd44b61fa4f609ed3b24f68c5 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
-Subject: [PATCH 6/9] rename kernel package names to *-socfpga-rt-ltsi
+Subject: [PATCH 06/10] rename kernel package names to *-socfpga-rt-ltsi
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -209,10 +209,10 @@ index d8cbeec..16554d2 100755
 2.7.4
 
 
-From 773d8d309165a3312f565b8b19fb0a58a6e9eb75 Mon Sep 17 00:00:00 2001
+From 9c63e69f872510fe1917f4f2d269489df9971657 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
-Subject: [PATCH 7/9] add spidev in dts so driver is loaded
+Subject: [PATCH 07/10] add spidev in dts so driver is loaded
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -246,36 +246,166 @@ index 595eb4f..6dcff22 100644
 2.7.4
 
 
-From b1ab6ff3fab17e2f3d712b32d2510159c0efac06 Mon Sep 17 00:00:00 2001
+From 25e9f24d3c6e0b7486d69cec0968099390d8bf3a Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 8/9] Added DE-10 Nano dts dtb
+Subject: [PATCH 08/10] Added DE-10 Nano with/without framebuffer dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/boot/dts/Makefile                       |   1 +
- arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts | 193 +++++++++++++++++++++++
- 2 files changed, 194 insertions(+)
+ arch/arm/boot/dts/Makefile                         |   2 +
+ arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts   | 121 ++++++++++++
+ .../arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts | 204 +++++++++++++++++++++
+ 3 files changed, 327 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
+ create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index 251e243..efeea2a 100644
+index 251e243..b4c3dd1 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -704,6 +704,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
+@@ -704,6 +704,8 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
  	socfpga_cyclone5_mcvevk.dtb \
  	socfpga_cyclone5_socdk.dtb \
  	socfpga_cyclone5_de0_sockit.dtb \
++	socfpga_cyclone5_de10_nano_fb.dtb \
 +	socfpga_cyclone5_de10_nano.dtb \
  	socfpga_cyclone5_sockit.dtb \
  	socfpga_cyclone5_socrates.dtb \
  	socfpga_cyclone5_sodia.dtb \
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
 new file mode 100644
-index 0000000..796037f
+index 0000000..80467c8
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
-@@ -0,0 +1,193 @@
+@@ -0,0 +1,121 @@
++/*
++ * Copyright Intel Corporation (C) 2017. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "socfpga_cyclone5.dtsi"
++
++/ {
++	model = "Terasic DE10-Nano";
++	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
++
++	chosen {
++		bootargs = "earlyprintk";
++		stdout-path = "serial0:115200n8";
++	};
++
++	memory {
++		name = "memory";
++		device_type = "memory";
++		reg = <0x0 0x40000000>; /* 1GB */
++	};
++
++	aliases {
++		ethernet0 = &gmac1;
++	};
++
++	regulator_3_3v: 3-3-v-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++	};
++
++	leds {
++		compatible = "gpio-leds";
++		hps0 {
++			label = "hps_led0";
++			gpios = <&portb 24 0>;
++			linux,default-trigger = "heartbeat";
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys";
++		hps0 {
++			label = "hps_key0";
++			gpios = <&portb 25 0>;
++			linux,code = <63>;
++			debounce-interval = <50>;
++		};
++	};
++};
++
++&gmac1 {
++	status = "okay";
++	phy-mode = "rgmii";
++
++	txd0-skew-ps = <0>; /* -420ps */
++	txd1-skew-ps = <0>; /* -420ps */
++	txd2-skew-ps = <0>; /* -420ps */
++	txd3-skew-ps = <0>; /* -420ps */
++	rxd0-skew-ps = <420>; /* 0ps */
++	rxd1-skew-ps = <420>; /* 0ps */
++	rxd2-skew-ps = <420>; /* 0ps */
++	rxd3-skew-ps = <420>; /* 0ps */
++	txen-skew-ps = <0>; /* -420ps */
++	txc-skew-ps = <1860>; /* 960ps */
++	rxdv-skew-ps = <420>; /* 0ps */
++	rxc-skew-ps = <1680>; /* 780ps */
++
++	max-frame-size = <3800>;
++};
++
++&gpio0 {
++	status = "okay";
++};
++
++&gpio1 {
++	status = "okay";
++};
++
++&gpio2 {
++	status = "okay";
++};
++
++&i2c0 {
++	status = "okay";
++	speed-mode = <0>;
++
++	adxl345: adxl345@0 {
++		compatible = "adi,adxl34x";
++		reg = <0x53>;
++
++		interrupt-parent = <&portc>;
++		interrupts = <3 2>;
++	};
++};
++
++&mmc0 {
++	vmmc-supply = <&regulator_3_3v>;
++	vqmmc-supply = <&regulator_3_3v>;
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&usb1 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
+new file mode 100644
+index 0000000..7fd21dc
+--- /dev/null
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
+@@ -0,0 +1,204 @@
 +/*
 +* Copyright Altera Corporation (C) 2015. All rights reserved.
 +*
@@ -339,8 +469,9 @@ index 0000000..796037f
 +				<0x00000001 0x00003000 0xff203000 0x00000010>,
 +				<0x00000001 0x00004000 0xff204000 0x00000010>,
 +				<0x00000001 0x00005000 0xff205000 0x00000010>,
-+				<0x00000001 0x00030000 0xff230000 0x00000100>,
-+				<0x00000001 0x00031000 0xff231000 0x00000080>;
++				<0x00000001 0x00050000 0xff250000 0x00000100>,
++				<0x00000001 0x00051000 0xff251000 0x00000080>;
++				<0x00000001 0x00040000 0xff240000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -394,7 +525,7 @@ index 0000000..796037f
 +
 +		ilc@0x100003000 {
 +			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
-+			reg = <0x00000001 0x00030000 0x00000100>;
++			reg = <0x00000001 0x00050000 0x00000100>;
 +			interrupt-controller;
 +			#interrupt-cells = <0x1>;
 +			altr,sw-fifo-depth = <0x20>;
@@ -402,13 +533,22 @@ index 0000000..796037f
 +
 +		vip@0x100031000 {
 +			compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
-+			reg = <0x00000001 0x00031000 0x00000080>;
++			reg = <0x00000001 0x00051000 0x00000080>;
 +			max-width = <0x400>;
 +			max-height = <0x300>;
 +			bits-per-color = <0x8>;
 +			colors-per-beat = <0x4>;
 +			beats-per-pixel = <0x1>;
 +			mem-word-width = <0x80>;
++		};
++
++		hm2-socfpga0@0x100040000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 43 4>;
++			address_width = <14>;
++			data_width = <32>;
 +		};
 +	};
 +};
@@ -421,14 +561,15 @@ index 0000000..796037f
 +	txd1-skew-ps = <0>; /* -420ps */
 +	txd2-skew-ps = <0>; /* -420ps */
 +	txd3-skew-ps = <0>; /* -420ps */
-+	rxd0-skew-ps = <0>; /* 0ps */
-+	rxd1-skew-ps = <0>; /* 0ps */
-+	rxd2-skew-ps = <0>; /* 0ps */
-+	rxd3-skew-ps = <0>; /* 0ps */
++	rxd0-skew-ps = <420>; /* 0ps */
++	rxd1-skew-ps = <420>; /* 0ps */
++	rxd2-skew-ps = <420>; /* 0ps */
++	rxd3-skew-ps = <420>; /* 0ps */
 +	txen-skew-ps = <0>; /* -420ps */
-+	txc-skew-ps = <3000>; /* 960ps */
-+	rxdv-skew-ps = <0>; /* 0ps */
-+	rxc-skew-ps = <3000>; /* 780ps */
++	txc-skew-ps = <1860>; /* 960ps */
++	rxdv-skew-ps = <420>; /* 0ps */
++	rxc-skew-ps = <1680>; /* 780ps */
++
 +	max-frame-size = <3800>;
 +};
 +
@@ -473,10 +614,10 @@ index 0000000..796037f
 2.7.4
 
 
-From fd321d3b0572fa247488e1452e4b3af0110dc3c2 Mon Sep 17 00:00:00 2001
+From 548d2bba96dde187764dc9b61ed162ed2f765687 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
-Subject: [PATCH 9/9] add iscsi modules
+Subject: [PATCH 09/10] add iscsi modules
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -502,6 +643,152 @@ index c17d698..13d3155 100644
  CONFIG_DEBUG_USER=y
 +CONFIG_ISCSI_TCP=m
 +CONFIG_ISCSI_TARGET=m
+-- 
+2.7.4
+
+
+From 505881623b7b5fe643952a4ae2c3d7f8e0781047 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Fri, 30 Mar 2018 20:41:53 +0200
+Subject: [PATCH 10/10] Enable altvip framebuffer
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/Kconfig                   |   1 +
+ arch/arm/configs/socfpga_defconfig | 111 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 112 insertions(+)
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 5715844..62f0881 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -1737,6 +1737,7 @@ source "mm/Kconfig"
+ 
+ config FORCE_MAX_ZONEORDER
+ 	int "Maximum zone order"
++	default "13" if ARCH_SOCFPGA
+ 	default "12" if SOC_AM33XX
+ 	default "9" if SA1111 || ARCH_EFM32
+ 	default "11"
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 13d3155..a7d03e2 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -180,3 +180,114 @@ CONFIG_FUNCTION_TRACER=y
+ CONFIG_DEBUG_USER=y
+ CONFIG_ISCSI_TCP=m
+ CONFIG_ISCSI_TARGET=m
++CONFIG_FIX_EARLYCON_MEM=y
++CONFIG_ARM_HEAVY_MB=y
++CONFIG_ARCH_SUPPORTS_BIG_ENDIAN=y
++CONFIG_DMA_SHARED_BUFFER=y
++CONFIG_FORCE_MAX_ZONEORDER=13
++CONFIG_CMA=y
++CONFIG_DMA_CMA=y
++CONFIG_MEMORY_ISOLATION=y
++CONFIG_CMA_DEBUG=y
++CONFIG_CMA_DEBUGFS=y
++CONFIG_CMA_AREAS=7
++CONFIG_GENERIC_EARLY_IOREMAP=y
++CONFIG_FRAME_VECTOR=y
++CONFIG_CMA_SIZE_MBYTES=512
++CONFIG_CMA_SIZE_SEL_MBYTES=y
++CONFIG_CMA_ALIGNMENT=8
++CONFIG_VT_HW_CONSOLE_BINDING=y
++CONFIG_MEDIA_SUPPORT=y
++CONFIG_MEDIA_SUPPORT=y
++CONFIG_MEDIA_CAMERA_SUPPORT=y
++CONFIG_MEDIA_CONTROLLER=y
++CONFIG_MEDIA_CONTROLLER_DVB=y
++CONFIG_VIDEO_DEV=y
++CONFIG_VIDEO_V4L2_SUBDEV_API=y
++CONFIG_VIDEO_V4L2=y
++CONFIG_VIDEOBUF_GEN=y
++CONFIG_VIDEOBUF2_CORE=y
++CONFIG_VIDEOBUF2_MEMOPS=y
++CONFIG_VIDEOBUF2_VMALLOC=y
++CONFIG_MEDIA_USB_SUPPORT=y
++CONFIG_MEDIA_USB_SUPPORT=y
++CONFIG_USB_VIDEO_CLASS=y
++CONFIG_USB_VIDEO_CLASS_INPUT_EVDEV=y
++CONFIG_USB_GSPCA=y
++CONFIG_USB_M5602=y
++CONFIG_USB_STV06XX=y
++CONFIG_USB_GL860=y
++CONFIG_USB_GSPCA_BENQ=y
++CONFIG_USB_GSPCA_CONEX=y
++CONFIG_USB_GSPCA_CPIA1=y
++CONFIG_USB_GSPCA_DTCS033=y
++CONFIG_USB_GSPCA_ETOMS=y
++CONFIG_USB_GSPCA_FINEPIX=y
++CONFIG_USB_GSPCA_JEILINJ=y
++CONFIG_USB_GSPCA_JL2005BCD=y
++CONFIG_USB_GSPCA_KINECT=y
++CONFIG_USB_GSPCA_KONICA=y
++CONFIG_USB_GSPCA_MARS=y
++CONFIG_USB_GSPCA_MR97310A=y
++CONFIG_USB_GSPCA_NW80X=y
++CONFIG_USB_GSPCA_OV519=y
++CONFIG_USB_GSPCA_OV534=y
++CONFIG_USB_GSPCA_OV534_9=y
++CONFIG_USB_GSPCA_PAC207=y
++CONFIG_USB_GSPCA_PAC7302=y
++CONFIG_USB_GSPCA_PAC7311=y
++CONFIG_USB_GSPCA_SE401=y
++CONFIG_USB_GSPCA_SN9C2028=y
++CONFIG_USB_GSPCA_SN9C20X=y
++CONFIG_USB_GSPCA_SONIXB=y
++CONFIG_USB_GSPCA_SONIXJ=y
++CONFIG_USB_GSPCA_SPCA500=y
++CONFIG_USB_GSPCA_SPCA501=y
++CONFIG_USB_GSPCA_SPCA505=y
++CONFIG_USB_GSPCA_SPCA506=y
++CONFIG_USB_GSPCA_SPCA508=y
++CONFIG_USB_GSPCA_SPCA561=y
++CONFIG_USB_GSPCA_SPCA1528=y
++CONFIG_USB_GSPCA_SQ905=y
++CONFIG_USB_GSPCA_SQ905C=y
++CONFIG_USB_GSPCA_SQ930X=y
++CONFIG_USB_GSPCA_STK014=y
++CONFIG_USB_GSPCA_STK1135=y
+++CONFIG_USB_GSPCA_STV0680=y
++CONFIG_USB_GSPCA_SUNPLUS=y
++CONFIG_USB_GSPCA_T613=y
++CONFIG_USB_GSPCA_TOPRO=y
++CONFIG_USB_GSPCA_TOUPTEK=y
++CONFIG_USB_GSPCA_TV8532=y
++CONFIG_USB_GSPCA_VC032X=y
++CONFIG_USB_GSPCA_VICAM=y
++CONFIG_USB_GSPCA_XIRLINK_CIT=y
++CONFIG_USB_GSPCA_ZC3XX=y
++CONFIG_V4L_PLATFORM_DRIVERS=y
++CONFIG_SOC_CAMERA=y
++CONFIG_SOC_CAMERA_PLATFORM=y
++CONFIG_FB_CMDLINE=y
++CONFIG_FB_NOTIFY=y
++CONFIG_FB_CFB_FILLRECT=y
++CONFIG_FB_CFB_COPYAREA=y
++CONFIG_FB_CFB_IMAGEBLIT=y
++CONFIG_FB_ALTERA_VIP=y
++CONFIG_DUMMY_CONSOLE=y
++CONFIG_FRAMEBUFFER_CONSOLE=y
++CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
++CONFIG_FRAMEBUFFER_CONSOLE_ROTATION=y
++CONFIG_LOGO=y
++CONFIG_LOGO_LINUX_MONO=y
++CONFIG_LOGO_LINUX_VGA16=y
++CONFIG_LOGO_LINUX_CLUT224=y
++CONFIG_MEDIA_SUBDRV_AUTOSELECT=y
++CONFIG_LIBCRC32C=y
++CONFIG_INPUT_EVDEV=y
++CONFIG_INPUT_UINPUT=y
++CONFIG_INPUT_TOUCHSCREEN=y
++CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
++CONFIG_HID=y
++CONFIG_USB_HID=y
++CONFIG_HID_MULTITOUCH=y
++#CONFIG_ALTERA_PR_IP_CORE=y
++#CONFIG_ALTERA_PR_IP_CORE_PLAT=y
 -- 
 2.7.4
 

@@ -1,4 +1,4 @@
-From e0b559bdca8188a9c637742ccaaea9fa3b113b0f Mon Sep 17 00:00:00 2001
+From a9390c8e8d16c168f5424ee413d22a8e5cb54087 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
 Subject: [PATCH 1/9] disable debug package gen
@@ -25,7 +25,7 @@ index 98b007e..efc9ed9 100644
 2.7.4
 
 
-From 0450b89ab9042ff33afc247756992c90119aaa07 Mon Sep 17 00:00:00 2001
+From 775c2e78c43d5fbd197fb1f9aef62ef422ca5d17 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
 Subject: [PATCH 2/9] add ext4 root fs support and autofs4 module
@@ -64,7 +64,7 @@ index efc9ed9..a9f5f99 100644
 2.7.4
 
 
-From 04aa914c28053267996fb8457f6ea88456a690e0 Mon Sep 17 00:00:00 2001
+From a93ef0fb9e2165726156e1dff9061c8ee71c6fbb Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
 Subject: [PATCH 3/9] add .dtd files to kernel-image .deb
@@ -102,7 +102,7 @@ index 3c575cd0..d67c791 100755
 2.7.4
 
 
-From accfafbed3447e9f3fadffbc14faea1b599787f4 Mon Sep 17 00:00:00 2001
+From 4cf57b82658d719ab08620f04ebe601c97f9b9ed Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
 Subject: [PATCH 4/9] add generate /boot/extlinux/extlinux.conf to boot with
@@ -138,7 +138,7 @@ index d67c791..d8cbeec 100755
 2.7.4
 
 
-From 05722e65659f1056402584b34d61d9ad758fdc91 Mon Sep 17 00:00:00 2001
+From daedee5170269ede998a195dd17dc618f1458cff Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
 Subject: [PATCH 5/9] add configfs and fpgacfg dts entities, and dynamic dts
@@ -178,7 +178,7 @@ index a9f5f99..c17d698 100644
 2.7.4
 
 
-From 813227f651836ca63521c65ee6c4db51087f02d9 Mon Sep 17 00:00:00 2001
+From 0ca95464f5ba084d54f538899cb2632cdb82061e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
 Subject: [PATCH 6/9] rename kernel package names to *-socfpga-rt-ltsi
@@ -209,7 +209,7 @@ index d8cbeec..16554d2 100755
 2.7.4
 
 
-From 773d8d309165a3312f565b8b19fb0a58a6e9eb75 Mon Sep 17 00:00:00 2001
+From 11bfb092721049077aeb0eacb3eac589ebfe8f5b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
 Subject: [PATCH 7/9] add spidev in dts so driver is loaded
@@ -246,7 +246,7 @@ index 595eb4f..6dcff22 100644
 2.7.4
 
 
-From b1ab6ff3fab17e2f3d712b32d2510159c0efac06 Mon Sep 17 00:00:00 2001
+From b387e836a3bc26395d4a0901468bf078f34b3098 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
 Subject: [PATCH 8/9] Added DE-10 Nano dts dtb
@@ -272,7 +272,7 @@ index 251e243..efeea2a 100644
  	socfpga_cyclone5_sodia.dtb \
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
 new file mode 100644
-index 0000000..796037f
+index 0000000..fda1c83
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
 @@ -0,0 +1,193 @@
@@ -421,15 +421,15 @@ index 0000000..796037f
 +	txd1-skew-ps = <0>; /* -420ps */
 +	txd2-skew-ps = <0>; /* -420ps */
 +	txd3-skew-ps = <0>; /* -420ps */
-+	rxd0-skew-ps = <0>; /* 0ps */
-+	rxd1-skew-ps = <0>; /* 0ps */
-+	rxd2-skew-ps = <0>; /* 0ps */
-+	rxd3-skew-ps = <0>; /* 0ps */
++	rxd0-skew-ps = <420>; /* 0ps */
++	rxd1-skew-ps = <420>; /* 0ps */
++	rxd2-skew-ps = <420>; /* 0ps */
++	rxd3-skew-ps = <420>; /* 0ps */
 +	txen-skew-ps = <0>; /* -420ps */
-+	txc-skew-ps = <3000>; /* 960ps */
-+	rxdv-skew-ps = <0>; /* 0ps */
-+	rxc-skew-ps = <3000>; /* 780ps */
-+	max-frame-size = <3800>;
++	txc-skew-ps = <1860>; /* 960ps */
++	rxdv-skew-ps = <420>; /* 0ps */
++	rxc-skew-ps = <1680>; /* 780ps */
++	max-frame-size = <9000>;
 +};
 +
 +&gpio0 {
@@ -473,7 +473,7 @@ index 0000000..796037f
 2.7.4
 
 
-From fd321d3b0572fa247488e1452e4b3af0110dc3c2 Mon Sep 17 00:00:00 2001
+From 9e947771531a9898e69a677214e3867721a9045c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
 Subject: [PATCH 9/9] add iscsi modules

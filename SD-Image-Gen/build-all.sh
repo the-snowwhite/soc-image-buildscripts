@@ -23,19 +23,26 @@
 
 ## Select distro:
 ### Debian based:
-#distro=sid
 #distro="jessie"
 distro="stretch"
+#distro="buster"
 ### Ubuntu based:
-#distro=zesty
+#distro=bionic
 #distro=xenial
-HOME_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
-#ROOT_REPO_URL=http://ports.ubuntu.com
+#HOME_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
+#HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
+HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
+
+shell_cmd="/bin/bash"
+#shell_cmd="/bin/sh"
+
 #ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
 ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
-final_repo="http://ftp.dk.debian.org/debian/"
+#final_repo="http://ftp.dk.debian.org/debian/"
+final_repo="http://deb.debian.org//debian/"
 local_repo=${HOME_MIRR_REPO_URL}
-local_ws=kubuntu16-ws
+local_ws=kdeneon-ws
+#local_ws=kubuntu16-ws
 #local_ws="debian9-ws"
 local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
 
@@ -53,37 +60,38 @@ mkfs_options=""
 
 
 ## Select board
-#BOARD=de10-nano
-BOARD=de0-nano-soc
+BOARD=de10-nano
+#BOARD=de0-nano-soc
 #BOARD=de1-soc
 #BOARD=sockitoc-
 
 ## Select u-boot version:
 #UBOOT_VERSION="v2016.09"
 UBOOT_VERSION="v2018.01"
-UBOOT_MAKE_CONFIG='u-boot-with-spl.sfp'
-
+#UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
+UBOOT_MAKE_CONFIG="all"
+UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"
 ## Select user name / function
+#USER_NAME=ubuntu;
 USER_NAME=machinekit;
 #USER_NAME=holosynth;
 
-#RT_KERNEL_VERSION="4.9.33"
-#RT_PATCH_REV="rt23"
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
-#GIT_KERNEL_VERSION="4.1.33"
-GIT_KERNEL_VERSION="4.9.76"
-GIT_KERNEL_REV="ltsi-rt"
 
-#SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
-SD_KERNEL_VERSION=${RT_KERNEL_VERSION}
+GIT_KERNEL_VERSION="4.9.76"
+GIT_KERNEL_REV="-ltsi-rt"
+#GIT_KERNEL_VERSION="4.15"
+#GIT_KERNEL_REV=""
+
+SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
+#SD_KERNEL_VERSION=${RT_KERNEL_VERSION}
 
 #RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
 #RT_PATCH_REV="ltsi-rt23"
 KERNEL_CONF="socfpga_defconfig"
-ALT_GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION}-${GIT_KERNEL_REV}"
+ALT_GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION}${GIT_KERNEL_REV}"
 
-#QT_VER=5.4.1
 QT_VER=5.7.1
 QT_ROOTFS_MNT="/tmp/qt_${QT_VER}-img"
 
@@ -99,7 +107,6 @@ WORK_DIR=${1}
 #HOME_REPO_DIR="/var/www/repos/apt/debian"
 HOME_REPO_DIR="/var/www/debian"
 
-#MAIN_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 MAIN_SCRIPT_DIR="$(cd $(dirname $0) && pwd)"
 SUB_SCRIPT_DIR=${MAIN_SCRIPT_DIR}/subscripts
 FUNC_SCRIPT_DIR=${MAIN_SCRIPT_DIR}/functions
@@ -140,8 +147,6 @@ TOOLCHAIN_DIR=${HOME}/bin
 QT_CFLAGS="-march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard"
 
 QT_CC_FOLDER_NAME="gcc-linaro-${CROSS_GNU_ARCH}-4.9-2014.09_linux"
-#QT_CC_FOLDER_NAME="gcc-linaro-5.4.1-2017.01-x86_64_${CROSS_GNU_ARCH}"
-#QT_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_${CROSS_GNU_ARCH}"
 
 QT_CC_DIR="${TOOLCHAIN_DIR}/${QT_CC_FOLDER_NAME}"
 #QT_CC_FILE="${QT_CC_FOLDER_NAME}.tar.xz"
@@ -158,9 +163,8 @@ RT_KERNEL_TAG="${RT_KERNEL_VERSION}-${RT_PATCH_REV}"
 RT_KERNEL_LOCALVERSION="socfpga-${RT_KERNEL_TAG}"
 GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}"
 GIT_KERNEL_LOCALVERSION="socfpga-${GIT_KERNEL_TAG}"
-SD_KERNEL_TAG="${GIT_KERNEL_TAG}"
 #SD_KERNEL_TAG="${RT_KERNEL_VERSION}-socfpga-${KERNEL_PKG_VERSION}"
-#SD_KERNEL_TAG="socfpga-rt-ltsi"
+SD_KERNEL_TAG="socfpga${GIT_KERNEL_REV}"
 
 RT_KERNEL_FOLDER="linux-${RT_KERNEL_VERSION}"
 RT_KERNEL_FILE_NAME="${RT_KERNEL_FOLDER}.tar.xz"
@@ -226,8 +230,6 @@ elif [ "${USER_NAME}" == "holosynth" ]; then
 fi
 
 SD_FILE_PRELUDE=mksocfpga_${distro}_${USER_NAME}_${SD_KERNEL_VERSION}-${REL_DATE}
-SD_IMG_NAME="${SD_FILE_PRELUDE}-${BOARD}_sd.img"
-SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
 
 #------------  Toolchain  -------------#
 CC_DIR="${TOOLCHAIN_DIR}/${CC_FOLDER_NAME}"
@@ -253,14 +255,12 @@ EnableSystemdResolvedLink='/etc/systemd/system/multi-user.target.wants/systemd-r
 #-----------------------------------------------------------------------------------
 usage()
 {
-    echo "if this was a real script you would see something useful here"
     echo ""
-    echo "    simple_args_parsing.sh"
-    echo "    -h --help"
+    echo "    -h --help (this printout)"
     echo "    --deps    Will install build deps"
-    echo "    --uboot   Will clone and build uboot"
-    echo "    --build_git-kernel   Will clone and build kernel from git"
-    echo "    --build_rt-ltsi-kernel   Will download rt-ltsi patch and build kernel"
+    echo "    --uboot   Will clone, patch and build uboot (add =c to skip build)"
+    echo "    --build_git-kernel   Will clone, patch and build kernel from git (add =c to skip build)"
+    echo "    --build_rt-ltsi-kernel   Will download rt-ltsi kernel, patch and build kernel (add =c to skip build)"
     echo "    --gitkernel2repo   Will add kernel .debs to local repo"
     echo "    --rtkernel2repo   Will add kernel .debs to local repo"
     echo "    --mk2repo   Will add machinekit .debs to local repo"
@@ -268,10 +268,10 @@ usage()
     echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs"
     echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience"
     echo "    --finalize-desktop-rootfs   Will create user and configure  rootfs with desktop for fully working out of the box experience"
-    echo "    --bindmount_rootfsimg    Will mount rootfs image"
-    echo "    --bindunmount_rootfsimg    Will unmount rootfs image"
     echo "    --inst_repo_kernel   Will install kernel from local repo"
     echo "    --inst_repo_kernel-desktop   Will install kernel from local repo in desktop version"
+    echo "    --bindmount_rootfsimg    Will mount rootfs image"
+    echo "    --bindunmount_rootfsimg    Will unmount rootfs image"
     echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file"
     echo "    --assemble_desktop_sd_img   Will generate full populated fb sd imagefile and bmap file"
     echo "    --inst_qt_img_deps  Will install qt build depedencies in rootfs image"
@@ -316,7 +316,7 @@ build_git_kernel() {
 #    distro="jessie"
     git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
     if [ "${1}" != "c" ]; then
-#	   armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
+#   armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
     armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
     fi
 }
@@ -348,20 +348,26 @@ gen_rootfs_image() {
     mount_imagefile ${2} ${1}
     . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
     echo ""
-    if [ "${USER_NAME}" = "holosynth" ]; then
+    if [ "${USER_NAME}" == "holosynth" ]; then
         run_qt_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-    echo "Scr_MSG: run_qt_qemu_debootstrap function return value was --> ${output}"
+    echo "Scr_MSG: run_qt_qemu_debootstrap (${3}) function return value was --> ${output}"
     else
         if [ "${DESKTOP}" == "yes" ]; then
-            run_desktop_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-        echo "Scr_MSG: run_qemu_debootstrap function return value was --> ${output}"
+            if [ "${3}" == "buster" ]; then
+                run_qemu_debootstrap_buster ${1} ${3} ${ROOT_REPO_URL}
+                echo "Scr_MSG: run_qemu_debootstrap_buster function return value was --> ${output}"
+            else
+                run_desktop_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
+                echo "Scr_MSG: run_desktop_qemu_debootstrap (${3}) function return value was --> ${output}"
+            fi
         else
             run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
+            echo "Scr_MSG: run_qemu_debootstrap (${3}) function return value was --> ${output}"
         fi
     fi
     echo ""
     if [[ $output -gt $zero ]]; then
-        echo "Scr_MSG: run_qt_qemu_debootstrap failed"
+        echo "Scr_MSG: debootstrap failed"
         unmount_binded ${1}
         exit 1
     else
@@ -379,15 +385,14 @@ gen_rootfs_image() {
 
 ## parameters: 1: mount dev name, 2: image name, 3: distro name
 finalize_rootfs_image() {
-    create_img 1 "${2}" ""
+    if [ "$(ls -A ${1})" ]; then
+        echo "Scr_MSG: !! Found ${1} mounted .. will unmount now"
+        unmount_binded ${1}
+    fi
+    create_img 1 "${2}" ""    
     mount_imagefile "${2}" ${1}
     bind_mounted ${ROOTFS_MNT}
     . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
-# 	if [ ${output} -gt 0 ]; then
-# 		echo "Scr_MSG: run_qt_qemu_debootstrap failed"
-# 		unmount_binded ${1}
-# 		exit 1
-# 	else
     if [ "${DESKTOP}" == "yes" ]; then
         extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "qemu_debootstrap-only-desktop"
     else
@@ -395,6 +400,7 @@ finalize_rootfs_image() {
     fi
     echo "Script_MSG: will now run final setup_configfiles"
     setup_configfiles
+    echo "Script_MSG: configfiles setup finished"
     initial_rootfs_user_setup_sh
     finalize
     if [ "${DESKTOP}" == "yes" ]; then
@@ -419,14 +425,21 @@ inst_repo_kernel() {
 
 ## parameters: 1: kernel image tag
 assemble_full_sd_img() {
-    echo "step 1 create image:"
+    if [ "${DESKTOP}" == "yes" ]; then
+        SD_IMG_NAME="${SD_FILE_PRELUDE}-${BOARD}_desktop_sd.img"
+    else 
+        SD_IMG_NAME="${SD_FILE_PRELUDE}-${BOARD}_sd.img"
+    fi
+    SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
+
+    echo "step 1 create ${SD_IMG_FILE}"
     create_img "3" "${SD_IMG_FILE}" "${ROOTFS_MNT}" "${media_rootfs_partition}"
     echo "step 2 mount:"
     mount_sd_imagefile ${SD_IMG_FILE} ${ROOTFS_MNT} ${media_rootfs_partition}
     extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
     unmount_binded ${ROOTFS_MNT}
     unmount_loopdev
-    install_uboot ${CURRENT_DIR} ${UBOOT_DIR} ${UBOOT_MAKE_CONFIG} ${SD_IMG_FILE}
+    install_uboot ${UBOOT_BUILD_DIR} ${UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
     make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
 }
 
@@ -437,6 +450,11 @@ assemble_full_sd_img() {
 . ${FUNC_SCRIPT_DIR}/file_build-func.sh
 
 mkdir -p Logs
+if [ "$1" == "" ]; then
+    echo ""
+    echo "!! You ran the script without any parameters:"
+    usage
+fi
 
 while [ "$1" != "" ]; do
     PARAM=`echo $1 | awk -F= '{print $1}'`
@@ -469,14 +487,7 @@ while [ "$1" != "" ]; do
             add2repo "stretch" ${RT_KERNEL_PARENT_DIR} "${RT_KERNEL_TAG}-socfpga-${KERNEL_PKG_VERSION}"
             ;;
         --mk2repo)
-            add2repo ${distro} "/home/mib/Development/Docker/test" "machinekit"
-            ;;
-        --inst_repo_kernel)
-            inst_repo_kernel "finalized-fully-configured-with-kernel" ${ROOTFS_IMG}
-            ;;
-        --inst_repo_kernel-desktop)
-            DESKTOP="yes"
-            inst_repo_kernel "finalized-fully-configured-with-kernel-and-desktop" "${ROOTFS_IMG}-desktop"
+            add2repo ${distro} "/home/mib/Development/Docker" "machinekit"
             ;;
         --gen-base-qemu-rootfs)
             gen_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
@@ -491,6 +502,13 @@ while [ "$1" != "" ]; do
         --finalize-desktop-rootfs)
             DESKTOP="yes"
             finalize_rootfs_image ${ROOTFS_MNT} "${ROOTFS_IMG}-desktop" ${distro} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            ;;
+        --inst_repo_kernel)
+            inst_repo_kernel "finalized-fully-configured-with-kernel" ${ROOTFS_IMG}
+            ;;
+        --inst_repo_kernel-desktop)
+            DESKTOP="yes"
+            inst_repo_kernel "finalized-fully-configured-with-kernel-and-desktop" "${ROOTFS_IMG}-desktop"
             ;;
         --bindmount_rootfsimg)
             mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}

@@ -1,7 +1,7 @@
-From e0b559bdca8188a9c637742ccaaea9fa3b113b0f Mon Sep 17 00:00:00 2001
+From edd597e0b3df15efd71637635231b5042fdcca22 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
-Subject: [PATCH 1/9] disable debug package gen
+Subject: [PATCH 1/8] disable debug package gen
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -25,18 +25,18 @@ index 98b007e..efc9ed9 100644
 2.7.4
 
 
-From 0450b89ab9042ff33afc247756992c90119aaa07 Mon Sep 17 00:00:00 2001
+From b5646dcdfbe026e5a1b91e53fc10c67865ac05d0 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
-Subject: [PATCH 2/9] add ext4 root fs support and autofs4 module
+Subject: [PATCH 2/8] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/configs/socfpga_defconfig | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ arch/arm/configs/socfpga_defconfig | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index efc9ed9..a9f5f99 100644
+index efc9ed9..aef7e28 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -12,7 +12,7 @@ CONFIG_PROFILING=y
@@ -48,13 +48,12 @@ index efc9ed9..a9f5f99 100644
  # CONFIG_BLK_DEV_BSG is not set
  # CONFIG_IOSCHED_DEADLINE is not set
  # CONFIG_IOSCHED_CFQ is not set
-@@ -150,7 +150,10 @@ CONFIG_EXT2_FS=y
+@@ -150,7 +150,9 @@ CONFIG_EXT2_FS=y
  CONFIG_EXT2_FS_XATTR=y
  CONFIG_EXT2_FS_POSIX_ACL=y
  CONFIG_EXT3_FS=y
 -CONFIG_AUTOFS4_FS=y
 +CONFIG_EXT4_FS=y
-+# CONFIG_AUTOFS4_FS=y
 +CONFIG_EXT4_FS_POSIX_ACL=y
 +CONFIG_EXT4_FS_SECURITY=y
  CONFIG_VFAT_FS=y
@@ -64,10 +63,10 @@ index efc9ed9..a9f5f99 100644
 2.7.4
 
 
-From 04aa914c28053267996fb8457f6ea88456a690e0 Mon Sep 17 00:00:00 2001
+From d7178225bc249dfc1f8af1e4e73c0dc7c3c075a8 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
-Subject: [PATCH 3/9] add .dtd files to kernel-image .deb
+Subject: [PATCH 3/8] add .dtd files to kernel-image .deb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -102,33 +101,46 @@ index 3c575cd0..d67c791 100755
 2.7.4
 
 
-From accfafbed3447e9f3fadffbc14faea1b599787f4 Mon Sep 17 00:00:00 2001
+From 0a3b5ad3517b2e26572d5add79f7260d9ea85e6e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
-Subject: [PATCH 4/9] add generate /boot/extlinux/extlinux.conf to boot with
- uboot
+Subject: [PATCH 4/8] add generate /boot/uEnv.txt containing kernel info for
+ uboot probing
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- scripts/package/builddeb | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ scripts/package/builddeb | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index d67c791..d8cbeec 100755
+index d67c791..20585ab 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -203,6 +203,16 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
+@@ -203,6 +203,29 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
  else
  	want_initrd=No
  fi
 +
 +# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
-+mkdir -p "$tmpdir/boot/extlinux"
-+cat <<EOF > "$tmpdir/boot/extlinux/extlinux.conf"
-+label Linux ${version}
-+    kernel /boot/vmlinuz-$version
-+    append  console=ttyS0,115200 root=/dev/mmcblk0p3 rw rootfstype=ext4 rootwait
-+    fdtdir /boot/dtb
++cat <<EOF > "$tmpdir/boot/uEnv.txt"
++kver=${version}
++initrd_installed=$want_initrd
++EOF
++cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
++bitimage=/lib/firmware/socfpga/DE10_Nano_FB.rbf
++fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
++fpgaintf=ffd08028
++fpgaintf_handoff=0x00000000
++fpga2sdram_apply=3ff795a4
++fpga2sdram=ffc25080
++fpga2sdram_handoff=0x00000000
++axibridge=ffd0501c
++axibridge_handoff=0x00000000
++l3remap=ff800000
++l3remap_handoff=0x00000019
++bridge_enable_handoff=mw ${fpgaintf} ${fpgaintf_handoff}; mw ${fpga2sdram} ${fpga2sdram_handoff}; mw ${axibridge} ${axibridge_handoff}; mw ${l3remap} ${l3remap_handoff}
++loadimage=if test ${fpgatype} = cv_se_a6; then run fpgaload; fi; run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++mmcboot=setenv bootargs console=ttyS0,115200 root=${mmcroot} rootfstype=ext4 rw rootwait;bootz ${loadaddr} - ${fdt_addr}
 +EOF
 +
  for script in postinst postrm preinst prerm ; do
@@ -138,10 +150,10 @@ index d67c791..d8cbeec 100755
 2.7.4
 
 
-From 05722e65659f1056402584b34d61d9ad758fdc91 Mon Sep 17 00:00:00 2001
+From 92760789075af532a6e091651298778c04178580 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
-Subject: [PATCH 5/9] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 5/8] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -150,7 +162,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index a9f5f99..c17d698 100644
+index aef7e28..3ea0f7e 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -61,8 +61,6 @@ CONFIG_MTD_NAND_DENALI_DT=y
@@ -178,10 +190,10 @@ index a9f5f99..c17d698 100644
 2.7.4
 
 
-From 813227f651836ca63521c65ee6c4db51087f02d9 Mon Sep 17 00:00:00 2001
+From 895dd703fe21a7d353311a4638e07c181e3bbd67 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
-Subject: [PATCH 6/9] rename kernel package names to *-socfpga-rt-ltsi
+Subject: [PATCH 6/8] rename kernel package names to *-socfpga-rt-ltsi
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -189,7 +201,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index d8cbeec..16554d2 100755
+index 20585ab..2b501e4 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
 @@ -96,9 +96,9 @@ fwdir="$objtree/debian/fwtmp"
@@ -209,10 +221,10 @@ index d8cbeec..16554d2 100755
 2.7.4
 
 
-From 773d8d309165a3312f565b8b19fb0a58a6e9eb75 Mon Sep 17 00:00:00 2001
+From 805703183b636864cabd42010f0298e1d2bd4d1e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
-Subject: [PATCH 7/9] add spidev in dts so driver is loaded
+Subject: [PATCH 7/8] add spidev in dts so driver is loaded
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -246,10 +258,10 @@ index 595eb4f..6dcff22 100644
 2.7.4
 
 
-From b1ab6ff3fab17e2f3d712b32d2510159c0efac06 Mon Sep 17 00:00:00 2001
+From aa51c8b7b821c2624833201d02615b0cee82509a Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 8/9] Added DE-10 Nano dts dtb
+Subject: [PATCH 8/8] Added DE-10 Nano dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -272,7 +284,7 @@ index 251e243..efeea2a 100644
  	socfpga_cyclone5_sodia.dtb \
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
 new file mode 100644
-index 0000000..796037f
+index 0000000..fda1c83
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
 @@ -0,0 +1,193 @@
@@ -421,15 +433,15 @@ index 0000000..796037f
 +	txd1-skew-ps = <0>; /* -420ps */
 +	txd2-skew-ps = <0>; /* -420ps */
 +	txd3-skew-ps = <0>; /* -420ps */
-+	rxd0-skew-ps = <0>; /* 0ps */
-+	rxd1-skew-ps = <0>; /* 0ps */
-+	rxd2-skew-ps = <0>; /* 0ps */
-+	rxd3-skew-ps = <0>; /* 0ps */
++	rxd0-skew-ps = <420>; /* 0ps */
++	rxd1-skew-ps = <420>; /* 0ps */
++	rxd2-skew-ps = <420>; /* 0ps */
++	rxd3-skew-ps = <420>; /* 0ps */
 +	txen-skew-ps = <0>; /* -420ps */
-+	txc-skew-ps = <3000>; /* 960ps */
-+	rxdv-skew-ps = <0>; /* 0ps */
-+	rxc-skew-ps = <3000>; /* 780ps */
-+	max-frame-size = <3800>;
++	txc-skew-ps = <1860>; /* 960ps */
++	rxdv-skew-ps = <420>; /* 0ps */
++	rxc-skew-ps = <1680>; /* 780ps */
++	max-frame-size = <9000>;
 +};
 +
 +&gpio0 {
@@ -469,39 +481,6 @@ index 0000000..796037f
 +&usb1 {
 +	status = "okay";
 +};
--- 
-2.7.4
-
-
-From fd321d3b0572fa247488e1452e4b3af0110dc3c2 Mon Sep 17 00:00:00 2001
-From: Michael Brown <producer@holotronic.dk>
-Date: Mon, 12 Mar 2018 23:41:23 +0100
-Subject: [PATCH 9/9] add iscsi modules
-
-Signed-off-by: Michael Brown <producer@holotronic.dk>
----
- arch/arm/configs/socfpga_defconfig | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index c17d698..13d3155 100644
---- a/arch/arm/configs/socfpga_defconfig
-+++ b/arch/arm/configs/socfpga_defconfig
-@@ -154,7 +154,7 @@ CONFIG_EXT2_FS_XATTR=y
- CONFIG_EXT2_FS_POSIX_ACL=y
- CONFIG_EXT3_FS=y
- CONFIG_EXT4_FS=y
--# CONFIG_AUTOFS4_FS=y
-+CONFIG_AUTOFS4_FS=y
- CONFIG_EXT4_FS_POSIX_ACL=y
- CONFIG_EXT4_FS_SECURITY=y
- CONFIG_VFAT_FS=y
-@@ -178,3 +178,5 @@ CONFIG_DETECT_HUNG_TASK=y
- # CONFIG_SCHED_DEBUG is not set
- CONFIG_FUNCTION_TRACER=y
- CONFIG_DEBUG_USER=y
-+CONFIG_ISCSI_TCP=m
-+CONFIG_ISCSI_TARGET=m
 -- 
 2.7.4
 
