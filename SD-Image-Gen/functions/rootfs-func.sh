@@ -34,7 +34,7 @@ output=${?}
 #,task-lxde-desktop,lxsession,xinput
 
 run_qt_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,task-lxde-desktop,lxsession,xinput,gksu,acpid,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge ${2} ${1} ${3}
 output=${?}
 }
 
@@ -777,20 +777,20 @@ rm -f /etc/resolv.conf
 
 # enable systemd-networkd
 if [ ! -L '/lib/systemd/system/systemd-networkd.service' ]; then
-	echo ""
-	echo "ECHO:--> Enabling Systemd Networkd"
-	echo ""
-	ln -s /lib/systemd/system/systemd-networkd.service '${EnableSystemdNetworkedLink}'
+    echo ""
+    echo "ECHO:--> Enabling Systemd Networkd"
+    echo ""
+    ln -s /lib/systemd/system/systemd-networkd.service '${EnableSystemdNetworkedLink}'
 fi
 
 enable systemd-resolved
 if [ ! -L '/lib/systemd/system/systemd-resolved.service' ]; then
-	echo ""
-	echo "ECHO:--> Enabling Systemd Resolved"
-	echo ""
-	ln -s /lib/systemd/system/systemd-resolved.service '${EnableSystemdResolvedLink}'
-	rm -f /etc/resolv.conf
-	ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+    echo ""
+    echo "ECHO:--> Enabling Systemd Resolved"
+    echo ""
+    ln -s /lib/systemd/system/systemd-resolved.service '${EnableSystemdResolvedLink}'
+    rm -f /etc/resolv.conf
+    ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 fi
 
 exit
@@ -846,16 +846,33 @@ echo "Script_MSG: installing apt-transport-https"
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y update'
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install apt-transport-https'
-#sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y --assume-yes install systemd-sysv
-#sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y --assume-yes install task-lxde-desktop
 if [[ "${USER_NAME}" == "machinekit" ]]; then
-	add_mk_repo
+    add_mk_repo
 fi
 
 if [ "${DESKTOP}" == "yes" ]; then
+    echo "Scr_MSG: Installing lxqt"
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install lxqt'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' --no-install-recommends install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' --no-install-recommends -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
+    if [[ "${USER_NAME}" == "holosynth" ]]; then
+        echo "Scr_MSG: Installing kxstudio"
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_9.5.1~kxstudio3_all.deb'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/dpkg -i kxstudio-repos_9.5.1~kxstudio3_all.deb'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libglibmm-2.4-1v5'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/dpkg -i kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y update'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install a2jmidid jackmeter carla-data lmms audacity'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install kxstudio-menu'
+
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libjack-dev libqt4-dev qt4-dev-tools'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install python-qt4-dev python3-pyqt4 pyqt4-dev-tools'
+
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install git'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/git clone https://github.com/falkTX/Cadence.git'
+    fi
 fi
 
 gen_initial_sh
@@ -874,12 +891,12 @@ echo "Script_MSG: initial_rootfs_user_setup_sh finished .. ok .."
 
 finalize(){
 if [[ "${USER_NAME}" == "holosynth" ]]; then
-	sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/output_files/DE10_NANO_SOC_FB.rbf ${ROOTFS_MNT}/boot
+    sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/output_files/DE1_SOC_Linux_FB.rbf ${ROOTFS_MNT}/boot
 #	sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/socfpga.dtb ${ROOTFS_MNT}/boot
-	echo ""
-	echo "# --------->   Flip framebuffer upside down and no blanking fix    <--------------- ---------"
-	echo ""
-	sudo sh -c 'cat <<EOF >> '${ROOTFS_MNT}'/boot/uEnv.txt
+    echo ""
+    echo "# --------->   Flip framebuffer upside down and no blanking fix    <--------------- ---------"
+    echo ""
+    sudo sh -c 'cat <<EOF >> '${ROOTFS_MNT}'/boot/uEnv.txt
 mmcboot=setenv bootargs console=ttyS0,115200 root=\${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz \${loadaddr} - \${fdt_addr}
 EOF'
 
@@ -911,23 +928,9 @@ EOF'
 
 EOF'
 
-    else
-        sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/.xsessionrc
-xinput set-prop 6 "Evdev Axis Inversion" 1,1
-xinput set-prop 6 "Evdev Axes Swap" 0
-
-EOF'
-
-        sudo mkdir -p ${ROOTFS_MNT}/home/holosynth/Desktop
-        sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/Desktop/HolosynthVEd.sh
-#xinput set-prop 6 "Evdev Axis Inversion" 1,1
-#xinput set-prop 6 "Evdev Axes Swap" 0
-/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
-
-EOF'
     fi
-	sudo chmod +x ${ROOTFS_MNT}/home/holosynth/Desktop/HolosynthVEd.sh
-	sudo chown -R mib:mib ${ROOTFS_MNT}/home/holosynth/Desktop
+    sudo chmod +x ${ROOTFS_MNT}/home/holosynth/Desktop/HolosynthVEd.sh
+    sudo chown -R mib:mib ${ROOTFS_MNT}/home/holosynth/Desktop
 
 fi
 
@@ -954,9 +957,9 @@ else
 sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/X11/xorg.conf
 
 Section "Screen"
-       Identifier   "Default Screen"
-       tDevice       "Dummy"
-       DefaultDepth 24
+    Identifier   "Default Screen"
+    tDevice       "Dummy"
+    DefaultDepth 24
 EndSection
 
 Section "Device"
@@ -977,8 +980,8 @@ echo "# --------->       Removing qemu policy file          <--------------- ---
 echo ""
 
 if [ -f ${POLICY_FILE} ]; then
-	echo "removing ${POLICY_FILE}"
-	sudo rm -f ${POLICY_FILE}
+    echo "removing ${POLICY_FILE}"
+    sudo rm -f ${POLICY_FILE}
 fi
 echo ""
 echo "# --------->       Restoring resolv.conf link         <--------------- ---------"

@@ -1,10 +1,22 @@
 #!/bin/bash
 OK="yes"
 
+function contains() {
+    local n=$#
+    local value=${!n}
+    for ((i=1;i < $#;i++)) {
+        if [ "${!i}" == "${value}" ]; then
+#            echo "y"
+            return 0
+        fi
+    }
+#    echo "n"
+    return 1
+}
 
 exit_fail() {
-	echo "Scr_MSG: Exit error: in function ${curr_function}"
-	exit 1
+    echo "Scr_MSG: Exit error: in function ${curr_function}"
+    exit 1
 }
 
 extract_xz() {
@@ -16,7 +28,7 @@ extract_xz() {
 get_and_extract() {
     if [ ! -f ${3} ]; then
         echo "MSG: downloading ${2}"
-    	wget -c ${2}
+        wget -c ${2}
     fi
     echo "MSG: extracting ${3}"
     extract_xz ${3}
@@ -24,13 +36,13 @@ get_and_extract() {
 
 install_uboot_dep() {
 # install deps for u-boot build
-	sudo ${apt_cmd} -y install lib32z1 device-tree-compiler bc u-boot-tools
+    sudo ${apt_cmd} -y install lib32z1 device-tree-compiler bc u-boot-tools
 }
 
 install_kernel_dep() {
 # install deps for kernel build
-	sudo ${apt_cmd} -y install build-essential fakeroot bc u-boot-tools
-	sudo apt-get -y build-dep linux
+    sudo ${apt_cmd} -y install build-essential fakeroot bc u-boot-tools
+    sudo apt-get -y build-dep linux
 }
 
 install_rootfs_dep() {
@@ -534,9 +546,9 @@ uiomod_kernel
 
 ## parameters: 1: folder name, 2: patch file name
 git_patch() {
-	echo "MGG: Applying patch ${2}"
-	cd "${1}"
-	git am --signoff < ${2}
+    echo "MGG: Applying patch ${2}"
+    cd "${1}"
+    git am --signoff < ${2}
 }
 
 ## parameters: 1: top folder name, 2: url, 3: branch name, 4: checkout string, 5: clone folder name, 6: patch file name
@@ -550,10 +562,10 @@ git_fetch() {
             echo "MSG: cloning ${2} into ${5}"
             git clone ${2} ${5}
         else
-    		echo "MSG: cloning ${2}"
-    		git clone ${2} ${1}
+            echo "MSG: cloning ${2}"
+            git clone ${2} ${1}
         fi
-	fi
+    fi
     if [ ! -z "${5}" ]; then
         echo "MSG: cleaning repo"
         cd ${1}/${5}
@@ -564,45 +576,48 @@ git_fetch() {
         git reset --hard ${4}
         git checkout ${4}
     else
-    	cd ${1}
-    	if [ ! -z "${3}" ]; then
-	   	    git fetch origin
-		    git reset --hard origin/master
-		    echo "MSG: Will now check out " ${3}
-		    git checkout ${3} ${4}
+        cd ${1}
+        if [ ! -z "${3}" ]; then
+            git fetch origin
+            git reset --hard origin/master
+            echo "MSG: Will now check out " ${3}
+            git checkout ${3} ${4}
         fi
-	fi
+    fi
     if [ ! -z "${6}" ]; then
         if [ -f "${PATCH_SCRIPT_DIR}/${6}" ]; then
             echo "MSG: Will now apply patch: " ${PATCH_SCRIPT_DIR}/${6}
             git_patch ${1}/${5} ${PATCH_SCRIPT_DIR}/${6}
         else
-            echo "MSG: Patch file: " ${PATCH_SCRIPT_DIR}/${6} "not found"            
+            echo "MSG: Patch file: " ${PATCH_SCRIPT_DIR}/${6} "not found"
         fi
     fi
-	cd ..
+    cd ..
 }
 
-## parameters: 1: folder name, 2: config string 3: build string
+## parameters: 1: folder name, 2: config string 3: build string 4: env_tools
 armhf_build() {
 #    set -x
     cd ${1}
-	## configure - compile
-	export ARCH=arm
-	export PATH=$CC_DIR/bin/:$PATH
-	export CROSS_COMPILE=$CC
+    ## configure - compile
+    export ARCH=arm
+    export PATH=$CC_DIR/bin/:$PATH
+    export CROSS_COMPILE=$CC
 
-	echo "MSG: configuring ${1}"
-	echo "MSG: as ${2}"
-	make -j${NCORES} mrproper
-	if [ ! -z "${3}" ]; then
-		echo "MSG: compiling ${1}"
+    echo "MSG: configuring ${1}"
+    echo "MSG: as ${2}"
+    make -j${NCORES} mrproper
+    if [ ! -z "${3}" ]; then
+        echo "MSG: compiling ${1}"
         if [ "${3}" == "deb-pkg" ]; then
             make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="${GIT_KERNEL_VERSION}" deb-pkg
         else
             make -j${NCORES} "${2}"
             echo "MSG: building ${1}"
             make -j$NCORES "${3}"
+            if [ ! -z "${4}" ]; then
+                make CROSS_COMPILE=$CC -j$NCORES "${4}"
+            fi
         fi
     else
         make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION=2 deb-pkg
@@ -629,20 +644,20 @@ echo "${REPO_LIST1}"
 echo ""
 
 if [ ! -z "${REPO_LIST1}" ]; then
-	echo ""
-	echo "Scr_MSG: Will remove former version from repo"
-	echo ""
-	reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${REPO_LIST1}
-	reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} linux-libc-dev
-	reprepro -b ${HOME_REPO_DIR} export ${1}
-	echo "Scr_MSG: Restarting web server"
+    echo ""
+    echo "Scr_MSG: Will remove former version from repo"
+    echo ""
+    reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${REPO_LIST1}
+    reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} linux-libc-dev
+    reprepro -b ${HOME_REPO_DIR} export ${1}
+    echo "Scr_MSG: Restarting web server"
 
-	sudo systemctl restart apache2
-	reprepro -b ${HOME_REPO_DIR} export ${1}
+    sudo systemctl restart apache2
+    reprepro -b ${HOME_REPO_DIR} export ${1}
 else
-	echo ""
-	echo "Scr_MSG: Former version not found"
-	echo ""
+    echo ""
+    echo "Scr_MSG: Former version not found"
+    echo ""
 fi
 echo ""
 
@@ -734,51 +749,51 @@ sudo chroot --userspec=root:root ${1} /bin/ln -s /run/systemd/resolve/resolv.con
 
 ## parameters: 1: image name, 2: mount name
 mount_imagefile(){
-	mkdir -p ${2}
-	sync
-	echo "#--------------------------------------------------------------------------------------#"
-	echo "# Scr_MSG:   mounting imagefile:                                                       #"
-	sudo mount ${1} ${2}
-	echo "# ${1}"
-	echo "# Is mounted in ---> ${2}"
-	echo "#                                                                                      #"
-	echo "#--------------------------------------------------------------------------------------#"
+    mkdir -p ${2}
+    sync
+    echo "#--------------------------------------------------------------------------------------#"
+    echo "# Scr_MSG:   mounting imagefile:                                                       #"
+    sudo mount ${1} ${2}
+    echo "# ${1}"
+    echo "# Is mounted in ---> ${2}"
+    echo "#                                                                                      #"
+    echo "#--------------------------------------------------------------------------------------#"
 }
 
 ## parameters: 1: image name, 2: mount name 3: img part num
 mount_sd_imagefile(){
-	mkdir -p ${2}
-	sync
-	echo "#--------------------------------------------------------------------------------------#"
-	echo "# Scr_MSG:   mounting imagefile:                                                       #"
-	if [ -z "${3}" ]; then
-		echo "# Scr_MSG: 1 empty image:"
-		LOOP_DEV=`eval sudo losetup -Pf --show ${1}`
-		echo "# ${1}"
-		echo "# Is mounted in ---> ${LOOP_DEV}"
-	else
-		LOOP_DEV=`eval sudo losetup -Pf --show ${1}`
-		echo "# ${1}"
-		echo "# Is mounted in ---> ${LOOP_DEV}"
-		sudo mount ${LOOP_DEV}${3} ${2}
-		echo "#                                                                                      #"
-		echo "# ${LOOP_DEV}${3}"
-		echo "# Is mounted in ---> ${2}"
-		echo "#                                                                                      #"
-		echo "#--------------------------------------------------------------------------------------#"
-	fi
+    mkdir -p ${2}
+    sync
+    echo "#--------------------------------------------------------------------------------------#"
+    echo "# Scr_MSG:   mounting imagefile:                                                       #"
+    if [ -z "${3}" ]; then
+        echo "# Scr_MSG: 1 empty image:"
+        LOOP_DEV=`eval sudo losetup -Pf --show ${1}`
+        echo "# ${1}"
+        echo "# Is mounted in ---> ${LOOP_DEV}"
+    else
+        LOOP_DEV=`eval sudo losetup -Pf --show ${1}`
+        echo "# ${1}"
+        echo "# Is mounted in ---> ${LOOP_DEV}"
+        sudo mount ${LOOP_DEV}${3} ${2}
+        echo "#                                                                                      #"
+        echo "# ${LOOP_DEV}${3}"
+        echo "# Is mounted in ---> ${2}"
+        echo "#                                                                                      #"
+        echo "#--------------------------------------------------------------------------------------#"
+    fi
 }
 
 ## parameters: 1: mount name
 unmount_imagefile(){
-	echo "Scr_MSG: Unmounting Imagefile in ---> ${1}"
-	sudo umount -R ${1}
+    echo "Scr_MSG: Unmounting Imagefile in ---> ${1}"
+    sudo umount -R ${1}
 }
 
 ## parameters: 1: loop dev
 unmount_loopdev(){
-	echo "Scr_MSG: Unmounting loopdev in ---> ${1}"
-	sudo losetup -d ${LOOP_DEV}
+    echo "Scr_MSG: Unmounting loopdev in ---> ${1}"
+    sudo losetup -d ${LOOP_DEV}
 }
 
 ## parameters: 1: image name
@@ -855,59 +870,59 @@ echo "#-------------------------------------------------------------------------
 mkfs_label="-L ${ROOTFS_LABEL}"
 
 if [ "${1}" = "1" ]; then
-	echo "# Scr_MSG: 1 part rootfs image"
-	create_rootfs_img ${2}
+    echo "# Scr_MSG: 1 part rootfs image"
+    create_rootfs_img ${2}
 elif [ "${1}" = "2" ] || [ "${1}" = "3" ]; then
-	sudo dd if=/dev/zero of=${2} bs=4K count=1700K
-	echo "Now mounting sd-image file"
-	mount_sd_imagefile ${2} ${3}
-	if [ "${1}" = "2" ]; then
-		echo "# Scr_MSG: 2 part sd image"
-		fdisk_2part ${LOOP_DEV}
-	elif [ "${1}" = "3" ]; then
-		echo "# Scr_MSG: 3 part sd image"
-		fdisk_3part_swap ${LOOP_DEV}
-	fi
-	sudo sync
-	echo "# Scr_MSG: will now part probe"
-	sudo partprobe -s ${LOOP_DEV}
-	sudo sync
+    sudo dd if=/dev/zero of=${2} bs=4K count=1700K
+    echo "Now mounting sd-image file"
+    mount_sd_imagefile ${2} ${3}
+    if [ "${1}" = "2" ]; then
+        echo "# Scr_MSG: 2 part sd image"
+        fdisk_2part ${LOOP_DEV}
+    elif [ "${1}" = "3" ]; then
+        echo "# Scr_MSG: 3 part sd image"
+        fdisk_3part_swap ${LOOP_DEV}
+    fi
+    sudo sync
+    echo "# Scr_MSG: will now part probe"
+    sudo partprobe -s ${LOOP_DEV}
+    sudo sync
 
-	echo ""
-	echo "SubScr_MSG: creating file systems"
-	echo ""
+    echo ""
+    echo "SubScr_MSG: creating file systems"
+    echo ""
 
-	mkfs_partition="${LOOP_DEV}${media_rootfs_partition}"
-	sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
+    mkfs_partition="${LOOP_DEV}${media_rootfs_partition}"
+    sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
 
-	if [ "${1}" = "3" ]; then
-		sudo mkswap -f ${LOOP_DEV}${media_swap_partition}
-	fi
+    if [ "${1}" = "3" ]; then
+        sudo mkswap -f ${LOOP_DEV}${media_swap_partition}
+    fi
 
-	sudo sync
-	unmount_loopdev ${LOOP_DEV}
+    sudo sync
+    unmount_loopdev ${LOOP_DEV}
 else
-	echo ""
-	echo "SubScr_MSG: create_img() No Valid number of partitions given ie: 1(rootfs only), 2 or 3(with swap)"
-	echo ""
+    echo ""
+    echo "SubScr_MSG: create_img() No Valid number of partitions given ie: 1(rootfs only), 2 or 3(with swap)"
+    echo ""
 fi
 
 }
 
 ## parameters: 1: mount dev name
 bind_mounted(){
-	sudo mkdir -p ${1}/dev
-	sudo mkdir -p ${1}/proc
-	sudo mkdir -p ${1}/sys
-	sudo sync
-	sudo mount --bind /dev ${1}/dev
-	sudo mount --bind /proc ${1}/proc
-	sudo mount --bind /sys ${1}/sys
+    sudo mkdir -p ${1}/dev
+    sudo mkdir -p ${1}/proc
+    sudo mkdir -p ${1}/sys
+    sudo sync
+    sudo mount --bind /dev ${1}/dev
+    sudo mount --bind /proc ${1}/proc
+    sudo mount --bind /sys ${1}/sys
 
-	echo "#--------------------------------------------------------------------------------------#"
-	echo "# Scr_MSG: ${1} now Bind mounted                                                  #"
-	echo "#                                                                                      #"
-	echo "#--------------------------------------------------------------------------------------#"
+    echo "#--------------------------------------------------------------------------------------#"
+    echo "# Scr_MSG: ${1} now Bind mounted                                                  #"
+    echo "#                                                                                      #"
+    echo "#--------------------------------------------------------------------------------------#"
 }
 
 ## parameters: 1: mount dev name
@@ -915,95 +930,186 @@ kill_ch_proc(){
 FOUND=0
 PREFIX=${1}
 for ROOT in /proc/*/root; do
-	LINK=$(sudo readlink ${ROOT})
-	if [ "x${LINK}" != "x" ]; then
-		if [ "x${LINK:0:${#PREFIX}}" = "x${PREFIX}" ]; then
-			# this process is in the chroot...
-			PID=$(basename $(dirname "${ROOT}"))
-			sudo kill -9 "${PID}"
-			FOUND=1
-		fi
-	fi
+    LINK=$(sudo readlink ${ROOT})
+    if [ "x${LINK}" != "x" ]; then
+        if [ "x${LINK:0:${#PREFIX}}" = "x${PREFIX}" ]; then
+            # this process is in the chroot...
+            PID=$(basename $(dirname "${ROOT}"))
+            sudo kill -9 "${PID}"
+            FOUND=1
+        fi
+    fi
 done
 }
 
 ## parameters: 1: mount dev name
 unmount_binded(){
-	cd ${CURRENT_DIR}
-	CDR=`eval pwd`
-	echo ""
-	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-	echo ""
-	echo "Scr_MSG: current dir is now: ${CDR}"
-	echo ""
-	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-	echo ""
-	sudo sync
-		echo "Scr_MSG: Will now ummount ${1}"
-		RES=`eval sudo umount -R ${1}`
-		echo ""
-		echo "Scr_MSG: Unmont result = ${RES}"
-		echo "Scr_MSG: Unmont return value = ${?}"
-	if [ ! -d "${1}/dev" ]; then
-		echo ""
-		echo "Scr_MSG: umount -R failed"
-		echo "Scr_MSG: Will now run  kill_ch_proc ${1}"
-		echo ""
-		kill_ch_proc ${1}
-		if [ -d "${1}/dev" ]; then
-			echo "Scr_MSG: kill_ch_proc ${1} failed also "
-			exit 1
-		else
-			echo ""
-			echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-			echo ""
-			echo "Scr_MSG: ${1} was unmounted correctly with kill_ch_proc"
-			echo ""
-			echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-			echo ""
-		fi
-	else
-		echo ""
-		echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-		echo ""
-		echo "Scr_MSG: ${1} was unmounted correctly with umount -R"
-		echo ""
-		echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-		echo ""
-	fi
+    cd ${CURRENT_DIR}
+    CDR=`eval pwd`
+    echo ""
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo ""
+    echo "Scr_MSG: current dir is now: ${CDR}"
+    echo ""
+    echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    echo ""
+    sudo sync
+        echo "Scr_MSG: Will now ummount ${1}"
+        RES=`eval sudo umount -R ${1}`
+        echo ""
+        echo "Scr_MSG: Unmont result = ${RES}"
+        echo "Scr_MSG: Unmont return value = ${?}"
+    if [ ! -d "${1}/dev" ]; then
+        echo ""
+        echo "Scr_MSG: umount -R failed"
+        echo "Scr_MSG: Will now run  kill_ch_proc ${1}"
+        echo ""
+        kill_ch_proc ${1}
+        if [ -d "${1}/dev" ]; then
+            echo "Scr_MSG: kill_ch_proc ${1} failed also "
+            exit 1
+        else
+            echo ""
+            echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+            echo ""
+            echo "Scr_MSG: ${1} was unmounted correctly with kill_ch_proc"
+            echo ""
+            echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+            echo ""
+        fi
+    else
+        echo ""
+        echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        echo ""
+        echo "Scr_MSG: ${1} was unmounted correctly with umount -R"
+        echo ""
+        echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        echo ""
+    fi
 }
 
 # parameters: 1: work dir, 2: mount dev name, 3: comp prefix
 compress_rootfs(){
-	COMPNAME=${COMP_REL}_${3}
-	echo "#---------------------------------------------------------------------------#"
-	echo "#Scr_MSG:                                                                   #"
-	echo "compressing latest rootfs from image into: -->                              #"
-	echo " ${1}/${COMPNAME}_rootfs.tar.bz2"
-	echo "----------------------------------------------------------------------------#"
-	cd ${2}
+    COMPNAME=${COMP_REL}_${3}
+    echo "#---------------------------------------------------------------------------#"
+    echo "#Scr_MSG:                                                                   #"
+    echo "compressing latest rootfs from image into: -->                              #"
+    echo " ${1}/${COMPNAME}_rootfs.tar.bz2"
+    echo "----------------------------------------------------------------------------#"
+    cd ${2}
 #	sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys --exclude=tmp .
-	sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys .
-	cd ${1}
-	echo "#                                                                           #"
-	echo "#Scr_MSG:                                                                   #"
-	echo "${COMPNAME}_rootfs.tar.bz2 rootfs compression finished ..."
-	echo "#                                                                           #"
-	echo "#---------------------------------------------------------------------------#"
+    sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys .
+    cd ${1}
+    echo "#                                                                           #"
+    echo "#Scr_MSG:                                                                   #"
+    echo "${COMPNAME}_rootfs.tar.bz2 rootfs compression finished ..."
+    echo "#                                                                           #"
+    echo "#---------------------------------------------------------------------------#"
 }
 
 # parameters: 1: work dir, 2: mount dev name, 3: comp prefix
 extract_rootfs(){
 if [ ! -z "${3}" ]; then
-	COMPNAME=${COMP_REL}_${3}
-	echo "Script_MSG: Extracting ${1}/${COMPNAME}_rootfs.tar.bz2"
-	echo "Script_MSG: Into imagefile"
-	echo "Rootfs configured ... extracting  ${COMPNAME} rootfs into image...."
-	## extract rootfs into image:
-	sudo tar xfjS ${1}/${COMPNAME}_rootfs.tar.bz2 -C ${2}
-	echo "${1}/${COMPNAME}_rootfs.tar.bz2 rootfs extraction finished .."
+    COMPNAME=${COMP_REL}_${3}
+    echo "Script_MSG: Extracting ${1}/${COMPNAME}_rootfs.tar.bz2"
+    echo "Script_MSG: Into imagefile"
+    echo "Rootfs configured ... extracting  ${COMPNAME} rootfs into image...."
+    ## extract rootfs into image:
+    sudo tar xfjS ${1}/${COMPNAME}_rootfs.tar.bz2 -C ${2}
+    echo "${1}/${COMPNAME}_rootfs.tar.bz2 rootfs extraction finished .."
 fi
 }
+
+# parameters: 1: variable name, 2: variable value
+sv(){
+#fw_setenv [-c /my/fw_env.config] [-a key] [variable name] [variable value]
+sudo sh -c 'fw_setenv -c '${CURRENT_DIR}'/fw_env.config '"${1}"' '"${2}"''
+}
+
+# parameters: 1: board name
+gen_uboot_env_vars(){
+echo ""
+echo "NOTE:  Now setting uboot variables"
+
+# --- default env ----
+sv eth1addr
+sv eth3addr
+sv eth5addr
+sv ethaddr
+sv arch arm
+sv board ${1}
+sv board_name ${1}
+sv boot_net_usb_start "usb start"
+sv boot_targets "mmc0 pxe dhcp"
+sv bootcmd "run distro_bootcmd"
+sv bootcmd_dhcp "run boot_net_usb_start\; if dhcp \$\{scriptaddr\} \$\{boot_script_dhcp\}\; then source \$\{scriptaddr\}\; fi\;"
+sv bootcmd_host0 "setenv devnum 0\; run host_boot"
+sv bootcmd_mmc0 "setenv devnum 0\; run mmc_boot"
+sv bootcmd_pxe "run boot_net_usb_start\; dhcp\; if pxe get\; then pxe boot\; fi"
+sv bootm_size 0xa000000
+sv cpu armv7
+sv fdt_addr_r 0x02000000
+sv fdtfile "socfpga_cyclone5_${1}.dtb"
+sv host_boot "if host dev \$\{devnum\}\; then setenv devtype host\; run scan_dev_for_boot_part\; fi"
+sv kernel_addr_r 0x01000000
+sv loadaddr 0x01000000
+sv mmc_boot "if mmc dev \$\{devnum\}\; then setenv devtype mmc\; run scan_dev_for_boot_part\; fi"
+sv pxefile_addr_r x02200000
+sv ramdisk_addr_r 0x02300000
+sv scan_dev_for_boot "echo Scanning \$\{devtype\} \$\{devnum\}\:\$\{distro_bootpart\}\.\.\.\; for prefix in \$\{boot_prefixes\}\; do run scan_dev_for_extlinux\; run scan_dev_for_scripts\; done\;"
+sv scriptaddr 0x02100000
+sv soc socfpga
+sv usb_boot "usb start\; if usb dev \$\{devnum\}\; then setenv devtype usb\; run scan_dev_for_boot_part\; fi"
+sv vendor terasic
+
+# set hostname:
+sv hostname ${HOST_NAME}
+if [ "${DESKTOP}" == "yes" ]; then
+# load fpga:
+echo ""
+echo "NOTE:  Now setting uboot fpga load variables"
+sv axibridge ffd0501c
+sv axibridge_handoff 0x00000000
+sv bitimage /boot/DE1_SOC_Linux_FB.rbf
+sv boot_extlinux "run fpgaload\; run bridge_enable_handoff\; sysboot \$\{devtype\} \$\{devnum\}:\$\{distro_bootpart\} any \$\{scriptaddr\} \$\{prefix\}extlinux/extlinux.conf"
+sv bridge_enable_handoff "mw \$\{fpgaintf\} \$\{fpgaintf_handoff\}\; mw \$\{fpga2sdram\} \$\{fpga2sdram_handoff\}\; mw \$\{axibridge\} \$\{axibridge_handoff\}\; mw \$\{l3remap\} \$\{l3remap_handoff\}"
+sv fpga2sdram ffc25080
+sv fpga2sdram_apply 3ff795a4
+sv fpga2sdram_handoff 0x00000000
+sv fpgaintf ffd08028
+sv fpgaintf_handoff 0x00000000
+sv fpgaload "mmc rescan\; load mmc 0\:\$\{distro_bootpart\} \$\{loadaddr\} \$\{bitimage\}\; fpga load 0 \$\{loadaddr\} \$\{filesize\}"
+sv l3remap ff800000
+sv l3remap_handoff 0x00000019
+fi
+echo ""
+echo "NOTE:  u boot variables set OK"
+}
+
+# parameters: 1: local destination 2: rootfs mount, 3: board name
+set_fw_uboot_env(){
+echo ""
+echo "NOTE:  Will now generate ${2}/etc/fw_env.config"
+echo ""
+sudo sh -c 'cat <<EOT > '${2}'/etc/fw_env.config
+# MMC device name       Device offset   Env. size       Flash sector size       Number of sectors
+/dev/mmcblk0            0x4000          0x2000
+EOT'
+echo ""
+echo "NOTE:  Generated ${2}/etc/fw_env.config"
+
+cat <<EOT > ${CURRENT_DIR}/fw_env.config
+# MMC device name       Device offset   Env. size       Flash sector size       Number of sectors
+${1}            0x4000          0x2000
+EOT
+
+gen_uboot_env_vars "${3}"
+sudo sh -c 'fw_printenv -c '${CURRENT_DIR}'/fw_env.config > '${2}'/boot/fw_env.txt'
+echo ""
+echo "NOTE: Saved uboot environment variables to /boot/fw_env.txt in sd image"
+
+}
+
 
 # parameters: 1: uboot dir, 2: uboot make config, 3: sd img file name
 install_uboot() {
@@ -1017,15 +1123,15 @@ sudo sync
 
 # parameters: 1: work dir, 2: sd img file name
 make_bmap_image() {
-	echo ""
-	echo "NOTE:  Will now make bmap image"
-	echo ""
-	cd ${1}
-	bmaptool create -o ${2}.bmap ${2}
-	tar -cjSf ${2}.tar.bz2 ${2}
-	echo ""
-	echo "NOTE:  Bmap image created"
-	echo ""
+    echo ""
+    echo "NOTE:  Will now make bmap image"
+    echo ""
+    cd ${1}
+    bmaptool create -o ${2}.bmap ${2}
+    tar -cjSf ${2}.tar.bz2 ${2}
+    echo ""
+    echo "NOTE:  Bmap image created"
+    echo ""
 }
 
 inst_qt_build_deps(){
@@ -1038,18 +1144,19 @@ sudo cp -f ${ROOTFS_MNT}/etc/apt/sources.list-local ${ROOTFS_MNT}/etc/apt/source
 sudo rm -f ${ROOTFS_MNT}/etc/resolv.conf
 sudo cp -f /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} update
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install libc6-dev x11proto-core-dev libsm6 libsm-dev libgtk-3-common libgtk-3-0 libgtk-3-dev
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' update'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libc6-dev x11proto-core-dev libsm6 libsm-dev libgtk-3-common libgtk-3-0 libgtk-3-dev'
 
 set +e
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y build-dep qt5-default
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y build-dep qt5-default'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install qtbase5-dev'
 
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install "^libxcb.*" libx11-xcb-dev libxrender-dev libxi-dev libinput5 libinput-pad1 libinput-dev libinput-pad-dev
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install libxcb-xkb1 libxkbcommon-dev libxkbcommon-x11-0 libxkbcommon-x11-dev libxkbcommon0 libxkbfile-dev libxkbfile1 libasound2-dev libmtdev1 libmtdev-dev
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install "^libxcb.*" libx11-xcb-dev libxrender-dev libxi-dev libinput10 libinput-pad1 libinput-dev libinput-pad-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libxcb-xkb1 libxkbcommon-dev libxkbcommon-x11-0 libxkbcommon-x11-dev libxkbcommon0 libxkbfile-dev libxkbfile1 libasound2-dev libmtdev1 libmtdev-dev'
 #libgtk2.0-0 libgtk2.0-common libgtk2.0-dev libgtk-3-common libgtk-3-0 libgtk-3-dev libgdk-pixbuf2.0-dev libhunspell-1.3-0 libhunspell-dev hunspell-en-us libgl1-mesa-dev libglu1-mesa-dev
 #libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y install  libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync0-dev libxcb-xfixes0-dev libxrender-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-glx0-dev libxcb-xinerama0-dev libfontconfig1 libevdev2 libevdev-dev libudev1 libudev-dev libfontconfig1-dev
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install  libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync0-dev libxcb-xfixes0-dev libxrender-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-glx0-dev libxcb-xinerama0-dev libfontconfig1 libevdev2 libevdev-dev libudev1 libudev-dev libfontconfig1-dev'
 #libegl1-mesa-dev libgegl-dev
 
 # echo ""
@@ -1071,9 +1178,9 @@ sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /run/systemd/resolve/r
 
 qt_gen_mkspec(){
 
-	rm -R -f ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++
-	mkdir -p ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++
-	cp -f -R ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabi-g++/* ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++/
+    rm -R -f ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++
+    mkdir -p ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++
+    cp -f -R ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabi-g++/* ${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++/
 
 # qmake.conf contents:
 #sh -c 'cat <<EOF > "${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++/qmake.conf"
@@ -1120,14 +1227,14 @@ QMAKE_LIBS             += -lrt -lpthread -ldl
 #QMAKE_LFLAGS_RELEASE=-"Wl,-O1,-rpath,'${QT_ROOTFS_MNT}'/usr/lib,-rpath,'${QT_ROOTFS_MNT}'/usr/lib/'${CROSS_GNU_ARCH}',-rpath,'${QT_ROOTFS_MNT}'/lib/'${CROSS_GNU_ARCH}'"
 #QMAKE_LFLAGS_DEBUG += "-Wl,-rpath,'${QT_ROOTFS_MNT}'/usr/lib,-rpath,'${QT_ROOTFS_MNT}'/usr/lib/${CROSS_GNU_ARCH},-rpath,'${QT_ROOTFS_MNT}'/lib/${CROSS_GNU_ARCH}"
 
-# QMAKE_INCDIR='${QT_ROOTFS_MNT}'/usr/include
-# QMAKE_LIBDIR='${QT_ROOTFS_MNT}'/usr/lib
-# QMAKE_LIBDIR+='${QT_ROOTFS_MNT}'/usr/lib/'${CROSS_GNU_ARCH}'
-# QMAKE_LIBDIR+='${QT_ROOTFS_MNT}'/lib/'${CROSS_GNU_ARCH}'
-# QMAKE_INCDIR_X11='${QT_ROOTFS_MNT}'/usr/include
-# QMAKE_LIBDIR_X11='${QT_ROOTFS_MNT}'/usr/lib
-# QMAKE_INCDIR_OPENGL='${QT_ROOTFS_MNT}'/usr/include
-# QMAKE_LIBDIR_OPENGL='${QT_ROOTFS_MNT}'/usr/lib
+#QMAKE_INCDIR='${QT_ROOTFS_MNT}'/usr/include
+#QMAKE_LIBDIR='${QT_ROOTFS_MNT}'/usr/lib
+#QMAKE_LIBDIR+='${QT_ROOTFS_MNT}'/usr/lib/'${CROSS_GNU_ARCH}'
+#QMAKE_LIBDIR+='${QT_ROOTFS_MNT}'/lib/'${CROSS_GNU_ARCH}'
+#QMAKE_INCDIR_X11='${QT_ROOTFS_MNT}'/usr/include
+#QMAKE_LIBDIR_X11='${QT_ROOTFS_MNT}'/usr/lib
+#QMAKE_INCDIR_OPENGL='${QT_ROOTFS_MNT}'/usr/include
+#QMAKE_LIBDIR_OPENGL='${QT_ROOTFS_MNT}'/usr/lib
 
 load(qt_config)
 
@@ -1158,18 +1265,16 @@ EOF
 qt_configure(){
 curr_function="qt_configure()"
 # ../configure -help
-# 	../configure -release -opensource -confirm-license -nomake examples -no-c++11 -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -qreal float -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
-#
-# ../configure -release -opensource -confirm-license -nomake examples -qreal float -no-c++11 -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
-#
-../configure -release -opensource -confirm-license -nomake examples -qreal float -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
-	output=${?}
-	output1=${output}
-	if [ ${output} -gt 0 ]; then
-		exit_fail
-	else
-		echo "Scr_MSG: function --> ${curr_function} exited with success"
-	fi
+#../configure -release -opensource -confirm-license -nomake examples -qreal float -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc -no-use-gold-linker
+../configure -release -opensource -confirm-license -nomake examples -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
+# -qreal float -no-use-gold-linker
+    output=${?}
+    output1=${output}
+    if [ ${output} -gt 0 ]; then
+        exit_fail
+    else
+        echo "Scr_MSG: function --> ${curr_function} exited with success"
+    fi
 }
 
 configure_for_qt_qwt(){
@@ -1193,12 +1298,15 @@ export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/arm-linux-gnueabihf/pkgconfig
 export PKG_CONFIG_SYSROOT_DIR=${QT_ROOTFS_MNT}
 export CROSS_COMPILE=${QT_CC}
 
-GEN_MKSPEC_QT="yes";
-CONFIGURE_QT="yes";
+#GEN_MKSPEC_QT="yes";
+#CONFIGURE_QT="yes";
 #
-BUILD_QT="yes";
+#BUILD_QT="yes"\;
 #
-INSTALL_QT="yes";
+#INSTALL_QT="yes";
+#
+#BUILD_QWT="yes";
+
 #CONFIGURE_FOR_QWT="yes";
 CONFIGURE_FOR_QWT="no";
 
@@ -1206,60 +1314,61 @@ mkdir -p ${CURRENT_DIR}/Qt_logs
 
 if [[ "${GEN_MKSPEC_QT}" ==  "${OK}" ]]; then
 #	old_gen_mkspec | tee ${CURRENT_DIR}/Qt_logs/old_gen_mkspec-log.txt
-	qt_gen_mkspec
-	echo "Scr_MSG: generated mkspecs"
-	echo ""
-	sudo ~/sysroot-relativelinks.py ${QT_ROOTFS_MNT}
+    qt_gen_mkspec
+    echo ""
+    echo "Scr_MSG: generated mkspecs"
+#	wget https://raw.githubusercontent.com/riscv/riscv-poky/master/scripts/sysroot-relativelinks.py
 fi
 
 
 if [[ "${CONFIGURE_QT}" ==  "${OK}" ]]; then
-	sudo rm -Rf ${QTDIR}/build
-	mkdir -p ${QTDIR}/build
-	cd ${QTDIR}/build
-	qt_configure 2>&1| tee ${CURRENT_DIR}/Qt_logs/qt_configure-log.txt
-	echo ""
-	echo " qt_configure return value = ${output1}"
-	echo ""
+    sudo rm -Rf ${QTDIR}/build
+    mkdir -p ${QTDIR}/build
+    cd ${QTDIR}/build
+    qt_configure 2>&1| tee ${CURRENT_DIR}/Qt_logs/qt_configure-log.txt
+    echo ""
+    echo " qt_configure return value = ${output1}"
+    echo ""
 fi
 
 if [[ "${BUILD_QT}" ==  "${OK}" ]]; then
-	cd ${QTDIR}/build
-	make -j${NCORES} 2>&1| tee ${CURRENT_DIR}/Qt_logs/qt_build-log.txt
-	output=${?}
-	output2=${output}
-	curr_function="make"
-	if [ ${output} -gt 0 ]; then
-		exit_fail
-	fi
-	echo ""
-	echo " qt make return value = ${output2}"
-	echo ""
+    sudo ~/bin/sysroot-relativelinks.py ${QT_ROOTFS_MNT}
+    cd ${QTDIR}/build
+    make -j${NCORES} 2>&1| tee ${CURRENT_DIR}/Qt_logs/qt_build-log.txt
+    output=${?}
+    output2=${output}
+    curr_function="make"
+    if [ ${output} -gt 0 ]; then
+        exit_fail
+    fi
+    echo ""
+    echo " qt make return value = ${output2}"
+    echo ""
 fi
 
 if [[ "${INSTALL_QT}" ==  "${OK}" ]]; then
-	cd ${QTDIR}/build
-	sudo make install 2>&1| tee ${CURRENT_DIR}/Qt_logs/qt_install-log.txt
-	output=${?}
-	output3=${output}
-	curr_function="make_install"
-	if [ ${output} -gt 0 ]; then
-		exit_fail
-	fi
-	echo ""
-	echo " qt_configure return value = ${output1}"
-	echo ""
-	echo ""
-	echo " qt make return value = ${output2}"
-	echo ""
-	echo ""
-	echo " qt make install return value = ${output3}"
-	echo ""
+    cd ${QTDIR}/build
+    sudo make install 2>&1| tee ${CURRENT_DIR}/Qt_logs/qt_install-log.txt
+    output=${?}
+    output3=${output}
+    curr_function="make_install"
+    if [ ${output} -gt 0 ]; then
+        exit_fail
+    fi
+    echo ""
+    echo " qt_configure return value = ${output1}"
+    echo ""
+    echo ""
+    echo " qt make return value = ${output2}"
+    echo ""
+    echo ""
+    echo " qt make install return value = ${output3}"
+    echo ""
 #	sudo cp -R '/usr/local/lib/qt-'${QT_VER}'-altera-soc' ''${QT_ROOTFS_MNT}'/usr/local/lib'
 fi
 
 if [[ "${CONFIGURE_FOR_QWT}" ==  "${OK}" ]]; then
-	configure_for_qt_qwt
+    configure_for_qt_qwt
 fi
 
 }

@@ -23,14 +23,12 @@
 
 ## Select distro:
 ### Debian based:
-#distro="jessie"
 distro="stretch"
 #distro="buster"
 ### Ubuntu based:
 #distro=bionic
 #distro=xenial
 #HOME_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
-#HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
 HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
 
 shell_cmd="/bin/bash"
@@ -42,8 +40,6 @@ ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
 final_repo="http://deb.debian.org//debian/"
 local_repo=${HOME_MIRR_REPO_URL}
 local_ws=kdeneon-ws
-#local_ws=kubuntu16-ws
-#local_ws="debian9-ws"
 local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
 
 
@@ -60,10 +56,11 @@ mkfs_options=""
 
 
 ## Select board
-BOARD=de10-nano
-#BOARD=de0-nano-soc
-#BOARD=de1-soc
-#BOARD=sockitoc-
+BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit")
+#BOARD=de10_nano
+#BOARD=de0_nano_soc
+#BOARD=de1_soc
+#BOARD=sockit
 
 ## Select u-boot version:
 #UBOOT_VERSION="v2016.09"
@@ -92,10 +89,11 @@ SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
 KERNEL_CONF="socfpga_defconfig"
 ALT_GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION}${GIT_KERNEL_REV}"
 
-QT_VER=5.7.1
+#QT_VER=5.7.1
+QT_VER=5.10.1
 QT_ROOTFS_MNT="/tmp/qt_${QT_VER}-img"
 
-QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
+QTDIR="/home/mib/qt-src/qt-everywhere-src-${QT_VER}"
 
 #------------------------------------------------------------------------------------------------------
 # Variables Prerequsites
@@ -150,7 +148,8 @@ QT_CC_FOLDER_NAME="gcc-linaro-${CROSS_GNU_ARCH}-4.9-2014.09_linux"
 
 QT_CC_DIR="${TOOLCHAIN_DIR}/${QT_CC_FOLDER_NAME}"
 #QT_CC_FILE="${QT_CC_FOLDER_NAME}.tar.xz"
-QT_CC="${QT_CC_DIR}/bin/${CROSS_GNU_ARCH}-"
+#QT_CC="${QT_CC_DIR}/bin/${CROSS_GNU_ARCH}-"
+QT_CC="/usr/bin/${CROSS_GNU_ARCH}-"
 
 ## ------------------------------  Kernel  -------------------------------##
 if [ "${USER_NAME}" == "machinekit" ]; then
@@ -163,8 +162,8 @@ RT_KERNEL_TAG="${RT_KERNEL_VERSION}-${RT_PATCH_REV}"
 RT_KERNEL_LOCALVERSION="socfpga-${RT_KERNEL_TAG}"
 GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}"
 GIT_KERNEL_LOCALVERSION="socfpga-${GIT_KERNEL_TAG}"
-#SD_KERNEL_TAG="${RT_KERNEL_VERSION}-socfpga-${KERNEL_PKG_VERSION}"
-SD_KERNEL_TAG="socfpga${GIT_KERNEL_REV}"
+#SD_KERNEL_TAG="socfpga${GIT_KERNEL_REV}"
+SD_KERNEL_TAG="socfpga-rt-ltsi"
 
 RT_KERNEL_FOLDER="linux-${RT_KERNEL_VERSION}"
 RT_KERNEL_FILE_NAME="${RT_KERNEL_FOLDER}.tar.xz"
@@ -194,26 +193,7 @@ UBOOT_BUILD_DIR="$UBOOT_PARENT_DIR/${UBOOT_VERSION}"
 UBOOT_CHKOUT_OPTIONS='-b tmp'
 #UBOOT_CHKOUT_OPTIONS=""
 
-if [ "${BOARD}" = "de10-nano" ]; then
-UBOOT_CONFIG='de10_nano'
-BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${nanofolder}
-elif [ "${BOARD}" = "de0-nano-soc" ]; then
-UBOOT_CONFIG='de0_nano_soc'
-BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${de1folder}
-elif [ "${BOARD}" = "de1-soc" ]; then
-UBOOT_CONFIG='de1_soc'
-BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${de1folder}
-elif [ "${BOARD}" = "sockit" ]; then
-UBOOT_CONFIG='sockit'
-BOOT_FILES_DIR=${MAIN_SCRIPT_DIR}/../boot_files/${sockitfolder}
-fi
-
-# 2016.0X patches:
-UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-${BOARD}-changeset.patch"
-
-UBOOT_BOARD_CONFIG="socfpga_${UBOOT_CONFIG}_defconfig"
-
-HOLOSYNTH_QUAR_PROJ_FOLDER="/home/mib/Developer/the-snowwhite_git/HolosynthV/QuartusProjects/DE10Nano"
+HOLOSYNTH_QUAR_PROJ_FOLDER='/home/mib/Developer/the-snowwhite_git/HolosynthV/QuartusProjects/HolosynthIV_DE1SoC-Q15.0_15-inch-lcd'
 
 #-----  select global toolchain  ------#
 
@@ -297,18 +277,30 @@ install_deps() {
         echo "Script_MSG: ${CC_DIR}"
         echo ""
     fi
-	install_uboot_dep
-	install_kernel_dep
+    install_uboot_dep
+    install_kernel_dep
     sudo ${apt_cmd} install kpartx
     install_rootfs_dep
-	sudo ${apt_cmd} install -y bmap-tools pbzip2 pigz
+    sudo ${apt_cmd} install -y bmap-tools pbzip2 pigz
     echo "MSG: deps installed"
 }
 
 build_uboot() {
-    git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
-    if [ "${1}" != "c" ]; then
-        armhf_build ${UBOOT_BUILD_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}"
+    contains ${BOARDS[@]} ${1}
+    if [ "$?" -eq 0 ]; then
+        echo "Valid boardname = ${1} given"
+        # patches:
+        UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-${1}-changeset.patch"
+        git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
+        UBOOT_BOARD_CONFIG="socfpga_${1}_defconfig"
+        armhf_build ${UBOOT_BUILD_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}" "envtools"
+    elif [ "${1}" == "c" ]; then
+        git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
+    else
+        echo "--build_uboot= bad argument --> ${1}"
+        echo "Use either =c to fetch and patch only or =boardname"
+        echo "Valid boardnames are:"
+        echo " ${BOARDS[@]}"
     fi
 }
 
@@ -316,7 +308,6 @@ build_git_kernel() {
 #    distro="jessie"
     git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
     if [ "${1}" != "c" ]; then
-#   armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" 2>&1 | tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
     armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
     fi
 }
@@ -335,8 +326,6 @@ build_rt_ltsi_kernel() {
     fi
     rt_patch_kernel
     if [ "${1}" != "c" ]; then
-#    	armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}" 2>&1 | tee ${CURRENT_DIR}/Logs/kernel_deb_rt-log.txt
-#	armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}" |& tee ${CURRENT_DIR}/Logs/kernel_deb_rt-log.txt
     armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}"
     fi
 }
@@ -389,7 +378,7 @@ finalize_rootfs_image() {
         echo "Scr_MSG: !! Found ${1} mounted .. will unmount now"
         unmount_binded ${1}
     fi
-    create_img 1 "${2}" ""    
+    create_img 1 "${2}" ""
     mount_imagefile "${2}" ${1}
     bind_mounted ${ROOTFS_MNT}
     . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
@@ -416,31 +405,51 @@ finalize_rootfs_image() {
 
 ## parameters: 1: kernel image tag, 2: rootfs image name
 inst_repo_kernel() {
+    if [ "$(ls -A ${ROOTFS_MNT})" ]; then
+        echo "Scr_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
+        unmount_binded ${ROOTFS_MNT}
+    fi
+    create_img 1 "${2}" ""
     mount_imagefile "${2}" ${ROOTFS_MNT}
     bind_mounted ${ROOTFS_MNT}
+    if [ "${DESKTOP}" == "yes" ]; then
+        extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-desktop"
+    else
+        extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured"
+    fi
+    echo "Script_MSG: will now install kernel"
     inst_kernel_from_local_repo ${ROOTFS_MNT} ${SD_KERNEL_TAG}
     compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
     unmount_binded ${ROOTFS_MNT}
 }
 
-## parameters: 1: kernel image tag
+## parameters: 1: kernel image tag, 2: board name
 assemble_full_sd_img() {
-    if [ "${DESKTOP}" == "yes" ]; then
-        SD_IMG_NAME="${SD_FILE_PRELUDE}-${BOARD}_desktop_sd.img"
-    else 
-        SD_IMG_NAME="${SD_FILE_PRELUDE}-${BOARD}_sd.img"
-    fi
-    SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
+    contains ${BOARDS[@]} ${2}
+    if [ "$?" -eq 0 ]; then
+        if [ "${DESKTOP}" == "yes" ]; then
+            SD_IMG_NAME="${SD_FILE_PRELUDE}-${2}_desktop_sd.img"
+        else
+            SD_IMG_NAME="${SD_FILE_PRELUDE}-${2}_sd.img"
+        fi
+        SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
 
-    echo "step 1 create ${SD_IMG_FILE}"
-    create_img "3" "${SD_IMG_FILE}" "${ROOTFS_MNT}" "${media_rootfs_partition}"
-    echo "step 2 mount:"
-    mount_sd_imagefile ${SD_IMG_FILE} ${ROOTFS_MNT} ${media_rootfs_partition}
-    extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
-    unmount_binded ${ROOTFS_MNT}
-    unmount_loopdev
-    install_uboot ${UBOOT_BUILD_DIR} ${UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
-    make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
+        echo "step 1 create ${SD_IMG_FILE}"
+        create_img "3" "${SD_IMG_FILE}" "${ROOTFS_MNT}" "${media_rootfs_partition}"
+        echo "step 2 mount:"
+        mount_sd_imagefile ${SD_IMG_FILE} ${ROOTFS_MNT} ${media_rootfs_partition}
+        extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} ${1}
+        set_fw_uboot_env ${LOOP_DEV} ${ROOTFS_MNT} ${2}
+        unmount_binded ${ROOTFS_MNT}
+        unmount_loopdev
+        install_uboot ${UBOOT_BUILD_DIR} ${UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
+        make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
+    else
+        echo "--build_uboot= bad argument --> ${2}"
+        echo "Use  =boardname"
+        echo "Valid boardnames are:"
+        echo " ${BOARDS[@]}"
+    fi
 }
 
 #------------------------------------------------------------------------------------------------------
@@ -470,7 +479,7 @@ while [ "$1" != "" ]; do
             install_deps
             ;;
         --uboot)
-            build_uboot
+            build_uboot ${VALUE}
             ;;
         --build_git-kernel)
             build_git_kernel ${VALUE}
@@ -508,7 +517,7 @@ while [ "$1" != "" ]; do
             ;;
         --inst_repo_kernel-desktop)
             DESKTOP="yes"
-            inst_repo_kernel "finalized-fully-configured-with-kernel-and-desktop" "${ROOTFS_IMG}-desktop"
+            inst_repo_kernel "finalized-fully-configured-with-kernel-and-desktop" "${ROOTFS_IMG}-desktop-kernel"
             ;;
         --bindmount_rootfsimg)
             mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
@@ -518,28 +527,31 @@ while [ "$1" != "" ]; do
             unmount_binded ${ROOTFS_MNT}
             ;;
         --assemble_sd_img)
-            assemble_full_sd_img "finalized-fully-configured-with-kernel"
+            assemble_full_sd_img "finalized-fully-configured-with-kernel" ${VALUE}
             ;;
         --assemble_desktop_sd_img)
             DESKTOP="yes"
-            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-desktop"
+            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-desktop" ${VALUE}
             ;;
         --inst_qt_img_deps)
-            mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
+            cp "${ROOTFS_IMG}-desktop" "${ROOTFS_IMG}-fin-qt-dep"
+            mount_imagefile "${ROOTFS_IMG}-fin-qt-dep" ${ROOTFS_MNT}
             bind_mounted ${ROOTFS_MNT}
             inst_qt_build_deps
             compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-qt-deps"
             unmount_binded ${ROOTFS_MNT}
-            cp ${ROOTFS_IMG} "${ROOTFS_IMG}-fin-qt-dep"
             ;;
         --build_qt)
-            mount_imagefile ${ROOTFS_IMG} ${QT_ROOTFS_MNT}
+            cp "${ROOTFS_IMG}-fin-qt-dep" "${ROOTFS_IMG}-fin-qt-built"
+            mount_imagefile "${ROOTFS_IMG}-fin-qt-built" ${QT_ROOTFS_MNT}
             qt_build
+            compress_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-qt-qwt"
             unmount_binded ${QT_ROOTFS_MNT}
-            cp ${ROOTFS_IMG} "${ROOTFS_IMG}-fin-qt-built"
             ;;
         --assemble_qt_dev_sd_img)
-            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-installed"
+            DESKTOP="yes"
+#            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-installed"
+            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-qwt" ${VALUE}
             ;;
     *)
             echo "ERROR: unknown parameter \"$PARAM\""
