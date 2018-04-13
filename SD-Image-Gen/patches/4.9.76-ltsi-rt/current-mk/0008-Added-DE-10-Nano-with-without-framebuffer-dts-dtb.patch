@@ -1,7 +1,7 @@
-From d88ba868727817a044f4fcb5209eb48878a0b69c Mon Sep 17 00:00:00 2001
+From 2e5e5a681e3cffc08ce9425468c934766738cd36 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 08/13] Added DE-10 Nano with/without framebuffer dts dtb
+Subject: [PATCH 08/10] Added DE-10 Nano with/without framebuffer dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -13,10 +13,10 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index b786f24..6e8a153 100644
+index 251e243..b4c3dd1 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -700,6 +700,8 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
+@@ -704,6 +704,8 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
  	socfpga_cyclone5_mcvevk.dtb \
  	socfpga_cyclone5_socdk.dtb \
  	socfpga_cyclone5_de0_sockit.dtb \
@@ -145,7 +145,7 @@ index 0000000..7645340
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
 new file mode 100644
-index 0000000..f69c95a
+index 0000000..d001578
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
 @@ -0,0 +1,215 @@

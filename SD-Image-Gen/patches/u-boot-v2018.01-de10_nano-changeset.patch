@@ -1,0 +1,62 @@
+From 1bcd1846c8823967ce8eb3472c2321558058e9ee Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 11 Mar 2018 20:02:36 +0100
+Subject: [PATCH 1/2] add support for part command
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ configs/socfpga_de10_nano_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/socfpga_de10_nano_defconfig b/configs/socfpga_de10_nano_defconfig
+index ecf6de3..aa9fe7e 100644
+--- a/configs/socfpga_de10_nano_defconfig
++++ b/configs/socfpga_de10_nano_defconfig
+@@ -38,6 +38,7 @@ CONFIG_MTDIDS_DEFAULT="nor0=ff705000.spi.0"
+ CONFIG_ENV_IS_IN_MMC=y
+ CONFIG_SPL_DM=y
+ CONFIG_DFU_MMC=y
++CONFIG_CMD_PART=y
+ CONFIG_FPGA_SOCFPGA=y
+ CONFIG_DM_GPIO=y
+ CONFIG_DWAPB_GPIO=y
+-- 
+2.7.4
+
+
+From 8e05a9f0c5bcc7a89f6621894c73d1af22b911c0 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Fri, 13 Apr 2018 14:06:40 +0200
+Subject: [PATCH 2/2] Add support for fw_printenv fw_setenv
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ configs/socfpga_de10_nano_defconfig | 1 +
+ include/configs/socfpga_common.h    | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configs/socfpga_de10_nano_defconfig b/configs/socfpga_de10_nano_defconfig
+index aa9fe7e..0998ba6 100644
+--- a/configs/socfpga_de10_nano_defconfig
++++ b/configs/socfpga_de10_nano_defconfig
+@@ -63,3 +63,4 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0xa4a5
+ CONFIG_USB_GADGET_DWC2_OTG=y
+ CONFIG_USB_GADGET_DOWNLOAD=y
+ CONFIG_USE_TINY_PRINTF=y
++CONFIG_FILE=y
+diff --git a/include/configs/socfpga_common.h b/include/configs/socfpga_common.h
+index 66e7c4f..1f5dd9e 100644
+--- a/include/configs/socfpga_common.h
++++ b/include/configs/socfpga_common.h
+@@ -235,7 +235,7 @@ unsigned int cm_get_qspi_controller_clk_hz(void);
+ /* Environment for SDMMC boot */
+ #if defined(CONFIG_ENV_IS_IN_MMC) && !defined(CONFIG_ENV_OFFSET)
+ #define CONFIG_SYS_MMC_ENV_DEV		0 /* device 0 */
+-#define CONFIG_ENV_OFFSET		(34 * 512) /* just after the GPT */
++#define CONFIG_ENV_OFFSET		(32 * 512) /* just after the GPT */
+ #endif
+ 
+ /* Environment for QSPI boot */
+-- 
+2.7.4
+

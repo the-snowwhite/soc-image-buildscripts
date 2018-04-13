@@ -1,154 +1,34 @@
-From d88ba868727817a044f4fcb5209eb48878a0b69c Mon Sep 17 00:00:00 2001
+From 80b0b29b9cd9d357ef1bb9594f8f7811d37dd7f4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
-Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 08/13] Added DE-10 Nano with/without framebuffer dts dtb
+Date: Sun, 8 Apr 2018 23:01:49 +0200
+Subject: [PATCH 12/13] Add framebuffer,audio and midi enabled dtb for de1
+ Socsynth
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/boot/dts/Makefile                         |   2 +
- arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts   | 112 +++++++++++
- .../arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts | 215 +++++++++++++++++++++
- 3 files changed, 329 insertions(+)
- create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
- create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
+ arch/arm/boot/dts/Makefile                     |   1 +
+ arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 290 +++++++++++++++++++++++++
+ 2 files changed, 291 insertions(+)
+ create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index b786f24..6e8a153 100644
+index 6e8a153..7638a3f 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -700,6 +700,8 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
+@@ -700,6 +700,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
  	socfpga_cyclone5_mcvevk.dtb \
  	socfpga_cyclone5_socdk.dtb \
  	socfpga_cyclone5_de0_sockit.dtb \
-+	socfpga_cyclone5_de10_nano_fb.dtb \
-+	socfpga_cyclone5_de10_nano.dtb \
++	socfpga_cyclone5_de1_soc.dtb \
+ 	socfpga_cyclone5_de10_nano_fb.dtb \
+ 	socfpga_cyclone5_de10_nano.dtb \
  	socfpga_cyclone5_sockit.dtb \
- 	socfpga_cyclone5_socrates.dtb \
- 	socfpga_cyclone5_sodia.dtb \
-diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 new file mode 100644
-index 0000000..7645340
+index 0000000..08ef49f
 --- /dev/null
-+++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
-@@ -0,0 +1,112 @@
-+/*
-+ * Copyright Intel Corporation (C) 2017. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "socfpga_cyclone5.dtsi"
-+
-+/ {
-+	model = "Terasic DE10-Nano";
-+	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
-+
-+	chosen {
-+		bootargs = "earlyprintk";
-+		stdout-path = "serial0:115200n8";
-+	};
-+
-+	memory@0 {
-+		name = "memory";
-+		device_type = "memory";
-+		reg = <0x0 0x40000000>; /* 1GB */
-+	};
-+
-+	aliases {
-+		ethernet0 = &gmac1;
-+	};
-+
-+	regulator_3_3v: 3-3-v-regulator {
-+		compatible = "regulator-fixed";
-+		regulator-name = "3.3V";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+		hps0 {
-+			label = "hps_led0";
-+			gpios = <&portb 24 0>;
-+			linux,default-trigger = "heartbeat";
-+		};
-+	};
-+};
-+
-+&gmac1 {
-+	status = "okay";
-+	phy-mode = "rgmii";
-+
-+	txd0-skew-ps = <0>; /* -420ps */
-+	txd1-skew-ps = <0>; /* -420ps */
-+	txd2-skew-ps = <0>; /* -420ps */
-+	txd3-skew-ps = <0>; /* -420ps */
-+	rxd0-skew-ps = <420>; /* 0ps */
-+	rxd1-skew-ps = <420>; /* 0ps */
-+	rxd2-skew-ps = <420>; /* 0ps */
-+	rxd3-skew-ps = <420>; /* 0ps */
-+	txen-skew-ps = <0>; /* -420ps */
-+	txc-skew-ps = <1860>; /* 960ps */
-+	rxdv-skew-ps = <420>; /* 0ps */
-+	rxc-skew-ps = <1680>; /* 780ps */
-+
-+	max-frame-size = <3800>;
-+};
-+
-+&gpio0 {
-+	status = "okay";
-+};
-+
-+&gpio1 {
-+	status = "okay";
-+};
-+
-+&gpio2 {
-+	status = "okay";
-+};
-+
-+&i2c0 {
-+	status = "okay";
-+	clock-frequency = <100000>;
-+
-+	adxl345: adxl345@0 {
-+		compatible = "adi,adxl345";
-+		reg = <0x53>;
-+
-+		interrupt-parent = <&portc>;
-+		interrupts = <3 2>;
-+	};
-+};
-+
-+&mmc0 {
-+	vmmc-supply = <&regulator_3_3v>;
-+	vqmmc-supply = <&regulator_3_3v>;
-+	status = "okay";
-+};
-+
-+&uart0 {
-+	status = "okay";
-+};
-+
-+&usb1 {
-+	status = "okay";
-+};
-diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
-new file mode 100644
-index 0000000..f69c95a
---- /dev/null
-+++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
-@@ -0,0 +1,215 @@
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+@@ -0,0 +1,290 @@
 +/*
 + * Copyright Intel Corporation (C) 2017. All rights reserved.
 + *
@@ -212,6 +92,60 @@ index 0000000..f69c95a
 +		};
 +	};
 +
++    sound {
++		compatible = "opencores,de1soc-wm8731-audio";
++		i2s-controller = <&i2s>;
++		audio-codec = <&wm8731>;
++		i2c-mux-gpio = <&portb 19 0>;
++    };
++
++	clk48: clk48 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <24576000>;
++		clock-output-names = "clk48";
++	};
++
++	clk44: clk44 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <33868800>;
++		clock-output-names = "clk44";
++	};
++
++	i2s: i2s@0 {
++		#sound-dai-cells = <1>;
++		compatible = "opencores,i2s";
++		reg = <0xff200000 0x20>, <0xff200020 0x20>;
++		clocks = <&clk44>, <&clk48>;
++		clock-names = "clk44", "clk48";
++		dmas = <&pdma 0>, <&pdma 1>;
++		dma-names = "tx", "rx";
++	};
++
++	socsound {
++		compatible = "holotr,socsynth-audio";
++		dmalink-controller = <&dmalink>;
++		audio-codec = <&hsynth7002_codec>;
++	};
++
++	dmalink: dmalink@40 {
++		#sound-dai-cells = <1>;
++		compatible = "holotr,dmalink";
++		reg = <0xff200040 0x20>, <0xff200060 0x20>;
++		clocks = <&clk44>;
++		clock-names = "clk44";
++		dmas = <&pdma 2>;
++		dma-names = "rx";
++	};
++
++	hsynth7002_codec: hsynth7002-codec {
++		#sound-dai-cells = <0>;
++		compatible = "holotr,hsynth7002";
++/*     IOVDD-supply = <&supply>;*/
++		status = "okay";
++	};
++
 +	bridge@0xc0000000 {
 +		compatible = "altr,bridge-15.1", "simple-bus";
 +		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
@@ -222,9 +156,10 @@ index 0000000..f69c95a
 +				<0x00000001 0x00003000 0xff203000 0x00000010>,
 +				<0x00000001 0x00004000 0xff204000 0x00000010>,
 +				<0x00000001 0x00005000 0xff205000 0x00000010>,
-+				<0x00000001 0x00050000 0xff250000 0x00000100>,
-+				<0x00000001 0x00051000 0xff251000 0x00000080>,
-+				<0x00000001 0x00040000 0xff240000 0x00010000>;
++				<0x00000001 0x00030000 0xff230000 0x00000100>,
++				<0x00000001 0x00031000 0xff231000 0x00000080>,
++				<0x00000001 0x00040000 0xff240000 0x00010000>,
++				<0x00000001 0x00050000 0xff250000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -276,9 +211,9 @@ index 0000000..f69c95a
 +			gpio-controller;
 +		};
 +
-+		ilc@0x100003000 {
++		ilc@0x100030000 {
 +			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
-+			reg = <0x00000001 0x00050000 0x00000100>;
++			reg = <0x00000001 0x00030000 0x00000100>;
 +			interrupt-controller;
 +			#interrupt-cells = <0x1>;
 +			altr,sw-fifo-depth = <0x20>;
@@ -286,8 +221,8 @@ index 0000000..f69c95a
 +
 +		vip@0x100031000 {
 +			compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
-+			reg = <0x00000001 0x00051000 0x00000080>;
-+			max-width = <0x400>;
++			reg = <0x00000001 0x00031000 0x00000080>;
++			max-width = <0x556>;
 +			max-height = <0x300>;
 +			bits-per-color = <0x8>;
 +			colors-per-beat = <0x4>;
@@ -295,13 +230,22 @@ index 0000000..f69c95a
 +			mem-word-width = <0x80>;
 +		};
 +
-+		hm2-socfpga0@0x100040000 {
-+			compatible = "generic-uio,ui_pdrv";
-+			reg = <0x00000001 0x00040000 0x00010000>;
++		uio-socfpg0@0x100040000 {
++				compatible = "uioreg_io,generic-uio,ui_pdrv";
++				reg = <0x00000001 0x00040000 0x00010000>;
++				interrupt-parent = <0x2>;
++				interrupts = <0 43 4>;
++				address_width = <14>;
++				data_width = <32>;
++		};
++
++		socmidi@0x100050000 {
++			compatible = "holotr,socmidi-1.0";
++			reg = <0x00000001 0x00050000 0x00010000>;
 +			interrupt-parent = <0x2>;
-+			interrupts = <0 43 1>;
-+			address_width = <14>;
-+			data_width = <32>;
++			interrupts = <0 44 4>;
++			address_width = <3>;   /* embeddedsw.dts.params.address_width type NUMBER */
++			data_width = <8>;      /* embeddedsw.dts.params.data_width type NUMBER */
 +		};
 +	};
 +};
@@ -342,6 +286,12 @@ index 0000000..f69c95a
 +	status = "okay";
 +	speed-mode = <0>;
 +
++	wm8731: wm8731@34 {
++		#sound-dai-cells = <0>;
++		compatible = "wlf,wm8731";
++		reg = <0x1a>;
++	};
++
 +	adxl345: adxl345@0 {
 +		compatible = "adi,adxl34x";
 +		reg = <0x53>;
@@ -349,6 +299,11 @@ index 0000000..f69c95a
 +		interrupt-parent = <&portc>;
 +		interrupts = <3 2>;
 +	};
++};
++
++&i2c1 {
++	status = "okay";
++	speed-mode = <0>;
 +};
 +
 +&mmc0 {
