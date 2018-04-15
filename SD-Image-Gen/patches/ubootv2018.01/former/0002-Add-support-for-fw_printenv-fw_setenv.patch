@@ -1,4 +1,4 @@
-From f3f41a64f668dd68ca66ef2083676cea32879960 Mon Sep 17 00:00:00 2001
+From c7adb2e41ff6441e3a46572bb0e0d18522f70dbc Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 13 Apr 2018 14:06:40 +0200
 Subject: [PATCH 2/4] Add support for fw_printenv fw_setenv

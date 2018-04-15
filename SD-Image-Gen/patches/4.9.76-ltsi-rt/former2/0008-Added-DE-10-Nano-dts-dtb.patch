@@ -1,4 +1,4 @@
-From b387e836a3bc26395d4a0901468bf078f34b3098 Mon Sep 17 00:00:00 2001
+From b1ab6ff3fab17e2f3d712b32d2510159c0efac06 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
 Subject: [PATCH 8/9] Added DE-10 Nano dts dtb
@@ -24,7 +24,7 @@ index 251e243..efeea2a 100644
  	socfpga_cyclone5_sodia.dtb \
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
 new file mode 100644
-index 0000000..fda1c83
+index 0000000..796037f
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
 @@ -0,0 +1,193 @@
@@ -173,15 +173,15 @@ index 0000000..fda1c83
 +	txd1-skew-ps = <0>; /* -420ps */
 +	txd2-skew-ps = <0>; /* -420ps */
 +	txd3-skew-ps = <0>; /* -420ps */
-+	rxd0-skew-ps = <420>; /* 0ps */
-+	rxd1-skew-ps = <420>; /* 0ps */
-+	rxd2-skew-ps = <420>; /* 0ps */
-+	rxd3-skew-ps = <420>; /* 0ps */
++	rxd0-skew-ps = <0>; /* 0ps */
++	rxd1-skew-ps = <0>; /* 0ps */
++	rxd2-skew-ps = <0>; /* 0ps */
++	rxd3-skew-ps = <0>; /* 0ps */
 +	txen-skew-ps = <0>; /* -420ps */
-+	txc-skew-ps = <1860>; /* 960ps */
-+	rxdv-skew-ps = <420>; /* 0ps */
-+	rxc-skew-ps = <1680>; /* 780ps */
-+	max-frame-size = <9000>;
++	txc-skew-ps = <3000>; /* 960ps */
++	rxdv-skew-ps = <0>; /* 0ps */
++	rxc-skew-ps = <3000>; /* 780ps */
++	max-frame-size = <3800>;
 +};
 +
 +&gpio0 {

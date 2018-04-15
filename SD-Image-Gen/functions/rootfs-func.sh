@@ -15,29 +15,29 @@ output=${?}
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url
 run_qemu_debootstrap_buster_lxqt() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid,lxqt-core,lxqt,task-lxqt-desktop ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofsfuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid,lxqt-core,lxqt,task-lxqt-desktop ${2} ${1} ${3}
 output=${?}
 }
-
+¤,dhcpcd5,open-iscsi,
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url
 run_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}
 output=${?}
 }
 
 ## parameters: 1: mount dev name, 2: distro name, 3: repo url
 run_desktop_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid ${2} ${1} ${3}
 output=${?}
 }
 #,task-lxde-desktop,lxsession,xinput
 
 run_qt_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid ${2} ${1} ${3}
 output=${?}
 }
-
+#,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge
 #
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url
 # run_qt_qemu_debootstrap() {
@@ -157,7 +157,9 @@ sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/systemd/network/20-dhcp.network
 Name=eth0
 
 [Network]
-DHCP=v4
+LinkLocalAddressing=ipv4
+IPv6AcceptRA=no
+DHCP=ipv4
 MTU=1500
 
 [DHCP]
@@ -836,7 +838,7 @@ echo "Script_MSG: gen_add_user_sh finished ... will now run in chroot"
 sudo sh -c 'LANG=C.UTF-8 chroot '${ROOTFS_MNT}' '${shell_cmd}' -c /home/add_user.sh'
 
 if [ "${distro}" == "buster" ]; then
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install iputils-ping dhcpcd5 xorg libpam-systemd systemd-sysv'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install iputils-ping xorg libpam-systemd systemd-sysv'
 fi
 echo ""
 echo "Scr_MSG: fix no sudo user ping:"
@@ -864,11 +866,11 @@ if [ "${DESKTOP}" == "yes" ]; then
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/dpkg -i kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y update'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install a2jmidid jackmeter carla-data lmms audacity'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install kxstudio-menu'
-
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libjack-dev libqt4-dev qt4-dev-tools'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install python-qt4-dev python3-pyqt4 pyqt4-dev-tools'
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install a2jmidid jackmeter carla-data lmms audacity'
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install kxstudio-menu'
+#
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libjack-dev libqt4-dev qt4-dev-tools'
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install python-qt4-dev python3-pyqt4 pyqt4-dev-tools'
 
 #        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install git'
 #        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/git clone https://github.com/falkTX/Cadence.git'

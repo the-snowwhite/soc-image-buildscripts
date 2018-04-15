@@ -1,7 +1,7 @@
-From 62d5f9cc67df18e59eadccc3829092be1a4d3f8a Mon Sep 17 00:00:00 2001
+From 2f69bc9328b0fe314c1e9b283948cc8156141db4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
-Subject: [PATCH 01/13] disable debug package gen
+Subject: [PATCH 01/12] disable debug package gen
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -25,10 +25,10 @@ index 98b007e..efc9ed9 100644
 2.7.4
 
 
-From 02bb7dabdd8dc7062b8105d7ff4577f4ec704f44 Mon Sep 17 00:00:00 2001
+From 32ecf2d17749d011231e83f7bceeccd056c1994b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
-Subject: [PATCH 02/13] add ext4 root fs support and autofs4 module
+Subject: [PATCH 02/12] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -64,10 +64,10 @@ index efc9ed9..a9f5f99 100644
 2.7.4
 
 
-From 630809a796cdbf7f349b707f902516069b61d2f0 Mon Sep 17 00:00:00 2001
+From 5c7ec9160ddae1e5039a27351134563b27810e38 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
-Subject: [PATCH 03/13] add .dtd files to kernel-image .deb
+Subject: [PATCH 03/12] add .dtd files to kernel-image .deb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -102,10 +102,10 @@ index 3c575cd0..d67c791 100755
 2.7.4
 
 
-From c3df0b60f769e7702fa865cad189ee4b41d12387 Mon Sep 17 00:00:00 2001
+From 6e42e8b208a60c8e3fbd00cc9333fdfce18c8a36 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
-Subject: [PATCH 04/13] add generate /boot/extlinux/extlinux.conf to boot with
+Subject: [PATCH 04/12] add generate /boot/extlinux/extlinux.conf to boot with
  uboot
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -138,10 +138,10 @@ index d67c791..d8cbeec 100755
 2.7.4
 
 
-From a75d6db68fcdc48b2d26e7b680749e118d58f3ed Mon Sep 17 00:00:00 2001
+From 301057d48b5410a9c024431b693cb0c2f97e9f61 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
-Subject: [PATCH 05/13] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 05/12] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -178,10 +178,10 @@ index a9f5f99..c17d698 100644
 2.7.4
 
 
-From 8af58bfce8e1f6136169ddb0d3aea21305c11812 Mon Sep 17 00:00:00 2001
+From 90be4853ab9f75d65f9c6a9ddecc814d090b26b7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
-Subject: [PATCH 06/13] rename kernel package names to *-socfpga-rt-ltsi
+Subject: [PATCH 06/12] rename kernel package names to *-socfpga-rt-ltsi
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -209,10 +209,10 @@ index d8cbeec..16554d2 100755
 2.7.4
 
 
-From 81f5d2673ede968d75e7850c25cb907b6e4776cf Mon Sep 17 00:00:00 2001
+From a0a8b81ca4dcf68cf1553bc795d5e4dca89140fe Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
-Subject: [PATCH 07/13] add spidev in dts so driver is loaded
+Subject: [PATCH 07/12] add spidev in dts so driver is loaded
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -246,10 +246,10 @@ index 595eb4f..6dcff22 100644
 2.7.4
 
 
-From d88ba868727817a044f4fcb5209eb48878a0b69c Mon Sep 17 00:00:00 2001
+From b31817d6840916b4dbf25bf80c6226809ebb7128 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 08/13] Added DE-10 Nano with/without framebuffer dts dtb
+Subject: [PATCH 08/12] Added DE-10 Nano with/without framebuffer dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -616,30 +616,40 @@ index 0000000..f69c95a
 2.7.4
 
 
-From bba08b46ba05084f8950cde1b30a8605ecbe406c Mon Sep 17 00:00:00 2001
+From d2ef3fd8dbb92eb2c09581e5a308112784ca4c7c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
-Subject: [PATCH 09/13] add iscsi modules
+Subject: [PATCH 09/12] set ACL secutity
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/configs/socfpga_defconfig | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm/configs/socfpga_defconfig | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index c17d698..13d3155 100644
+index c17d698..f01e3e0 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -154,7 +154,7 @@ CONFIG_EXT2_FS_XATTR=y
+@@ -154,13 +154,17 @@ CONFIG_EXT2_FS_XATTR=y
  CONFIG_EXT2_FS_POSIX_ACL=y
  CONFIG_EXT3_FS=y
  CONFIG_EXT4_FS=y
 -# CONFIG_AUTOFS4_FS=y
-+CONFIG_AUTOFS4_FS=y
  CONFIG_EXT4_FS_POSIX_ACL=y
  CONFIG_EXT4_FS_SECURITY=y
++CONFIG_EXT4_FS_XATTR=y
  CONFIG_VFAT_FS=y
-@@ -178,3 +178,5 @@ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_NTFS_FS=y
+ CONFIG_NTFS_RW=y
++CONFIG_AUTOFS4_FS=m
+ CONFIG_TMPFS=y
++CONFIG_TMPFS_POSIX_ACL=y
++CONFIG_TMPFS_SECURITY=y
++CONFIG_TMPFS_XATTR=y
+ CONFIG_JFFS2_FS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V3_ACL=y
+@@ -178,3 +182,5 @@ CONFIG_DETECT_HUNG_TASK=y
  # CONFIG_SCHED_DEBUG is not set
  CONFIG_FUNCTION_TRACER=y
  CONFIG_DEBUG_USER=y
@@ -649,10 +659,10 @@ index c17d698..13d3155 100644
 2.7.4
 
 
-From 2746afe78c7d2f5c12ceb59a73239ef3e1494b31 Mon Sep 17 00:00:00 2001
+From ec6092df8688a31db104cfdab2f9ad435075d139 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 30 Mar 2018 20:41:53 +0200
-Subject: [PATCH 10/13] Enable altvip framebuffer
+Subject: [PATCH 10/12] Enable altvip framebuffer
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -673,10 +683,10 @@ index 5715844..62f0881 100644
  	default "9" if SA1111 || ARCH_EFM32
  	default "11"
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 13d3155..a7d03e2 100644
+index f01e3e0..50ba023 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -180,3 +180,114 @@ CONFIG_FUNCTION_TRACER=y
+@@ -184,3 +184,114 @@ CONFIG_FUNCTION_TRACER=y
  CONFIG_DEBUG_USER=y
  CONFIG_ISCSI_TCP=m
  CONFIG_ISCSI_TARGET=m
@@ -795,10 +805,10 @@ index 13d3155..a7d03e2 100644
 2.7.4
 
 
-From 39082255b9b32f249392618c0a6e2fb736334e77 Mon Sep 17 00:00:00 2001
+From 90ccdf5e33977d016601c33fb8052f90cccc9e56 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
-Subject: [PATCH 11/13] Add audio and midi drivers for holosynth and builtin
+Subject: [PATCH 11/12] Add audio and midi drivers for holosynth and builtin
  audio codec on de1 board
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -1022,7 +1032,7 @@ index 0000000..1c54d02
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
 new file mode 100644
-index 0000000..42538c8
+index 0000000..572c882
 --- /dev/null
 +++ b/sound/soc/socsynth/Kconfig
 @@ -0,0 +1,33 @@
@@ -1056,7 +1066,7 @@ index 0000000..42538c8
 +
 +config SND_SOC_DE1_WM8731
 +       tristate "DE1-Audio support"
-+       depends on SND_SOC_WM8731
++       select SND_SOC_WM8731
 +       select SND_SOC_OC_I2S
 +       select REGMAP_MMIO
 diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
@@ -2497,17 +2507,19 @@ index 0000000..1f4268c
 2.7.4
 
 
-From 80b0b29b9cd9d357ef1bb9594f8f7811d37dd7f4 Mon Sep 17 00:00:00 2001
+From e24910d6a63834c0998748fb5fe79be36144a88a Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 23:01:49 +0200
-Subject: [PATCH 12/13] Add framebuffer,audio and midi enabled dtb for de1
- Socsynth
+Subject: [PATCH 12/12] Enable bridges in dtb's and add framebuffer,audio and
+ midi enabled dtb for de1 Socsynth
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                     |   1 +
- arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 290 +++++++++++++++++++++++++
- 2 files changed, 291 insertions(+)
+ arch/arm/boot/dts/socfpga.dtsi                 |   2 +
+ arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 291 +++++++++++++++++++++++++
+ arch/arm/configs/socfpga_defconfig             |  59 +++++
+ 4 files changed, 353 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
@@ -2522,12 +2534,32 @@ index 6e8a153..7638a3f 100644
  	socfpga_cyclone5_de10_nano_fb.dtb \
  	socfpga_cyclone5_de10_nano.dtb \
  	socfpga_cyclone5_sockit.dtb \
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index 6dcff22..dce1143 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -526,6 +526,7 @@
+ 			reg = <0xff400000 0x100000>;
+ 			resets = <&rst LWHPS2FPGA_RESET>;
+ 			clocks = <&l4_main_clk>;
++            bridge-enable = <1>;
+ 		};
+ 
+ 		fpga_bridge1: fpga_bridge@ff500000 {
+@@ -533,6 +534,7 @@
+ 			reg = <0xff500000 0x10000>;
+ 			resets = <&rst HPS2FPGA_RESET>;
+ 			clocks = <&l4_main_clk>;
++            bridge-enable = <1>;
+ 		};
+ 
+ 		fpgamgr0: fpgamgr@ff706000 {
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 new file mode 100644
-index 0000000..08ef49f
+index 0000000..d0a1fc1
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
-@@ -0,0 +1,290 @@
+@@ -0,0 +1,291 @@
 +/*
 + * Copyright Intel Corporation (C) 2017. All rights reserved.
 + *
@@ -2648,6 +2680,7 @@ index 0000000..08ef49f
 +	bridge@0xc0000000 {
 +		compatible = "altr,bridge-15.1", "simple-bus";
 +		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
++		bridge-enable = <1>;
 +		#address-cells = <0x2>;
 +		#size-cells = <0x1>;
 +		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
@@ -2818,25 +2851,11 @@ index 0000000..08ef49f
 +&usb1 {
 +	status = "okay";
 +};
--- 
-2.7.4
-
-
-From 859f10a33d277bf5cbc06d98a5213b41891381f2 Mon Sep 17 00:00:00 2001
-From: Michael Brown <producer@holotronic.dk>
-Date: Mon, 9 Apr 2018 05:06:01 +0200
-Subject: [PATCH 13/13] Enable kernel sound modules
-
-Signed-off-by: Michael Brown <producer@holotronic.dk>
----
- arch/arm/configs/socfpga_defconfig | 60 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
-
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index a7d03e2..4766270 100644
+index 50ba023..8b01c80 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -291,3 +291,63 @@ CONFIG_USB_HID=y
+@@ -295,3 +295,62 @@ CONFIG_USB_HID=y
  CONFIG_HID_MULTITOUCH=y
  #CONFIG_ALTERA_PR_IP_CORE=y
  #CONFIG_ALTERA_PR_IP_CORE_PLAT=y
@@ -2847,7 +2866,6 @@ index a7d03e2..4766270 100644
 +CONFIG_SND_SOC_SIGMADSP_I2C=m
 +CONFIG_SND_SOC_SSM2602=m
 +CONFIG_SND_SOC_SSM2602_I2C=m
-+CONFIG_SND_SOC_WM8731=m
 +CONFIG_SND_ALOOP=m
 +CONFIG_SND_VIRMIDI=m
 +CONFIG_SND_SOC_HOLOSYNTHV=m

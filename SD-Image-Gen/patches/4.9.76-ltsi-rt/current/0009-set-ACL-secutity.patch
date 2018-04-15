@@ -1,27 +1,37 @@
-From bba08b46ba05084f8950cde1b30a8605ecbe406c Mon Sep 17 00:00:00 2001
+From d2ef3fd8dbb92eb2c09581e5a308112784ca4c7c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
-Subject: [PATCH 09/13] add iscsi modules
+Subject: [PATCH 09/12] set ACL secutity
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/configs/socfpga_defconfig | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm/configs/socfpga_defconfig | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index c17d698..13d3155 100644
+index c17d698..f01e3e0 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -154,7 +154,7 @@ CONFIG_EXT2_FS_XATTR=y
+@@ -154,13 +154,17 @@ CONFIG_EXT2_FS_XATTR=y
  CONFIG_EXT2_FS_POSIX_ACL=y
  CONFIG_EXT3_FS=y
  CONFIG_EXT4_FS=y
 -# CONFIG_AUTOFS4_FS=y
-+CONFIG_AUTOFS4_FS=y
  CONFIG_EXT4_FS_POSIX_ACL=y
  CONFIG_EXT4_FS_SECURITY=y
++CONFIG_EXT4_FS_XATTR=y
  CONFIG_VFAT_FS=y
-@@ -178,3 +178,5 @@ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_NTFS_FS=y
+ CONFIG_NTFS_RW=y
++CONFIG_AUTOFS4_FS=m
+ CONFIG_TMPFS=y
++CONFIG_TMPFS_POSIX_ACL=y
++CONFIG_TMPFS_SECURITY=y
++CONFIG_TMPFS_XATTR=y
+ CONFIG_JFFS2_FS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V3_ACL=y
+@@ -178,3 +182,5 @@ CONFIG_DETECT_HUNG_TASK=y
  # CONFIG_SCHED_DEBUG is not set
  CONFIG_FUNCTION_TRACER=y
  CONFIG_DEBUG_USER=y

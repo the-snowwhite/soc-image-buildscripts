@@ -1,7 +1,7 @@
-From accfafbed3447e9f3fadffbc14faea1b599787f4 Mon Sep 17 00:00:00 2001
+From 2f9b0852b1e7ea0283e762e72146085caf1d292b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
-Subject: [PATCH 4/9] add generate /boot/extlinux/extlinux.conf to boot with
+Subject: [PATCH 04/13] add generate /boot/extlinux/extlinux.conf to boot with
  uboot
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>

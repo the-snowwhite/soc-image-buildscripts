@@ -1,7 +1,7 @@
-From 39082255b9b32f249392618c0a6e2fb736334e77 Mon Sep 17 00:00:00 2001
+From 90ccdf5e33977d016601c33fb8052f90cccc9e56 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
-Subject: [PATCH 11/13] Add audio and midi drivers for holosynth and builtin
+Subject: [PATCH 11/12] Add audio and midi drivers for holosynth and builtin
  audio codec on de1 board
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -225,7 +225,7 @@ index 0000000..1c54d02
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
 new file mode 100644
-index 0000000..42538c8
+index 0000000..572c882
 --- /dev/null
 +++ b/sound/soc/socsynth/Kconfig
 @@ -0,0 +1,33 @@
@@ -259,7 +259,7 @@ index 0000000..42538c8
 +
 +config SND_SOC_DE1_WM8731
 +       tristate "DE1-Audio support"
-+       depends on SND_SOC_WM8731
++       select SND_SOC_WM8731
 +       select SND_SOC_OC_I2S
 +       select REGMAP_MMIO
 diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile

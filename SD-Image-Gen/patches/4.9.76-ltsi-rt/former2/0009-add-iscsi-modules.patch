@@ -1,4 +1,4 @@
-From 9e947771531a9898e69a677214e3867721a9045c Mon Sep 17 00:00:00 2001
+From fd321d3b0572fa247488e1452e4b3af0110dc3c2 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
 Subject: [PATCH 9/9] add iscsi modules

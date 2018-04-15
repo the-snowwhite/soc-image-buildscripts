@@ -1,7 +1,7 @@
-From 93a6ea050fa87328c30c1bb0b16eb3040c17f665 Mon Sep 17 00:00:00 2001
+From 9e947771531a9898e69a677214e3867721a9045c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
-Subject: [PATCH 09/13] add iscsi modules
+Subject: [PATCH 9/9] add iscsi modules
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index c17d698..a9973e9 100644
+index c17d698..13d3155 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -154,7 +154,7 @@ CONFIG_EXT2_FS_XATTR=y
@@ -17,7 +17,7 @@ index c17d698..a9973e9 100644
  CONFIG_EXT3_FS=y
  CONFIG_EXT4_FS=y
 -# CONFIG_AUTOFS4_FS=y
-+CONFIG_AUTOFS4_FS=m
++CONFIG_AUTOFS4_FS=y
  CONFIG_EXT4_FS_POSIX_ACL=y
  CONFIG_EXT4_FS_SECURITY=y
  CONFIG_VFAT_FS=y

@@ -1,14 +1,16 @@
-From 80b0b29b9cd9d357ef1bb9594f8f7811d37dd7f4 Mon Sep 17 00:00:00 2001
+From e24910d6a63834c0998748fb5fe79be36144a88a Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 23:01:49 +0200
-Subject: [PATCH 12/13] Add framebuffer,audio and midi enabled dtb for de1
- Socsynth
+Subject: [PATCH 12/12] Enable bridges in dtb's and add framebuffer,audio and
+ midi enabled dtb for de1 Socsynth
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                     |   1 +
- arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 290 +++++++++++++++++++++++++
- 2 files changed, 291 insertions(+)
+ arch/arm/boot/dts/socfpga.dtsi                 |   2 +
+ arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 291 +++++++++++++++++++++++++
+ arch/arm/configs/socfpga_defconfig             |  59 +++++
+ 4 files changed, 353 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
@@ -23,12 +25,32 @@ index 6e8a153..7638a3f 100644
  	socfpga_cyclone5_de10_nano_fb.dtb \
  	socfpga_cyclone5_de10_nano.dtb \
  	socfpga_cyclone5_sockit.dtb \
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index 6dcff22..dce1143 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -526,6 +526,7 @@
+ 			reg = <0xff400000 0x100000>;
+ 			resets = <&rst LWHPS2FPGA_RESET>;
+ 			clocks = <&l4_main_clk>;
++            bridge-enable = <1>;
+ 		};
+ 
+ 		fpga_bridge1: fpga_bridge@ff500000 {
+@@ -533,6 +534,7 @@
+ 			reg = <0xff500000 0x10000>;
+ 			resets = <&rst HPS2FPGA_RESET>;
+ 			clocks = <&l4_main_clk>;
++            bridge-enable = <1>;
+ 		};
+ 
+ 		fpgamgr0: fpgamgr@ff706000 {
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 new file mode 100644
-index 0000000..08ef49f
+index 0000000..d0a1fc1
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
-@@ -0,0 +1,290 @@
+@@ -0,0 +1,291 @@
 +/*
 + * Copyright Intel Corporation (C) 2017. All rights reserved.
 + *
@@ -149,6 +171,7 @@ index 0000000..08ef49f
 +	bridge@0xc0000000 {
 +		compatible = "altr,bridge-15.1", "simple-bus";
 +		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
++		bridge-enable = <1>;
 +		#address-cells = <0x2>;
 +		#size-cells = <0x1>;
 +		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
@@ -319,6 +342,73 @@ index 0000000..08ef49f
 +&usb1 {
 +	status = "okay";
 +};
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 50ba023..8b01c80 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -295,3 +295,62 @@ CONFIG_USB_HID=y
+ CONFIG_HID_MULTITOUCH=y
+ #CONFIG_ALTERA_PR_IP_CORE=y
+ #CONFIG_ALTERA_PR_IP_CORE_PLAT=y
++CONFIG_SND_USB_AUDIO=m
++CONFIG_SND_SOC=y
++CONFIG_SND_SOC_I2C_AND_SPI=y
++CONFIG_SND_SOC_SIGMADSP=m
++CONFIG_SND_SOC_SIGMADSP_I2C=m
++CONFIG_SND_SOC_SSM2602=m
++CONFIG_SND_SOC_SSM2602_I2C=m
++CONFIG_SND_ALOOP=m
++CONFIG_SND_VIRMIDI=m
++CONFIG_SND_SOC_HOLOSYNTHV=m
++CONFIG_SND_SOC_DE1_WM8731=m
++CONFIG_SND_SOC_PCM5102A=m
++CONFIG_FPGADMA=m
++CONFIG_REGMAP_I2C=y
++CONFIG_REGMAP_SPI=y
++CONFIG_SOUND=y
++CONFIG_SOUND_OSS_CORE=y
++CONFIG_SOUND_OSS_CORE_PRECLAIM=y
++CONFIG_SND=y
++CONFIG_SND_TIMER=y
++CONFIG_SND_PCM=y
++CONFIG_SND_HWDEP=y
++CONFIG_SND_RAWMIDI=y
++CONFIG_SND_COMPRESS_OFFLOAD=y
++CONFIG_SND_JACK=y
++CONFIG_SND_SEQUENCER=y
++CONFIG_SND_SEQ_DUMMY=y
++CONFIG_SND_OSSEMUL=y
++CONFIG_SND_SEQUENCER_OSS=y
++CONFIG_SND_SUPPORT_OLD_API=y
++CONFIG_SND_VERBOSE_PROCFS=y
++CONFIG_SND_VERBOSE_PRINTK=y
++CONFIG_SND_DEBUG=y
++CONFIG_SND_DEBUG_VERBOSE=y
++CONFIG_SND_DMA_SGBUF=y
++CONFIG_SND_DRIVERS=y
++CONFIG_SND_DUMMY=m
++CONFIG_SND_SERIAL_U16550=m
++CONFIG_SND_SPI=y
++CONFIG_SND_USB=y
++CONFIG_I2C_BOARDINFO=y
++CONFIG_I2C_COMPAT=y
++CONFIG_I2C_HELPER_AUTO=y
++CONFIG_I2C_DESIGNWARE_CORE=y
++CONFIG_I2C_OCORES=y
++CONFIG_REGULATOR_DEBUG=y
++CONFIG_REGULATOR_GPIO=y
++CONFIG_SND_ARM=y
++CONFIG_SND_SOC_GENERIC_DMAENGINE_PCM=y
++CONFIG_SND_ATMEL_SOC=m
++CONFIG_SND_DESIGNWARE_I2S=m
++CONFIG_SND_SOC_FSL_ASRC=m
++CONFIG_SND_SOC_FSL_SAI=m
++CONFIG_SND_SOC_FSL_SSI=m
++CONFIG_SND_SOC_FSL_SPDIF=m
++CONFIG_SND_SOC_FSL_ESAI=m
++CONFIG_SND_SOC_IMX_AUDMUX=m
++CONFIG_SND_SOC_I2C_AND_SPI=y
++CONFIG_HZ_1000=y
 -- 
 2.7.4
 

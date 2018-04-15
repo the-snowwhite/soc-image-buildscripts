@@ -737,7 +737,7 @@ sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y upgrade
 echo ""
 echo "Script_MSG: Will now install kernel packages"
 echo ""
-sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} install -y linux-headers-${2} linux-image-${2}
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install linux-headers-'${2}' linux-image-'${2}''
 
 
 cd ${CURRENT_DIR}
@@ -1103,10 +1103,10 @@ cat <<EOT > ${CURRENT_DIR}/fw_env.config
 ${1}            0x4000          0x2000
 EOT
 
-gen_uboot_env_vars "${3}"
-sudo sh -c 'fw_printenv -c '${CURRENT_DIR}'/fw_env.config > '${2}'/boot/fw_env.txt'
-echo ""
-echo "NOTE: Saved uboot environment variables to /boot/fw_env.txt in sd image"
+# gen_uboot_env_vars "${3}"
+# sudo sh -c 'fw_printenv -c '${CURRENT_DIR}'/fw_env.config > '${2}'/boot/fw_env.txt'
+# echo ""
+# echo "NOTE: Saved uboot environment variables to /boot/fw_env.txt in sd image"
 
 }
 

@@ -1,7 +1,7 @@
-From aa51c8b7b821c2624833201d02615b0cee82509a Mon Sep 17 00:00:00 2001
+From b387e836a3bc26395d4a0901468bf078f34b3098 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 8/8] Added DE-10 Nano dts dtb
+Subject: [PATCH 8/9] Added DE-10 Nano dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

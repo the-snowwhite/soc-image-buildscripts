@@ -68,10 +68,11 @@ UBOOT_VERSION="v2018.01"
 #UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
 UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"
+
 ## Select user name / function
 #USER_NAME=ubuntu;
-USER_NAME=machinekit;
-#USER_NAME=holosynth;
+#USER_NAME=machinekit;
+USER_NAME=holosynth;
 
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
@@ -114,7 +115,7 @@ DTS_DIR=${MAIN_SCRIPT_DIR}/../dts
 CURRENT_DIR=`pwd`
 ROOTFS_MNT="/tmp/myimage"
 
-ROOTFS_IMG="${CURRENT_DIR}/${ROOTFS_LABEL}.img"
+ROOTFS_IMG="${ROOTFS_LABEL}.img"
 
 CURRENT_DATE=`date -I`
 REL_DATE=${CURRENT_DATE}
@@ -290,7 +291,8 @@ build_uboot() {
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
         # patches:
-        UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-${1}-changeset.patch"
+#        UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-${1}-changeset.patch"
+        UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-de0-de10_nano-de1_soc-changeset.patch"
         git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
         UBOOT_BOARD_CONFIG="socfpga_${1}_defconfig"
         armhf_build ${UBOOT_BUILD_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}" "envtools"
@@ -337,10 +339,10 @@ gen_rootfs_image() {
     mount_imagefile ${2} ${1}
     . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
     echo ""
-    if [ "${USER_NAME}" == "holosynth" ]; then
-        run_qt_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-    echo "Scr_MSG: run_qt_qemu_debootstrap (${3}) function return value was --> ${output}"
-    else
+#     if [ "${USER_NAME}" == "holosynth" ]; then
+#         run_qt_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
+#     echo "Scr_MSG: run_qt_qemu_debootstrap (${3}) function return value was --> ${output}"
+#    else
         if [ "${DESKTOP}" == "yes" ]; then
             if [ "${3}" == "buster" ]; then
                 run_qemu_debootstrap_buster ${1} ${3} ${ROOT_REPO_URL}
@@ -353,7 +355,7 @@ gen_rootfs_image() {
             run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
             echo "Scr_MSG: run_qemu_debootstrap (${3}) function return value was --> ${output}"
         fi
-    fi
+#    fi
     echo ""
     if [[ $output -gt $zero ]]; then
         echo "Scr_MSG: debootstrap failed"
@@ -393,9 +395,9 @@ finalize_rootfs_image() {
     initial_rootfs_user_setup_sh
     finalize
     if [ "${DESKTOP}" == "yes" ]; then
-        compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-desktop"
+        compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-desktop"
     else
-        compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured"
+        compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured"
     fi
     set +e
     unmount_binded ${1}
@@ -413,9 +415,9 @@ inst_repo_kernel() {
     mount_imagefile "${2}" ${ROOTFS_MNT}
     bind_mounted ${ROOTFS_MNT}
     if [ "${DESKTOP}" == "yes" ]; then
-        extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-desktop"
+        extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-desktop"
     else
-        extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured"
+        extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured"
     fi
     echo "Script_MSG: will now install kernel"
     inst_kernel_from_local_repo ${ROOTFS_MNT} ${SD_KERNEL_TAG}
@@ -499,59 +501,75 @@ while [ "$1" != "" ]; do
             add2repo ${distro} "/home/mib/Development/Docker" "machinekit"
             ;;
         --gen-base-qemu-rootfs)
-            gen_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
+            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/${ROOTFS_IMG}" ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
             ;;
         --gen-base-qemu-rootfs-desktop)
             DESKTOP="yes"
-            gen_rootfs_image ${ROOTFS_MNT} "${ROOTFS_IMG}-desktop" ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
+            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/desktop-${ROOTFS_IMG}" ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
             ;;
         --finalize-rootfs)
-            finalize_rootfs_image ${ROOTFS_MNT} ${ROOTFS_IMG} ${distro} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/${ROOTFS_IMG}" ${distro} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
             ;;
         --finalize-desktop-rootfs)
             DESKTOP="yes"
-            finalize_rootfs_image ${ROOTFS_MNT} "${ROOTFS_IMG}-desktop" ${distro} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/desktop-${ROOTFS_IMG}" ${distro} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
             ;;
         --inst_repo_kernel)
-            inst_repo_kernel "finalized-fully-configured-with-kernel" ${ROOTFS_IMG}
+            inst_repo_kernel "${USER_NAME}_finalized-fully-configured-with-kernel" "${CURRENT_DIR}/${ROOTFS_IMG}"
             ;;
         --inst_repo_kernel-desktop)
             DESKTOP="yes"
-            inst_repo_kernel "finalized-fully-configured-with-kernel-and-desktop" "${ROOTFS_IMG}-desktop-kernel"
+            inst_repo_kernel "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop" "${CURRENT_DIR}/desktop-kernel-${ROOTFS_IMG}"
             ;;
         --bindmount_rootfsimg)
-            mount_imagefile ${ROOTFS_IMG} ${ROOTFS_MNT}
+            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
             bind_mounted ${ROOTFS_MNT}
             ;;
         --bindunmount_rootfsimg)
             unmount_binded ${ROOTFS_MNT}
             ;;
         --assemble_sd_img)
-            assemble_full_sd_img "finalized-fully-configured-with-kernel" ${VALUE}
+            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel" ${VALUE}
             ;;
         --assemble_desktop_sd_img)
             DESKTOP="yes"
-            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-desktop" ${VALUE}
+            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop" ${VALUE}
             ;;
         --inst_qt_img_deps)
-            cp "${ROOTFS_IMG}-desktop" "${ROOTFS_IMG}-fin-qt-dep"
-            mount_imagefile "${ROOTFS_IMG}-fin-qt-dep" ${ROOTFS_MNT}
+            if [ "$(ls -A ${ROOTFS_MNT})" ]; then
+                echo "Scr_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
+                unmount_binded ${ROOTFS_MNT}
+            fi
+            create_img 1 "${CURRENT_DIR}/${ROOTFS_IMG}" ""
+            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
             bind_mounted ${ROOTFS_MNT}
+            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop"
+#           cp "${CURRENT_DIR}/desktop-${ROOTFS_IMG}" "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}"
+#            mount_imagefile "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}" ${ROOTFS_MNT}
+#            bind_mounted ${ROOTFS_MNT}
             inst_qt_build_deps
-            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-qt-deps"
+            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
             unmount_binded ${ROOTFS_MNT}
             ;;
         --build_qt)
-            cp "${ROOTFS_IMG}-fin-qt-dep" "${ROOTFS_IMG}-fin-qt-built"
-            mount_imagefile "${ROOTFS_IMG}-fin-qt-built" ${QT_ROOTFS_MNT}
+            if [ "$(ls -A ${ROOTFS_MNT})" ]; then
+                echo "Scr_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
+                unmount_binded ${ROOTFS_MNT}
+            fi
+            create_img 1 "${CURRENT_DIR}/${ROOTFS_IMG}" ""
+            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
+            bind_mounted ${ROOTFS_MNT}
+            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
+#            cp "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}" "${CURRENT_DIR}/fin-qt-built-${ROOTFS_IMG}"
+#            mount_imagefile "${CURRENT_DIR}/fin-qt-built-${ROOTFS_IMG}" ${QT_ROOTFS_MNT}
             qt_build
-            compress_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-qt-qwt"
+            compress_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-qt-qwt"
             unmount_binded ${QT_ROOTFS_MNT}
             ;;
         --assemble_qt_dev_sd_img)
             DESKTOP="yes"
 #            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-installed"
-            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-qwt" ${VALUE}
+            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-qt-qwt" ${VALUE}
             ;;
     *)
             echo "ERROR: unknown parameter \"$PARAM\""
