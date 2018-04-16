@@ -94,7 +94,10 @@ ALT_GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION}${GIT_KERNEL_REV}"
 QT_VER=5.10.1
 QT_ROOTFS_MNT="/tmp/qt_${QT_VER}-img"
 
-QTDIR="/home/mib/qt-src/qt-everywhere-src-${QT_VER}"
+QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
+#QTDIR="/home/mib/qt-src/qt-everywhere-src-${QT_VER}"
+
+QWTDIR="/home/mib/Developer/ext-repos/qwt/qwt"
 
 #------------------------------------------------------------------------------------------------------
 # Variables Prerequsites
@@ -116,6 +119,7 @@ CURRENT_DIR=`pwd`
 ROOTFS_MNT="/tmp/myimage"
 
 ROOTFS_IMG="${ROOTFS_LABEL}.img"
+QT_ROOTFS_IMG="qt_${ROOTFS_LABEL}.img"
 
 CURRENT_DATE=`date -I`
 REL_DATE=${CURRENT_DATE}
@@ -145,7 +149,9 @@ TOOLCHAIN_DIR=${HOME}/bin
 
 QT_CFLAGS="-march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard"
 
-QT_CC_FOLDER_NAME="gcc-linaro-${CROSS_GNU_ARCH}-4.9-2014.09_linux"
+#QT_CC_FOLDER_NAME="gcc-linaro-${CROSS_GNU_ARCH}-4.9-2014.09_linux"
+QT_CC_FOLDER_NAME=PCH63_CC_FOLDER_NAME
+#QT_CC_FOLDER_NAME=PCH52_CC_FOLDER_NAME
 
 QT_CC_DIR="${TOOLCHAIN_DIR}/${QT_CC_FOLDER_NAME}"
 #QT_CC_FILE="${QT_CC_FOLDER_NAME}.tar.xz"
@@ -256,7 +262,8 @@ usage()
     echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file"
     echo "    --assemble_desktop_sd_img   Will generate full populated fb sd imagefile and bmap file"
     echo "    --inst_qt_img_deps  Will install qt build depedencies in rootfs image"
-    echo "    --build_qt  Will build qt in rootfs image"
+    echo "    --build_qt_cross  Will build and install qt in rootfs image"
+    echo "    --crossbuild_qt_plugins  Will build and install qt plugins in qt_rootfs image"
     echo "    --assemble_qt_dev_sd_img   Will generate full populated sd imagefile with QT-dev and bmap file"
     echo ""
 }
@@ -341,24 +348,24 @@ gen_rootfs_image() {
     echo ""
 #     if [ "${USER_NAME}" == "holosynth" ]; then
 #         run_qt_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-#     echo "Scr_MSG: run_qt_qemu_debootstrap (${3}) function return value was --> ${output}"
+#     echo "Script_MSG: run_qt_qemu_debootstrap (${3}) function return value was --> ${output}"
 #    else
         if [ "${DESKTOP}" == "yes" ]; then
             if [ "${3}" == "buster" ]; then
                 run_qemu_debootstrap_buster ${1} ${3} ${ROOT_REPO_URL}
-                echo "Scr_MSG: run_qemu_debootstrap_buster function return value was --> ${output}"
+                echo "Script_MSG: run_qemu_debootstrap_buster function return value was --> ${output}"
             else
                 run_desktop_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-                echo "Scr_MSG: run_desktop_qemu_debootstrap (${3}) function return value was --> ${output}"
+                echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) function return value was --> ${output}"
             fi
         else
             run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-            echo "Scr_MSG: run_qemu_debootstrap (${3}) function return value was --> ${output}"
+            echo "Script_MSG: run_qemu_debootstrap (${3}) function return value was --> ${output}"
         fi
 #    fi
     echo ""
     if [[ $output -gt $zero ]]; then
-        echo "Scr_MSG: debootstrap failed"
+        echo "Script_MSG: debootstrap failed"
         unmount_binded ${1}
         exit 1
     else
@@ -377,7 +384,7 @@ gen_rootfs_image() {
 ## parameters: 1: mount dev name, 2: image name, 3: distro name
 finalize_rootfs_image() {
     if [ "$(ls -A ${1})" ]; then
-        echo "Scr_MSG: !! Found ${1} mounted .. will unmount now"
+        echo "Script_MSG: !! Found ${1} mounted .. will unmount now"
         unmount_binded ${1}
     fi
     create_img 1 "${2}" ""
@@ -408,7 +415,7 @@ finalize_rootfs_image() {
 ## parameters: 1: kernel image tag, 2: rootfs image name
 inst_repo_kernel() {
     if [ "$(ls -A ${ROOTFS_MNT})" ]; then
-        echo "Scr_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
+        echo "Script_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
         unmount_binded ${ROOTFS_MNT}
     fi
     create_img 1 "${2}" ""
@@ -537,7 +544,7 @@ while [ "$1" != "" ]; do
             ;;
         --inst_qt_img_deps)
             if [ "$(ls -A ${ROOTFS_MNT})" ]; then
-                echo "Scr_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
+                echo "Script_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
                 unmount_binded ${ROOTFS_MNT}
             fi
             create_img 1 "${CURRENT_DIR}/${ROOTFS_IMG}" ""
@@ -547,29 +554,44 @@ while [ "$1" != "" ]; do
 #           cp "${CURRENT_DIR}/desktop-${ROOTFS_IMG}" "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}"
 #            mount_imagefile "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}" ${ROOTFS_MNT}
 #            bind_mounted ${ROOTFS_MNT}
-            inst_qt_build_deps
+            inst_qt_build_deps 2>&1| tee ${CURRENT_DIR}/Qt_logs/install_qt_deps-log.txt
             compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
             unmount_binded ${ROOTFS_MNT}
             ;;
-        --build_qt)
-            if [ "$(ls -A ${ROOTFS_MNT})" ]; then
-                echo "Scr_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
-                unmount_binded ${ROOTFS_MNT}
+        --build_qt_cross)
+            if [ "$(ls -A ${QT_ROOTFS_MNT})" ]; then
+                echo "Script_MSG: !! Found ${QT_ROOTFS_MNT} mounted .. will unmount now"
+                unmount_binded ${QT_ROOTFS_MNT}
             fi
             create_img 1 "${CURRENT_DIR}/${ROOTFS_IMG}" ""
-            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
-            bind_mounted ${ROOTFS_MNT}
-            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
+            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${QT_ROOTFS_MNT}
+            bind_mounted ${QT_ROOTFS_MNT}
+            extract_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
 #            cp "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}" "${CURRENT_DIR}/fin-qt-built-${ROOTFS_IMG}"
 #            mount_imagefile "${CURRENT_DIR}/fin-qt-built-${ROOTFS_IMG}" ${QT_ROOTFS_MNT}
             qt_build
-            compress_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-qt-qwt"
+            compress_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt"
+            unmount_binded ${QT_ROOTFS_MNT}
+            ;;
+        --crossbuild_qt_plugins)
+            if [ "$(ls -A ${QT_ROOTFS_MNT})" ]; then
+                echo "Script_MSG: !! Found ${QT_ROOTFS_MNT} mounted .. will unmount now"
+                unmount_binded ${QT_ROOTFS_MNT}
+            fi
+            create_img 1 "${CURRENT_DIR}/${QT_ROOTFS_IMG}" ""
+            mount_imagefile "${CURRENT_DIR}/${QT_ROOTFS_IMG}" ${QT_ROOTFS_MNT}
+            bind_mounted ${QT_ROOTFS_MNT}
+            extract_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt"
+#            cp "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}" "${CURRENT_DIR}/fin-qt-built-${ROOTFS_IMG}"
+#            mount_imagefile "${CURRENT_DIR}/fin-qt-built-${ROOTFS_IMG}" ${QT_ROOTFS_MNT}
+            build_qt_plugins qwt
+            compress_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt-and-qt-plugins"
             unmount_binded ${QT_ROOTFS_MNT}
             ;;
         --assemble_qt_dev_sd_img)
             DESKTOP="yes"
 #            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-installed"
-            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-qt-qwt" ${VALUE}
+            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt-and-qt-plugins" ${VALUE}
             ;;
     *)
             echo "ERROR: unknown parameter \"$PARAM\""

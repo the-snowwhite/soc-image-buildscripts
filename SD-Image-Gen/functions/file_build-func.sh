@@ -15,7 +15,7 @@ function contains() {
 }
 
 exit_fail() {
-    echo "Scr_MSG: Exit error: in function ${curr_function}"
+    echo "Script_MSG: Exit error: in function ${curr_function}"
     exit 1
 }
 
@@ -629,7 +629,7 @@ add2repo(){
 #sudo systemctl stop apache2
 
 echo ""
-echo "Scr_MSG: Repo content before -->"
+echo "Script_MSG: Repo content before -->"
 echo ""
 LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1} | { grep ${3} || true; }`
 echo "Got list1"
@@ -638,25 +638,25 @@ REPO_LIST1=$"${LIST1}"
 echo "REPO_LIST1"
 
 echo "${REPO_LIST1}"
-echo "Scr_MSG: Contents of REPO_LIST1 -->"
+echo "Script_MSG: Contents of REPO_LIST1 -->"
 echo "${REPO_LIST1}"
 
 echo ""
 
 if [ ! -z "${REPO_LIST1}" ]; then
     echo ""
-    echo "Scr_MSG: Will remove former version from repo"
+    echo "Script_MSG: Will remove former version from repo"
     echo ""
     reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${REPO_LIST1}
     reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} linux-libc-dev
     reprepro -b ${HOME_REPO_DIR} export ${1}
-    echo "Scr_MSG: Restarting web server"
+    echo "Script_MSG: Restarting web server"
 
     sudo systemctl restart apache2
     reprepro -b ${HOME_REPO_DIR} export ${1}
 else
     echo ""
-    echo "Scr_MSG: Former version not found"
+    echo "Script_MSG: Former version not found"
     echo ""
 fi
 echo ""
@@ -669,15 +669,15 @@ echo ""
 #
 # 	if [ ! -z "${JESSIE_CLEAN_ALL_LIST}" ]; then
 # 		echo ""
-# 		echo "Scr_MSG: Will clean repo"
+# 		echo "Script_MSG: Will clean repo"
 # 		echo ""
 # 		reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${JESSIE_CLEAN_ALL_LIST}
 #                 reprepro -b ${HOME_REPO_DIR} export ${1}
-#                 echo "Scr_MSG: Restarting web server"
+#                 echo "Script_MSG: Restarting web server"
 #                 sudo systemctl restart apache2
 # 	else
 # 		echo ""
-# 		echo "Scr_MSG: Repo is empty"
+# 		echo "Script_MSG: Repo is empty"
 # 		echo ""
 # 	fi
 # 	echo ""
@@ -691,7 +691,7 @@ LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}
 REPO_LIST2=$"${LIST2}"
 echo  "${REPO_LIST2}"
 echo ""
-echo "Scr_MSG: Repo content After: -->"
+echo "Script_MSG: Repo content After: -->"
 echo ""
 echo  "${REPO_LIST2}"
 echo ""
@@ -752,7 +752,7 @@ mount_imagefile(){
     mkdir -p ${2}
     sync
     echo "#--------------------------------------------------------------------------------------#"
-    echo "# Scr_MSG:   mounting imagefile:                                                       #"
+    echo "# Script_MSG:   mounting imagefile:                                                       #"
     sudo mount ${1} ${2}
     echo "# ${1}"
     echo "# Is mounted in ---> ${2}"
@@ -765,9 +765,9 @@ mount_sd_imagefile(){
     mkdir -p ${2}
     sync
     echo "#--------------------------------------------------------------------------------------#"
-    echo "# Scr_MSG:   mounting imagefile:                                                       #"
+    echo "# Script_MSG:   mounting imagefile:                                                       #"
     if [ -z "${3}" ]; then
-        echo "# Scr_MSG: 1 empty image:"
+        echo "# Script_MSG: 1 empty image:"
         LOOP_DEV=`eval sudo losetup -Pf --show ${1}`
         echo "# ${1}"
         echo "# Is mounted in ---> ${LOOP_DEV}"
@@ -786,13 +786,13 @@ mount_sd_imagefile(){
 
 ## parameters: 1: mount name
 unmount_imagefile(){
-    echo "Scr_MSG: Unmounting Imagefile in ---> ${1}"
+    echo "Script_MSG: Unmounting Imagefile in ---> ${1}"
     sudo umount -R ${1}
 }
 
 ## parameters: 1: loop dev
 unmount_loopdev(){
-    echo "Scr_MSG: Unmounting loopdev in ---> ${1}"
+    echo "Script_MSG: Unmounting loopdev in ---> ${1}"
     sudo losetup -d ${LOOP_DEV}
 }
 
@@ -870,26 +870,26 @@ echo "#-------------------------------------------------------------------------
 mkfs_label="-L ${ROOTFS_LABEL}"
 
 if [ "${1}" = "1" ]; then
-    echo "# Scr_MSG: 1 part rootfs image"
+    echo "# Script_MSG: 1 part rootfs image"
     create_rootfs_img ${2}
 elif [ "${1}" = "2" ] || [ "${1}" = "3" ]; then
     sudo dd if=/dev/zero of=${2} bs=4K count=1700K
     echo "Now mounting sd-image file"
     mount_sd_imagefile ${2} ${3}
     if [ "${1}" = "2" ]; then
-        echo "# Scr_MSG: 2 part sd image"
+        echo "# Script_MSG: 2 part sd image"
         fdisk_2part ${LOOP_DEV}
     elif [ "${1}" = "3" ]; then
-        echo "# Scr_MSG: 3 part sd image"
+        echo "# Script_MSG: 3 part sd image"
         fdisk_3part_swap ${LOOP_DEV}
     fi
     sudo sync
-    echo "# Scr_MSG: will now part probe"
+    echo "# Script_MSG: will now part probe"
     sudo partprobe -s ${LOOP_DEV}
     sudo sync
 
     echo ""
-    echo "SubScr_MSG: creating file systems"
+    echo "SubScript_MSG: creating file systems"
     echo ""
 
     mkfs_partition="${LOOP_DEV}${media_rootfs_partition}"
@@ -903,7 +903,7 @@ elif [ "${1}" = "2" ] || [ "${1}" = "3" ]; then
     unmount_loopdev ${LOOP_DEV}
 else
     echo ""
-    echo "SubScr_MSG: create_img() No Valid number of partitions given ie: 1(rootfs only), 2 or 3(with swap)"
+    echo "SubScript_MSG: create_img() No Valid number of partitions given ie: 1(rootfs only), 2 or 3(with swap)"
     echo ""
 fi
 
@@ -920,7 +920,7 @@ bind_mounted(){
     sudo mount --bind /sys ${1}/sys
 
     echo "#--------------------------------------------------------------------------------------#"
-    echo "# Scr_MSG: ${1} now Bind mounted                                                  #"
+    echo "# Script_MSG: ${1} now Bind mounted                                                  #"
     echo "#                                                                                      #"
     echo "#--------------------------------------------------------------------------------------#"
 }
@@ -949,30 +949,30 @@ unmount_binded(){
     echo ""
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo ""
-    echo "Scr_MSG: current dir is now: ${CDR}"
+    echo "Script_MSG: current dir is now: ${CDR}"
     echo ""
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     echo ""
     sudo sync
-        echo "Scr_MSG: Will now ummount ${1}"
+        echo "Script_MSG: Will now ummount ${1}"
         RES=`eval sudo umount -R ${1}`
         echo ""
-        echo "Scr_MSG: Unmont result = ${RES}"
-        echo "Scr_MSG: Unmont return value = ${?}"
+        echo "Script_MSG: Unmont result = ${RES}"
+        echo "Script_MSG: Unmont return value = ${?}"
     if [ ! -d "${1}/dev" ]; then
         echo ""
-        echo "Scr_MSG: umount -R failed"
-        echo "Scr_MSG: Will now run  kill_ch_proc ${1}"
+        echo "Script_MSG: umount -R failed"
+        echo "Script_MSG: Will now run  kill_ch_proc ${1}"
         echo ""
         kill_ch_proc ${1}
         if [ -d "${1}/dev" ]; then
-            echo "Scr_MSG: kill_ch_proc ${1} failed also "
+            echo "Script_MSG: kill_ch_proc ${1} failed also "
             exit 1
         else
             echo ""
             echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
             echo ""
-            echo "Scr_MSG: ${1} was unmounted correctly with kill_ch_proc"
+            echo "Script_MSG: ${1} was unmounted correctly with kill_ch_proc"
             echo ""
             echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
             echo ""
@@ -981,7 +981,7 @@ unmount_binded(){
         echo ""
         echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         echo ""
-        echo "Scr_MSG: ${1} was unmounted correctly with umount -R"
+        echo "Script_MSG: ${1} was unmounted correctly with umount -R"
         echo ""
         echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         echo ""
@@ -992,7 +992,7 @@ unmount_binded(){
 compress_rootfs(){
     COMPNAME=${COMP_REL}_${3}
     echo "#---------------------------------------------------------------------------#"
-    echo "#Scr_MSG:                                                                   #"
+    echo "#Script_MSG:                                                                   #"
     echo "compressing latest rootfs from image into: -->                              #"
     echo " ${1}/${COMPNAME}_rootfs.tar.bz2"
     echo "----------------------------------------------------------------------------#"
@@ -1001,7 +1001,7 @@ compress_rootfs(){
     sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys .
     cd ${1}
     echo "#                                                                           #"
-    echo "#Scr_MSG:                                                                   #"
+    echo "#Script_MSG:                                                                   #"
     echo "${COMPNAME}_rootfs.tar.bz2 rootfs compression finished ..."
     echo "#                                                                           #"
     echo "#---------------------------------------------------------------------------#"
@@ -1145,18 +1145,19 @@ sudo rm -f ${ROOTFS_MNT}/etc/resolv.conf
 sudo cp -f /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' update'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libc6-dev x11proto-core-dev libsm6 libsm-dev libgtk-3-common libgtk-3-0 libgtk-3-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install --reinstall libc6 libc6-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install x11proto-core-dev libsm6 libsm-dev libgtk-3-common libgtk-3-0 libgtk-3-dev'
 
 set +e
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y build-dep qt5-default'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install'
+#sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install'
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install qtbase5-dev'
 
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install "^libxcb.*" libx11-xcb-dev libxrender-dev libxi-dev libinput10 libinput-pad1 libinput-dev libinput-pad-dev'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libxcb-xkb1 libxkbcommon-dev libxkbcommon-x11-0 libxkbcommon-x11-dev libxkbcommon0 libxkbfile-dev libxkbfile1 libasound2-dev libmtdev1 libmtdev-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install --reinstall "^libxcb.*" libxcb1-dev libx11-xcb-dev libxrender-dev libxi-dev libglu1-mesa-dev libinput10 libinput-pad1 libinput-dev libinput-pad-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libharfbuzz-dev libxcb-xkb1 libxkbcommon-dev libxkbcommon-x11-0 libxkbcommon-x11-dev libxkbcommon0 libxkbfile-dev libxkbfile1 libasound2-dev libmtdev1 libmtdev-dev'
 #libgtk2.0-0 libgtk2.0-common libgtk2.0-dev libgtk-3-common libgtk-3-0 libgtk-3-dev libgdk-pixbuf2.0-dev libhunspell-1.3-0 libhunspell-dev hunspell-en-us libgl1-mesa-dev libglu1-mesa-dev
 #libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install  libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync0-dev libxcb-xfixes0-dev libxrender-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-glx0-dev libxcb-xinerama0-dev libfontconfig1 libevdev2 libevdev-dev libudev1 libudev-dev libfontconfig1-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install --reinstall libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync0-dev libxcb-sync-dev libxcb-xfixes0-dev libxrender-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-glx0-dev libxcb-xinerama0-dev libfontconfig1 libevdev2 libevdev-dev libudev1 libudev-dev libfontconfig1-dev'
 #libegl1-mesa-dev libgegl-dev
 
 # echo ""
@@ -1205,7 +1206,7 @@ CONFIG += '${CROSS_GNU_ARCH}'
 QT_QPA_DEFAULT_PLATFORM = xcb
 
 # modifications to g++.conf
-QMAKE_CC                = '${QT_CC}'gcc
+QMAKE_CC                = '${QT_CC}'gcc -fPIC
 QMAKE_CXX               = '${QT_CC}'g++ -fPIC
 QMAKE_LINK              = '${QT_CC}'g++ -fPIC
 QMAKE_LINK_SHLIB        = '${QT_CC}'g++ -fPIC
@@ -1265,25 +1266,26 @@ EOF
 qt_configure(){
 curr_function="qt_configure()"
 # ../configure -help
-#../configure -release -opensource -confirm-license -nomake examples -qreal float -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc -no-use-gold-linker
-../configure -release -opensource -confirm-license -nomake examples -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
-# -qreal float -no-use-gold-linker
+#../configure -release -opensource -confirm-license -nomake examples -nomake tools -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc -no-use-gold-linker
+../configure -release -opensource -confirm-license -optimize-size -nomake tools -nomake examples -skip webengine -skip qtvirtualkeyboard -skip qtwayland -no-use-gold-linker -shared -nomake tests -system-xcb -no-pch -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
+# -qreal float -no-use-gold-linker -static -ltcg
     output=${?}
     output1=${output}
     if [ ${output} -gt 0 ]; then
         exit_fail
     else
-        echo "Scr_MSG: function --> ${curr_function} exited with success"
+        echo "Script_MSG: function --> ${curr_function} exited with success"
     fi
 }
 
 configure_for_qt_qwt(){
-sudo cp -R /usr/local/qwt-6.1.3 ${QT_ROOTFS_MNT}/usr/local/lib
-sudo sh -c 'echo "/usr/local/lib/qwt-6.1.3/lib" > '${QT_ROOTFS_MNT}'/etc/ld.so.conf.d/qt.conf'
+QWT_PREFIX="/usr/local/qwt-6.3.0-svn"
+#sudo cp -R /usr/local/qwt-6.1.3 ${QT_ROOTFS_MNT}/usr/local/lib
+sudo sh -c 'echo "'${QWT_PREFIX}'/lib" > '${QT_ROOTFS_MNT}'/etc/ld.so.conf.d/qt.conf'
 
-sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:/usr/local/lib/qwt-6.1.3/lib\n" >> '${QT_ROOTFS_MNT}'/etc/profile'
-sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:/usr/local/lib/qwt-6.1.3/lib\n" >> '${QT_ROOTFS_MNT}'/.bashrc'
-sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:/usr/local/lib/qwt-6.1.3/lib\n" >> '${QT_ROOTFS_MNT}'/.profile'
+sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/etc/profile'
+sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.bashrc'
+sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.profile'
 
 sudo chroot --userspec=root:root ${QT_ROOTFS_MNT} /sbin/ldconfig
 }
@@ -1298,25 +1300,19 @@ export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/arm-linux-gnueabihf/pkgconfig
 export PKG_CONFIG_SYSROOT_DIR=${QT_ROOTFS_MNT}
 export CROSS_COMPILE=${QT_CC}
 
-#GEN_MKSPEC_QT="yes";
-#CONFIGURE_QT="yes";
+GEN_MKSPEC_QT="yes";
+CONFIGURE_QT="yes";
 #
-#BUILD_QT="yes"\;
+BUILD_QT="yes"\;
 #
-#INSTALL_QT="yes";
-#
-#BUILD_QWT="yes";
-
-#CONFIGURE_FOR_QWT="yes";
-CONFIGURE_FOR_QWT="no";
+INSTALL_QT="yes";
 
 mkdir -p ${CURRENT_DIR}/Qt_logs
 
 if [[ "${GEN_MKSPEC_QT}" ==  "${OK}" ]]; then
-#	old_gen_mkspec | tee ${CURRENT_DIR}/Qt_logs/old_gen_mkspec-log.txt
     qt_gen_mkspec
     echo ""
-    echo "Scr_MSG: generated mkspecs"
+    echo "Script_MSG: generated mkspecs"
 #	wget https://raw.githubusercontent.com/riscv/riscv-poky/master/scripts/sysroot-relativelinks.py
 fi
 
@@ -1366,9 +1362,28 @@ if [[ "${INSTALL_QT}" ==  "${OK}" ]]; then
     echo ""
 #	sudo cp -R '/usr/local/lib/qt-'${QT_VER}'-altera-soc' ''${QT_ROOTFS_MNT}'/usr/local/lib'
 fi
+}
 
-if [[ "${CONFIGURE_FOR_QWT}" ==  "${OK}" ]]; then
-    configure_for_qt_qwt
+# parameters: 1: plugin name
+build_qt_plugins(){
+#
+BUILD_QWT="yes";
+
+CONFIGURE_FOR_QWT="yes";
+#CONFIGURE_FOR_QWT="no";
+
+if [[ "${BUILD_QWT}" ==  "${OK}" ]]; then
+    export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/arm-linux-gnueabihf/pkgconfig
+    export PKG_CONFIG_SYSROOT_DIR=${QT_ROOTFS_MNT}
+    export CROSS_COMPILE=${QT_CC}
+    sudo rm -Rf ${QWTDIR}../build
+    mkdir -p ${QWTDIR}../build
+    cd ${QWTDIR}../build
+    "/usr/local/lib/qt-${QT_VER}-altera-soc/bin/qmake ${QWTDIR}/qwt.pro" 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_qmake-log.txt
+    make -j${NCORES} 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
+    sudo make install 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_install-log.txt
+    if [[ "${CONFIGURE_FOR_QWT}" ==  "${OK}" ]]; then
+        configure_for_qt_qwt
+    fi
 fi
-
 }
