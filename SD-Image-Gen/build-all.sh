@@ -94,8 +94,8 @@ ALT_GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION}${GIT_KERNEL_REV}"
 QT_VER=5.10.1
 QT_ROOTFS_MNT="/tmp/qt_${QT_VER}-img"
 
-QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
-#QTDIR="/home/mib/qt-src/qt-everywhere-src-${QT_VER}"
+#QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
+QTDIR="/home/mib/qt-src/qt-everywhere-src-${QT_VER}"
 
 QWTDIR="/home/mib/Developer/ext-repos/qwt/qwt"
 
@@ -554,6 +554,7 @@ while [ "$1" != "" ]; do
 #           cp "${CURRENT_DIR}/desktop-${ROOTFS_IMG}" "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}"
 #            mount_imagefile "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}" ${ROOTFS_MNT}
 #            bind_mounted ${ROOTFS_MNT}
+            mkdir -p ${CURRENT_DIR}/Qt_logs
             inst_qt_build_deps 2>&1| tee ${CURRENT_DIR}/Qt_logs/install_qt_deps-log.txt
             compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
             unmount_binded ${ROOTFS_MNT}
