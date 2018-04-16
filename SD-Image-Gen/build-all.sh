@@ -150,10 +150,10 @@ TOOLCHAIN_DIR=${HOME}/bin
 QT_CFLAGS="-march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard"
 
 #QT_CC_FOLDER_NAME="gcc-linaro-${CROSS_GNU_ARCH}-4.9-2014.09_linux"
-QT_CC_FOLDER_NAME=PCH63_CC_FOLDER_NAME
+#QT_CC_FOLDER_NAME=PCH63_CC_FOLDER_NAME
 #QT_CC_FOLDER_NAME=PCH52_CC_FOLDER_NAME
 
-QT_CC_DIR="${TOOLCHAIN_DIR}/${QT_CC_FOLDER_NAME}"
+#QT_CC_DIR="${TOOLCHAIN_DIR}/${QT_CC_FOLDER_NAME}"
 #QT_CC_FILE="${QT_CC_FOLDER_NAME}.tar.xz"
 #QT_CC="${QT_CC_DIR}/bin/${CROSS_GNU_ARCH}-"
 QT_CC="/usr/bin/${CROSS_GNU_ARCH}-"
@@ -204,8 +204,8 @@ HOLOSYNTH_QUAR_PROJ_FOLDER='/home/mib/Developer/the-snowwhite_git/HolosynthV/Qua
 
 #-----  select global toolchain  ------#
 
-CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
-CC_URL=${PCH63_CC_URL}
+#CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
+#CC_URL=${PCH63_CC_URL}
 
 #------------------------------------------------------------------------------------------------------
 # Variables Postrequsites
@@ -219,9 +219,10 @@ fi
 SD_FILE_PRELUDE=mksocfpga_${distro}_${USER_NAME}_${SD_KERNEL_VERSION}-${REL_DATE}
 
 #------------  Toolchain  -------------#
-CC_DIR="${TOOLCHAIN_DIR}/${CC_FOLDER_NAME}"
-CC_FILE="${CC_FOLDER_NAME}.tar.xz"
-CC="${CC_DIR}/bin/${CROSS_GNU_ARCH}-"
+#CC_DIR="${TOOLCHAIN_DIR}/${CC_FOLDER_NAME}"
+#CC_FILE="${CC_FOLDER_NAME}.tar.xz"
+#CC="${CC_DIR}/bin/${CROSS_GNU_ARCH}-"
+CC="/usr/bin/${CROSS_GNU_ARCH}-"
 
 COMP_REL=debian-${distro}_socfpga
 NCORES=`nproc`
@@ -270,21 +271,22 @@ usage()
 
 install_deps() {
 ## toolchain:
-    if [ ! -d ${CC_DIR} ]; then
-        echo ""
-        echo "Script_MSG: Toolchain not preinstalled .!"
-        echo "Script_MSG: ${CC_DIR}"
-        echo ""
-        cd ${TOOLCHAIN_DIR}
-        get_and_extract ${CC_DIR} ${CC_URL} ${CC_FILE}
-        # install linaro gcc crosstoolchain dependency:
-        sudo ${apt_cmd} -y install lib32stdc++6
-    else
-        echo ""
-        echo "Script_MSG: Toolchain allready installed in -->"
-        echo "Script_MSG: ${CC_DIR}"
-        echo ""
-    fi
+#     if [ ! -d ${CC_DIR} ]; then
+#         echo ""
+#         echo "Script_MSG: Toolchain not preinstalled .!"
+#         echo "Script_MSG: ${CC_DIR}"
+#         echo ""
+#         cd ${TOOLCHAIN_DIR}
+#         get_and_extract ${CC_DIR} ${CC_URL} ${CC_FILE}
+#         # install linaro gcc crosstoolchain dependency:
+#         sudo ${apt_cmd} -y install lib32stdc++6
+#     else
+#         echo ""
+#         echo "Script_MSG: Toolchain allready installed in -->"
+#         echo "Script_MSG: ${CC_DIR}"
+#         echo ""
+#     fi
+    install_crossbuild_armhf
     install_uboot_dep
     install_kernel_dep
     sudo ${apt_cmd} install kpartx

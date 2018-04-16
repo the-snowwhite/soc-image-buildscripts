@@ -34,6 +34,15 @@ get_and_extract() {
     extract_xz ${3}
 }
 
+install_crossbuild_armhf() {
+# install deps for u-boot build
+    sudo apt -y build-dep linux
+    sudo apt -y install
+    sudo dpkg --add-architecture armhf
+    sudo apt -y install --no-install-recommends build-essential crossbuild-essential-armhf
+    sudo apt -y install --reinstall lib32stdc++6 gcc-arm-linux-gnueabihf
+}
+
 install_uboot_dep() {
 # install deps for u-boot build
     sudo ${apt_cmd} -y install lib32z1 device-tree-compiler bc u-boot-tools
@@ -41,13 +50,11 @@ install_uboot_dep() {
 
 install_kernel_dep() {
 # install deps for kernel build
-    sudo ${apt_cmd} -y install build-essential fakeroot bc u-boot-tools
-    sudo apt-get -y build-dep linux
+    sudo ${apt_cmd} -y install fakeroot bc u-boot-tools
 }
 
 install_rootfs_dep() {
     sudo apt-get -y install qemu binfmt-support qemu-user-static schroot debootstrap libc6 debian-archive-keyring
-#    sudo dpkg --add-architecture armhf
     sudo apt update
 #    sudo apt -y --force-yes upgrade
     sudo update-binfmts --display | grep interpreter
@@ -1145,7 +1152,7 @@ sudo rm -f ${ROOTFS_MNT}/etc/resolv.conf
 sudo cp -f /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
 
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' update'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install --reinstall libc6 libc6-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install --reinstall libharfbuzz0b libc6 libc6-dev'
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libpcre2-32-0 libpcre2-dev x11proto-core-dev libsm6 libsm-dev libgtk-3-common libgtk-3-0 libgtk-3-dev'
 
 set +e
