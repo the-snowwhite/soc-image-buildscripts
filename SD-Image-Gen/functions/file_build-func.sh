@@ -1194,7 +1194,7 @@ qt_gen_mkspec(){
 #sh -c 'cat <<EOF > "${QTDIR}/qtbase/mkspecs/linux-arm-gnueabihf-g++/qmake.conf"
 sh -c 'cat <<EOF > '${QTDIR}'/qtbase/mkspecs/linux-arm-gnueabihf-g++/qmake.conf
 #
-# qmake configuration for building with arm-linux-gnueabihf-g++
+# qmake configuration for building with linux-arm-gnueabihf-g++
 #
 
 MAKEFILE_GENERATOR      = UNIX
@@ -1205,15 +1205,15 @@ include(../common/linux.conf)
 include(../common/gcc-base-unix.conf)
 include(../common/g++-unix.conf)
 
-CROSS_GNU_ARCH          = arm-linux-gnueabihf
+CROSS_GNU_ARCH          = linux-arm-gnueabihf
 warning("preparing QMake configuration for '${CROSS_GNU_ARCH}'")
 CONFIG += '${CROSS_GNU_ARCH}'
 
 
 QT_QPA_DEFAULT_PLATFORM = xcb
 
-# modifications to g++.conf
-QMAKE_CC                = '${QT_CC}'gcc -fPIC
+# modifications to g++.conf -fPIC
+QMAKE_CC                = '${QT_CC}'gcc
 QMAKE_CXX               = '${QT_CC}'g++ -fPIC
 QMAKE_LINK              = '${QT_CC}'g++ -fPIC
 QMAKE_LINK_SHLIB        = '${QT_CC}'g++ -fPIC
@@ -1231,6 +1231,9 @@ QMAKE_CXXFLAGS_RELEASE += -O3
 
 QMAKE_LIBS             += -lrt -lpthread -ldl
 
+QMAKE_RPATHLINKDIR += '${QT_ROOTFS_MNT}'/lib/linux-arm-gnueabihf
+QMAKE_RPATHLINKDIR += '${QT_ROOTFS_MNT}'/usr/lib/linux-arm-gnueabihf
+QMAKE_RPATHLINKDIR += '${QT_ROOTFS_MNT}'/usr/lib/
 
 #QMAKE_LFLAGS_RELEASE=-"Wl,-O1,-rpath,'${QT_ROOTFS_MNT}'/usr/lib,-rpath,'${QT_ROOTFS_MNT}'/usr/lib/'${CROSS_GNU_ARCH}',-rpath,'${QT_ROOTFS_MNT}'/lib/'${CROSS_GNU_ARCH}'"
 #QMAKE_LFLAGS_DEBUG += "-Wl,-rpath,'${QT_ROOTFS_MNT}'/usr/lib,-rpath,'${QT_ROOTFS_MNT}'/usr/lib/${CROSS_GNU_ARCH},-rpath,'${QT_ROOTFS_MNT}'/lib/${CROSS_GNU_ARCH}"
@@ -1273,9 +1276,12 @@ EOF
 qt_configure(){
 curr_function="qt_configure()"
 # ../configure -help
-#../configure -release -opensource -confirm-license -nomake examples -nomake tools -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc -no-use-gold-linker
-../configure -release -opensource -confirm-license -optimize-size -nomake tools -nomake examples -skip webengine -skip qtvirtualkeyboard -skip qtwayland -system-pcre -no-use-gold-linker -shared -nomake tests -system-xcb -no-pch -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
-# -qreal float -no-use-gold-linker -static -ltcg -qt-pcre, -system-pcre
+../configure -release -opensource -confirm-license -nomake examples -nomake tools -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc -no-use-gold-linker
+#../configure -release -opensource -confirm-license -optimize-size -nomake tools -nomake examples -skip webengine -skip qtvirtualkeyboard -skip qtwayland -system-pcre -no-opengl -no-use-gold-linker -no-eglfs -nomake tests -system-xcb -no-pch -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
+# -qreal float -no-use-gold-linker -static -ltcg -qt-pcre, -system-pcre -gui -shared
+
+#-platform linux-g++
+#../configure -confirm-license -prefix "${QT_ROOTFS_MNT}/usr" -bindir "${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/qt5/bin" -libdir "${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf" -docdir "${QT_ROOTFS_MNT}/usr/share/qt5/doc" -headerdir "${QT_ROOTFS_MNT}/usr/include/linux-arm-gnueabihf/qt5" -datadir "${QT_ROOTFS_MNT}/usr/share/qt5" -archdatadir "${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/qt5" -plugindir "${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/qt5/plugins" -importdir "${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/qt5/imports" -translationdir "${QT_ROOTFS_MNT}/usr/share/qt5/translations" -hostdatadir "${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/qt5" -sysconfdir "${QT_ROOTFS_MNT}/etc/xdg" -examplesdir "${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/qt5/examples" -opensource -plugin-sql-mysql -plugin-sql-odbc -plugin-sql-psql -plugin-sql-sqlite -no-sql-sqlite2 -plugin-sql-tds -system-sqlite -system-harfbuzz -system-zlib -system-libpng -system-libjpeg -system-doubleconversion -openssl -no-rpath -verbose -optimized-qmake -dbus-linked -no-strip -no-separate-debug-info -qpa xcb -xcb -glib -icu -accessibility -compile-examples -no-directfb -gstreamer 1.0 -plugin-sql-ibase  -no-opengl -no-eglfs -xplatform linux-arm-gnueabihf-g++
     output=${?}
     output1=${output}
     if [ ${output} -gt 0 ]; then
@@ -1287,7 +1293,9 @@ curr_function="qt_configure()"
 
 configure_for_qt_qwt(){
 QWT_PREFIX="/usr/local/qwt-6.3.0-svn"
-#sudo cp -R /usr/local/qwt-6.1.3 ${QT_ROOTFS_MNT}/usr/local/lib
+echo ""
+echo "Script_MSG: Setting up QWT"
+sudo cp -r ${QWT_PREFIX} ${QT_ROOTFS_MNT}/usr/local
 sudo sh -c 'echo "'${QWT_PREFIX}'/lib" > '${QT_ROOTFS_MNT}'/etc/ld.so.conf.d/qt.conf'
 
 sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/etc/profile'
@@ -1303,14 +1311,14 @@ echo ""
 echo "Script_MSG: Running qt_build"
 echo ""
 
-export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/arm-linux-gnueabihf/pkgconfig
+export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/pkgconfig
 export PKG_CONFIG_SYSROOT_DIR=${QT_ROOTFS_MNT}
 export CROSS_COMPILE=${QT_CC}
 
 GEN_MKSPEC_QT="yes";
 CONFIGURE_QT="yes";
 #
-BUILD_QT="yes"\;
+BUILD_QT="yes";
 #
 INSTALL_QT="yes";
 
@@ -1332,6 +1340,7 @@ if [[ "${CONFIGURE_QT}" ==  "${OK}" ]]; then
     echo ""
     echo " qt_configure return value = ${output1}"
     echo ""
+#	sudo cp -R '/usr/local/lib/qt-'${QT_VER}'-altera-soc' ''${QT_ROOTFS_MNT}'/usr/local/lib'
 fi
 
 if [[ "${BUILD_QT}" ==  "${OK}" ]]; then
@@ -1345,7 +1354,7 @@ if [[ "${BUILD_QT}" ==  "${OK}" ]]; then
         exit_fail
     fi
     echo ""
-    echo " qt make return value = ${output2}"
+    echo " qt make return value = '${output2}"
     echo ""
 fi
 
@@ -1374,23 +1383,25 @@ fi
 # parameters: 1: plugin name
 build_qt_plugins(){
 #
-BUILD_QWT="yes";
+#BUILD_QWT="yes";
 
 CONFIGURE_FOR_QWT="yes";
 #CONFIGURE_FOR_QWT="no";
 
 if [[ "${BUILD_QWT}" ==  "${OK}" ]]; then
-    export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/arm-linux-gnueabihf/pkgconfig
+    export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/pkgconfig
     export PKG_CONFIG_SYSROOT_DIR=${QT_ROOTFS_MNT}
     export CROSS_COMPILE=${QT_CC}
-    sudo rm -Rf ${QWTDIR}../build
-    mkdir -p ${QWTDIR}../build
-    cd ${QWTDIR}../build
-    "/usr/local/lib/qt-${QT_VER}-altera-soc/bin/qmake ${QWTDIR}/qwt.pro" 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_qmake-log.txt
+    sudo rm -Rf ${QWTDIR}/../build
+    mkdir -p ${QWTDIR}/../build
+    cd ${QWTDIR}/../build
+#    "/usr/local/lib/qt-${QT_VER}-altera-soc/bin/qmake ${QWTDIR}/qwt.pro" 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_qmake-log.txt
+#    qmake -makefile -qtconf /tmp/qmake.conf QMAKE_CC=arm-linux-gnueabihf-gcc QMAKE_CXX=arm-linux-gnueabihf-g++ QMAKE_LINK=arm-linux-gnueabihf-g++ ${QWTDIR}/qwt.pro 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
+    /usr/local/bin/qmake-arm-linux-gnueabihf ${QWTDIR}/qwt.pro 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
     make -j${NCORES} 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
     sudo make install 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_install-log.txt
-    if [[ "${CONFIGURE_FOR_QWT}" ==  "${OK}" ]]; then
-        configure_for_qt_qwt
-    fi
+fi
+if [[ "${CONFIGURE_FOR_QWT}" ==  "${OK}" ]]; then
+    configure_for_qt_qwt
 fi
 }

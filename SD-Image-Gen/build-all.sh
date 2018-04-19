@@ -90,13 +90,12 @@ SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
 KERNEL_CONF="socfpga_defconfig"
 ALT_GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION}${GIT_KERNEL_REV}"
 
-#QT_VER=5.7.1
-QT_VER=5.10.1
+QT_VER=5.7.1
+QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
+#QT_VER=5.10.1
+#QTDIR="/home/mib/qt-src/qt-everywhere-src-${QT_VER}"
+
 QT_ROOTFS_MNT="/tmp/qt_${QT_VER}-img"
-
-#QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
-QTDIR="/home/mib/qt-src/qt-everywhere-src-${QT_VER}"
-
 QWTDIR="/home/mib/Developer/ext-repos/qwt/qwt"
 
 #------------------------------------------------------------------------------------------------------
@@ -587,7 +586,7 @@ while [ "$1" != "" ]; do
             extract_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt"
 #            cp "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}" "${CURRENT_DIR}/fin-qt-built-${ROOTFS_IMG}"
 #            mount_imagefile "${CURRENT_DIR}/fin-qt-built-${ROOTFS_IMG}" ${QT_ROOTFS_MNT}
-            build_qt_plugins qwt
+            build_qt_plugins
             compress_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt-and-qt-plugins"
             unmount_binded ${QT_ROOTFS_MNT}
             ;;
