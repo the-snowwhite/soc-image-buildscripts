@@ -64,7 +64,8 @@ BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit")
 
 ## Select u-boot version:
 #UBOOT_VERSION="v2016.09"
-UBOOT_VERSION="v2018.01"
+#UBOOT_VERSION="v2018.01"
+UBOOT_VERSION="v2018.03"
 #UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
 UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"
@@ -96,6 +97,8 @@ QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
 #QTDIR="/home/mib/qt-src/qt-everywhere-src-${QT_VER}"
 
 QT_ROOTFS_MNT="/tmp/qt_${QT_VER}-img"
+QT_PREFIX="/usr/local/lib/qt-${QT_VER}-altera-soc"
+
 QWTDIR="/home/mib/Developer/ext-repos/qwt/qwt"
 
 #------------------------------------------------------------------------------------------------------
@@ -203,7 +206,7 @@ HOLOSYNTH_QUAR_PROJ_FOLDER='/home/mib/Developer/the-snowwhite_git/HolosynthV/Qua
 
 #-----  select global toolchain  ------#
 
-#CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
+CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
 #CC_URL=${PCH63_CC_URL}
 
 #------------------------------------------------------------------------------------------------------
@@ -218,10 +221,10 @@ fi
 SD_FILE_PRELUDE=mksocfpga_${distro}_${USER_NAME}_${SD_KERNEL_VERSION}-${REL_DATE}
 
 #------------  Toolchain  -------------#
-#CC_DIR="${TOOLCHAIN_DIR}/${CC_FOLDER_NAME}"
+CC_DIR="${TOOLCHAIN_DIR}/${CC_FOLDER_NAME}"
 #CC_FILE="${CC_FOLDER_NAME}.tar.xz"
-#CC="${CC_DIR}/bin/${CROSS_GNU_ARCH}-"
-CC="/usr/bin/${CROSS_GNU_ARCH}-"
+CC="${CC_DIR}/bin/${CROSS_GNU_ARCH}-"
+#CC="/usr/bin/${CROSS_GNU_ARCH}-"
 
 COMP_REL=debian-${distro}_socfpga
 NCORES=`nproc`

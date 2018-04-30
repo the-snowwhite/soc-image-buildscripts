@@ -1,4 +1,4 @@
-From d1e5c4af4ce21e7212e98e80f4a4f675b400903c Mon Sep 17 00:00:00 2001
+From c199f8ff187b7436502637cd8861462f4e3c5ffa Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 23:01:49 +0200
 Subject: [PATCH 12/13] Enable bridges in dtb's and add framebuffer,audio and
@@ -8,8 +8,9 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                     |   1 +
  arch/arm/boot/dts/socfpga.dtsi                 |   2 +
- arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 291 +++++++++++++++++++++++++
- 3 files changed, 294 insertions(+)
+ arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 266 +++++++++++++++++++++++++
+ arch/arm/configs/socfpga_defconfig             |  59 ++++++
+ 4 files changed, 328 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
@@ -46,10 +47,10 @@ index 6dcff22..dce1143 100644
  		fpgamgr0: fpgamgr@ff706000 {
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 new file mode 100644
-index 0000000..d0a1fc1
+index 0000000..1207869
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
-@@ -0,0 +1,291 @@
+@@ -0,0 +1,266 @@
 +/*
 + * Copyright Intel Corporation (C) 2017. All rights reserved.
 + *
@@ -69,7 +70,7 @@ index 0000000..d0a1fc1
 +#include "socfpga_cyclone5.dtsi"
 +
 +/ {
-+	model = "Terasic DE10-Nano";
++	model = "Terasic DE1-SoC";
 +	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
 +
 +	chosen {
@@ -134,37 +135,14 @@ index 0000000..d0a1fc1
 +		clock-output-names = "clk44";
 +	};
 +
-+	i2s: i2s@0 {
++	i2s: i2s@0x0 {
 +		#sound-dai-cells = <1>;
 +		compatible = "opencores,i2s";
-+		reg = <0xff200000 0x20>, <0xff200020 0x20>;
++		reg = <0xff200000 0x40>, <0xff200040 0x20>;
 +		clocks = <&clk44>, <&clk48>;
 +		clock-names = "clk44", "clk48";
 +		dmas = <&pdma 0>, <&pdma 1>;
 +		dma-names = "tx", "rx";
-+	};
-+
-+	socsound {
-+		compatible = "holotr,socsynth-audio";
-+		dmalink-controller = <&dmalink>;
-+		audio-codec = <&hsynth7002_codec>;
-+	};
-+
-+	dmalink: dmalink@40 {
-+		#sound-dai-cells = <1>;
-+		compatible = "holotr,dmalink";
-+		reg = <0xff200040 0x20>, <0xff200060 0x20>;
-+		clocks = <&clk44>;
-+		clock-names = "clk44";
-+		dmas = <&pdma 2>;
-+		dma-names = "rx";
-+	};
-+
-+	hsynth7002_codec: hsynth7002-codec {
-+		#sound-dai-cells = <0>;
-+		compatible = "holotr,hsynth7002";
-+/*     IOVDD-supply = <&supply>;*/
-+		status = "okay";
 +	};
 +
 +	bridge@0xc0000000 {
@@ -173,73 +151,22 @@ index 0000000..d0a1fc1
 +		bridge-enable = <1>;
 +		#address-cells = <0x2>;
 +		#size-cells = <0x1>;
-+		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
-+				<0x00000001 0x00002000 0xff202000 0x00000008>,
-+				<0x00000001 0x00003000 0xff203000 0x00000010>,
-+				<0x00000001 0x00004000 0xff204000 0x00000010>,
-+				<0x00000001 0x00005000 0xff205000 0x00000010>,
-+				<0x00000001 0x00030000 0xff230000 0x00000100>,
-+				<0x00000001 0x00031000 0xff231000 0x00000080>,
-+				<0x00000001 0x00040000 0xff240000 0x00010000>,
-+				<0x00000001 0x00050000 0xff250000 0x00010000>;
++		ranges = <0x00000001 0x00020000 0xff220000 0x00000008>,
++			<0x00000001 0x00031000 0xff231000 0x00000080>,
++			<0x00000001 0x00010000 0xff210000 0x00000008>,
++			<0x00000001 0x000100c0 0xff2100c0 0x00000010>,
++			<0x00000001 0x00010080 0xff210080 0x00000010>,
++			<0x00000001 0x00010040 0xff210040 0x00000010>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00010000>;
 +
-+		sysid@0x100001000 {
-+			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
-+			reg = <0x00000001 0x00001000 0x00000008>;
-+			id = <0xacd51302>;
-+			timestamp = <0x5929e204>;
-+		};
-+
-+		serial@0x100002000 {
-+			compatible = "altr,juart-15.1", "altr,juart-1.0";
-+			reg = <0x00000001 0x00002000 0x00000008>;
-+			interrupt-parent = <0x3>;
-+			interrupts = <0x0 0x2a 0x4>;
++		serial@0x100020000 {
++			compatible = "altr,juart-17.1", "altr,juart-1.0";
++			reg = <0x00000001 0x00020000 0x00000008>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 40 4>;
 +			clocks = <0x2>;
-+		};
-+
-+		gpio@0x100003000 {
-+			compatible = "altr,pio-15.1", "altr,pio-1.0";
-+			reg = <0x00000001 0x00003000 0x00000010>;
-+			altr,gpio-bank-width = <0x8>;
-+			resetvalue = <0xff>;
-+			#gpio-cells = <0x2>;
-+			gpio-controller;
-+		};
-+
-+		gpio@0x100004000 {
-+			compatible = "altr,pio-15.1", "altr,pio-1.0";
-+			reg = <0x00000001 0x00004000 0x00000010>;
-+			altr,gpio-bank-width = <0x4>;
-+			altr,interrupt-type = <0x3>;
-+			altr,interrupt_type = <0x3>;
-+			edge_type = <0x2>;
-+			level_trigger = <0x0>;
-+			resetvalue = <0x0>;
-+			#gpio-cells = <0x2>;
-+			gpio-controller;
-+		};
-+
-+		gpio@0x100005000 {
-+			compatible = "altr,pio-15.1", "altr,pio-1.0";
-+			reg = <0x00000001 0x00005000 0x00000010>;
-+			altr,gpio-bank-width = <0x2>;
-+			altr,interrupt-type = <0x2>;
-+			altr,interrupt_type = <0x2>;
-+			edge_type = <0x1>;
-+			level_trigger = <0x0>;
-+			resetvalue = <0x0>;
-+			#gpio-cells = <0x2>;
-+			gpio-controller;
-+		};
-+
-+		ilc@0x100030000 {
-+			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
-+			reg = <0x00000001 0x00030000 0x00000100>;
-+			interrupt-controller;
-+			#interrupt-cells = <0x1>;
-+			altr,sw-fifo-depth = <0x20>;
-+		};
++		}; //end serial@0x100020000 (jtag_uart)
 +
 +		vip@0x100031000 {
 +			compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
@@ -252,13 +179,62 @@ index 0000000..d0a1fc1
 +			mem-word-width = <0x80>;
 +		};
 +
++		sysid@0x100010000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00010000 0x00000008>;
++			id = <2899645186>;
++			timestamp = <1524157570>;
++		};
++
++		gpio@0x1000100c0 {
++			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			reg = <0x00000001 0x000100c0 0x00000010>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 41 1>;
++			clocks = <0x2>;
++			altr,gpio-bank-width = <2>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++			altr,interrupt-type = <2>;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
++			altr,interrupt_type = <2>;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
++			edge_type = <1>;	/* embeddedsw.dts.params.edge_type type NUMBER */
++			level_trigger = <0>;	/* embeddedsw.dts.params.level_trigger type NUMBER */
++			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++			#gpio-cells = <2>;
++			gpio-controller;
++		}; //end gpio@0x1000100c0 (button_pio)
++
++		gpio@0x100010080 {
++			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00010080 0x00000010>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 42 1>;
++			clocks = <0x2>;
++			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++			altr,interrupt-type = <3>;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
++			altr,interrupt_type = <3>;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
++			edge_type = <2>;	/* embeddedsw.dts.params.edge_type type NUMBER */
++			level_trigger = <0>;	/* embeddedsw.dts.params.level_trigger type NUMBER */
++			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++			#gpio-cells = <2>;
++			gpio-controller;
++		}; //end gpio@0x100010080 (dipsw_pio)
++
++		gpio@0x100010040 {
++			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00010040 0x00000010>;
++			clocks = <0x2>;
++			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++			#gpio-cells = <2>;
++			gpio-controller;
++		}; //end gpio@0x100010040 (led_pio)
++
 +		uio-socfpg0@0x100040000 {
-+				compatible = "uioreg_io,generic-uio,ui_pdrv";
-+				reg = <0x00000001 0x00040000 0x00010000>;
-+				interrupt-parent = <0x2>;
-+				interrupts = <0 43 4>;
-+				address_width = <14>;
-+				data_width = <32>;
++            compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 43 4>;
++			address_width = <14>;
++			data_width = <32>;
 +		};
 +
 +		socmidi@0x100050000 {
@@ -315,7 +291,7 @@ index 0000000..d0a1fc1
 +	};
 +
 +	adxl345: adxl345@0 {
-+		compatible = "adi,adxl34x";
++		compatible = "adi,adxl345";
 +		reg = <0x53>;
 +
 +		interrupt-parent = <&portc>;
@@ -341,6 +317,73 @@ index 0000000..d0a1fc1
 +&usb1 {
 +	status = "okay";
 +};
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 50ba023..8b01c80 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -295,3 +295,62 @@ CONFIG_USB_HID=y
+ CONFIG_HID_MULTITOUCH=y
+ #CONFIG_ALTERA_PR_IP_CORE=y
+ #CONFIG_ALTERA_PR_IP_CORE_PLAT=y
++CONFIG_SND_USB_AUDIO=m
++CONFIG_SND_SOC=y
++CONFIG_SND_SOC_I2C_AND_SPI=y
++CONFIG_SND_SOC_SIGMADSP=m
++CONFIG_SND_SOC_SIGMADSP_I2C=m
++CONFIG_SND_SOC_SSM2602=m
++CONFIG_SND_SOC_SSM2602_I2C=m
++CONFIG_SND_ALOOP=m
++CONFIG_SND_VIRMIDI=m
++CONFIG_SND_SOC_HOLOSYNTHV=m
++CONFIG_SND_SOC_DE1_WM8731=m
++CONFIG_SND_SOC_PCM5102A=m
++CONFIG_FPGADMA=m
++CONFIG_REGMAP_I2C=y
++CONFIG_REGMAP_SPI=y
++CONFIG_SOUND=y
++CONFIG_SOUND_OSS_CORE=y
++CONFIG_SOUND_OSS_CORE_PRECLAIM=y
++CONFIG_SND=y
++CONFIG_SND_TIMER=y
++CONFIG_SND_PCM=y
++CONFIG_SND_HWDEP=y
++CONFIG_SND_RAWMIDI=y
++CONFIG_SND_COMPRESS_OFFLOAD=y
++CONFIG_SND_JACK=y
++CONFIG_SND_SEQUENCER=y
++CONFIG_SND_SEQ_DUMMY=y
++CONFIG_SND_OSSEMUL=y
++CONFIG_SND_SEQUENCER_OSS=y
++CONFIG_SND_SUPPORT_OLD_API=y
++CONFIG_SND_VERBOSE_PROCFS=y
++CONFIG_SND_VERBOSE_PRINTK=y
++CONFIG_SND_DEBUG=y
++CONFIG_SND_DEBUG_VERBOSE=y
++CONFIG_SND_DMA_SGBUF=y
++CONFIG_SND_DRIVERS=y
++CONFIG_SND_DUMMY=m
++CONFIG_SND_SERIAL_U16550=m
++CONFIG_SND_SPI=y
++CONFIG_SND_USB=y
++CONFIG_I2C_BOARDINFO=y
++CONFIG_I2C_COMPAT=y
++CONFIG_I2C_HELPER_AUTO=y
++CONFIG_I2C_DESIGNWARE_CORE=y
++CONFIG_I2C_OCORES=y
++CONFIG_REGULATOR_DEBUG=y
++CONFIG_REGULATOR_GPIO=y
++CONFIG_SND_ARM=y
++CONFIG_SND_SOC_GENERIC_DMAENGINE_PCM=y
++CONFIG_SND_ATMEL_SOC=m
++CONFIG_SND_DESIGNWARE_I2S=m
++CONFIG_SND_SOC_FSL_ASRC=m
++CONFIG_SND_SOC_FSL_SAI=m
++CONFIG_SND_SOC_FSL_SSI=m
++CONFIG_SND_SOC_FSL_SPDIF=m
++CONFIG_SND_SOC_FSL_ESAI=m
++CONFIG_SND_SOC_IMX_AUDMUX=m
++CONFIG_SND_SOC_I2C_AND_SPI=y
++CONFIG_HZ_1000=y
 -- 
 2.7.4
 

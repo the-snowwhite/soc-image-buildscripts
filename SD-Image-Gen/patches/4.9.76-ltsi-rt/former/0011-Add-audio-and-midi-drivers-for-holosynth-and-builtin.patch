@@ -1,4 +1,4 @@
-From 19f633b9d36dd90dffc14edb5805d5700d3dea35 Mon Sep 17 00:00:00 2001
+From 7b9e9b11e015718f8c40a2b990c661710de025ff Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
 Subject: [PATCH 11/13] Add audio and midi drivers for holosynth and builtin

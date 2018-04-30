@@ -1,7 +1,7 @@
-From 813227f651836ca63521c65ee6c4db51087f02d9 Mon Sep 17 00:00:00 2001
+From ad0394ee5a2c6a3cc8afae67b990953311467e9d Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
-Subject: [PATCH 6/9] rename kernel package names to *-socfpga-rt-ltsi
+Subject: [PATCH 06/12] rename kernel package names to *-socfpga-rt-ltsi
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index d8cbeec..16554d2 100755
+index d6a4058..ee58811 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
 @@ -96,9 +96,9 @@ fwdir="$objtree/debian/fwtmp"

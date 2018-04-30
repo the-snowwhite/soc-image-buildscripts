@@ -1,4 +1,4 @@
-From b9fbc7233b92b3ffac224a1d6add263a3aa08393 Mon Sep 17 00:00:00 2001
+From 792174e2c912cec76692a07af3bc217cb2ed3050 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
 Subject: [PATCH 05/13] add configfs and fpgacfg dts entities, and dynamic dts

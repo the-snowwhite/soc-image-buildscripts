@@ -93,7 +93,7 @@ static void snd_socmidi_output_trigger(struct snd_rawmidi_substream *substream, 
         unsigned char data;
         if (snd_rawmidi_transmit(substream, &data, 1) != 1)
             break; /* no more data */
-            snd_socmidi_transmit(data);
+        snd_socmidi_transmit(data);
     }
 }
 

@@ -1,7 +1,7 @@
-From 2f69bc9328b0fe314c1e9b283948cc8156141db4 Mon Sep 17 00:00:00 2001
+From 6ca066d2d4a728219980634d657879f5afb1aca1 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
-Subject: [PATCH 01/12] disable debug package gen
+Subject: [PATCH 01/14] disable debug package gen
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -25,10 +25,10 @@ index 98b007e..efc9ed9 100644
 2.7.4
 
 
-From 32ecf2d17749d011231e83f7bceeccd056c1994b Mon Sep 17 00:00:00 2001
+From ed2a995146237060f9bea5a5f4c548dbd10af464 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
-Subject: [PATCH 02/12] add ext4 root fs support and autofs4 module
+Subject: [PATCH 02/14] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -64,10 +64,10 @@ index efc9ed9..a9f5f99 100644
 2.7.4
 
 
-From 5c7ec9160ddae1e5039a27351134563b27810e38 Mon Sep 17 00:00:00 2001
+From 90a8a6bedb61df19229869b4b1b8f27ed14a7d7b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
-Subject: [PATCH 03/12] add .dtd files to kernel-image .deb
+Subject: [PATCH 03/14] add .dtd files to kernel-image .deb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -102,27 +102,38 @@ index 3c575cd0..d67c791 100755
 2.7.4
 
 
-From 6e42e8b208a60c8e3fbd00cc9333fdfce18c8a36 Mon Sep 17 00:00:00 2001
+From b52c5d08cf09a43ca796ad4a5c50f5ddce8e2af5 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
-Subject: [PATCH 04/12] add generate /boot/extlinux/extlinux.conf to boot with
- uboot
+Subject: [PATCH 04/14] add generate /boot/extlinux/extlinux.conf and
+ /boot/uEnv.txt for uboot boot info
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- scripts/package/builddeb | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ scripts/package/builddeb | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index d67c791..d8cbeec 100755
+index d67c791..d6a4058 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -203,6 +203,16 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
+@@ -203,6 +203,27 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
  else
  	want_initrd=No
  fi
-+
 +# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
++cat <<EOF > "$tmpdir/boot/uEnv.txt"
++kver=${version}
++initrd_installed=$want_initrd
++hostname=holosynthv
++EOF
++cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
++fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
++loadimage=run fpgaload; bridge enable; mw.b 0xffd05018 0xf0; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++mmcboot=setenv bootargs console=ttyS0,115200 root=${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz ${loadaddr} - ${fdt_addr}
++EOF
++
++# create extlinux.conf in /boot folder (for u-boot probing)
 +mkdir -p "$tmpdir/boot/extlinux"
 +cat <<EOF > "$tmpdir/boot/extlinux/extlinux.conf"
 +label Linux ${version}
@@ -138,10 +149,10 @@ index d67c791..d8cbeec 100755
 2.7.4
 
 
-From 301057d48b5410a9c024431b693cb0c2f97e9f61 Mon Sep 17 00:00:00 2001
+From 84d871756a5ea365fb70be8b73a7dfd0b70a1064 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
-Subject: [PATCH 05/12] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 05/14] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -178,10 +189,10 @@ index a9f5f99..c17d698 100644
 2.7.4
 
 
-From 90be4853ab9f75d65f9c6a9ddecc814d090b26b7 Mon Sep 17 00:00:00 2001
+From e922dbaaed4293725f6453d686fa6365b3cd060c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
-Subject: [PATCH 06/12] rename kernel package names to *-socfpga-rt-ltsi
+Subject: [PATCH 06/14] rename kernel package names to *-socfpga-rt-ltsi
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -189,7 +200,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index d8cbeec..16554d2 100755
+index d6a4058..ee58811 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
 @@ -96,9 +96,9 @@ fwdir="$objtree/debian/fwtmp"
@@ -209,10 +220,10 @@ index d8cbeec..16554d2 100755
 2.7.4
 
 
-From a0a8b81ca4dcf68cf1553bc795d5e4dca89140fe Mon Sep 17 00:00:00 2001
+From 29c4fcdf71a2b76e50a89c792286da57d4ad30e9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
-Subject: [PATCH 07/12] add spidev in dts so driver is loaded
+Subject: [PATCH 07/14] add spidev in dts so driver is loaded
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -246,10 +257,10 @@ index 595eb4f..6dcff22 100644
 2.7.4
 
 
-From b31817d6840916b4dbf25bf80c6226809ebb7128 Mon Sep 17 00:00:00 2001
+From 853fcabeb98526a6abecee65a24d4876fd407205 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 08/12] Added DE-10 Nano with/without framebuffer dts dtb
+Subject: [PATCH 08/14] Added DE-10 Nano with/without framebuffer dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -616,10 +627,10 @@ index 0000000..f69c95a
 2.7.4
 
 
-From d2ef3fd8dbb92eb2c09581e5a308112784ca4c7c Mon Sep 17 00:00:00 2001
+From 7f50f6e7257a9a437c17c8e8d36fac4a1cdae20b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
-Subject: [PATCH 09/12] set ACL secutity
+Subject: [PATCH 09/14] set ACL secutity
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -659,10 +670,10 @@ index c17d698..f01e3e0 100644
 2.7.4
 
 
-From ec6092df8688a31db104cfdab2f9ad435075d139 Mon Sep 17 00:00:00 2001
+From 270ae8856c7dea3a5ff283fe6f46617d631b5a11 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 30 Mar 2018 20:41:53 +0200
-Subject: [PATCH 10/12] Enable altvip framebuffer
+Subject: [PATCH 10/14] Enable altvip framebuffer
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -805,10 +816,10 @@ index f01e3e0..50ba023 100644
 2.7.4
 
 
-From 90ccdf5e33977d016601c33fb8052f90cccc9e56 Mon Sep 17 00:00:00 2001
+From 6f169ff9dadd9b6aeea695a97afc4b88150f2a0f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
-Subject: [PATCH 11/12] Add audio and midi drivers for holosynth and builtin
+Subject: [PATCH 11/14] Add audio and midi drivers for holosynth and builtin
  audio codec on de1 board
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -2507,19 +2518,19 @@ index 0000000..1f4268c
 2.7.4
 
 
-From e24910d6a63834c0998748fb5fe79be36144a88a Mon Sep 17 00:00:00 2001
+From d57d1fbc32937da35d2d3ec75707c415a4606c5c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 23:01:49 +0200
-Subject: [PATCH 12/12] Enable bridges in dtb's and add framebuffer,audio and
+Subject: [PATCH 12/14] Enable bridges in dtb's and add framebuffer,audio and
  midi enabled dtb for de1 Socsynth
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                     |   1 +
  arch/arm/boot/dts/socfpga.dtsi                 |   2 +
- arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 291 +++++++++++++++++++++++++
- arch/arm/configs/socfpga_defconfig             |  59 +++++
- 4 files changed, 353 insertions(+)
+ arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 266 +++++++++++++++++++++++++
+ arch/arm/configs/socfpga_defconfig             |  59 ++++++
+ 4 files changed, 328 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
@@ -2556,10 +2567,10 @@ index 6dcff22..dce1143 100644
  		fpgamgr0: fpgamgr@ff706000 {
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 new file mode 100644
-index 0000000..d0a1fc1
+index 0000000..1207869
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
-@@ -0,0 +1,291 @@
+@@ -0,0 +1,266 @@
 +/*
 + * Copyright Intel Corporation (C) 2017. All rights reserved.
 + *
@@ -2579,7 +2590,7 @@ index 0000000..d0a1fc1
 +#include "socfpga_cyclone5.dtsi"
 +
 +/ {
-+	model = "Terasic DE10-Nano";
++	model = "Terasic DE1-SoC";
 +	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
 +
 +	chosen {
@@ -2644,37 +2655,14 @@ index 0000000..d0a1fc1
 +		clock-output-names = "clk44";
 +	};
 +
-+	i2s: i2s@0 {
++	i2s: i2s@0x0 {
 +		#sound-dai-cells = <1>;
 +		compatible = "opencores,i2s";
-+		reg = <0xff200000 0x20>, <0xff200020 0x20>;
++		reg = <0xff200000 0x40>, <0xff200040 0x20>;
 +		clocks = <&clk44>, <&clk48>;
 +		clock-names = "clk44", "clk48";
 +		dmas = <&pdma 0>, <&pdma 1>;
 +		dma-names = "tx", "rx";
-+	};
-+
-+	socsound {
-+		compatible = "holotr,socsynth-audio";
-+		dmalink-controller = <&dmalink>;
-+		audio-codec = <&hsynth7002_codec>;
-+	};
-+
-+	dmalink: dmalink@40 {
-+		#sound-dai-cells = <1>;
-+		compatible = "holotr,dmalink";
-+		reg = <0xff200040 0x20>, <0xff200060 0x20>;
-+		clocks = <&clk44>;
-+		clock-names = "clk44";
-+		dmas = <&pdma 2>;
-+		dma-names = "rx";
-+	};
-+
-+	hsynth7002_codec: hsynth7002-codec {
-+		#sound-dai-cells = <0>;
-+		compatible = "holotr,hsynth7002";
-+/*     IOVDD-supply = <&supply>;*/
-+		status = "okay";
 +	};
 +
 +	bridge@0xc0000000 {
@@ -2683,73 +2671,22 @@ index 0000000..d0a1fc1
 +		bridge-enable = <1>;
 +		#address-cells = <0x2>;
 +		#size-cells = <0x1>;
-+		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
-+				<0x00000001 0x00002000 0xff202000 0x00000008>,
-+				<0x00000001 0x00003000 0xff203000 0x00000010>,
-+				<0x00000001 0x00004000 0xff204000 0x00000010>,
-+				<0x00000001 0x00005000 0xff205000 0x00000010>,
-+				<0x00000001 0x00030000 0xff230000 0x00000100>,
-+				<0x00000001 0x00031000 0xff231000 0x00000080>,
-+				<0x00000001 0x00040000 0xff240000 0x00010000>,
-+				<0x00000001 0x00050000 0xff250000 0x00010000>;
++		ranges = <0x00000001 0x00020000 0xff220000 0x00000008>,
++			<0x00000001 0x00031000 0xff231000 0x00000080>,
++			<0x00000001 0x00010000 0xff210000 0x00000008>,
++			<0x00000001 0x000100c0 0xff2100c0 0x00000010>,
++			<0x00000001 0x00010080 0xff210080 0x00000010>,
++			<0x00000001 0x00010040 0xff210040 0x00000010>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00010000>;
 +
-+		sysid@0x100001000 {
-+			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
-+			reg = <0x00000001 0x00001000 0x00000008>;
-+			id = <0xacd51302>;
-+			timestamp = <0x5929e204>;
-+		};
-+
-+		serial@0x100002000 {
-+			compatible = "altr,juart-15.1", "altr,juart-1.0";
-+			reg = <0x00000001 0x00002000 0x00000008>;
-+			interrupt-parent = <0x3>;
-+			interrupts = <0x0 0x2a 0x4>;
++		serial@0x100020000 {
++			compatible = "altr,juart-17.1", "altr,juart-1.0";
++			reg = <0x00000001 0x00020000 0x00000008>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 40 4>;
 +			clocks = <0x2>;
-+		};
-+
-+		gpio@0x100003000 {
-+			compatible = "altr,pio-15.1", "altr,pio-1.0";
-+			reg = <0x00000001 0x00003000 0x00000010>;
-+			altr,gpio-bank-width = <0x8>;
-+			resetvalue = <0xff>;
-+			#gpio-cells = <0x2>;
-+			gpio-controller;
-+		};
-+
-+		gpio@0x100004000 {
-+			compatible = "altr,pio-15.1", "altr,pio-1.0";
-+			reg = <0x00000001 0x00004000 0x00000010>;
-+			altr,gpio-bank-width = <0x4>;
-+			altr,interrupt-type = <0x3>;
-+			altr,interrupt_type = <0x3>;
-+			edge_type = <0x2>;
-+			level_trigger = <0x0>;
-+			resetvalue = <0x0>;
-+			#gpio-cells = <0x2>;
-+			gpio-controller;
-+		};
-+
-+		gpio@0x100005000 {
-+			compatible = "altr,pio-15.1", "altr,pio-1.0";
-+			reg = <0x00000001 0x00005000 0x00000010>;
-+			altr,gpio-bank-width = <0x2>;
-+			altr,interrupt-type = <0x2>;
-+			altr,interrupt_type = <0x2>;
-+			edge_type = <0x1>;
-+			level_trigger = <0x0>;
-+			resetvalue = <0x0>;
-+			#gpio-cells = <0x2>;
-+			gpio-controller;
-+		};
-+
-+		ilc@0x100030000 {
-+			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
-+			reg = <0x00000001 0x00030000 0x00000100>;
-+			interrupt-controller;
-+			#interrupt-cells = <0x1>;
-+			altr,sw-fifo-depth = <0x20>;
-+		};
++		}; //end serial@0x100020000 (jtag_uart)
 +
 +		vip@0x100031000 {
 +			compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
@@ -2762,13 +2699,62 @@ index 0000000..d0a1fc1
 +			mem-word-width = <0x80>;
 +		};
 +
++		sysid@0x100010000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00010000 0x00000008>;
++			id = <2899645186>;
++			timestamp = <1524157570>;
++		};
++
++		gpio@0x1000100c0 {
++			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			reg = <0x00000001 0x000100c0 0x00000010>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 41 1>;
++			clocks = <0x2>;
++			altr,gpio-bank-width = <2>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++			altr,interrupt-type = <2>;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
++			altr,interrupt_type = <2>;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
++			edge_type = <1>;	/* embeddedsw.dts.params.edge_type type NUMBER */
++			level_trigger = <0>;	/* embeddedsw.dts.params.level_trigger type NUMBER */
++			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++			#gpio-cells = <2>;
++			gpio-controller;
++		}; //end gpio@0x1000100c0 (button_pio)
++
++		gpio@0x100010080 {
++			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00010080 0x00000010>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 42 1>;
++			clocks = <0x2>;
++			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++			altr,interrupt-type = <3>;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
++			altr,interrupt_type = <3>;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
++			edge_type = <2>;	/* embeddedsw.dts.params.edge_type type NUMBER */
++			level_trigger = <0>;	/* embeddedsw.dts.params.level_trigger type NUMBER */
++			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++			#gpio-cells = <2>;
++			gpio-controller;
++		}; //end gpio@0x100010080 (dipsw_pio)
++
++		gpio@0x100010040 {
++			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00010040 0x00000010>;
++			clocks = <0x2>;
++			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++			#gpio-cells = <2>;
++			gpio-controller;
++		}; //end gpio@0x100010040 (led_pio)
++
 +		uio-socfpg0@0x100040000 {
-+				compatible = "uioreg_io,generic-uio,ui_pdrv";
-+				reg = <0x00000001 0x00040000 0x00010000>;
-+				interrupt-parent = <0x2>;
-+				interrupts = <0 43 4>;
-+				address_width = <14>;
-+				data_width = <32>;
++            compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 43 4>;
++			address_width = <14>;
++			data_width = <32>;
 +		};
 +
 +		socmidi@0x100050000 {
@@ -2825,7 +2811,7 @@ index 0000000..d0a1fc1
 +	};
 +
 +	adxl345: adxl345@0 {
-+		compatible = "adi,adxl34x";
++		compatible = "adi,adxl345";
 +		reg = <0x53>;
 +
 +		interrupt-parent = <&portc>;
@@ -2918,6 +2904,1910 @@ index 50ba023..8b01c80 100644
 +CONFIG_SND_SOC_IMX_AUDMUX=m
 +CONFIG_SND_SOC_I2C_AND_SPI=y
 +CONFIG_HZ_1000=y
+-- 
+2.7.4
+
+
+From e06036cc19c336cf717754a68722d0bca75a59f7 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 29 Apr 2018 02:00:12 +0200
+Subject: [PATCH 13/14] Convert de1-soc-wm8731 to de1-soc-wm8731-midi driver
+ remove hsynthdma and holosynth driver
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts     |  15 +-
+ arch/arm/configs/socfpga_defconfig                 |   3 +-
+ sound/soc/socsynth/Kconfig                         |  25 +-
+ sound/soc/socsynth/Makefile                        |  10 +-
+ .../{holosynthv.c => de1-soc-wm8731-midi.c}        | 205 +++++++---
+ sound/soc/socsynth/de1-soc-wm8731.c                | 247 ------------
+ sound/soc/socsynth/hsynthdma.c                     | 418 ---------------------
+ 7 files changed, 158 insertions(+), 765 deletions(-)
+ rename sound/soc/socsynth/{holosynthv.c => de1-soc-wm8731-midi.c} (52%)
+ delete mode 100644 sound/soc/socsynth/de1-soc-wm8731.c
+ delete mode 100644 sound/soc/socsynth/hsynthdma.c
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+index 1207869..0649be3 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+@@ -62,7 +62,7 @@
+ 	};
+ 
+     sound {
+-		compatible = "opencores,de1soc-wm8731-audio";
++		compatible = "opencores,de1soc-wm8731-audio-midi";
+ 		i2s-controller = <&i2s>;
+ 		audio-codec = <&wm8731>;
+ 		i2c-mux-gpio = <&portb 19 0>;
+@@ -88,8 +88,8 @@
+ 		reg = <0xff200000 0x40>, <0xff200040 0x20>;
+ 		clocks = <&clk44>, <&clk48>;
+ 		clock-names = "clk44", "clk48";
+-		dmas = <&pdma 0>, <&pdma 1>;
+-		dma-names = "tx", "rx";
++		dmas = <&pdma 0>, <&pdma 1>, <&pdma 2>;
++		dma-names = "tx", "rx", "rx";
+ 	};
+ 
+ 	bridge@0xc0000000 {
+@@ -183,15 +183,6 @@
+ 			address_width = <14>;
+ 			data_width = <32>;
+ 		};
+-
+-		socmidi@0x100050000 {
+-			compatible = "holotr,socmidi-1.0";
+-			reg = <0x00000001 0x00050000 0x00010000>;
+-			interrupt-parent = <0x2>;
+-			interrupts = <0 44 4>;
+-			address_width = <3>;   /* embeddedsw.dts.params.address_width type NUMBER */
+-			data_width = <8>;      /* embeddedsw.dts.params.data_width type NUMBER */
+-		};
+ 	};
+ };
+ 
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 8b01c80..18965b0 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -304,8 +304,7 @@ CONFIG_SND_SOC_SSM2602=m
+ CONFIG_SND_SOC_SSM2602_I2C=m
+ CONFIG_SND_ALOOP=m
+ CONFIG_SND_VIRMIDI=m
+-CONFIG_SND_SOC_HOLOSYNTHV=m
+-CONFIG_SND_SOC_DE1_WM8731=m
++CONFIG_SND_SOC_DE1_WM8731_MIDI=m
+ CONFIG_SND_SOC_PCM5102A=m
+ CONFIG_FPGADMA=m
+ CONFIG_REGMAP_I2C=y
+diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
+index 572c882..4427807 100644
+--- a/sound/soc/socsynth/Kconfig
++++ b/sound/soc/socsynth/Kconfig
+@@ -1,12 +1,3 @@
+-config SND_SOC_HSYNTHDMA
+-       tristate "holosynth DMA Controller"
+-       help
+-         If you say yes to this option, support will be included for the
+-         HSYNTHDMA dma controller. For details see
+-
+-         This driver can also be built as a module.  If so, the module
+-         will be called hsynthdma.
+-
+ config SND_SOC_OC_I2S
+        tristate "OpenCores I2S Controller"
+        help
+@@ -16,18 +7,10 @@ config SND_SOC_OC_I2S
+          This driver can also be built as a module.  If so, the module
+          will be called opencores_i2s.
+ 
+-config SND_SOC_HOLOSYNTHV
+-       tristate "SOC-Synthsizer support"
+-       select SND_SOC_HSYNTH7002
+-       select SND_SOC_HSYNTHDMA
+-       select SND_SOC_GENERIC_DMAENGINE_PCM
+-       select SND_RAWMIDI
+-       select REGMAP_MMIO
+-       help
+-         ASoC driver for fpga Sound Synthesizer peripheral with pcm / rawmidi support.
+-
+-config SND_SOC_DE1_WM8731
+-       tristate "DE1-Audio support"
++config SND_SOC_DE1_WM8731_MIDI
++       tristate "DE1-Audio MIDI support"
+        select SND_SOC_WM8731
+        select SND_SOC_OC_I2S
++       select SND_SOC_GENERIC_DMAENGINE_PCM
++       select SND_RAWMIDI
+        select REGMAP_MMIO
+diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
+index d9e999e..2b41e2b 100644
+--- a/sound/soc/socsynth/Makefile
++++ b/sound/soc/socsynth/Makefile
+@@ -1,11 +1,5 @@
+ snd-soc-opencores_i2s-objs := opencores_i2s.o
+ obj-$(CONFIG_SND_SOC_OC_I2S) += snd-soc-opencores_i2s.o
+ 
+-snd-de1-soc-wm8731-objs := de1-soc-wm8731.o
+-obj-$(CONFIG_SND_SOC_DE1_WM8731) += snd-de1-soc-wm8731.o
+-
+-snd-soc-hsynthdma-objs := hsynthdma.o
+-obj-$(CONFIG_SND_SOC_HSYNTHDMA) += snd-soc-hsynthdma.o
+-
+-snd-soc-holosynthv-objs := holosynthv.o
+-obj-$(CONFIG_SND_SOC_HOLOSYNTHV) += snd-soc-holosynthv.o
++snd-de1-soc-wm8731-midi-objs := de1-soc-wm8731-midi.o
++obj-$(CONFIG_SND_SOC_DE1_WM8731_MIDI) += snd-de1-soc-wm8731-midi.o
+diff --git a/sound/soc/socsynth/holosynthv.c b/sound/soc/socsynth/de1-soc-wm8731-midi.c
+similarity index 52%
+rename from sound/soc/socsynth/holosynthv.c
+rename to sound/soc/socsynth/de1-soc-wm8731-midi.c
+index 60104716d..fe5d3e3 100644
+--- a/sound/soc/socsynth/holosynthv.c
++++ b/sound/soc/socsynth/de1-soc-wm8731-midi.c
+@@ -1,35 +1,33 @@
+ /*
+- * hsynth-soc -- SoC audio ( midi for Altera SoC boards
+- * Author: Michael Brown the-snowwhite <producer@holotronic.dk>
+- *
+- * Based on de1-soc-wm8731 by
+- *  B. Steinsbo <bsteinsbo@gmail.com>
+- *
+- * Licensed under the GPL-2.
+- */
++* de1-soc-wm8731 -- SoC audio for Terasic DE1-SoC board
++* Author: B. Steinsbo <bsteinsbo@gmail.com>
++*
++* Based on sam9g20_wm8731 by
++* Sedji Gaouaou <sedji.gaouaou@atmel.com>
++*
++* Licensed under the GPL-2.
++*/
+ 
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/clk.h>
+ #include <linux/platform_device.h>
+ #include <linux/of.h>
++#include <linux/gpio.h>
++#include <linux/of_gpio.h>
+ #include <linux/uaccess.h>
+ #include <linux/ioport.h>
+ #include <linux/io.h>
+ 
+ #include <sound/core.h>
+-#include <sound/seq_kernel.h>
+-#include <sound/rawmidi.h>
+-#include <sound/initval.h>
+ #include <sound/pcm.h>
+ #include <sound/pcm_params.h>
+ #include <sound/soc.h>
++#include <sound/seq_kernel.h>
++#include <sound/rawmidi.h>
++#include <sound/initval.h>
+ 
+-#define SYNTHSOCSOUND_LOG_PREFIX "synthsound: "
+-
+-#define HSYNTH_SYSCLK_MCLK 2
+-//#define MCLK_RATE_48K 12288000 /* fs*256 */
+-#define MCLK_RATE_44K 16934400 /* fs*384 */
++#define SOCSYNTHMIDI_LOG_PREFIX "socsynthmidi: "
+ #define midi_ins 0
+ #define midi_outs 1
+ 
+@@ -37,7 +35,12 @@
+ #define MIDIREG_SIZE PAGE_SIZE
+ #define MIDIREG_OFFSET 0x50000
+ 
+-#define printe(...) pr_err(SYNTHSOCSOUND_LOG_PREFIX __VA_ARGS__)
++#define WM8731_SYSCLK_XTAL 1
++#define WM8731_SYSCLK_MCLK 2
++#define MCLK_RATE_48K 12288000 /* fs*256 */
++#define MCLK_RATE_44K 16934400 /* fs*384 */
++
++#define printe(...) pr_err(SOCSYNTHMIDI_LOG_PREFIX __VA_ARGS__)
+ 
+ static int snd_socmidi_open(struct snd_rawmidi_substream *substream);
+ static int snd_socmidi_close(struct snd_rawmidi_substream *substream);
+@@ -93,7 +96,7 @@ static void snd_socmidi_output_trigger(struct snd_rawmidi_substream *substream,
+         unsigned char data;
+         if (snd_rawmidi_transmit(substream, &data, 1) != 1)
+             break; /* no more data */
+-            snd_socmidi_transmit(data);
++        snd_socmidi_transmit(data);
+     }
+ }
+ 
+@@ -156,15 +159,77 @@ static int hsound_midi_init(struct snd_card *card)
+     return 0;
+ }
+ 
+-static const struct snd_soc_dapm_widget soc_dapm_widgets[] = {
+-    SND_SOC_DAPM_LINE("Hsynth in", NULL),
++static unsigned int i2c_mux_gpio;
++
++static int de1soc_hw_params(struct snd_pcm_substream *substream,
++    struct snd_pcm_hw_params *params)
++{
++    struct snd_soc_pcm_runtime *rtd = substream->private_data;
++    struct snd_soc_dai *codec_dai = rtd->codec_dai;
++    struct device *dev = rtd->card->dev;
++    unsigned int mclk_freq;
++    int ret;
++
++    if ((params_rate(params) % 44100) == 0) {
++        mclk_freq = MCLK_RATE_44K;
++    } else if ((params_rate(params) % 48000) == 0) {
++        mclk_freq = MCLK_RATE_48K;
++    } else
++        return -EINVAL;
++
++    /* set codec mclk configuration */
++    ret = snd_soc_dai_set_sysclk(codec_dai, WM8731_SYSCLK_MCLK,
++        mclk_freq, SND_SOC_CLOCK_OUT);
++    if (ret < 0)
++        return ret;
++
++    dev_dbg(dev, "hw_params: mclk_freq=%d\n", mclk_freq);
++    return 0;
++}
++
++static void de1soc_shutdown(struct snd_pcm_substream *substream)
++{
++    struct snd_soc_pcm_runtime *rtd = substream->private_data;
++    struct snd_soc_dai *codec_dai = rtd->codec_dai;
++    struct device *dev = rtd->card->dev;
++    int ret;
++
++    dev_dbg(dev, "shutdown\n");
++    ret = snd_soc_dai_set_sysclk(codec_dai, WM8731_SYSCLK_MCLK,
++        0, SND_SOC_CLOCK_OUT);
++    if (ret < 0) {
++        dev_err(dev, "Failed to reset WM8731 SYSCLK: %d\n", ret);
++    }
++}
++
++static struct snd_soc_ops de1soc_ops = {
++    // .startup
++    .shutdown = de1soc_shutdown,
++    .hw_params = de1soc_hw_params,
++    // .hw_free
++    // .prepare
++    // .trigger
++};
++
++static const struct snd_soc_dapm_widget de1soc_dapm_widgets[] = {
++    SND_SOC_DAPM_HP("Headphone Jack", NULL),
++    SND_SOC_DAPM_MIC("Microphone Jack", NULL),
++    SND_SOC_DAPM_LINE("Line In Jack", NULL),
++    SND_SOC_DAPM_LINE("Line Out Jack", NULL),
+ };
+ 
+ static const struct snd_soc_dapm_route intercon[] = {
+-    {"PDM_DAT", NULL, "Hsynth in"},
++    {"MICIN", NULL, "Mic Bias"},
++    {"Mic Bias", NULL, "Microphone Jack"},
++    {"LLINEIN", NULL, "Line In Jack"},
++    {"RLINEIN", NULL, "Line In Jack"},
++    {"Line Out Jack", NULL, "LOUT"},
++    {"Line Out Jack", NULL, "ROUT"},
++    {"Headphone Jack", NULL, "LHPOUT"},
++    {"Headphone Jack", NULL, "RHPOUT"},
+ };
+ 
+-static int soc_hsynth_init(struct snd_soc_pcm_runtime *rtd)
++static int de1soc_wm8731_init(struct snd_soc_pcm_runtime *rtd)
+ {
+     struct snd_soc_dai *codec_dai = rtd->codec_dai;
+     struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
+@@ -175,7 +240,7 @@ static int soc_hsynth_init(struct snd_soc_pcm_runtime *rtd)
+     dev_dbg(dev, "init\n");
+ 
+     fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
+-    SND_SOC_DAIFMT_CBS_CFS;
++        SND_SOC_DAIFMT_CBS_CFS;
+ 
+     /* set cpu DAI configuration */
+     ret = snd_soc_dai_set_fmt(cpu_dai, fmt);
+@@ -187,39 +252,48 @@ static int soc_hsynth_init(struct snd_soc_pcm_runtime *rtd)
+     if (ret < 0)
+         return ret;
+ 
++    /* Don't let codec constraints interfere */
++    ret = snd_soc_dai_set_sysclk(codec_dai, WM8731_SYSCLK_MCLK,
++        0, SND_SOC_CLOCK_OUT);
++    if (ret < 0) {
++        dev_err(dev, "Failed to set WM8731 SYSCLK: %d\n", ret);
++        return ret;
++    }
++
+     return 0;
+ }
+ 
+-static struct snd_soc_dai_link hsynth_soc_dai = {
+-    .name = "HSYNTH",
+-    .stream_name = "HSYNTH PCM",
+-    .cpu_dai_name = "ff200000.dmalink",
+-    .codec_dai_name = "hsynth7002-hifi",
+-    .init = soc_hsynth_init,
+-    .platform_name = "socsynth",
+-    .codec_name = "hsynth7002.hsynth",
++static struct snd_soc_dai_link de1soc_dai = {
++    .name = "WM8731",
++    .stream_name = "WM8731 PCM",
++    .cpu_dai_name = "ff200000.i2s",
++    .codec_dai_name = "wm8731-hifi",
++    .init = de1soc_wm8731_init,
++    .platform_name = "de1soc",
++    .codec_name = "wm8731.0-001a",
++    .ops = &de1soc_ops,
+ };
+ 
+-static struct snd_soc_card snd_soc_hsynth_soc = {
+-    .name = "HOLOSYNTHV",
++static struct snd_soc_card snd_soc_de1soc = {
++    .name = "DE1SOC-WM8731",
+     .owner = THIS_MODULE,
+-    .dai_link = &hsynth_soc_dai,
++    .dai_link = &de1soc_dai,
+     .num_links = 1,
+ 
+     .probe        = hmidi_card_probe,
+     .remove       = hmidi_card_remove,
+ 
+-    .dapm_widgets = soc_dapm_widgets,
+-    .num_dapm_widgets = ARRAY_SIZE(soc_dapm_widgets),
++    .dapm_widgets = de1soc_dapm_widgets,
++    .num_dapm_widgets = ARRAY_SIZE(de1soc_dapm_widgets),
+     .dapm_routes = intercon,
+     .num_dapm_routes = ARRAY_SIZE(intercon),
+ };
+ 
+-static int hsynth_soc_audio_probe(struct platform_device *pdev)
++static int de1soc_audio_probe(struct platform_device *pdev)
+ {
+     struct device_node *np = pdev->dev.of_node;
+     struct device_node *codec_np, *cpu_np;
+-    struct snd_soc_card *card = &snd_soc_hsynth_soc;
++    struct snd_soc_card *card = &snd_soc_de1soc;
+     int ret;
+ 
+     if (!np) {
+@@ -228,25 +302,39 @@ static int hsynth_soc_audio_probe(struct platform_device *pdev)
+ 
+     card->dev = &pdev->dev;
+ 
++    /* I2C bus is muxed between HPS and FPGA. Set mux to HPS */
++    i2c_mux_gpio = of_get_named_gpio(np, "i2c-mux-gpio", 0);
++    if (gpio_is_valid(i2c_mux_gpio)) {
++        ret = devm_gpio_request_one(&pdev->dev,
++            i2c_mux_gpio, GPIOF_OUT_INIT_LOW, "I2C_MUX");
++        if (ret) {
++            dev_err(&pdev->dev,
++                "Failed to request GPIO_%d for i2c_mux: %d\n",
++                i2c_mux_gpio, ret);
++            return ret;
++        }
++        gpio_set_value(i2c_mux_gpio, 1);
++    }
++
+     /* Parse codec info */
+-    hsynth_soc_dai.codec_name = NULL;
++    de1soc_dai.codec_name = NULL;
+     codec_np = of_parse_phandle(np, "audio-codec", 0);
+     if (!codec_np) {
+         dev_err(&pdev->dev, "codec info missing\n");
+         return -EINVAL;
+     }
+-    hsynth_soc_dai.codec_of_node = codec_np;
++    de1soc_dai.codec_of_node = codec_np;
+ 
+     /* Parse dai and platform info */
+-    hsynth_soc_dai.cpu_dai_name = NULL;
+-    hsynth_soc_dai.platform_name = NULL;
+-    cpu_np = of_parse_phandle(np, "dmalink-controller", 0);
++    de1soc_dai.cpu_dai_name = NULL;
++    de1soc_dai.platform_name = NULL;
++    cpu_np = of_parse_phandle(np, "i2s-controller", 0);
+     if (!cpu_np) {
+         dev_err(&pdev->dev, "dai and pcm info missing\n");
+         return -EINVAL;
+     }
+-    hsynth_soc_dai.cpu_of_node = cpu_np;
+-    hsynth_soc_dai.platform_of_node = cpu_np;
++    de1soc_dai.cpu_of_node = cpu_np;
++    de1soc_dai.platform_of_node = cpu_np;
+ 
+     of_node_put(codec_np);
+     of_node_put(cpu_np);
+@@ -259,34 +347,37 @@ static int hsynth_soc_audio_probe(struct platform_device *pdev)
+     return ret;
+ }
+ 
+-static int soc_audio_remove(struct platform_device *pdev)
++static int de1soc_audio_remove(struct platform_device *pdev)
+ {
+     struct snd_soc_card *card = platform_get_drvdata(pdev);
+ 
++    if (gpio_is_valid(i2c_mux_gpio))
++        devm_gpio_free(&pdev->dev, i2c_mux_gpio);
++
+     snd_soc_unregister_card(card);
+ 
+     return 0;
+ }
+ 
+-static const struct of_device_id soc_hsynth_dt_ids[] = {
+-    { .compatible = "holotr,socsynth-audio", },
++static const struct of_device_id de1soc_wm8731_dt_ids[] = {
++    { .compatible = "opencores,de1soc-wm8731-audio-midi", },
+     { }
+ };
+-MODULE_DEVICE_TABLE(of, soc_hsynth_dt_ids);
++MODULE_DEVICE_TABLE(of, de1soc_wm8731_dt_ids);
+ 
+-static struct platform_driver soc_audio_driver = {
++static struct platform_driver de1soc_audio_driver = {
+     .driver = {
+-        .name	= "soc-synth-audio",
++        .name	= "de1soc-audio",
+         .owner	= THIS_MODULE,
+-        .of_match_table = of_match_ptr(soc_hsynth_dt_ids),
++        .of_match_table = of_match_ptr(de1soc_wm8731_dt_ids),
+     },
+-    .probe	= hsynth_soc_audio_probe,
+-    .remove	= soc_audio_remove,
++    .probe	= de1soc_audio_probe,
++    .remove	= de1soc_audio_remove,
+ };
+ 
+-module_platform_driver(soc_audio_driver);
++module_platform_driver(de1soc_audio_driver);
+ 
+ /* Module information */
+-MODULE_AUTHOR("Michael Brown (the-snowwhite) <producer@holotronic.dk>");
+-MODULE_DESCRIPTION("ALSA SoC HOLOSYNTHV");
++MODULE_AUTHOR("Bjarne Steinsbo <bsteinsbo@gmail.com>");
++MODULE_DESCRIPTION("ALSA SoC DE1-SoC_WM8731");
+ MODULE_LICENSE("GPL");
+diff --git a/sound/soc/socsynth/de1-soc-wm8731.c b/sound/soc/socsynth/de1-soc-wm8731.c
+deleted file mode 100644
+index 4e199bb..0000000
+--- a/sound/soc/socsynth/de1-soc-wm8731.c
++++ /dev/null
+@@ -1,247 +0,0 @@
+-/*
+- * de1-soc-wm8731 -- SoC audio for Terasic DE1-SoC board
+- * Author: B. Steinsbo <bsteinsbo@gmail.com>
+- *
+- * Based on sam9g20_wm8731 by
+- * Sedji Gaouaou <sedji.gaouaou@atmel.com>
+- *
+- * Licensed under the GPL-2.
+- */
+-
+-#include <linux/module.h>
+-#include <linux/kernel.h>
+-#include <linux/clk.h>
+-#include <linux/platform_device.h>
+-#include <linux/of.h>
+-#include <linux/gpio.h>
+-#include <linux/of_gpio.h>
+-
+-#include <sound/core.h>
+-#include <sound/pcm.h>
+-#include <sound/pcm_params.h>
+-#include <sound/soc.h>
+-
+-#define WM8731_SYSCLK_XTAL 1
+-#define WM8731_SYSCLK_MCLK 2
+-#define MCLK_RATE_48K 12288000 /* fs*256 */
+-#define MCLK_RATE_44K 16934400 /* fs*384 */
+-
+-static unsigned int i2c_mux_gpio;
+-
+-static int de1soc_hw_params(struct snd_pcm_substream *substream,
+-	struct snd_pcm_hw_params *params)
+-{
+-	struct snd_soc_pcm_runtime *rtd = substream->private_data;
+-	struct snd_soc_dai *codec_dai = rtd->codec_dai;
+-	struct device *dev = rtd->card->dev;
+-	unsigned int mclk_freq;
+-	int ret;
+-
+-	if ((params_rate(params) % 44100) == 0) {
+-		mclk_freq = MCLK_RATE_44K;
+-	} else if ((params_rate(params) % 48000) == 0) {
+-		mclk_freq = MCLK_RATE_48K;
+-	} else
+-		return -EINVAL;
+-
+-	/* set codec mclk configuration */
+-	ret = snd_soc_dai_set_sysclk(codec_dai, WM8731_SYSCLK_MCLK,
+-		mclk_freq, SND_SOC_CLOCK_OUT);
+-	if (ret < 0)
+-		return ret;
+-
+-	dev_dbg(dev, "hw_params: mclk_freq=%d\n", mclk_freq);
+-	return 0;
+-}
+-
+-static void de1soc_shutdown(struct snd_pcm_substream *substream)
+-{
+-	struct snd_soc_pcm_runtime *rtd = substream->private_data;
+-	struct snd_soc_dai *codec_dai = rtd->codec_dai;
+-	struct device *dev = rtd->card->dev;
+-	int ret;
+-
+-	dev_dbg(dev, "shutdown\n");
+-	ret = snd_soc_dai_set_sysclk(codec_dai, WM8731_SYSCLK_MCLK,
+-		0, SND_SOC_CLOCK_OUT);
+-	if (ret < 0) {
+-		dev_err(dev, "Failed to reset WM8731 SYSCLK: %d\n", ret);
+-	}
+-}
+-
+-static struct snd_soc_ops de1soc_ops = {
+-	// .startup
+-	.shutdown = de1soc_shutdown,
+-	.hw_params = de1soc_hw_params,
+-	// .hw_free
+-	// .prepare
+-	// .trigger
+-};
+-
+-static const struct snd_soc_dapm_widget de1soc_dapm_widgets[] = {
+-	SND_SOC_DAPM_HP("Headphone Jack", NULL),
+-	SND_SOC_DAPM_MIC("Microphone Jack", NULL),
+-	SND_SOC_DAPM_LINE("Line In Jack", NULL),
+-	SND_SOC_DAPM_LINE("Line Out Jack", NULL),
+-};
+-
+-static const struct snd_soc_dapm_route intercon[] = {
+-	{"MICIN", NULL, "Mic Bias"},
+-	{"Mic Bias", NULL, "Microphone Jack"},
+-	{"LLINEIN", NULL, "Line In Jack"},
+-	{"RLINEIN", NULL, "Line In Jack"},
+-	{"Line Out Jack", NULL, "LOUT"},
+-	{"Line Out Jack", NULL, "ROUT"},
+-	{"Headphone Jack", NULL, "LHPOUT"},
+-	{"Headphone Jack", NULL, "RHPOUT"},
+-};
+-
+-static int de1soc_wm8731_init(struct snd_soc_pcm_runtime *rtd)
+-{
+-	struct snd_soc_dai *codec_dai = rtd->codec_dai;
+-	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
+-	struct device *dev = rtd->card->dev;
+-	unsigned int fmt;
+-	int ret;
+-
+-	dev_dbg(dev, "init\n");
+-
+-	fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
+-	      SND_SOC_DAIFMT_CBS_CFS;
+-
+-	/* set cpu DAI configuration */
+-	ret = snd_soc_dai_set_fmt(cpu_dai, fmt);
+-	if (ret < 0)
+-		return ret;
+-
+-	/* set codec DAI configuration */
+-	ret = snd_soc_dai_set_fmt(codec_dai, fmt);
+-	if (ret < 0)
+-		return ret;
+-
+-	/* Don't let codec constraints interfere */
+-	ret = snd_soc_dai_set_sysclk(codec_dai, WM8731_SYSCLK_MCLK,
+-		0, SND_SOC_CLOCK_OUT);
+-	if (ret < 0) {
+-		dev_err(dev, "Failed to set WM8731 SYSCLK: %d\n", ret);
+-		return ret;
+-	}
+-
+-	return 0;
+-}
+-
+-static struct snd_soc_dai_link de1soc_dai = {
+-	.name = "WM8731",
+-	.stream_name = "WM8731 PCM",
+-	.cpu_dai_name = "ff200000.i2s",
+-	.codec_dai_name = "wm8731-hifi",
+-	.init = de1soc_wm8731_init,
+-	.platform_name = "de1soc",
+-	.codec_name = "wm8731.0-001a",
+-	.ops = &de1soc_ops,
+-};
+-
+-static struct snd_soc_card snd_soc_de1soc = {
+-	.name = "DE1SOC-WM8731",
+-	.owner = THIS_MODULE,
+-	.dai_link = &de1soc_dai,
+-	.num_links = 1,
+-
+-	.dapm_widgets = de1soc_dapm_widgets,
+-	.num_dapm_widgets = ARRAY_SIZE(de1soc_dapm_widgets),
+-	.dapm_routes = intercon,
+-	.num_dapm_routes = ARRAY_SIZE(intercon),
+-};
+-
+-static int de1soc_audio_probe(struct platform_device *pdev)
+-{
+-	struct device_node *np = pdev->dev.of_node;
+-	struct device_node *codec_np, *cpu_np;
+-	struct snd_soc_card *card = &snd_soc_de1soc;
+-	int ret;
+-
+-	if (!np) {
+-		return -ENODEV;
+-	}
+-
+-	card->dev = &pdev->dev;
+-
+-	/* I2C bus is muxed between HPS and FPGA. Set mux to HPS */
+-	i2c_mux_gpio = of_get_named_gpio(np, "i2c-mux-gpio", 0);
+-	if (gpio_is_valid(i2c_mux_gpio)) {
+-		ret = devm_gpio_request_one(&pdev->dev,
+-			i2c_mux_gpio, GPIOF_OUT_INIT_LOW, "I2C_MUX");
+-		if (ret) {
+-			dev_err(&pdev->dev,
+-				"Failed to request GPIO_%d for i2c_mux: %d\n",
+-				i2c_mux_gpio, ret);
+-			return ret;
+-		}
+-		gpio_set_value(i2c_mux_gpio, 1);
+-	}
+-
+-	/* Parse codec info */
+-	de1soc_dai.codec_name = NULL;
+-	codec_np = of_parse_phandle(np, "audio-codec", 0);
+-	if (!codec_np) {
+-		dev_err(&pdev->dev, "codec info missing\n");
+-		return -EINVAL;
+-	}
+-	de1soc_dai.codec_of_node = codec_np;
+-
+-	/* Parse dai and platform info */
+-	de1soc_dai.cpu_dai_name = NULL;
+-	de1soc_dai.platform_name = NULL;
+-	cpu_np = of_parse_phandle(np, "i2s-controller", 0);
+-	if (!cpu_np) {
+-		dev_err(&pdev->dev, "dai and pcm info missing\n");
+-		return -EINVAL;
+-	}
+-	de1soc_dai.cpu_of_node = cpu_np;
+-	de1soc_dai.platform_of_node = cpu_np;
+-
+-	of_node_put(codec_np);
+-	of_node_put(cpu_np);
+-
+-	ret = snd_soc_register_card(card);
+-	if (ret) {
+-		dev_err(&pdev->dev, "snd_soc_register_card() failed\n");
+-	}
+-
+-	return ret;
+-}
+-
+-static int de1soc_audio_remove(struct platform_device *pdev)
+-{
+-	struct snd_soc_card *card = platform_get_drvdata(pdev);
+-
+-	if (gpio_is_valid(i2c_mux_gpio))
+-		devm_gpio_free(&pdev->dev, i2c_mux_gpio);
+-
+-	snd_soc_unregister_card(card);
+-
+-	return 0;
+-}
+-
+-static const struct of_device_id de1soc_wm8731_dt_ids[] = {
+-	{ .compatible = "opencores,de1soc-wm8731-audio", },
+-	{ }
+-};
+-MODULE_DEVICE_TABLE(of, de1soc_wm8731_dt_ids);
+-
+-static struct platform_driver de1soc_audio_driver = {
+-	.driver = {
+-		.name	= "de1soc-audio",
+-		.owner	= THIS_MODULE,
+-		.of_match_table = of_match_ptr(de1soc_wm8731_dt_ids),
+-	},
+-	.probe	= de1soc_audio_probe,
+-	.remove	= de1soc_audio_remove,
+-};
+-
+-module_platform_driver(de1soc_audio_driver);
+-
+-/* Module information */
+-MODULE_AUTHOR("Bjarne Steinsbo <bsteinsbo@gmail.com>");
+-MODULE_DESCRIPTION("ALSA SoC DE1-SoC_WM8731");
+-MODULE_LICENSE("GPL");
+diff --git a/sound/soc/socsynth/hsynthdma.c b/sound/soc/socsynth/hsynthdma.c
+deleted file mode 100644
+index afb4850..0000000
+--- a/sound/soc/socsynth/hsynthdma.c
++++ /dev/null
+@@ -1,418 +0,0 @@
+-/*
+-* Copyright (C) 2017 Michael Brown (the-snowwhite) <producer@holotronic.dk>
+-* Largely based on opencores_i2s.c by Bjarne Steinsbo <bsteinsbo@gmail.com>.
+-*
+-* Licensed under the GPL-2.
+-*/
+-
+-#include <linux/clk.h>
+-#include <linux/init.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/of.h>
+-#include <linux/platform_device.h>
+-#include <linux/regmap.h>
+-#include <linux/slab.h>
+-
+-#include <sound/core.h>
+-#include <sound/pcm.h>
+-#include <sound/dmaengine_pcm.h>
+-#include <sound/pcm_params.h>
+-#include <sound/soc.h>
+-
+-//#define DAC_FIFO_ADDR  0x00
+-#define STATUS_ADDR    0x04
+-#define CMD_ADDR       0x08
+-#define ADC_FIFO_ADDR  0x00
+-
+-/* Commands to register at CMD_ADDR */
+-#define PB_FIFO_CLEAR  BIT(0)
+-#define PB_ENABLE      BIT(1)
+-#define CAP_FIFO_CLEAR BIT(2)
+-#define CAP_ENABLE     BIT(3)
+-
+-#define CLK_CTRL1      0x00
+-#define CLK_CTRL2      0x04
+-
+-/* Bit-fields of clk control register 1 */
+-#define CLK_MASTER_SLAVE  BIT(0)
+-#define CLK_SEL_48_44    BIT(1)
+-#define MCLK_DIV_SHIFT   (24)
+-#define MCLK_DIV_MASK    GENMASK(MCLK_DIV_SHIFT + 7, MCLK_DIV_SHIFT)
+-#define BCLK_DIV_SHIFT   (16)
+-#define BCLK_DIV_MASK    GENMASK(BCLK_DIV_SHIFT + 7, BCLK_DIV_SHIFT)
+-/* Bit-fields of clk control register 2 */
+-#define PB_LRC_DIV_SHIFT  (8)
+-#define PB_LRC_DIV_MASK          GENMASK(PB_LRC_DIV_SHIFT + 7, PB_LRC_DIV_SHIFT)
+-#define CAP_LRC_DIV_SHIFT (0)
+-#define CAP_LRC_DIV_MASK  GENMASK(CAP_LRC_DIV_SHIFT + 7, CAP_LRC_DIV_SHIFT)
+-
+-/* The frame size is not configurable */
+-#define BITS_PER_FRAME 64
+-
+-struct holotr_dmalink {
+-    struct regmap *regmap_data;
+-    struct regmap *regmap_clk;
+-//       struct clk *clk48;
+-    struct clk *clk44;
+-
+-    struct snd_soc_dai_driver dai_driver;
+-
+-    struct snd_dmaengine_dai_dma_data capture_dma_data;
+-//       struct snd_dmaengine_dai_dma_data playback_dma_data;
+-
+-    struct snd_ratnum ratnum;
+-    struct snd_pcm_hw_constraint_ratnums rate_constraints;
+-};
+-
+-static int holotr_dmalink_trigger(struct snd_pcm_substream *substream, int cmd,
+-    struct snd_soc_dai *dai)
+-{
+-    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
+-    unsigned int mask, val;
+-
+-    if (substream->stream == SNDRV_PCM_STREAM_CAPTURE)
+-            mask = CAP_ENABLE;
+-    else
+-            mask = PB_ENABLE;
+-
+-    switch (cmd) {
+-    case SNDRV_PCM_TRIGGER_START:
+-    case SNDRV_PCM_TRIGGER_RESUME:
+-    case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
+-            val = mask;
+-            break;
+-    case SNDRV_PCM_TRIGGER_STOP:
+-    case SNDRV_PCM_TRIGGER_SUSPEND:
+-    case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
+-            val = 0;
+-            break;
+-    default:
+-            return -EINVAL;
+-    }
+-
+-    regmap_update_bits(dmalink->regmap_data, CMD_ADDR, mask, val);
+-//     regmap_write(dmalink->regmap_data, CMD_ADDR, val);
+-
+-    dev_dbg(dai->dev, "trigger %x\n", val);
+-    return 0;
+-}
+-
+-static int divisor_value(unsigned long xtal_rate, unsigned long rate, int shift)
+-{
+-    return ((xtal_rate / rate / 2) >> shift) - 1;
+-}
+-
+-static int holotr_dmalink_hw_params(struct snd_pcm_substream *substream,
+-    struct snd_pcm_hw_params *params, struct snd_soc_dai *dai)
+-{
+-    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
+-    unsigned long xtal_rate;
+-    int lrclk_div;
+-    int mclk_div;
+-    int bclk_div;
+-    int mask, val;
+-    int mask2, val2;
+-
+-    dev_dbg(dai->dev, "hw_params fmt=0x%x\n", params_format(params));
+-    dev_dbg(dai->dev, "hw_params rate=%d\n", params_rate(params));
+-    if (params_format(params) != SNDRV_PCM_FORMAT_S32_LE)
+-            return -EINVAL;
+-
+-    if ((params_rate(params) % 44100) == 0) {
+-        val = CLK_SEL_48_44;
+-        xtal_rate = clk_get_rate(dmalink->clk44);
+-        mclk_div = divisor_value(xtal_rate, 16934400, 0); /* fs*384 at 44.1kHz */
+-    }
+-//    else if ((params_rate(params) % 48000) == 0) {
+-//      val = 0;
+-//      xtal_rate = clk_get_rate(dmalink->clk48);
+-//      mclk_div = divisor_value(xtal_rate, 12288000, 0); /* fs*256 at 48kHz */
+-//    }
+-    else
+-        return -EINVAL;
+-
+-    mask = CLK_SEL_48_44;
+-    mask2 = 0;
+-
+-    lrclk_div = divisor_value(xtal_rate, params_rate(params), 4);
+-    bclk_div = divisor_value(xtal_rate, params_rate(params) * BITS_PER_FRAME, 0);
+-    dev_dbg(dai->dev, "hw_params mclk_div=%d\n", mclk_div);
+-    dev_dbg(dai->dev, "hw_params lrclk_div=%d\n", lrclk_div);
+-    dev_dbg(dai->dev, "hw_params bclk_div=%d\n", bclk_div);
+-    val |= mclk_div << MCLK_DIV_SHIFT;
+-    mask |= MCLK_DIV_MASK;
+-    val |= bclk_div << BCLK_DIV_SHIFT;
+-    mask |= BCLK_DIV_MASK;
+-    regmap_update_bits(dmalink->regmap_clk, CLK_CTRL1, mask, val);
+-    dev_dbg(dai->dev, "hw_params mask=0x%x val=0x%x\n", mask, val);
+-    if (substream->stream == SNDRV_PCM_STREAM_CAPTURE) {
+-        val2 = lrclk_div << CAP_LRC_DIV_SHIFT;
+-        mask2 = CAP_LRC_DIV_MASK;
+-    } else {
+-        val2 = lrclk_div << PB_LRC_DIV_SHIFT;
+-        mask2 = PB_LRC_DIV_MASK;
+-    }
+-    regmap_update_bits(dmalink->regmap_clk, CLK_CTRL2, mask2, val2);
+-    dev_dbg(dai->dev, "hw_params mask2=0x%x val2=0x%x\n", mask2, val2);
+-    return 0;
+-}
+-
+-static int holotr_dmalink_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
+-{
+-    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
+-    int val = 0;
+-    dev_dbg(dai->dev, "set_fmt 0x%x\n", fmt);
+-
+-    if ((fmt & SND_SOC_DAIFMT_FORMAT_MASK) != SND_SOC_DAIFMT_I2S)
+-        return -EINVAL;
+-
+-    if ((fmt & SND_SOC_DAIFMT_INV_MASK) != SND_SOC_DAIFMT_NB_NF)
+-        return -EINVAL;
+-
+-    switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
+-    case SND_SOC_DAIFMT_CBM_CFM:
+-        val = 0;
+-        break;
+-    case SND_SOC_DAIFMT_CBS_CFS:
+-        val = 1;
+-        break;
+-    default:
+-        return -EINVAL;
+-    }
+-
+-    dev_dbg(dai->dev, "set_fmt master=%d\n", val);
+-    regmap_update_bits(dmalink->regmap_clk, 0, CLK_MASTER_SLAVE, val);
+-    return 0;
+-}
+-
+-static int holotr_dmalink_sysclk(struct snd_soc_dai *dai, int clk_id,
+-    unsigned int freq, int dir)
+-{
+-    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
+-    int val = SND_SOC_CLOCK_IN ? 1 : 0;
+-    dev_dbg(dai->dev, "sysclk id=%d freq=%d dir=%d\n", clk_id, freq, dir);
+-    regmap_update_bits(dmalink->regmap_clk, 0, CLK_MASTER_SLAVE, val);
+-    return 0;
+-}
+-
+-static void holotr_dmalink_shutdown(struct snd_pcm_substream *substream,
+-    struct snd_soc_dai *dai)
+-{
+-    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
+-    int mask;
+-    int val;
+-    dev_dbg(dai->dev, "shutdown\n");
+-
+-    if (substream->stream == SNDRV_PCM_STREAM_CAPTURE)
+-        mask = CAP_ENABLE | CAP_FIFO_CLEAR;
+-    else
+-        mask = PB_ENABLE | PB_FIFO_CLEAR;
+-
+-    val = PB_FIFO_CLEAR | CAP_FIFO_CLEAR;
+-    regmap_update_bits(dmalink->regmap_data, CMD_ADDR, mask, val);
+-}
+-
+-static int holotr_dmalink_dai_probe(struct snd_soc_dai *dai)
+-{
+-    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
+-
+-    dev_dbg(dai->dev, "dai_probe\n");
+-//       snd_soc_dai_init_dma_data(dai, &dmalink->playback_dma_data,
+-    snd_soc_dai_init_dma_data(dai, NULL,
+-    &dmalink->capture_dma_data);
+-
+-    return 0;
+-}
+-
+-static const struct snd_soc_dai_ops holotr_dmalink_dai_ops = {
+-    .set_sysclk = holotr_dmalink_sysclk,
+-    .set_fmt = holotr_dmalink_set_fmt,
+-    .shutdown = holotr_dmalink_shutdown,
+-    .hw_params = holotr_dmalink_hw_params,
+-    .trigger = holotr_dmalink_trigger,
+-};
+-
+-static struct snd_soc_dai_driver holotr_dmalink_dai = {
+-    .probe = holotr_dmalink_dai_probe,
+-    .capture = {
+-        .channels_min = 2,
+-        .channels_max = 2,
+-//      .rates = SNDRV_PCM_RATE_44100 | SNDRV_PCM_RATE_48000
+-//      | SNDRV_PCM_RATE_88200 | SNDRV_PCM_RATE_96000
+-//      | SNDRV_PCM_RATE_176400 | SNDRV_PCM_RATE_192000,
+-        .rates = SNDRV_PCM_RATE_44100,
+-        .formats = SNDRV_PCM_FMTBIT_S32_LE,
+-    },
+-    .ops = &holotr_dmalink_dai_ops,
+-    .symmetric_rates = 1,
+-};
+-
+-static const struct snd_soc_component_driver holotr_dmalink_component = {
+-    .name = "holotr-dmalink",
+-};
+-
+-static const struct regmap_config holotr_dmalink_regmap_data_config = {
+-    .name = "holotr_dmalink.data",
+-    .reg_bits = 32,
+-    .reg_stride = 4,
+-    .val_bits = 32,
+-    .max_register = CMD_ADDR,
+-};
+-
+-static const struct regmap_config holotr_dmalink_regmap_clk_config = {
+-    .name = "holotr_dmalink.clk",
+-    .reg_bits = 32,
+-    .reg_stride = 4,
+-    .val_bits = 32,
+-    .max_register = CLK_CTRL2,
+-};
+-
+-static int holotr_dmalink_probe(struct platform_device *pdev)
+-{
+-    struct resource *res, *res_clk;
+-    struct holotr_dmalink *dmalink;
+-    void __iomem *base;
+-    int signature;
+-    int ret;
+-
+-    dmalink = devm_kzalloc(&pdev->dev, sizeof(*dmalink), GFP_KERNEL);
+-    if (!dmalink) {
+-            dev_err(&pdev->dev, "Can't allocate holotr_dmalink\n");
+-            return -ENOMEM;
+-    }
+-    platform_set_drvdata(pdev, dmalink);
+-
+-    res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-    if (!res) {
+-            dev_err(&pdev->dev, "No memory resource\n");
+-            return -ENODEV;
+-    }
+-    base = devm_ioremap_resource(&pdev->dev, res);
+-    if (IS_ERR(base)) {
+-            dev_err(&pdev->dev, "No ioremap resource\n");
+-            return PTR_ERR(base);
+-    }
+-    printk(KERN_ALERT "holotr_dmalink at %08x\n", (int)base);
+-
+-    dmalink->regmap_data = devm_regmap_init_mmio(&pdev->dev, base,
+-            &holotr_dmalink_regmap_data_config);
+-    if (IS_ERR(dmalink->regmap_data)) {
+-            dev_err(&pdev->dev, "No regmap_data\n");
+-            return PTR_ERR(dmalink->regmap_data);
+-    }
+-
+-    res_clk = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+-    if (!res_clk) {
+-            dev_err(&pdev->dev, "No memory resource\n");
+-            return -ENODEV;
+-    }
+-    base = devm_ioremap_resource(&pdev->dev, res_clk);
+-    if (IS_ERR(base)) {
+-            dev_err(&pdev->dev, "No ioremap resource\n");
+-            return PTR_ERR(base);
+-    }
+-
+-    dmalink->regmap_clk = devm_regmap_init_mmio(&pdev->dev, base,
+-            &holotr_dmalink_regmap_clk_config);
+-    if (IS_ERR(dmalink->regmap_clk)) {
+-            dev_err(&pdev->dev, "No regmap_clk\n");
+-            return PTR_ERR(dmalink->regmap_clk);
+-    }
+-/*
+-    dmalink->clk48 = devm_clk_get(&pdev->dev, "clk48");
+-    if (IS_ERR(dmalink->clk48)) {
+-            dev_err(&pdev->dev, "No clk48 clock\n");
+-            return PTR_ERR(dmalink->clk48);
+-    }
+-
+-    ret = clk_prepare_enable(dmalink->clk48);
+-    if (ret) {
+-            dev_err(&pdev->dev, "Cannot enable clock\n");
+-            return ret;
+-    }
+-*/
+-    dmalink->clk44 = devm_clk_get(&pdev->dev, "clk44");
+-    if (IS_ERR(dmalink->clk44)) {
+-            dev_err(&pdev->dev, "No clk44 clock\n");
+-            return PTR_ERR(dmalink->clk44);
+-    }
+-
+-    ret = clk_prepare_enable(dmalink->clk44);
+-    if (ret) {
+-            dev_err(&pdev->dev, "Cannot enable clock\n");
+-            return ret;
+-    }
+-
+-//       dmalink->playback_dma_data.addr = res->start + DAC_FIFO_ADDR;
+-//       dmalink->playback_dma_data.addr_width = 4;
+-//       dmalink->playback_dma_data.maxburst = 1;
+-    //dmalink->playback_dma_data.maxburst = 2;
+-//       dev_dbg(&pdev->dev, "probe playback dma addr : %8x\n",
+-//       dmalink->playback_dma_data.addr);
+-
+-    dmalink->capture_dma_data.addr = res->start + ADC_FIFO_ADDR;
+-    dmalink->capture_dma_data.addr_width = 4;
+-    dmalink->capture_dma_data.maxburst = 1;
+-    //dmalink->capture_dma_data.maxburst = 2;
+-
+-/*
+-    dmalink->ratnum.num = clk_get_rate(dmalink->clk_ref) / 2 / BITS_PER_FRAME;
+-    dmalink->ratnum.den_step = 1;
+-    dmalink->ratnum.den_min = 1;
+-    dmalink->ratnum.den_max = 64;
+-
+-    dmalink->rate_constraints.rats = &dmalink->ratnum;
+-    dmalink->rate_constraints.nrats = 1;
+-*/
+-
+-    regmap_write(dmalink->regmap_data, CMD_ADDR, PB_FIFO_CLEAR | CAP_FIFO_CLEAR);
+-    ret = regmap_read(dmalink->regmap_data, STATUS_ADDR, &signature);
+-    if (ret) {
+-        dev_err(&pdev->dev, "Cannot read signature\n");
+-        printk(KERN_ALERT "holotr_dmalink probe signature : %4x\n", signature);
+-        goto err_clk_disable;
+-    }
+-    dev_dbg(&pdev->dev, "probe signature : %4x\n", signature);
+-
+-    ret = devm_snd_soc_register_component(&pdev->dev, &holotr_dmalink_component,
+-                                        &holotr_dmalink_dai, 1);
+-    if (ret) {
+-        dev_err(&pdev->dev, "Cannot register component\n");
+-        goto err_clk_disable;
+-    }
+-
+-    ret = devm_snd_dmaengine_pcm_register(&pdev->dev, NULL, 0);
+-    if (ret) {
+-        dev_err(&pdev->dev, "Cannot register dmaengine\n");
+-        goto err_clk_disable;
+-    }
+-
+-    dev_dbg(&pdev->dev, "probe finishing\n");
+-    return ret;
+-
+-err_clk_disable:
+-//       clk_disable_unprepare(dmalink->clk48);
+-    clk_disable_unprepare(dmalink->clk44);
+-    return ret;
+-}
+-
+-static const struct of_device_id holotr_dmalink_of_match[] = {
+-    { .compatible = "holotr,dmalink", },
+-    {},
+-};
+-MODULE_DEVICE_TABLE(of, holotr_dmalink_of_match);
+-
+-static struct platform_driver holotr_dmalink_driver = {
+-    .probe = holotr_dmalink_probe,
+-    .driver = {
+-        .name = "holotr-dmalink",
+-//        .owner = THIS_MODULE,
+-        .of_match_table = holotr_dmalink_of_match,
+-    },
+-};
+-module_platform_driver(holotr_dmalink_driver);
+-
+-MODULE_AUTHOR("Michael Brown (the-snowwhite) <producer@holotronic.dk");
+-MODULE_DESCRIPTION("DMA sound driver for soc at https://github.com/the-snowwhite");
+-MODULE_LICENSE("GPL");
+-- 
+2.7.4
+
+
+From 224761a1bbdc0df03ce01a9f7d32530f0d000839 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 29 Apr 2018 19:34:08 +0200
+Subject: [PATCH 14/14] Add hsynth dma audio to de1-soc-wm8731-midi driver
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts |  55 ++--
+ sound/soc/codecs/hsynth7002.c                  |   8 +-
+ sound/soc/socsynth/Kconfig                     |  11 +
+ sound/soc/socsynth/Makefile                    |   3 +
+ sound/soc/socsynth/de1-soc-wm8731-midi.c       | 105 ++++++-
+ sound/soc/socsynth/hsynthdma.c                 | 418 +++++++++++++++++++++++++
+ 6 files changed, 563 insertions(+), 37 deletions(-)
+ create mode 100644 sound/soc/socsynth/hsynthdma.c
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+index 0649be3..901dcf2 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+@@ -1,18 +1,18 @@
+ /*
+- * Copyright Intel Corporation (C) 2017. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms and conditions of the GNU General Public License,
+- * version 2, as published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope it will be useful, but WITHOUT
+- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+- * more details.
+- *
+- * You should have received a copy of the GNU General Public License along with
+- * this program.  If not, see <http://www.gnu.org/licenses/>.
+- */
++* Copyright Intel Corporation (C) 2017. All rights reserved.
++*
++* This program is free software; you can redistribute it and/or modify
++* it under the terms and conditions of the GNU General Public License,
++* version 2, as published by the Free Software Foundation.
++*
++* This program is distributed in the hope it will be useful, but WITHOUT
++* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++* more details.
++*
++* You should have received a copy of the GNU General Public License along with
++* this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
+ 
+ #include "socfpga_cyclone5.dtsi"
+ 
+@@ -61,12 +61,14 @@
+ 		};
+ 	};
+ 
+-    sound {
++	sound {
+ 		compatible = "opencores,de1soc-wm8731-audio-midi";
+ 		i2s-controller = <&i2s>;
+ 		audio-codec = <&wm8731>;
+ 		i2c-mux-gpio = <&portb 19 0>;
+-    };
++		dmalink-controller = <&dmalink>;
++		synth-codec = <&hsynth7002_codec>;
++	};
+ 
+ 	clk48: clk48 {
+ 		compatible = "fixed-clock";
+@@ -85,13 +87,30 @@
+ 	i2s: i2s@0x0 {
+ 		#sound-dai-cells = <1>;
+ 		compatible = "opencores,i2s";
+-		reg = <0xff200000 0x40>, <0xff200040 0x20>;
++		reg = <0xff200000 0x20>, <0xff200040 0x20>;
+ 		clocks = <&clk44>, <&clk48>;
+ 		clock-names = "clk44", "clk48";
+ 		dmas = <&pdma 0>, <&pdma 1>, <&pdma 2>;
+ 		dma-names = "tx", "rx", "rx";
+ 	};
+ 
++	dmalink: dmalink@0x20 {
++		#sound-dai-cells = <1>;
++		compatible = "holotr,dmalink";
++		reg = <0xff200020 0x20>, <0xff200060 0x20>;
++		clocks = <&clk44>;
++		clock-names = "clk44";
++		dmas = <&pdma 2>;
++		dma-names = "rx";
++	};
++
++	hsynth7002_codec: hsynth7002-codec {
++	#sound-dai-cells = <0>;
++		compatible = "holotr,hsynth7002";
++/*     IOVDD-supply = <&supply>;*/
++		status = "okay";
++	};
++
+ 	bridge@0xc0000000 {
+ 		compatible = "altr,bridge-15.1", "simple-bus";
+ 		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
+@@ -176,7 +195,7 @@
+ 		}; //end gpio@0x100010040 (led_pio)
+ 
+ 		uio-socfpg0@0x100040000 {
+-            compatible = "generic-uio,ui_pdrv";
++			compatible = "generic-uio,ui_pdrv";
+ 			reg = <0x00000001 0x00040000 0x00010000>;
+ 			interrupt-parent = <0x2>;
+ 			interrupts = <0 43 4>;
+diff --git a/sound/soc/codecs/hsynth7002.c b/sound/soc/codecs/hsynth7002.c
+index 1c54d02..b1898b3 100644
+--- a/sound/soc/codecs/hsynth7002.c
++++ b/sound/soc/codecs/hsynth7002.c
+@@ -16,13 +16,13 @@
+ #include <sound/soc.h>
+ 
+ static const struct snd_soc_dapm_widget hsynth7002_widgets[] = {
+-	SND_SOC_DAPM_INPUT("PDM_DAT"),
+-	SND_SOC_DAPM_REGULATOR_SUPPLY("IOVDD", 0, 0),
++	SND_SOC_DAPM_INPUT("HSYNTH"),
++//	SND_SOC_DAPM_REGULATOR_SUPPLY("IOVDD", 0, 0),
+ };
+ 
+ static const struct snd_soc_dapm_route hsynth7002_routes[] = {
+-	{ "Capture", NULL, "PDM_DAT" },
+-	{ "Capture", NULL, "IOVDD" },
++	{ "Capture", NULL, "HSYNTH" },
++//	{ "Capture", NULL, "IOVDD" },
+ };
+ 
+ static int hsynth7002_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
+diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
+index 4427807..5486745 100644
+--- a/sound/soc/socsynth/Kconfig
++++ b/sound/soc/socsynth/Kconfig
+@@ -7,6 +7,15 @@ config SND_SOC_OC_I2S
+          This driver can also be built as a module.  If so, the module
+          will be called opencores_i2s.
+ 
++config SND_SOC_HSYNTHDMA
++       tristate "holosynth DMA Controller"
++       help
++         If you say yes to this option, support will be included for the
++         HSYNTHDMA dma controller. For details see
++
++         This driver can also be built as a module.  If so, the module
++         will be called hsynthdma.
++
+ config SND_SOC_DE1_WM8731_MIDI
+        tristate "DE1-Audio MIDI support"
+        select SND_SOC_WM8731
+@@ -14,3 +23,5 @@ config SND_SOC_DE1_WM8731_MIDI
+        select SND_SOC_GENERIC_DMAENGINE_PCM
+        select SND_RAWMIDI
+        select REGMAP_MMIO
++       select SND_SOC_HSYNTH7002
++       select SND_SOC_HSYNTHDMA
+diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
+index 2b41e2b..d0ec5df 100644
+--- a/sound/soc/socsynth/Makefile
++++ b/sound/soc/socsynth/Makefile
+@@ -3,3 +3,6 @@ obj-$(CONFIG_SND_SOC_OC_I2S) += snd-soc-opencores_i2s.o
+ 
+ snd-de1-soc-wm8731-midi-objs := de1-soc-wm8731-midi.o
+ obj-$(CONFIG_SND_SOC_DE1_WM8731_MIDI) += snd-de1-soc-wm8731-midi.o
++
++snd-soc-hsynthdma-objs := hsynthdma.o
++obj-$(CONFIG_SND_SOC_HSYNTHDMA) += snd-soc-hsynthdma.o
+diff --git a/sound/soc/socsynth/de1-soc-wm8731-midi.c b/sound/soc/socsynth/de1-soc-wm8731-midi.c
+index fe5d3e3..6203172 100644
+--- a/sound/soc/socsynth/de1-soc-wm8731-midi.c
++++ b/sound/soc/socsynth/de1-soc-wm8731-midi.c
+@@ -216,6 +216,7 @@ static const struct snd_soc_dapm_widget de1soc_dapm_widgets[] = {
+     SND_SOC_DAPM_MIC("Microphone Jack", NULL),
+     SND_SOC_DAPM_LINE("Line In Jack", NULL),
+     SND_SOC_DAPM_LINE("Line Out Jack", NULL),
++    SND_SOC_DAPM_LINE("Hsynth in", NULL),
+ };
+ 
+ static const struct snd_soc_dapm_route intercon[] = {
+@@ -227,6 +228,7 @@ static const struct snd_soc_dapm_route intercon[] = {
+     {"Line Out Jack", NULL, "ROUT"},
+     {"Headphone Jack", NULL, "LHPOUT"},
+     {"Headphone Jack", NULL, "RHPOUT"},
++    {"HSYNTH", NULL, "Hsynth in"},
+ };
+ 
+ static int de1soc_wm8731_init(struct snd_soc_pcm_runtime *rtd)
+@@ -263,8 +265,35 @@ static int de1soc_wm8731_init(struct snd_soc_pcm_runtime *rtd)
+     return 0;
+ }
+ 
+-static struct snd_soc_dai_link de1soc_dai = {
+-    .name = "WM8731",
++static int soc_hsynth_init(struct snd_soc_pcm_runtime *rtd)
++{
++    struct snd_soc_dai *codec_dai = rtd->codec_dai;
++    struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
++    struct device *dev = rtd->card->dev;
++    unsigned int fmt;
++    int ret;
++
++    dev_dbg(dev, "init\n");
++
++    fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
++    SND_SOC_DAIFMT_CBS_CFS;
++
++    /* set cpu DAI configuration */
++    ret = snd_soc_dai_set_fmt(cpu_dai, fmt);
++    if (ret < 0)
++        return ret;
++
++    /* set codec DAI configuration */
++    ret = snd_soc_dai_set_fmt(codec_dai, fmt);
++    if (ret < 0)
++        return ret;
++
++    return 0;
++}
++
++static struct snd_soc_dai_link de1soc_dai[] = {
++	{ /* Primary DAI i/f */
++    .name = "SSND0",
+     .stream_name = "WM8731 PCM",
+     .cpu_dai_name = "ff200000.i2s",
+     .codec_dai_name = "wm8731-hifi",
+@@ -272,13 +301,33 @@ static struct snd_soc_dai_link de1soc_dai = {
+     .platform_name = "de1soc",
+     .codec_name = "wm8731.0-001a",
+     .ops = &de1soc_ops,
++	}, { /* Sec_Fifo Playback i/f */
++    .name = "SSND1",
++    .stream_name = "HSYNTH PCM",
++    .cpu_dai_name = "ff200000.dmalink",
++    .codec_dai_name = "hsynth7002-hifi",
++    .init = soc_hsynth_init,
++    .platform_name = "de1soc",
++    .codec_name = "hsynth7002.hsynth",
++	},
+ };
+-
++/*
++static struct snd_soc_dai_link hsynth_soc_dai = {
++    .name = "HSYNTH",
++    .stream_name = "HSYNTH PCM",
++    .cpu_dai_name = "ff200000.dmalink",
++    .codec_dai_name = "hsynth7002-hifi",
++    .init = soc_hsynth_init,
++    .platform_name = "de1soc",
++    .codec_name = "hsynth7002.hsynth",
++};
++*/
+ static struct snd_soc_card snd_soc_de1soc = {
+-    .name = "DE1SOC-WM8731",
++    .name = "DE1SND",
+     .owner = THIS_MODULE,
+-    .dai_link = &de1soc_dai,
+-    .num_links = 1,
++    .dai_link = de1soc_dai,
++//    .dai_link = &hsynth_soc_dai,
++    .num_links = ARRAY_SIZE(de1soc_dai),
+ 
+     .probe        = hmidi_card_probe,
+     .remove       = hmidi_card_remove,
+@@ -316,29 +365,55 @@ static int de1soc_audio_probe(struct platform_device *pdev)
+         gpio_set_value(i2c_mux_gpio, 1);
+     }
+ 
+-    /* Parse codec info */
+-    de1soc_dai.codec_name = NULL;
++    /* Parse codec1 info */
++    de1soc_dai[0].codec_name = NULL;
+     codec_np = of_parse_phandle(np, "audio-codec", 0);
+     if (!codec_np) {
+-        dev_err(&pdev->dev, "codec info missing\n");
++        dev_err(&pdev->dev, "audio-codec info missing\n");
+         return -EINVAL;
+     }
+-    de1soc_dai.codec_of_node = codec_np;
++    de1soc_dai[0].codec_of_node = codec_np;
+ 
+     /* Parse dai and platform info */
+-    de1soc_dai.cpu_dai_name = NULL;
+-    de1soc_dai.platform_name = NULL;
++    de1soc_dai[0].cpu_dai_name = NULL;
++    de1soc_dai[0].platform_name = NULL;
+     cpu_np = of_parse_phandle(np, "i2s-controller", 0);
+     if (!cpu_np) {
+-        dev_err(&pdev->dev, "dai and pcm info missing\n");
++        dev_err(&pdev->dev, "i2s dai1 and pcm info missing\n");
++        return -EINVAL;
++    }
++
++    de1soc_dai[0].cpu_of_node = cpu_np;
++    de1soc_dai[0].platform_of_node = cpu_np;
++
++    of_node_put(codec_np);
++    of_node_put(cpu_np);
++
++    /* Parse codec2 info */
++    de1soc_dai[1].codec_name = NULL;
++    codec_np = of_parse_phandle(np, "synth-codec", 0);
++    if (!codec_np) {
++        dev_err(&pdev->dev, "synth-codec info missing\n");
++        return -EINVAL;
++    }
++    de1soc_dai[1].codec_of_node = codec_np;
++
++    /* Parse dai and platform info */
++    de1soc_dai[1].cpu_dai_name = NULL;
++    de1soc_dai[1].platform_name = NULL;
++    cpu_np = of_parse_phandle(np, "dmalink-controller", 0);
++    if (!cpu_np) {
++        dev_err(&pdev->dev, "dmalink-controller info missing\n");
+         return -EINVAL;
+     }
+-    de1soc_dai.cpu_of_node = cpu_np;
+-    de1soc_dai.platform_of_node = cpu_np;
++
++    de1soc_dai[1].cpu_of_node = cpu_np;
++    de1soc_dai[1].platform_of_node = cpu_np;
+ 
+     of_node_put(codec_np);
+     of_node_put(cpu_np);
+ 
++
+     ret = snd_soc_register_card(card);
+     if (ret) {
+         dev_err(&pdev->dev, "snd_soc_register_card() failed\n");
+diff --git a/sound/soc/socsynth/hsynthdma.c b/sound/soc/socsynth/hsynthdma.c
+new file mode 100644
+index 0000000..afb4850
+--- /dev/null
++++ b/sound/soc/socsynth/hsynthdma.c
+@@ -0,0 +1,418 @@
++/*
++* Copyright (C) 2017 Michael Brown (the-snowwhite) <producer@holotronic.dk>
++* Largely based on opencores_i2s.c by Bjarne Steinsbo <bsteinsbo@gmail.com>.
++*
++* Licensed under the GPL-2.
++*/
++
++#include <linux/clk.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
++#include <linux/regmap.h>
++#include <linux/slab.h>
++
++#include <sound/core.h>
++#include <sound/pcm.h>
++#include <sound/dmaengine_pcm.h>
++#include <sound/pcm_params.h>
++#include <sound/soc.h>
++
++//#define DAC_FIFO_ADDR  0x00
++#define STATUS_ADDR    0x04
++#define CMD_ADDR       0x08
++#define ADC_FIFO_ADDR  0x00
++
++/* Commands to register at CMD_ADDR */
++#define PB_FIFO_CLEAR  BIT(0)
++#define PB_ENABLE      BIT(1)
++#define CAP_FIFO_CLEAR BIT(2)
++#define CAP_ENABLE     BIT(3)
++
++#define CLK_CTRL1      0x00
++#define CLK_CTRL2      0x04
++
++/* Bit-fields of clk control register 1 */
++#define CLK_MASTER_SLAVE  BIT(0)
++#define CLK_SEL_48_44    BIT(1)
++#define MCLK_DIV_SHIFT   (24)
++#define MCLK_DIV_MASK    GENMASK(MCLK_DIV_SHIFT + 7, MCLK_DIV_SHIFT)
++#define BCLK_DIV_SHIFT   (16)
++#define BCLK_DIV_MASK    GENMASK(BCLK_DIV_SHIFT + 7, BCLK_DIV_SHIFT)
++/* Bit-fields of clk control register 2 */
++#define PB_LRC_DIV_SHIFT  (8)
++#define PB_LRC_DIV_MASK          GENMASK(PB_LRC_DIV_SHIFT + 7, PB_LRC_DIV_SHIFT)
++#define CAP_LRC_DIV_SHIFT (0)
++#define CAP_LRC_DIV_MASK  GENMASK(CAP_LRC_DIV_SHIFT + 7, CAP_LRC_DIV_SHIFT)
++
++/* The frame size is not configurable */
++#define BITS_PER_FRAME 64
++
++struct holotr_dmalink {
++    struct regmap *regmap_data;
++    struct regmap *regmap_clk;
++//       struct clk *clk48;
++    struct clk *clk44;
++
++    struct snd_soc_dai_driver dai_driver;
++
++    struct snd_dmaengine_dai_dma_data capture_dma_data;
++//       struct snd_dmaengine_dai_dma_data playback_dma_data;
++
++    struct snd_ratnum ratnum;
++    struct snd_pcm_hw_constraint_ratnums rate_constraints;
++};
++
++static int holotr_dmalink_trigger(struct snd_pcm_substream *substream, int cmd,
++    struct snd_soc_dai *dai)
++{
++    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
++    unsigned int mask, val;
++
++    if (substream->stream == SNDRV_PCM_STREAM_CAPTURE)
++            mask = CAP_ENABLE;
++    else
++            mask = PB_ENABLE;
++
++    switch (cmd) {
++    case SNDRV_PCM_TRIGGER_START:
++    case SNDRV_PCM_TRIGGER_RESUME:
++    case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
++            val = mask;
++            break;
++    case SNDRV_PCM_TRIGGER_STOP:
++    case SNDRV_PCM_TRIGGER_SUSPEND:
++    case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
++            val = 0;
++            break;
++    default:
++            return -EINVAL;
++    }
++
++    regmap_update_bits(dmalink->regmap_data, CMD_ADDR, mask, val);
++//     regmap_write(dmalink->regmap_data, CMD_ADDR, val);
++
++    dev_dbg(dai->dev, "trigger %x\n", val);
++    return 0;
++}
++
++static int divisor_value(unsigned long xtal_rate, unsigned long rate, int shift)
++{
++    return ((xtal_rate / rate / 2) >> shift) - 1;
++}
++
++static int holotr_dmalink_hw_params(struct snd_pcm_substream *substream,
++    struct snd_pcm_hw_params *params, struct snd_soc_dai *dai)
++{
++    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
++    unsigned long xtal_rate;
++    int lrclk_div;
++    int mclk_div;
++    int bclk_div;
++    int mask, val;
++    int mask2, val2;
++
++    dev_dbg(dai->dev, "hw_params fmt=0x%x\n", params_format(params));
++    dev_dbg(dai->dev, "hw_params rate=%d\n", params_rate(params));
++    if (params_format(params) != SNDRV_PCM_FORMAT_S32_LE)
++            return -EINVAL;
++
++    if ((params_rate(params) % 44100) == 0) {
++        val = CLK_SEL_48_44;
++        xtal_rate = clk_get_rate(dmalink->clk44);
++        mclk_div = divisor_value(xtal_rate, 16934400, 0); /* fs*384 at 44.1kHz */
++    }
++//    else if ((params_rate(params) % 48000) == 0) {
++//      val = 0;
++//      xtal_rate = clk_get_rate(dmalink->clk48);
++//      mclk_div = divisor_value(xtal_rate, 12288000, 0); /* fs*256 at 48kHz */
++//    }
++    else
++        return -EINVAL;
++
++    mask = CLK_SEL_48_44;
++    mask2 = 0;
++
++    lrclk_div = divisor_value(xtal_rate, params_rate(params), 4);
++    bclk_div = divisor_value(xtal_rate, params_rate(params) * BITS_PER_FRAME, 0);
++    dev_dbg(dai->dev, "hw_params mclk_div=%d\n", mclk_div);
++    dev_dbg(dai->dev, "hw_params lrclk_div=%d\n", lrclk_div);
++    dev_dbg(dai->dev, "hw_params bclk_div=%d\n", bclk_div);
++    val |= mclk_div << MCLK_DIV_SHIFT;
++    mask |= MCLK_DIV_MASK;
++    val |= bclk_div << BCLK_DIV_SHIFT;
++    mask |= BCLK_DIV_MASK;
++    regmap_update_bits(dmalink->regmap_clk, CLK_CTRL1, mask, val);
++    dev_dbg(dai->dev, "hw_params mask=0x%x val=0x%x\n", mask, val);
++    if (substream->stream == SNDRV_PCM_STREAM_CAPTURE) {
++        val2 = lrclk_div << CAP_LRC_DIV_SHIFT;
++        mask2 = CAP_LRC_DIV_MASK;
++    } else {
++        val2 = lrclk_div << PB_LRC_DIV_SHIFT;
++        mask2 = PB_LRC_DIV_MASK;
++    }
++    regmap_update_bits(dmalink->regmap_clk, CLK_CTRL2, mask2, val2);
++    dev_dbg(dai->dev, "hw_params mask2=0x%x val2=0x%x\n", mask2, val2);
++    return 0;
++}
++
++static int holotr_dmalink_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
++{
++    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
++    int val = 0;
++    dev_dbg(dai->dev, "set_fmt 0x%x\n", fmt);
++
++    if ((fmt & SND_SOC_DAIFMT_FORMAT_MASK) != SND_SOC_DAIFMT_I2S)
++        return -EINVAL;
++
++    if ((fmt & SND_SOC_DAIFMT_INV_MASK) != SND_SOC_DAIFMT_NB_NF)
++        return -EINVAL;
++
++    switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
++    case SND_SOC_DAIFMT_CBM_CFM:
++        val = 0;
++        break;
++    case SND_SOC_DAIFMT_CBS_CFS:
++        val = 1;
++        break;
++    default:
++        return -EINVAL;
++    }
++
++    dev_dbg(dai->dev, "set_fmt master=%d\n", val);
++    regmap_update_bits(dmalink->regmap_clk, 0, CLK_MASTER_SLAVE, val);
++    return 0;
++}
++
++static int holotr_dmalink_sysclk(struct snd_soc_dai *dai, int clk_id,
++    unsigned int freq, int dir)
++{
++    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
++    int val = SND_SOC_CLOCK_IN ? 1 : 0;
++    dev_dbg(dai->dev, "sysclk id=%d freq=%d dir=%d\n", clk_id, freq, dir);
++    regmap_update_bits(dmalink->regmap_clk, 0, CLK_MASTER_SLAVE, val);
++    return 0;
++}
++
++static void holotr_dmalink_shutdown(struct snd_pcm_substream *substream,
++    struct snd_soc_dai *dai)
++{
++    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
++    int mask;
++    int val;
++    dev_dbg(dai->dev, "shutdown\n");
++
++    if (substream->stream == SNDRV_PCM_STREAM_CAPTURE)
++        mask = CAP_ENABLE | CAP_FIFO_CLEAR;
++    else
++        mask = PB_ENABLE | PB_FIFO_CLEAR;
++
++    val = PB_FIFO_CLEAR | CAP_FIFO_CLEAR;
++    regmap_update_bits(dmalink->regmap_data, CMD_ADDR, mask, val);
++}
++
++static int holotr_dmalink_dai_probe(struct snd_soc_dai *dai)
++{
++    struct holotr_dmalink *dmalink = snd_soc_dai_get_drvdata(dai);
++
++    dev_dbg(dai->dev, "dai_probe\n");
++//       snd_soc_dai_init_dma_data(dai, &dmalink->playback_dma_data,
++    snd_soc_dai_init_dma_data(dai, NULL,
++    &dmalink->capture_dma_data);
++
++    return 0;
++}
++
++static const struct snd_soc_dai_ops holotr_dmalink_dai_ops = {
++    .set_sysclk = holotr_dmalink_sysclk,
++    .set_fmt = holotr_dmalink_set_fmt,
++    .shutdown = holotr_dmalink_shutdown,
++    .hw_params = holotr_dmalink_hw_params,
++    .trigger = holotr_dmalink_trigger,
++};
++
++static struct snd_soc_dai_driver holotr_dmalink_dai = {
++    .probe = holotr_dmalink_dai_probe,
++    .capture = {
++        .channels_min = 2,
++        .channels_max = 2,
++//      .rates = SNDRV_PCM_RATE_44100 | SNDRV_PCM_RATE_48000
++//      | SNDRV_PCM_RATE_88200 | SNDRV_PCM_RATE_96000
++//      | SNDRV_PCM_RATE_176400 | SNDRV_PCM_RATE_192000,
++        .rates = SNDRV_PCM_RATE_44100,
++        .formats = SNDRV_PCM_FMTBIT_S32_LE,
++    },
++    .ops = &holotr_dmalink_dai_ops,
++    .symmetric_rates = 1,
++};
++
++static const struct snd_soc_component_driver holotr_dmalink_component = {
++    .name = "holotr-dmalink",
++};
++
++static const struct regmap_config holotr_dmalink_regmap_data_config = {
++    .name = "holotr_dmalink.data",
++    .reg_bits = 32,
++    .reg_stride = 4,
++    .val_bits = 32,
++    .max_register = CMD_ADDR,
++};
++
++static const struct regmap_config holotr_dmalink_regmap_clk_config = {
++    .name = "holotr_dmalink.clk",
++    .reg_bits = 32,
++    .reg_stride = 4,
++    .val_bits = 32,
++    .max_register = CLK_CTRL2,
++};
++
++static int holotr_dmalink_probe(struct platform_device *pdev)
++{
++    struct resource *res, *res_clk;
++    struct holotr_dmalink *dmalink;
++    void __iomem *base;
++    int signature;
++    int ret;
++
++    dmalink = devm_kzalloc(&pdev->dev, sizeof(*dmalink), GFP_KERNEL);
++    if (!dmalink) {
++            dev_err(&pdev->dev, "Can't allocate holotr_dmalink\n");
++            return -ENOMEM;
++    }
++    platform_set_drvdata(pdev, dmalink);
++
++    res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++    if (!res) {
++            dev_err(&pdev->dev, "No memory resource\n");
++            return -ENODEV;
++    }
++    base = devm_ioremap_resource(&pdev->dev, res);
++    if (IS_ERR(base)) {
++            dev_err(&pdev->dev, "No ioremap resource\n");
++            return PTR_ERR(base);
++    }
++    printk(KERN_ALERT "holotr_dmalink at %08x\n", (int)base);
++
++    dmalink->regmap_data = devm_regmap_init_mmio(&pdev->dev, base,
++            &holotr_dmalink_regmap_data_config);
++    if (IS_ERR(dmalink->regmap_data)) {
++            dev_err(&pdev->dev, "No regmap_data\n");
++            return PTR_ERR(dmalink->regmap_data);
++    }
++
++    res_clk = platform_get_resource(pdev, IORESOURCE_MEM, 1);
++    if (!res_clk) {
++            dev_err(&pdev->dev, "No memory resource\n");
++            return -ENODEV;
++    }
++    base = devm_ioremap_resource(&pdev->dev, res_clk);
++    if (IS_ERR(base)) {
++            dev_err(&pdev->dev, "No ioremap resource\n");
++            return PTR_ERR(base);
++    }
++
++    dmalink->regmap_clk = devm_regmap_init_mmio(&pdev->dev, base,
++            &holotr_dmalink_regmap_clk_config);
++    if (IS_ERR(dmalink->regmap_clk)) {
++            dev_err(&pdev->dev, "No regmap_clk\n");
++            return PTR_ERR(dmalink->regmap_clk);
++    }
++/*
++    dmalink->clk48 = devm_clk_get(&pdev->dev, "clk48");
++    if (IS_ERR(dmalink->clk48)) {
++            dev_err(&pdev->dev, "No clk48 clock\n");
++            return PTR_ERR(dmalink->clk48);
++    }
++
++    ret = clk_prepare_enable(dmalink->clk48);
++    if (ret) {
++            dev_err(&pdev->dev, "Cannot enable clock\n");
++            return ret;
++    }
++*/
++    dmalink->clk44 = devm_clk_get(&pdev->dev, "clk44");
++    if (IS_ERR(dmalink->clk44)) {
++            dev_err(&pdev->dev, "No clk44 clock\n");
++            return PTR_ERR(dmalink->clk44);
++    }
++
++    ret = clk_prepare_enable(dmalink->clk44);
++    if (ret) {
++            dev_err(&pdev->dev, "Cannot enable clock\n");
++            return ret;
++    }
++
++//       dmalink->playback_dma_data.addr = res->start + DAC_FIFO_ADDR;
++//       dmalink->playback_dma_data.addr_width = 4;
++//       dmalink->playback_dma_data.maxburst = 1;
++    //dmalink->playback_dma_data.maxburst = 2;
++//       dev_dbg(&pdev->dev, "probe playback dma addr : %8x\n",
++//       dmalink->playback_dma_data.addr);
++
++    dmalink->capture_dma_data.addr = res->start + ADC_FIFO_ADDR;
++    dmalink->capture_dma_data.addr_width = 4;
++    dmalink->capture_dma_data.maxburst = 1;
++    //dmalink->capture_dma_data.maxburst = 2;
++
++/*
++    dmalink->ratnum.num = clk_get_rate(dmalink->clk_ref) / 2 / BITS_PER_FRAME;
++    dmalink->ratnum.den_step = 1;
++    dmalink->ratnum.den_min = 1;
++    dmalink->ratnum.den_max = 64;
++
++    dmalink->rate_constraints.rats = &dmalink->ratnum;
++    dmalink->rate_constraints.nrats = 1;
++*/
++
++    regmap_write(dmalink->regmap_data, CMD_ADDR, PB_FIFO_CLEAR | CAP_FIFO_CLEAR);
++    ret = regmap_read(dmalink->regmap_data, STATUS_ADDR, &signature);
++    if (ret) {
++        dev_err(&pdev->dev, "Cannot read signature\n");
++        printk(KERN_ALERT "holotr_dmalink probe signature : %4x\n", signature);
++        goto err_clk_disable;
++    }
++    dev_dbg(&pdev->dev, "probe signature : %4x\n", signature);
++
++    ret = devm_snd_soc_register_component(&pdev->dev, &holotr_dmalink_component,
++                                        &holotr_dmalink_dai, 1);
++    if (ret) {
++        dev_err(&pdev->dev, "Cannot register component\n");
++        goto err_clk_disable;
++    }
++
++    ret = devm_snd_dmaengine_pcm_register(&pdev->dev, NULL, 0);
++    if (ret) {
++        dev_err(&pdev->dev, "Cannot register dmaengine\n");
++        goto err_clk_disable;
++    }
++
++    dev_dbg(&pdev->dev, "probe finishing\n");
++    return ret;
++
++err_clk_disable:
++//       clk_disable_unprepare(dmalink->clk48);
++    clk_disable_unprepare(dmalink->clk44);
++    return ret;
++}
++
++static const struct of_device_id holotr_dmalink_of_match[] = {
++    { .compatible = "holotr,dmalink", },
++    {},
++};
++MODULE_DEVICE_TABLE(of, holotr_dmalink_of_match);
++
++static struct platform_driver holotr_dmalink_driver = {
++    .probe = holotr_dmalink_probe,
++    .driver = {
++        .name = "holotr-dmalink",
++//        .owner = THIS_MODULE,
++        .of_match_table = holotr_dmalink_of_match,
++    },
++};
++module_platform_driver(holotr_dmalink_driver);
++
++MODULE_AUTHOR("Michael Brown (the-snowwhite) <producer@holotronic.dk");
++MODULE_DESCRIPTION("DMA sound driver for soc at https://github.com/the-snowwhite");
++MODULE_LICENSE("GPL");
 -- 
 2.7.4
 

@@ -1,7 +1,7 @@
-From b31817d6840916b4dbf25bf80c6226809ebb7128 Mon Sep 17 00:00:00 2001
+From 853fcabeb98526a6abecee65a24d4876fd407205 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 08/12] Added DE-10 Nano with/without framebuffer dts dtb
+Subject: [PATCH 08/14] Added DE-10 Nano with/without framebuffer dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

@@ -1,0 +1,60 @@
+From d3edca31b113300c2b1bb3e31ef38235ef2f0462 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Fri, 27 Apr 2018 04:17:45 +0200
+Subject: [PATCH 13/13] Changed to altvip-II framebuffer
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 14 ++++++--------
+ arch/arm/configs/socfpga_defconfig             |  3 ++-
+ 2 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+index 265d388..8014244 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+@@ -116,14 +116,12 @@
+ 		}; //end serial@0x100020000 (jtag_uart)
+ 
+ 		vip@0x100031000 {
+-			compatible = "ALTR,vip-frame-reader-14.0", "ALTR,vip-frame-reader-9.1";
+-			reg = <0x00000001 0x00031000 0x00000080>;
+-			max-width = <0x556>;
+-			max-height = <0x300>;
+-			bits-per-color = <0x8>;
+-			colors-per-beat = <0x4>;
+-			beats-per-pixel = <0x1>;
+-			mem-word-width = <0x80>;
++			compatible = "altr,vip-17.1", "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,bits-per-symbol = <8>;
++			altr,max-height = <768>;
++			altr,max-width = <1366>;
++			altr,mem-port-width = <128>;
+ 		};
+ 
+ 		sysid@0x100010000 {
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 8b01c80..51b8c36 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -115,6 +115,7 @@ CONFIG_MFD_STMPE=y
+ CONFIG_REGULATOR=y
+ CONFIG_REGULATOR_FIXED_VOLTAGE=y
+ CONFIG_FB=y
++CONFIG_FB_ALTERA_VIP_FB2=m
+ CONFIG_FB_ALTERA_VIP_FB2_PLAT=m
+ CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
+@@ -275,7 +276,7 @@ CONFIG_FB_NOTIFY=y
+ CONFIG_FB_CFB_FILLRECT=y
+ CONFIG_FB_CFB_COPYAREA=y
+ CONFIG_FB_CFB_IMAGEBLIT=y
+-CONFIG_FB_ALTERA_VIP=y
++# CONFIG_FB_ALTERA_VIP is not set
+ CONFIG_DUMMY_CONSOLE=y
+ CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
+-- 
+2.7.4
+

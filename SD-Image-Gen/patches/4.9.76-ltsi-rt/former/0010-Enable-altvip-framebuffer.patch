@@ -1,4 +1,4 @@
-From e16d74aaf9e155192b5d67af1e7368c92775b798 Mon Sep 17 00:00:00 2001
+From c9242efd64cd3f130c0b5d4868c763e53c8eeaed Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 30 Mar 2018 20:41:53 +0200
 Subject: [PATCH 10/13] Enable altvip framebuffer
@@ -22,10 +22,10 @@ index 5715844..62f0881 100644
  	default "9" if SA1111 || ARCH_EFM32
  	default "11"
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index a9973e9..0a7def4 100644
+index f01e3e0..50ba023 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -180,3 +180,114 @@ CONFIG_FUNCTION_TRACER=y
+@@ -184,3 +184,114 @@ CONFIG_FUNCTION_TRACER=y
  CONFIG_DEBUG_USER=y
  CONFIG_ISCSI_TCP=m
  CONFIG_ISCSI_TARGET=m

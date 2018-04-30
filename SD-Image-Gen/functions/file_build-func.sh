@@ -561,17 +561,17 @@ git_patch() {
 ## parameters: 1: top folder name, 2: url, 3: branch name, 4: checkout string, 5: clone folder name, 6: patch file name
 git_fetch() {
 #    set -x
-    if [ ! -d ${1} ]; then
-        if [ ! -z "${5}" ]; then
-            echo "MSG: creating dir ${1}"
-            mkdir ${1}
-            cd ${1}
-            echo "MSG: cloning ${2} into ${5}"
-            git clone ${2} ${5}
-        else
-            echo "MSG: cloning ${2}"
-            git clone ${2} ${1}
-        fi
+    if [ ! -d "${1}" ]; then
+        echo "MSG: dir ${1} does not exist"
+        mkdir ${1}
+    fi
+    cd ${1}
+    if [ ! -z "${5}" ]; then
+        echo "MSG: cloning ${2} into ${5}"
+        git clone ${2} ${5}
+    else
+        echo "MSG: cloning ${2}"
+        git clone ${2}
     fi
     if [ ! -z "${5}" ]; then
         echo "MSG: cleaning repo"
@@ -1276,7 +1276,9 @@ EOF
 qt_configure(){
 curr_function="qt_configure()"
 # ../configure -help
-../configure -release -opensource -confirm-license -nomake examples -nomake tools -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc -no-use-gold-linker
+../configure -release -opensource -confirm-license -nomake examples -qreal float -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix ${QT_PREFIX} -no-use-gold-linker
+
+#../configure -release -opensource -confirm-license -nomake examples -nomake tools -skip webengine -nomake tests -system-xcb -no-pch -shared -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -gui -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix ${QT_PREFIX} -no-use-gold-linker
 #../configure -release -opensource -confirm-license -optimize-size -nomake tools -nomake examples -skip webengine -skip qtvirtualkeyboard -skip qtwayland -system-pcre -no-opengl -no-use-gold-linker -no-eglfs -nomake tests -system-xcb -no-pch -sysroot ${QT_ROOTFS_MNT} -xplatform linux-arm-gnueabihf-g++ -force-pkg-config -linuxfb -widgets -device-option CROSS_COMPILE=${QT_CC} -prefix /usr/local/lib/qt-${QT_VER}-altera-soc
 # -qreal float -no-use-gold-linker -static -ltcg -qt-pcre, -system-pcre -gui -shared
 
@@ -1290,21 +1292,6 @@ curr_function="qt_configure()"
         echo "Script_MSG: function --> ${curr_function} exited with success"
     fi
 }
-
-configure_for_qt_qwt(){
-QWT_PREFIX="/usr/local/qwt-6.3.0-svn"
-echo ""
-echo "Script_MSG: Setting up QWT"
-sudo cp -r ${QWT_PREFIX} ${QT_ROOTFS_MNT}/usr/local
-sudo sh -c 'echo "'${QWT_PREFIX}'/lib" > '${QT_ROOTFS_MNT}'/etc/ld.so.conf.d/qt.conf'
-
-sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/etc/profile'
-sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.bashrc'
-sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.profile'
-
-sudo chroot --userspec=root:root ${QT_ROOTFS_MNT} /sbin/ldconfig
-}
-
 
 qt_build(){
 echo ""
@@ -1380,13 +1367,27 @@ if [[ "${INSTALL_QT}" ==  "${OK}" ]]; then
 fi
 }
 
+configure_for_qt_qwt(){
+echo ""
+echo "Script_MSG: Setting up QWT"
+sudo cp -r ${QWT_PREFIX} ${QT_ROOTFS_MNT}/usr/local
+sudo sh -c 'echo "'${QWT_PREFIX}'/lib" > '${QT_ROOTFS_MNT}'/etc/ld.so.conf.d/qt.conf'
+
+sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/etc/profile'
+sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.bashrc'
+sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.profile'
+
+sudo chroot --userspec=root:root ${QT_ROOTFS_MNT} /sbin/ldconfig
+}
+
 # parameters: 1: plugin name
 build_qt_plugins(){
 #
-#BUILD_QWT="yes";
+BUILD_QWT="yes";
 
 CONFIGURE_FOR_QWT="yes";
 #CONFIGURE_FOR_QWT="no";
+QWT_PREFIX="/usr/local/qwt-6.3.0-svn"
 
 if [[ "${BUILD_QWT}" ==  "${OK}" ]]; then
     export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/pkgconfig
@@ -1397,7 +1398,7 @@ if [[ "${BUILD_QWT}" ==  "${OK}" ]]; then
     cd ${QWTDIR}/../build
 #    "/usr/local/lib/qt-${QT_VER}-altera-soc/bin/qmake ${QWTDIR}/qwt.pro" 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_qmake-log.txt
 #    qmake -makefile -qtconf /tmp/qmake.conf QMAKE_CC=arm-linux-gnueabihf-gcc QMAKE_CXX=arm-linux-gnueabihf-g++ QMAKE_LINK=arm-linux-gnueabihf-g++ ${QWTDIR}/qwt.pro 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
-    /usr/local/bin/qmake-arm-linux-gnueabihf ${QWTDIR}/qwt.pro 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
+    ${QT_ROOTFS_MNT}/${QT_PREFIX}/bin/qmake ${QWTDIR}/qwt.pro 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
     make -j${NCORES} 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
     sudo make install 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_install-log.txt
 fi
