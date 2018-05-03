@@ -1,0 +1,39 @@
+From 13484bfbae219303c74b61823bb522b2053cfa95 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Wed, 7 Mar 2018 15:43:11 +0100
+Subject: [PATCH 05/16] add configfs and fpgacfg dts entities, and dynamic dts
+ overlay support
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index a9f5f99..c17d698 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -61,8 +61,6 @@ CONFIG_MTD_NAND_DENALI_DT=y
+ CONFIG_MTD_SPI_NOR=y
+ # CONFIG_MTD_SPI_NOR_USE_4K_SECTORS is not set
+ CONFIG_SPI_CADENCE_QUADSPI=y
+-CONFIG_OF_OVERLAY=y
+-CONFIG_OF_CONFIGFS=y
+ CONFIG_BLK_DEV_RAM=y
+ CONFIG_BLK_DEV_RAM_COUNT=2
+ CONFIG_BLK_DEV_RAM_SIZE=8192
+@@ -146,6 +144,11 @@ CONFIG_FPGA_BRIDGE=y
+ CONFIG_SOCFPGA_FPGA_BRIDGE=y
+ CONFIG_ALTERA_FREEZE_BRIDGE=y
+ CONFIG_ALTERA_FREEZE_BRIDGE_PLAT=y
++CONFIG_UIO=m
++CONFIG_UIO_PDRV_GENIRQ=m
++CONFIG_OF_OVERLAY=y
++CONFIG_CONFIGFS_FS=y
++CONFIG_OF_CONFIGFS=y
+ CONFIG_EXT2_FS=y
+ CONFIG_EXT2_FS_XATTR=y
+ CONFIG_EXT2_FS_POSIX_ACL=y
+-- 
+2.7.4
+

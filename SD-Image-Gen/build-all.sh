@@ -64,8 +64,8 @@ BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit")
 
 ## Select u-boot version:
 #UBOOT_VERSION="v2016.09"
-#UBOOT_VERSION="v2018.01"
-UBOOT_VERSION="v2018.03"
+UBOOT_VERSION="v2018.01"
+#UBOOT_VERSION="v2018.03"
 #UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
 UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"

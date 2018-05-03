@@ -1,7 +1,7 @@
-From 442b740eab6bc4930cdb4cdb5df356da9d1ac6ad Mon Sep 17 00:00:00 2001
+From 4760163a08a6892b6f9fdbdeb0b0288f4b3271f0 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 20:02:36 +0100
-Subject: [PATCH 1/4] add support for part command
+Subject: [PATCH 1/5] add support for part command
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

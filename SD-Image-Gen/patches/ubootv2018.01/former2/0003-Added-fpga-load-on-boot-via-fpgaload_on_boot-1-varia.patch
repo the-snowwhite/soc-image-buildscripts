@@ -1,7 +1,7 @@
-From 389bafb4365fca5202ca1b990503e1e1aaa0325e Mon Sep 17 00:00:00 2001
+From 2a04093a4ad060f5db7595721eca9b0b4a40c65d Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 13 Apr 2018 23:02:14 +0200
-Subject: [PATCH 3/3] Added fpga load on boot via fpgaload_on_boot=1 variable
+Subject: [PATCH 3/4] Added fpga load on boot via fpgaload_on_boot=1 variable
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
