@@ -1,7 +1,7 @@
-From 442b740eab6bc4930cdb4cdb5df356da9d1ac6ad Mon Sep 17 00:00:00 2001
+From 4760163a08a6892b6f9fdbdeb0b0288f4b3271f0 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 20:02:36 +0100
-Subject: [PATCH 1/4] add support for part command
+Subject: [PATCH 1/5] add support for part command
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -50,10 +50,10 @@ index 97a6c5e..bc7af51 100644
 2.7.4
 
 
-From f3f41a64f668dd68ca66ef2083676cea32879960 Mon Sep 17 00:00:00 2001
+From a7806074b9fb0d11f3c2061b07803cc0ceb83a7b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 13 Apr 2018 14:06:40 +0200
-Subject: [PATCH 2/4] Add support for fw_printenv fw_setenv
+Subject: [PATCH 2/5] Add support for fw_printenv fw_setenv
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -107,10 +107,10 @@ index 66e7c4f..1f5dd9e 100644
 2.7.4
 
 
-From eb63d6815720d5bce408ef8c019820e5c0dd8a84 Mon Sep 17 00:00:00 2001
+From 72854795d90935d76878b4bf6f4293042d4c72cd Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 13 Apr 2018 23:02:14 +0200
-Subject: [PATCH 3/4] Added fpga load on boot via fpgaload_on_boot=1 variable
+Subject: [PATCH 3/5] Added fpga load on boot via fpgaload_on_boot=1 variable
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -156,10 +156,38 @@ index 1f5dd9e..8f76934 100644
 2.7.4
 
 
-From e90114c8c3f1bc5182357ecbd6d8b0a3ef2a7c32 Mon Sep 17 00:00:00 2001
+From c7df1eb3e2636f06bcc946e845a0ef6b6edfcad1 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Tue, 1 May 2018 15:37:43 +0200
+Subject: [PATCH 4/5] Enable cpu DMA(0-3), fix for audio drivers
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ include/config_distro_bootcmd.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
+index 66e1065..c1ca235 100644
+--- a/include/config_distro_bootcmd.h
++++ b/include/config_distro_bootcmd.h
+@@ -338,7 +338,8 @@
+ 	\
+ 	"boot_extlinux="                                              \
+         "if test ${fpgaload_on_boot} = 1;"                         \
+-        "then run fpgaload; bridge enable; fi;"       \
++        "then run fpgaload; bridge enable;"       \
++        "mw.b 0xffd05018 0xf0; fi;"       \
+ 		"sysboot ${devtype} ${devnum}:${distro_bootpart} any "    \
+ 			"${scriptaddr} ${prefix}extlinux/extlinux.conf\0" \
+ 	\
+-- 
+2.7.4
+
+
+From 2c225940483e40ee393c426c0d97aa5a86745720 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 14 Apr 2018 04:35:00 +0200
-Subject: [PATCH 4/4] update de1_soc board with socsynth quartus project
+Subject: [PATCH 5/5] update de1_soc board with socsynth quartus project
  headers
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>

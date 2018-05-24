@@ -1,4 +1,4 @@
-From 741948a70bdbb8547e759ff876611019f10e3a12 Mon Sep 17 00:00:00 2001
+From e90114c8c3f1bc5182357ecbd6d8b0a3ef2a7c32 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 14 Apr 2018 04:35:00 +0200
 Subject: [PATCH 4/4] update de1_soc board with socsynth quartus project

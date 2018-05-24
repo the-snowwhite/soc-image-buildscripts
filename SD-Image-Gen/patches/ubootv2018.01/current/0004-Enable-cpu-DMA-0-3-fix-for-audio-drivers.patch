@@ -1,4 +1,4 @@
-From c7df1eb3e2636f06bcc946e845a0ef6b6edfcad1 Mon Sep 17 00:00:00 2001
+From 8fa6bc08459d7803851a4d5e0b54cc497b618772 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 1 May 2018 15:37:43 +0200
 Subject: [PATCH 4/5] Enable cpu DMA(0-3), fix for audio drivers

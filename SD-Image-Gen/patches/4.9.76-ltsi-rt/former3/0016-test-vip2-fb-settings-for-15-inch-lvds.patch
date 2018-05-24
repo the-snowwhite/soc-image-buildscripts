@@ -1,0 +1,37 @@
+From 0d83a637fbeea3395e5b95de6dd2e69fb7647ca6 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Fri, 4 May 2018 14:32:56 +0200
+Subject: [PATCH 16/18] test vip2 fb settings for 15 inch lvds
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ drivers/video/fbdev/altvipfb2.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/video/fbdev/altvipfb2.c b/drivers/video/fbdev/altvipfb2.c
+index e6d3b1c..879b9bd 100644
+--- a/drivers/video/fbdev/altvipfb2.c
++++ b/drivers/video/fbdev/altvipfb2.c
+@@ -104,13 +104,13 @@ static void altvipfb2_setup_fb_info(struct altvipfb2_priv *fbpriv)
+ 	info->var.width = -1;
+ 	info->var.vmode = FB_VMODE_NONINTERLACED;
+ 
+-	info->var.pixclock = 6734;
+-	info->var.left_margin = 148;
+-	info->var.right_margin = 88;
+-	info->var.upper_margin = 36;
++	info->var.pixclock = 6667;
++	info->var.left_margin = 10;
++	info->var.right_margin = 2;
++	info->var.upper_margin = 32;
+ 	info->var.lower_margin = 4;
+-	info->var.hsync_len = 44;
+-	info->var.vsync_len = 5;
++	info->var.hsync_len = 36;
++	info->var.vsync_len = 4;
+ 
+ 	/* settings for 32bit pixels */
+ 	info->var.red.offset = 16;
+-- 
+2.7.4
+
