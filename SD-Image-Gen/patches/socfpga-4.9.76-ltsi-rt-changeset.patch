@@ -1,4 +1,4 @@
-From 35961f7c5cf4fd5e52d838d18c3534c3e294b592 Mon Sep 17 00:00:00 2001
+From 576f6edcdbd9f66b809cebd3e9427155825a3e52 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
 Subject: [PATCH 01/17] disable debug package gen
@@ -25,7 +25,7 @@ index 98b007e..efc9ed9 100644
 2.7.4
 
 
-From c22bee681414ebed42e3fb551344a161350f604a Mon Sep 17 00:00:00 2001
+From 85ab370c200bba3f602f376ef2c27b2320f312c7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 1 May 2018 16:02:19 +0200
 Subject: [PATCH 02/17] Remove gittag from kernel (file) name(s)
@@ -48,7 +48,7 @@ index efc9ed9..f2b597b 100644
 2.7.4
 
 
-From 2bc0d07c4446c78c67a33583b5282ff757da5c20 Mon Sep 17 00:00:00 2001
+From 037e3b0cae472aa19442bfa8407f6acc50951db3 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
 Subject: [PATCH 03/17] add ext4 root fs support and autofs4 module
@@ -87,7 +87,7 @@ index f2b597b..b167ffa7 100644
 2.7.4
 
 
-From 83e01a63ac51f368c87b2a5dc0cb4ceea40bd89d Mon Sep 17 00:00:00 2001
+From 581b89081159ad1db692d459bfdcd09a6e52b957 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
 Subject: [PATCH 04/17] add .dtd files to kernel-image .deb
@@ -125,7 +125,7 @@ index 3c575cd0..d67c791 100755
 2.7.4
 
 
-From 42b2343f4f2fc94ae45b60732fc5c6438be3287a Mon Sep 17 00:00:00 2001
+From 2b5f16a77bdac9c9d358fbbf07158580ff86ffb2 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
 Subject: [PATCH 05/17] add generate /boot/extlinux/extlinux.conf and
@@ -172,7 +172,7 @@ index d67c791..d6a4058 100755
 2.7.4
 
 
-From 2e6d483c5e8df5d5bdbecee3016690676ca286a5 Mon Sep 17 00:00:00 2001
+From fb263baf38a7d5e68ad436e198b4444783af87c9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
 Subject: [PATCH 06/17] add configfs and fpgacfg dts entities, and dynamic dts
@@ -212,7 +212,7 @@ index b167ffa7..a831d0c 100644
 2.7.4
 
 
-From 361eee85e33179b135f7d0d16c4c18c3e3394393 Mon Sep 17 00:00:00 2001
+From c55d257acfd8d055e1a135d7755e3c1a607e9f14 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
 Subject: [PATCH 07/17] rename kernel package names to *-socfpga-rt-ltsi
@@ -243,7 +243,7 @@ index d6a4058..ee58811 100755
 2.7.4
 
 
-From 654169fbfd10ba1d26840b7a14c803cab60fea1f Mon Sep 17 00:00:00 2001
+From d23bd451fc94d0ad782b767521ea7adc8fa136e1 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 21 May 2018 13:19:43 +0200
 Subject: [PATCH 08/17] Enable bridges in dtb's
@@ -277,7 +277,7 @@ index 595eb4f..3de276d 100644
 2.7.4
 
 
-From 95a5c352f8964b4b0979a6dc0508a6fb8a2662c0 Mon Sep 17 00:00:00 2001
+From d12e80bea7bd5acdbb430aaf9e489b50941aaf75 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
 Subject: [PATCH 09/17] add spidev in dts so driver is loaded
@@ -314,7 +314,7 @@ index 3de276d..dce1143 100644
 2.7.4
 
 
-From 239148c75ca77c2d973c8a6b678df99a1429ec5b Mon Sep 17 00:00:00 2001
+From fd0a1032ef67dd9bbeb2755c70732aedd11b606d Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
 Subject: [PATCH 10/17] set ACL secutity
@@ -357,7 +357,7 @@ index a831d0c..a6b5b70 100644
 2.7.4
 
 
-From 91ab5f6f3146340503925a38f831c8421f16cf6f Mon Sep 17 00:00:00 2001
+From 35f901ca468d7fb8b313f94f64b82e34aa2c7eb1 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 30 Mar 2018 20:41:53 +0200
 Subject: [PATCH 11/17] Enable altvip framebuffer
@@ -503,19 +503,19 @@ index a6b5b70..05ad8d5 100644
 2.7.4
 
 
-From ee1984ca7837a51eee21fdfdea50323c6e42f40b Mon Sep 17 00:00:00 2001
+From 518c3ded8211bf210a65b124f9b88ffab4301dbe Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 12/17] Added DE-10 Nano with/without framebuffer 1024x768 and
- 1920x1080(hd) dts dtb
+Subject: [PATCH 12/17] Added DE-10 Nano with uio, with/without framebuffer
+ 1024x768 and 1920x1080(hd) dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                         |   3 +
  arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts   | 112 +++++++++++
- .../boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 205 +++++++++++++++++++++
- .../dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts   | 205 +++++++++++++++++++++
- 4 files changed, 525 insertions(+)
+ .../boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 215 +++++++++++++++++++++
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts   | 215 +++++++++++++++++++++
+ 4 files changed, 545 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
@@ -654,10 +654,10 @@ index 0000000..7645340
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 new file mode 100644
-index 0000000..51fa8dd
+index 0000000..074a589
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
-@@ -0,0 +1,205 @@
+@@ -0,0 +1,215 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -732,7 +732,8 @@ index 0000000..51fa8dd
 +				<0x00000001 0x00004000 0xff204000 0x00000010>,
 +				<0x00000001 0x00005000 0xff205000 0x00000010>,
 +				<0x00000001 0x00030000 0xff230000 0x00000100>,
-+				<0x00000001 0x00031000 0xff231000 0x00000080>;
++				<0x00000001 0x00031000 0xff231000 0x00000080>,
++				<0x00000001 0x00040000 0xff240000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -802,6 +803,15 @@ index 0000000..51fa8dd
 +			beats-per-pixel = <0x1>;
 +			mem-word-width = <0x80>;
 +		};
++
++		uio-socfpg0@0x100040000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 43 1>;
++			address_width = <14>;
++			data_width = <32>;
++		};
 +	};
 +};
 +
@@ -865,10 +875,10 @@ index 0000000..51fa8dd
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
 new file mode 100644
-index 0000000..d6c2df7
+index 0000000..bfb2898
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
-@@ -0,0 +1,205 @@
+@@ -0,0 +1,215 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -943,7 +953,8 @@ index 0000000..d6c2df7
 +				<0x00000001 0x00004000 0xff204000 0x00000010>,
 +				<0x00000001 0x00005000 0xff205000 0x00000010>,
 +				<0x00000001 0x00030000 0xff230000 0x00000100>,
-+				<0x00000001 0x00031000 0xff231000 0x00000080>;
++				<0x00000001 0x00031000 0xff231000 0x00000080>,
++				<0x00000001 0x00040000 0xff240000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -1013,6 +1024,15 @@ index 0000000..d6c2df7
 +			beats-per-pixel = <0x1>;
 +			mem-word-width = <0x80>;
 +		};
++
++		uio-socfpg0@0x100040000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 43 1>;
++			address_width = <14>;
++			data_width = <32>;
++		};
 +	};
 +};
 +
@@ -1078,7 +1098,7 @@ index 0000000..d6c2df7
 2.7.4
 
 
-From 5745f5e579dccf5703e281415d250e193ca5000d Mon Sep 17 00:00:00 2001
+From 88bb2ace95f0c5bf4e0409d6dbfcd6f15e3de104 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 18 May 2018 20:35:35 +0200
 Subject: [PATCH 13/17] Add framebuffer-ii core driver based on Mister, and
@@ -1986,7 +2006,7 @@ index 0000000..a80ae1a
 2.7.4
 
 
-From c5b28245eccc28265b9dacf0a56d0bd2137419bf Mon Sep 17 00:00:00 2001
+From dc7cb3bf189362c295dad11e8fa94f5240866aae Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
 Subject: [PATCH 14/17] Add audio and midi drivers for holosynth and builtin
@@ -4287,7 +4307,7 @@ index 0000000..1f4268c
 2.7.4
 
 
-From bdf253c28c2a0e0e26e52fcd285ae6942d922aae Mon Sep 17 00:00:00 2001
+From 879a03c271d02483744aca1276e550d451b63414 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 17 May 2018 10:58:21 +0200
 Subject: [PATCH 15/17] Add Hsynth audio driver with Phat(pcm5102) audio output
@@ -5249,7 +5269,7 @@ index 0000000..2d56f0b
 2.7.4
 
 
-From 5db72a25cf669a2695d8e8c713c3be5482fb3762 Mon Sep 17 00:00:00 2001
+From a1ce114ed934e71ffd1e3dd03af2613992ebefe7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 4 May 2018 14:32:56 +0200
 Subject: [PATCH 16/17] add vipii framebuffer dtb for de1_soc
@@ -5568,7 +5588,7 @@ index 0000000..225e461
 2.7.4
 
 
-From 8370a248d9bac706338f9f9d26c5252658116625 Mon Sep 17 00:00:00 2001
+From 235888aeea0d0e202b61a2616a54ee435a1ab658 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 24 May 2018 12:18:18 +0200
 Subject: [PATCH 17/17] div codec mods
