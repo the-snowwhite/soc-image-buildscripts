@@ -1,7 +1,7 @@
-From 235888aeea0d0e202b61a2616a54ee435a1ab658 Mon Sep 17 00:00:00 2001
+From e174e8a81befdc588dc3a9d5d0d1dc04627388a8 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 24 May 2018 12:18:18 +0200
-Subject: [PATCH 17/17] div codec mods
+Subject: [PATCH 17/18] div codec mods
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

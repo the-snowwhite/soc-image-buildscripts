@@ -1,7 +1,7 @@
-From dc7cb3bf189362c295dad11e8fa94f5240866aae Mon Sep 17 00:00:00 2001
+From 2b77438809b377eeda2f10be8456131f74a3012c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
-Subject: [PATCH 14/17] Add audio and midi drivers for holosynth and builtin
+Subject: [PATCH 14/18] Add audio and midi drivers for holosynth and builtin
  audio codec on de1 board
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -334,10 +334,10 @@ index 0000000..d2b80e6
 +	status = "okay";
 +};
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index b7a3e50..058212d 100644
+index cb504b6..d090fe7 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -278,7 +278,6 @@ CONFIG_FB_NOTIFY=y
+@@ -280,7 +280,6 @@ CONFIG_FB_NOTIFY=y
  CONFIG_FB_CFB_FILLRECT=y
  CONFIG_FB_CFB_COPYAREA=y
  CONFIG_FB_CFB_IMAGEBLIT=y
@@ -345,7 +345,7 @@ index b7a3e50..058212d 100644
  CONFIG_DUMMY_CONSOLE=y
  CONFIG_FRAMEBUFFER_CONSOLE=y
  CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
-@@ -296,5 +295,64 @@ CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
+@@ -298,5 +297,64 @@ CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
  CONFIG_HID=y
  CONFIG_USB_HID=y
  CONFIG_HID_MULTITOUCH=y

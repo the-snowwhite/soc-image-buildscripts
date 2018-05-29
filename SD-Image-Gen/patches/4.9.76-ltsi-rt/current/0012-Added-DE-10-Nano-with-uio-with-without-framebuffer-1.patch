@@ -1,7 +1,7 @@
-From 518c3ded8211bf210a65b124f9b88ffab4301dbe Mon Sep 17 00:00:00 2001
+From b24ca38b38542e7ba7943d24793feb6ab2c527f4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 12/17] Added DE-10 Nano with uio, with/without framebuffer
+Subject: [PATCH 12/18] Added DE-10 Nano with uio, with/without framebuffer
  1024x768 and 1920x1080(hd) dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>

@@ -1,7 +1,7 @@
-From a1ce114ed934e71ffd1e3dd03af2613992ebefe7 Mon Sep 17 00:00:00 2001
+From 16af1e992897ccd80cc78854bae3510aca2d1a4b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 4 May 2018 14:32:56 +0200
-Subject: [PATCH 16/17] add vipii framebuffer dtb for de1_soc
+Subject: [PATCH 16/18] add vipii framebuffer dtb for de1_soc
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
