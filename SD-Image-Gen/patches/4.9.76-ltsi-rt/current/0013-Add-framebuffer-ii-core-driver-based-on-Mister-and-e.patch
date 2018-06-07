@@ -1,7 +1,7 @@
-From 5745f5e579dccf5703e281415d250e193ca5000d Mon Sep 17 00:00:00 2001
+From 4c317d9daddfc01549805a6af599ce5c050e5a33 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 18 May 2018 20:35:35 +0200
-Subject: [PATCH 13/17] Add framebuffer-ii core driver based on Mister, and
+Subject: [PATCH 13/18] Add framebuffer-ii core driver based on Mister, and
  enable it
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -15,10 +15,10 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  create mode 100644 drivers/video/fbdev/altvipfbii.c
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 05ad8d5..b7a3e50 100644
+index ad7ca9d..cb504b6 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -116,7 +116,9 @@ CONFIG_MFD_STMPE=y
+@@ -118,7 +118,9 @@ CONFIG_MFD_STMPE=y
  CONFIG_REGULATOR=y
  CONFIG_REGULATOR_FIXED_VOLTAGE=y
  CONFIG_FB=y

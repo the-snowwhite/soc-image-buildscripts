@@ -1,16 +1,16 @@
-From ee1984ca7837a51eee21fdfdea50323c6e42f40b Mon Sep 17 00:00:00 2001
+From b24ca38b38542e7ba7943d24793feb6ab2c527f4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 12/17] Added DE-10 Nano with/without framebuffer 1024x768 and
- 1920x1080(hd) dts dtb
+Subject: [PATCH 12/18] Added DE-10 Nano with uio, with/without framebuffer
+ 1024x768 and 1920x1080(hd) dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                         |   3 +
  arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts   | 112 +++++++++++
- .../boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 205 +++++++++++++++++++++
- .../dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts   | 205 +++++++++++++++++++++
- 4 files changed, 525 insertions(+)
+ .../boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 215 +++++++++++++++++++++
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts   | 215 +++++++++++++++++++++
+ 4 files changed, 545 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
@@ -149,10 +149,10 @@ index 0000000..7645340
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 new file mode 100644
-index 0000000..51fa8dd
+index 0000000..074a589
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
-@@ -0,0 +1,205 @@
+@@ -0,0 +1,215 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -227,7 +227,8 @@ index 0000000..51fa8dd
 +				<0x00000001 0x00004000 0xff204000 0x00000010>,
 +				<0x00000001 0x00005000 0xff205000 0x00000010>,
 +				<0x00000001 0x00030000 0xff230000 0x00000100>,
-+				<0x00000001 0x00031000 0xff231000 0x00000080>;
++				<0x00000001 0x00031000 0xff231000 0x00000080>,
++				<0x00000001 0x00040000 0xff240000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -297,6 +298,15 @@ index 0000000..51fa8dd
 +			beats-per-pixel = <0x1>;
 +			mem-word-width = <0x80>;
 +		};
++
++		uio-socfpg0@0x100040000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 43 1>;
++			address_width = <14>;
++			data_width = <32>;
++		};
 +	};
 +};
 +
@@ -360,10 +370,10 @@ index 0000000..51fa8dd
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
 new file mode 100644
-index 0000000..d6c2df7
+index 0000000..bfb2898
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
-@@ -0,0 +1,205 @@
+@@ -0,0 +1,215 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -438,7 +448,8 @@ index 0000000..d6c2df7
 +				<0x00000001 0x00004000 0xff204000 0x00000010>,
 +				<0x00000001 0x00005000 0xff205000 0x00000010>,
 +				<0x00000001 0x00030000 0xff230000 0x00000100>,
-+				<0x00000001 0x00031000 0xff231000 0x00000080>;
++				<0x00000001 0x00031000 0xff231000 0x00000080>,
++				<0x00000001 0x00040000 0xff240000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -507,6 +518,15 @@ index 0000000..d6c2df7
 +			colors-per-beat = <0x4>;
 +			beats-per-pixel = <0x1>;
 +			mem-word-width = <0x80>;
++		};
++
++		uio-socfpg0@0x100040000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 43 1>;
++			address_width = <14>;
++			data_width = <32>;
 +		};
 +	};
 +};
