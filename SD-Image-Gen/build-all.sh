@@ -23,7 +23,7 @@
 
 ## Select distro:
 ### Debian based:
-distro="stretch"
+distro="bionic"
 #distro="buster"
 ### Ubuntu based:
 #distro=bionic
@@ -34,8 +34,8 @@ HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
 shell_cmd="/bin/bash"
 #shell_cmd="/bin/sh"
 
-#ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
-ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
+ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
+#ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
 #final_repo="http://ftp.dk.debian.org/debian/"
 final_repo="http://deb.debian.org//debian/"
 local_repo=${HOME_MIRR_REPO_URL}
@@ -264,7 +264,7 @@ usage()
     echo "    --bindunmount_rootfsimg    Will unmount rootfs image"
     echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file"
     echo "    --assemble_desktop_sd_img   Will generate full populated fb sd imagefile and bmap file"
-    echo "    --inst_qt_img_deps  Will install qt build depedencies in rootfs image"
+    echo "    --inst_hs_aud_stuff  Will install holosynth audio stuff in rootfs image"
     echo "    --build_qt_cross  Will build and install qt in rootfs image"
     echo "    --crossbuild_qt_plugins  Will build and install qt plugins in qt_rootfs image"
     echo "    --assemble_qt_dev_sd_img   Will generate full populated sd imagefile with QT-dev and bmap file"
@@ -546,7 +546,7 @@ while [ "$1" != "" ]; do
             DESKTOP="yes"
             assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop" ${VALUE}
             ;;
-        --inst_qt_img_deps)
+        --inst_hs_aud_stuff)
             if [ "$(ls -A ${ROOTFS_MNT})" ]; then
                 echo "Script_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
                 unmount_binded ${ROOTFS_MNT}
@@ -596,7 +596,8 @@ while [ "$1" != "" ]; do
         --assemble_qt_dev_sd_img)
             DESKTOP="yes"
 #            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-installed"
-            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt-and-qt-plugins" ${VALUE}
+#            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt-and-qt-plugins" ${VALUE}
+            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps" ${VALUE}
             ;;
     *)
             echo "ERROR: unknown parameter \"$PARAM\""
