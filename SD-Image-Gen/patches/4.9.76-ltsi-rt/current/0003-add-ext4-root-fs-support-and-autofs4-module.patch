@@ -1,7 +1,7 @@
-From 92122fd2c48ad2f375b5ac902a0d8dd473da33e7 Mon Sep 17 00:00:00 2001
+From 846ba91a9e0ace87e89bc3ef43a5a50276c602d8 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
-Subject: [PATCH 03/18] add ext4 root fs support and autofs4 module
+Subject: [PATCH 03/23] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

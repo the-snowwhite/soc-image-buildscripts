@@ -1,0 +1,315 @@
+From 5e510d8a218793c02edef33da7b7a4c78b0b17e9 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Fri, 1 Jun 2018 12:52:57 +0200
+Subject: [PATCH 22/23] Make DE1x Devicetree qsys core addresses consistant
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ .../socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts |  6 +-
+ .../boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 22 +++----
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts   | 26 ++++----
+ arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts     | 70 +++++++++++-----------
+ 4 files changed, 58 insertions(+), 66 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+index 65d1a56..4b8b813 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+@@ -133,7 +133,7 @@
+ 			resetvalue = <0xff>;
+ 			#gpio-cells = <0x2>;
+ 			gpio-controller;
+-		};
++		};// (led_pio)
+ 
+ 		gpio@0x100004000 {
+ 			compatible = "altr,pio-15.1", "altr,pio-1.0";
+@@ -148,7 +148,7 @@
+ 			resetvalue = <0x0>;
+ 			#gpio-cells = <0x2>;
+ 			gpio-controller;
+-		};
++		};// (dipsw_pio)
+ 
+ 		gpio@0x100005000 {
+ 			compatible = "altr,pio-15.1", "altr,pio-1.0";
+@@ -163,7 +163,7 @@
+ 			resetvalue = <0x0>;
+ 			#gpio-cells = <0x2>;
+ 			gpio-controller;
+-		};
++		};// (button_pio)
+ 
+ 		ilc@0x100030000 {
+ 			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
+index c05a7f7..cc62324 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
+@@ -85,8 +85,8 @@
+ 		serial@0x100002000 {
+ 			compatible = "altr,juart-15.1", "altr,juart-1.0";
+ 			reg = <0x00000001 0x00002000 0x00000008>;
+-			interrupt-parent = <0x3>;
+-			interrupts = <0x0 0x2a 0x4>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 40 4>;
+ 			clocks = <0x2>;
+ 		};
+ 
+@@ -103,6 +103,8 @@
+ 			compatible = "altr,pio-15.1", "altr,pio-1.0";
+ 			reg = <0x00000001 0x00004000 0x00000010>;
+ 			altr,gpio-bank-width = <0x4>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 41 1>;
+ 			altr,interrupt-type = <0x3>;
+ 			altr,interrupt_type = <0x3>;
+ 			edge_type = <0x2>;
+@@ -115,6 +117,8 @@
+ 		gpio@0x100005000 {
+ 			compatible = "altr,pio-15.1", "altr,pio-1.0";
+ 			reg = <0x00000001 0x00005000 0x00000010>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 42 1>;
+ 			altr,gpio-bank-width = <0x2>;
+ 			altr,interrupt-type = <0x2>;
+ 			altr,interrupt_type = <0x2>;
+@@ -125,14 +129,6 @@
+ 			gpio-controller;
+ 		};
+ 
+-		ilc@0x100030000 {
+-			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
+-			reg = <0x00000001 0x00030000 0x00000100>;
+-			interrupt-controller;
+-			#interrupt-cells = <0x1>;
+-			altr,sw-fifo-depth = <0x20>;
+-		};
+-
+ 		vip@0x100031000 {
+ 			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-9.1";
+ 			reg = <0x00000001 0x00031000 0x00000080>;
+@@ -147,8 +143,8 @@
+ 		hm2-socfpga0@0x100040000 {
+ 			compatible = "generic-uio,ui_pdrv";
+ 			reg = <0x00000001 0x00040000 0x00010000>;
+-			interrupt-parent = <0x2>;
+-			interrupts = <0 43 1>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 43 4>;
+ 			address_width = <14>;
+ 			data_width = <32>;
+ 		};
+@@ -195,7 +191,7 @@
+ 		compatible = "adi,adxl34x";
+ 		reg = <0x53>;
+ 
+-		interrupt-parent = <&portc>;
++		interrupt-parent = <&intc>;
+ 		interrupts = <3 2>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
+index ce568a0..67bf19f 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
+@@ -71,8 +71,8 @@
+ 			<0x00000001 0x00003000 0xff203000 0x00000010>,
+ 			<0x00000001 0x00004000 0xff204000 0x00000010>,
+ 			<0x00000001 0x00005000 0xff205000 0x00000010>,
+-			<0x00000001 0x00030000 0xff230000 0x00000100>,
+-			<0x00000001 0x00031000 0xff231000 0x00000080>,
++            <0x00000000 0x00010000 0xc0010000 0x00010000>,
++            <0x00000001 0x00031000 0xff231000 0x00000080>,
+ 			<0x00000001 0x00040000 0xff240000 0x00010000>;
+ 
+ 		sysid@0x100001000 {
+@@ -85,8 +85,8 @@
+ 		serial@0x100002000 {
+ 			compatible = "altr,juart-15.1", "altr,juart-1.0";
+ 			reg = <0x00000001 0x00002000 0x00000008>;
+-			interrupt-parent = <0x3>;
+-			interrupts = <0x0 0x2a 0x4>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 40 4>;
+ 			clocks = <0x2>;
+ 		};
+ 
+@@ -102,6 +102,8 @@
+ 		gpio@0x100004000 {
+ 			compatible = "altr,pio-15.1", "altr,pio-1.0";
+ 			reg = <0x00000001 0x00004000 0x00000010>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 41 1>;
+ 			altr,gpio-bank-width = <0x4>;
+ 			altr,interrupt-type = <0x3>;
+ 			altr,interrupt_type = <0x3>;
+@@ -115,6 +117,8 @@
+ 		gpio@0x100005000 {
+ 			compatible = "altr,pio-15.1", "altr,pio-1.0";
+ 			reg = <0x00000001 0x00005000 0x00000010>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 42 1>;
+ 			altr,gpio-bank-width = <0x2>;
+ 			altr,interrupt-type = <0x2>;
+ 			altr,interrupt_type = <0x2>;
+@@ -125,14 +129,6 @@
+ 			gpio-controller;
+ 		};
+ 
+-		ilc@0x100030000 {
+-			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
+-			reg = <0x00000001 0x00030000 0x00000100>;
+-			interrupt-controller;
+-			#interrupt-cells = <0x1>;
+-			altr,sw-fifo-depth = <0x20>;
+-		};
+-
+ 		vip@0x100031000 {
+ 			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-9.1";
+ 			reg = <0x00000001 0x00031000 0x00000080>;
+@@ -147,8 +143,8 @@
+ 		hm2-socfpga0@0x100040000 {
+ 			compatible = "generic-uio,ui_pdrv";
+ 			reg = <0x00000001 0x00040000 0x00010000>;
+-			interrupt-parent = <0x2>;
+-			interrupts = <0 43 1>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 43 4>;
+ 			address_width = <14>;
+ 			data_width = <32>;
+ 		};
+@@ -195,7 +191,7 @@
+ 		compatible = "adi,adxl34x";
+ 		reg = <0x53>;
+ 
+-		interrupt-parent = <&portc>;
++		interrupt-parent = <&intc>;
+ 		interrupts = <3 2>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+index 4925f44..11f0a9c 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+@@ -137,56 +137,56 @@
+ 		serial@0x100002000 {
+ 			compatible = "altr,juart-17.1", "altr,juart-1.0";
+ 			reg = <0x00000001 0x00002000 0x00000008>;
+-			interrupt-parent = <0x2>;
++			interrupt-parent = <&intc>;
+ 			interrupts = <0 40 4>;
+ 			clocks = <0x2>;
+ 		}; //end serial@0x100020000 (jtag_uart)
+ 
+ 		gpio@0x100003000 {
+-			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
+ 			reg = <0x00000001 0x00003000 0x00000010>;
+-			interrupt-parent = <0x2>;
+-			interrupts = <0 41 1>;
+-			clocks = <0x2>;
+-			altr,gpio-bank-width = <2>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+-			altr,interrupt-type = <2>;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
+-			altr,interrupt_type = <2>;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
+-			edge_type = <1>;	/* embeddedsw.dts.params.edge_type type NUMBER */
+-			level_trigger = <0>;	/* embeddedsw.dts.params.level_trigger type NUMBER */
+-			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+-			#gpio-cells = <2>;
++			altr,gpio-bank-width = <0x8>;
++			resetvalue = <0xff>;
++			#gpio-cells = <0x2>;
+ 			gpio-controller;
+-		}; //end gpio@0x1000100c0 (button_pio)
++		};// (led_pio)
+ 
+ 		gpio@0x100004000 {
+-			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
+ 			reg = <0x00000001 0x00004000 0x00000010>;
+-			interrupt-parent = <0x2>;
+-			interrupts = <0 42 1>;
+-			clocks = <0x2>;
+-			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+-			altr,interrupt-type = <3>;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
+-			altr,interrupt_type = <3>;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
+-			edge_type = <2>;	/* embeddedsw.dts.params.edge_type type NUMBER */
+-			level_trigger = <0>;	/* embeddedsw.dts.params.level_trigger type NUMBER */
+-			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+-			#gpio-cells = <2>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 41 1>;
++			altr,gpio-bank-width = <0x4>;
++			altr,interrupt-type = <0x3>;
++			altr,interrupt_type = <0x3>;
++			edge_type = <0x2>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
+ 			gpio-controller;
+-		}; //end gpio@0x100010080 (dipsw_pio)
++		};// (dipsw_pio)
+ 
+ 		gpio@0x100005000 {
+-			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
+ 			reg = <0x00000001 0x00005000 0x00000010>;
+-			clocks = <0x2>;
+-			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+-			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+-			#gpio-cells = <2>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 42 1>;
++			altr,gpio-bank-width = <0x2>;
++			altr,interrupt-type = <0x2>;
++			altr,interrupt_type = <0x2>;
++			edge_type = <0x1>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
+ 			gpio-controller;
+-		}; //end gpio@0x100010040 (led_pio)
++		};// (button_pio)
+ 
+ 		ilc@0x100030000 {
+ 			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
+ 			reg = <0x00000001 0x00030000 0x00000100>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 0 4 0 2 1 0 1 1 0 3 4 0 4 4>;
++			interrupt-names = "jtag_uart", "button_pio", "dipsw_pio", "uioreg_io_0", "socmidi_0";
+ 			interrupt-controller;
+ 			#interrupt-cells = <0x1>;
+ 			altr,sw-fifo-depth = <0x20>;
+@@ -206,7 +206,7 @@
+ 		uio-socfpg0@0x100040000 {
+ 			compatible = "generic-uio,ui_pdrv";
+ 			reg = <0x00000001 0x00040000 0x00010000>;
+-			interrupt-parent = <0x2>;
++			interrupt-parent = <&intc>;
+ 			interrupts = <0 43 4>;
+ 			address_width = <14>;
+ 			data_width = <32>;
+@@ -215,8 +215,8 @@
+ 		socmidi@0x100050000 {
+ 			compatible = "holotr,socsynth-midi";
+ 			reg = <0x00000001 0x00050000 0x00010000>;
+-			interrupt-parent = <0x2>;
+-/*			interrupts = <0 44 4>;*/
++			interrupt-parent = <&intc>;
++			interrupts = <0 44 4>;
+ 			address_width = <3>;   /* embeddedsw.dts.params.address_width type NUMBER */
+ 			data_width = <8>;      /* embeddedsw.dts.params.data_width type NUMBER */
+ 		};
+@@ -269,7 +269,7 @@
+ 		compatible = "adi,adxl345";
+ 		reg = <0x53>;
+ 
+-		interrupt-parent = <&portc>;
++		interrupt-parent = <&intc>;
+ 		interrupts = <3 2>;
+ 	};
+ };
+-- 
+2.7.4
+

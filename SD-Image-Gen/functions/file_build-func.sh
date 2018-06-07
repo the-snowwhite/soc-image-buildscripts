@@ -631,14 +631,14 @@ armhf_build() {
     fi
 }
 
-## parameters: 1: distro name, 2: kernel dir, 3: file filter
+## parameters: 1: distro name, 2: dir, 3: file filter
 add2repo(){
 #sudo systemctl stop apache2
 
 echo ""
 echo "Script_MSG: Repo content before -->"
 echo ""
-LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1} | { grep ${3} || true; }`
+LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1} | { grep -E "${3}" || true; }`
 echo "Got list1"
 REPO_LIST1=$"${LIST1}"
 
@@ -655,7 +655,6 @@ if [ ! -z "${REPO_LIST1}" ]; then
     echo "Script_MSG: Will remove former version from repo"
     echo ""
     reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${REPO_LIST1}
-    reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} linux-libc-dev
     reprepro -b ${HOME_REPO_DIR} export ${1}
     echo "Script_MSG: Restarting web server"
 

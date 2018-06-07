@@ -1,7 +1,7 @@
-From e111e08bc321fddc1467ae86b86333a8ecddd9a9 Mon Sep 17 00:00:00 2001
+From bc57689674b257adc6fdbfe30ed8ae5aece86ace Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 17 May 2018 10:58:21 +0200
-Subject: [PATCH 15/18] Add Hsynth audio driver with Phat(pcm5102) audio output
+Subject: [PATCH 15/23] Add Hsynth audio driver with Phat(pcm5102) audio output
  Add vipii fb,pidac/hsynth audio dtb for DE10 Nano HD HDMI
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>

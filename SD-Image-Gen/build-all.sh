@@ -34,7 +34,8 @@ HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
 shell_cmd="/bin/bash"
 #shell_cmd="/bin/sh"
 
-ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
+ROOT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
+#ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
 #ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
 #final_repo="http://ftp.dk.debian.org/debian/"
 final_repo="http://deb.debian.org//debian/"
@@ -254,6 +255,7 @@ usage()
     echo "    --gitkernel2repo   Will add kernel .debs to local repo"
     echo "    --rtkernel2repo   Will add kernel .debs to local repo"
     echo "    --mk2repo   Will add machinekit .debs to local repo"
+    echo "    --cadence2repo   Will add cadence .debs to local repo"
     echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs"
     echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs"
     echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience"
@@ -355,9 +357,9 @@ gen_rootfs_image() {
 #     echo "Script_MSG: run_qt_qemu_debootstrap (${3}) function return value was --> ${output}"
 #    else
         if [ "${DESKTOP}" == "yes" ]; then
-            if [ "${3}" == "buster" ]; then
-                run_qemu_debootstrap_buster ${1} ${3} ${ROOT_REPO_URL}
-                echo "Script_MSG: run_qemu_debootstrap_buster function return value was --> ${output}"
+            if [ "${3}" == "bionic" ]; then
+                run_qemu_debootstrap_bionic ${1} ${3} ${ROOT_REPO_URL}
+                echo "Script_MSG: run_qemu_debootstrap_bionicfunction return value was --> ${output}"
             else
                 run_desktop_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
                 echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) function return value was --> ${output}"
@@ -506,10 +508,13 @@ while [ "$1" != "" ]; do
             ;;
         --rtkernel2repo)
 #            add2repo ${distro} ${RT_KERNEL_PARENT_DIR} ${RT_KERNEL_TAG}
-            add2repo "stretch" ${RT_KERNEL_PARENT_DIR} "${RT_KERNEL_TAG}-socfpga-${KERNEL_PKG_VERSION}"
+            add2repo "stretch" ${RT_KERNEL_PARENT_DIR} "${RT_KERNEL_TAG}-socfpga-${KERNEL_PKG_VERSION} linux-libc-dev"
             ;;
         --mk2repo)
             add2repo ${distro} "/home/mib/Development/Docker" "machinekit"
+            ;;
+        --cadence2repo)
+            add2repo ${distro} "/home/mib/Development/deb_comp/Cadence" "'cadence claudia catia'"
             ;;
         --gen-base-qemu-rootfs)
             gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/${ROOTFS_IMG}" ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt

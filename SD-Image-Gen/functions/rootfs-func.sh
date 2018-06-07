@@ -2,8 +2,9 @@
 
 # lightdm,lxqt
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url
-run_qemu_debootstrap_buster() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=sudo,locales,wget ${2} ${1} ${3}
+## E: Couldn't find these debs: libdirectfb-1.7-7 libssh2-1 cgroupfs-mount gnupg2 ntp leafpad avahi-discover traceroute ifupdown2
+run_qemu_debootstrap_bionic() {
+sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=sudo,locales,wget,nano,apt-utils,rsyslog,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,iproute2,avahi-daemon,uuid-runtime,libnss-mdns,strace,u-boot-tools,initramfs-tools,dirmngr,git,curl,xorg,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}
 output=${?}
 }
 
@@ -906,7 +907,7 @@ sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/etc/X11/xorg.conf
 Section "Device"
     Identifier      "Frame Buffer"
     Driver  "fbdev"
-    Option "Rotate" "UD"
+    Option "Rotate" "off"
 EndSection
 
 Section "ServerLayout"
@@ -921,7 +922,6 @@ EOF'
     if [[ "${distro}" == "stretch" ]]; then
         sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/.xsessionrc
 xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
-#/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
 EOF'
 
     sudo mkdir -p ${ROOTFS_MNT}/home/holosynth/Desktop
@@ -938,9 +938,7 @@ Categories=AudioVideo;AudioEditing;Qt
 EOF'
 
     sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/Desktop/HolosynthVEd.sh
-#xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
 /home/holosynth/prg/HolosynthVEd -nograb -platform xcb
-
 EOF'
 
     fi
