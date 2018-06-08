@@ -23,7 +23,7 @@
 
 ## Select distro:
 ### Debian based:
-distro="bionic"
+distro="stretch"
 #distro="buster"
 ### Ubuntu based:
 #distro=bionic
@@ -34,9 +34,9 @@ HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
 shell_cmd="/bin/bash"
 #shell_cmd="/bin/sh"
 
-ROOT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
+#ROOT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
 #ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
-#ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
+ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
 #final_repo="http://ftp.dk.debian.org/debian/"
 final_repo="http://deb.debian.org//debian/"
 local_repo=${HOME_MIRR_REPO_URL}
