@@ -508,13 +508,14 @@ while [ "$1" != "" ]; do
             ;;
         --rtkernel2repo)
 #            add2repo ${distro} ${RT_KERNEL_PARENT_DIR} ${RT_KERNEL_TAG}
-            add2repo "stretch" ${RT_KERNEL_PARENT_DIR} "${RT_KERNEL_TAG}-socfpga-${KERNEL_PKG_VERSION} linux-libc-dev"
+            add2repo "stretch" ${RT_KERNEL_PARENT_DIR} "${RT_KERNEL_TAG}-socfpga-${KERNEL_PKG_VERSION}|linux-libc-dev"
             ;;
         --mk2repo)
             add2repo ${distro} "/home/mib/Development/Docker" "machinekit"
             ;;
         --cadence2repo)
-            add2repo ${distro} "/home/mib/Development/deb_comp/Cadence" "'cadence claudia catia'"
+#            add2repo ${distro} "/home/mib/Development/deb_comp/Cadence" "cadence \| claudia \| catia"
+            add2repo ${distro} "/home/mib/Development/deb_comp/Cadence" "cadence|claudia|catia "
             ;;
         --gen-base-qemu-rootfs)
             gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/${ROOTFS_IMG}" ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
