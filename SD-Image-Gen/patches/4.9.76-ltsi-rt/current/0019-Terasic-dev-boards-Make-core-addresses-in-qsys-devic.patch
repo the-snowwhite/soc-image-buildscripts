@@ -1,7 +1,7 @@
-From 0c3b0fac1543c1f6c36f3a220da59ff54453887a Mon Sep 17 00:00:00 2001
+From c634af893171b99459a55146f6f57185d62743f1 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 30 May 2018 12:33:08 +0200
-Subject: [PATCH 19/23] Terasic dev boards: Make core addresses in qsys
+Subject: [PATCH 19/28] Terasic dev boards: Make core addresses in qsys
  devicetrees consistant
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>

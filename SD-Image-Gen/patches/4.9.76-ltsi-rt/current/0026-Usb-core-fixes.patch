@@ -1,0 +1,89 @@
+From 1deab2089609954ff25735b2753e2d062df282fd Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 10 Jun 2018 18:13:46 +0200
+Subject: [PATCH 26/28] Usb core fixes
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ .../socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts |  2 ++
+ drivers/usb/dwc2/core.h                            |  1 +
+ drivers/usb/dwc2/platform.c                        | 24 +++++++++++++++++++++-
+ 3 files changed, 26 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+index 723f2a3..317c9c5 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+@@ -265,5 +265,7 @@
+ };
+ 
+ &usb1 {
++	disable-over-current;
++	dr_mode = "host";
+ 	status = "okay";
+ };
+diff --git a/drivers/usb/dwc2/core.h b/drivers/usb/dwc2/core.h
+index 5095263..98b35ad 100644
+--- a/drivers/usb/dwc2/core.h
++++ b/drivers/usb/dwc2/core.h
+@@ -873,6 +873,7 @@ struct dwc2_hsotg {
+ 	int     irq;
+ 	struct clk *clk;
+ 	struct reset_control *reset;
++	struct reset_control *reset_ecc;
+ 
+ 	unsigned int queuing_high_bandwidth:1;
+ 	unsigned int srp_success:1;
+diff --git a/drivers/usb/dwc2/platform.c b/drivers/usb/dwc2/platform.c
+index fe2fc57..2de69d5 100644
+--- a/drivers/usb/dwc2/platform.c
++++ b/drivers/usb/dwc2/platform.c
+@@ -388,6 +388,23 @@ static int dwc2_lowlevel_hw_init(struct dwc2_hsotg *hsotg)
+ 	if (hsotg->reset)
+ 		reset_control_deassert(hsotg->reset);
+ 
++	hsotg->reset_ecc = devm_reset_control_get_optional(hsotg->dev, "dwc2-ecc");
++	if (IS_ERR(hsotg->reset_ecc)) {
++		ret = PTR_ERR(hsotg->reset_ecc);
++		switch (ret) {
++		case -ENOENT:
++		case -ENOTSUPP:
++			hsotg->reset_ecc = NULL;
++			break;
++		default:
++			dev_err(hsotg->dev, "error getting reset control for ecc %d\n", ret);
++			return ret;
++		}
++	}
++
++	if (hsotg->reset_ecc)
++		reset_control_deassert(hsotg->reset_ecc);
++
+ 	/* Set default UTMI width */
+ 	hsotg->phyif = GUSBCFG_PHYIF16;
+ 
+@@ -487,6 +504,8 @@ static int dwc2_driver_remove(struct platform_device *dev)
+ 
+ 	if (hsotg->reset)
+ 		reset_control_assert(hsotg->reset);
++	if (hsotg->reset_ecc)
++		reset_control_assert(hsotg->reset_ecc);
+ 
+ 	return 0;
+ }
+@@ -634,8 +653,11 @@ static int dwc2_driver_probe(struct platform_device *dev)
+ 	/* Validate parameter values */
+ 	dwc2_set_parameters(hsotg, params);
+ 
+-	if (of_find_property(hsotg->dev->of_node, "disable-over-current", NULL)) 
++	if (of_find_property(hsotg->dev->of_node, "disable-over-current", NULL))
++	{
+ 		hsotg->core_params->oc_disable = true;
++		dev_info(hsotg->dev, "disabling over-current protection\n");
++	}
+ 
+ 	dwc2_force_dr_mode(hsotg);
+ 
+-- 
+2.7.4
+
