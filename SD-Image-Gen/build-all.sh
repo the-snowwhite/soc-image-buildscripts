@@ -256,6 +256,7 @@ usage()
     echo "    --rtkernel2repo   Will add kernel .debs to local repo"
     echo "    --mk2repo   Will add machinekit .debs to local repo"
     echo "    --cadence2repo   Will add cadence .debs to local repo"
+    echo "    --carla2repo   Will add carla .debs to local repo"
     echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs"
     echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs"
     echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience"
@@ -514,8 +515,10 @@ while [ "$1" != "" ]; do
             add2repo ${distro} "/home/mib/Development/Docker" "machinekit"
             ;;
         --cadence2repo)
-#            add2repo ${distro} "/home/mib/Development/deb_comp/Cadence" "cadence \| claudia \| catia"
-            add2repo ${distro} "/home/mib/Development/deb_comp/Cadence" "cadence|claudia|catia "
+            add2repo ${distro} "/home/mib/Development/deb_comp/Cadence" "cadence|claudia|catia|catarina"
+            ;;
+        --carla2repo)
+            add2repo ${distro} "/home/mib/Development/Deb-Pkg/carla_debs" "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler|carla"
             ;;
         --gen-base-qemu-rootfs)
             gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/${ROOTFS_IMG}" ${distro} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
