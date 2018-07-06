@@ -1,7 +1,7 @@
-From b043bd248bb7dfd6799c41e1df405d3f1f3b7414 Mon Sep 17 00:00:00 2001
+From db823480effbe0e871d4a5a9bcd56a8400dcc576 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 31 May 2018 18:08:43 +0200
-Subject: [PATCH 21/28] Add missing .ops to synthpcm5102 codec
+Subject: [PATCH 21/29] Add missing .ops to synthpcm5102 codec
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

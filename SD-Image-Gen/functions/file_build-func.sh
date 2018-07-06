@@ -634,77 +634,86 @@ armhf_build() {
 ## parameters: 1: distro name, 2: dir, 3: file filter
 add2repo(){
 #sudo systemctl stop apache2
+    contains ${DISTROS[@]} ${1}
+    if [ "$?" -eq 0 ]; then
+        echo "Valid distroname = ${1} given"
 
-echo ""
-echo "Script_MSG: Repo content before -->"
-echo ""
-LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1} | { grep -E "${3}" || true; }`
-echo "Got list1"
-REPO_LIST1=$"${LIST1}"
+        echo ""
+        echo "Script_MSG: Repo content before -->"
+        echo ""
+        LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1} | { grep -E "${3}" || true; }`
+        echo "Got list1"
+        REPO_LIST1=$"${LIST1}"
 
-echo "REPO_LIST1"
+        echo "REPO_LIST1"
 
-echo "${REPO_LIST1}"
-echo "Script_MSG: Contents of REPO_LIST1 -->"
-echo "${REPO_LIST1}"
+        echo "${REPO_LIST1}"
+        echo "Script_MSG: Contents of REPO_LIST1 -->"
+        echo "${REPO_LIST1}"
 
-echo ""
+        echo ""
 
-if [ ! -z "${REPO_LIST1}" ]; then
-    echo ""
-    echo "Script_MSG: Will remove former version from repo"
-    echo ""
-    reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${REPO_LIST1}
-    reprepro -b ${HOME_REPO_DIR} export ${1}
-    echo "Script_MSG: Restarting web server"
+        if [ ! -z "${REPO_LIST1}" ]; then
+            echo ""
+            echo "Script_MSG: Will remove former version from repo"
+            echo ""
+            reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${REPO_LIST1}
+            reprepro -b ${HOME_REPO_DIR} export ${1}
+            echo "Script_MSG: Restarting web server"
 
-    sudo systemctl restart apache2
-    reprepro -b ${HOME_REPO_DIR} export ${1}
-else
-    echo ""
-    echo "Script_MSG: Former version not found"
-    echo ""
-fi
-echo ""
+            sudo systemctl restart apache2
+            reprepro -b ${HOME_REPO_DIR} export ${1}
+        else
+            echo ""
+            echo "Script_MSG: Former version not found"
+            echo ""
+        fi
+        echo ""
 
-#
-# if [[ "${CLEAN_KERNELREPO}" ==  "${OK}" ]]; then
-# CLEAN_ALL_LIST=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1}`
-#
-# JESSIE_CLEAN_ALL_LIST=$"${CLEAN_ALL_LIST}"
-#
-# 	if [ ! -z "${JESSIE_CLEAN_ALL_LIST}" ]; then
-# 		echo ""
-# 		echo "Script_MSG: Will clean repo"
-# 		echo ""
-# 		reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${JESSIE_CLEAN_ALL_LIST}
-#                 reprepro -b ${HOME_REPO_DIR} export ${1}
-#                 echo "Script_MSG: Restarting web server"
-#                 sudo systemctl restart apache2
-# 	else
-# 		echo ""
-# 		echo "Script_MSG: Repo is empty"
-# 		echo ""
-# 	fi
-# 	echo ""
-# fi
-#
-reprepro -b ${HOME_REPO_DIR} -C main -A armhf includedeb ${1} ${2}/*.deb
-reprepro -b ${HOME_REPO_DIR} export ${1}
-reprepro -b ${HOME_REPO_DIR} list ${1}
+        #
+        # if [[ "${CLEAN_KERNELREPO}" ==  "${OK}" ]]; then
+        # CLEAN_ALL_LIST=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1}`
+        #
+        # JESSIE_CLEAN_ALL_LIST=$"${CLEAN_ALL_LIST}"
+        #
+        # 	if [ ! -z "${JESSIE_CLEAN_ALL_LIST}" ]; then
+        # 		echo ""
+        # 		echo "Script_MSG: Will clean repo"
+        # 		echo ""
+        # 		reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${JESSIE_CLEAN_ALL_LIST}
+        #                 reprepro -b ${HOME_REPO_DIR} export ${1}
+        #                 echo "Script_MSG: Restarting web server"
+        #                 sudo systemctl restart apache2
+        # 	else
+        # 		echo ""
+        # 		echo "Script_MSG: Repo is empty"
+        # 		echo ""
+        # 	fi
+        # 	echo ""
+        # fi
+        #
+        reprepro -b ${HOME_REPO_DIR} -C main -A armhf includedeb ${1} ${2}/*.deb
+        reprepro -b ${HOME_REPO_DIR} export ${1}
+        reprepro -b ${HOME_REPO_DIR} list ${1}
 
-LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1}`
-REPO_LIST2=$"${LIST2}"
-echo  "${REPO_LIST2}"
-echo ""
-echo "Script_MSG: Repo content After: -->"
-echo ""
-echo  "${REPO_LIST2}"
-echo ""
-echo "#--->       Repo updated                                                  <---#"
+        LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1}`
+        REPO_LIST2=$"${LIST2}"
+        echo  "${REPO_LIST2}"
+        echo ""
+        echo "Script_MSG: Repo content After: -->"
+        echo ""
+        echo  "${REPO_LIST2}"
+        echo ""
+        echo "#--->       Repo updated                                                  <---#"
+    else
+        echo "--xxx2repo bad argument --> ${1}"
+        echo "Use =distroname"
+        echo "Valid distrosnames are:"
+        echo " ${DISTROS[@]}"
+    fi
 }
 
-## parameters: 1: mount name, 2: kernel tag
+## parameters: 1: dev mount name, 2: kernel tag
 inst_kernel_from_local_repo(){
 
 cd ${CURRENT_DIR}
@@ -719,11 +728,11 @@ sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
 echo ""
 # echo "Script_MSG: Will now add key to ${local_ws}"
 # echo ""
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir -p /var/tmp
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /var/tmp
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
+sudo chroot --userspec=root:root ${1} /bin/mkdir -p /var/tmp
+sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /var/tmp
+sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 #
-# sudo chroot --userspec=root:root ${ROOTFS_MNT} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
+# sudo chroot --userspec=root:root ${1} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
 #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update --allow-unauthenticated
 sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 
@@ -743,7 +752,7 @@ sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y upgrade
 echo ""
 echo "Script_MSG: Will now install kernel packages"
 echo ""
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install linux-headers-'${2}' linux-image-'${2}''
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install linux-headers-'${2}' linux-image-'${2}''
 
 
 cd ${CURRENT_DIR}
@@ -965,7 +974,7 @@ unmount_binded(){
         echo ""
         echo "Script_MSG: Unmont result = ${RES}"
         echo "Script_MSG: Unmont return value = ${?}"
-    if [ ! -d "${1}/dev" ]; then
+    if [ -d "${1}/dev" ]; then
         echo ""
         echo "Script_MSG: umount -R failed"
         echo "Script_MSG: Will now run  kill_ch_proc ${1}"
@@ -994,9 +1003,13 @@ unmount_binded(){
     fi
 }
 
-# parameters: 1: work dir, 2: mount dev name, 3: comp prefix
+# parameters: 1: work dir, 2: mount dev name, 3: comp prefix, 4 distro name
 compress_rootfs(){
-    COMPNAME=${COMP_REL}_${3}
+    if [ "${4}" == "bionic" ]; then
+        COMPNAME=ubuntu-${4}-socfpga_${3}
+    else
+        COMPNAME=debian-${4}-socfpga_${3}
+    fi
     echo "#---------------------------------------------------------------------------#"
     echo "#Script_MSG:                                                                   #"
     echo "compressing latest rootfs from image into: -->                              #"
@@ -1013,10 +1026,14 @@ compress_rootfs(){
     echo "#---------------------------------------------------------------------------#"
 }
 
-# parameters: 1: work dir, 2: mount dev name, 3: comp prefix
+# parameters: 1: work dir, 2: mount dev name, 3: comp prefix, 4 distro name
 extract_rootfs(){
 if [ ! -z "${3}" ]; then
-    COMPNAME=${COMP_REL}_${3}
+    if [ "${4}" == "bionic" ]; then
+        COMPNAME=ubuntu-${4}-socfpga_${3}
+    else
+        COMPNAME=debian-${4}-socfpga_${3}
+    fi
     echo "Script_MSG: Extracting ${1}/${COMPNAME}_rootfs.tar.bz2"
     echo "Script_MSG: Into imagefile"
     echo "Rootfs configured ... extracting  ${COMPNAME} rootfs into image...."
@@ -1033,67 +1050,67 @@ sudo sh -c 'fw_setenv -c '${CURRENT_DIR}'/fw_env.config '"${1}"' '"${2}"''
 }
 
 # parameters: 1: board name
-gen_uboot_env_vars(){
-echo ""
-echo "NOTE:  Now setting uboot variables"
-
-# --- default env ----
-sv eth1addr
-sv eth3addr
-sv eth5addr
-sv ethaddr
-sv arch arm
-sv board ${1}
-sv board_name ${1}
-sv boot_net_usb_start "usb start"
-sv boot_targets "mmc0 pxe dhcp"
-sv bootcmd "run distro_bootcmd"
-sv bootcmd_dhcp "run boot_net_usb_start\; if dhcp \$\{scriptaddr\} \$\{boot_script_dhcp\}\; then source \$\{scriptaddr\}\; fi\;"
-sv bootcmd_host0 "setenv devnum 0\; run host_boot"
-sv bootcmd_mmc0 "setenv devnum 0\; run mmc_boot"
-sv bootcmd_pxe "run boot_net_usb_start\; dhcp\; if pxe get\; then pxe boot\; fi"
-sv bootm_size 0xa000000
-sv cpu armv7
-sv fdt_addr_r 0x02000000
-sv fdtfile "socfpga_cyclone5_${1}.dtb"
-sv host_boot "if host dev \$\{devnum\}\; then setenv devtype host\; run scan_dev_for_boot_part\; fi"
-sv kernel_addr_r 0x01000000
-sv loadaddr 0x01000000
-sv mmc_boot "if mmc dev \$\{devnum\}\; then setenv devtype mmc\; run scan_dev_for_boot_part\; fi"
-sv pxefile_addr_r x02200000
-sv ramdisk_addr_r 0x02300000
-sv scan_dev_for_boot "echo Scanning \$\{devtype\} \$\{devnum\}\:\$\{distro_bootpart\}\.\.\.\; for prefix in \$\{boot_prefixes\}\; do run scan_dev_for_extlinux\; run scan_dev_for_scripts\; done\;"
-sv scriptaddr 0x02100000
-sv soc socfpga
-sv usb_boot "usb start\; if usb dev \$\{devnum\}\; then setenv devtype usb\; run scan_dev_for_boot_part\; fi"
-sv vendor terasic
-
-# set hostname:
-sv hostname ${HOST_NAME}
-if [ "${DESKTOP}" == "yes" ]; then
-# load fpga:
-echo ""
-echo "NOTE:  Now setting uboot fpga load variables"
-sv axibridge ffd0501c
-sv axibridge_handoff 0x00000000
-sv bitimage /boot/DE1_SOC_Linux_FB.rbf
-sv boot_extlinux "run fpgaload\; run bridge_enable_handoff\; sysboot \$\{devtype\} \$\{devnum\}:\$\{distro_bootpart\} any \$\{scriptaddr\} \$\{prefix\}extlinux/extlinux.conf"
-sv bridge_enable_handoff "mw \$\{fpgaintf\} \$\{fpgaintf_handoff\}\; mw \$\{fpga2sdram\} \$\{fpga2sdram_handoff\}\; mw \$\{axibridge\} \$\{axibridge_handoff\}\; mw \$\{l3remap\} \$\{l3remap_handoff\}"
-sv fpga2sdram ffc25080
-sv fpga2sdram_apply 3ff795a4
-sv fpga2sdram_handoff 0x00000000
-sv fpgaintf ffd08028
-sv fpgaintf_handoff 0x00000000
-sv fpgaload "mmc rescan\; load mmc 0\:\$\{distro_bootpart\} \$\{loadaddr\} \$\{bitimage\}\; fpga load 0 \$\{loadaddr\} \$\{filesize\}"
-sv l3remap ff800000
-sv l3remap_handoff 0x00000019
-fi
-echo ""
-echo "NOTE:  u boot variables set OK"
-}
+# gen_uboot_env_vars(){
+# echo ""
+# echo "NOTE:  Now setting uboot variables"
+#
+# # --- default env ----
+# sv eth1addr
+# sv eth3addr
+# sv eth5addr
+# sv ethaddr
+# sv arch arm
+# sv board ${1}
+# sv board_name ${1}
+# sv boot_net_usb_start "usb start"
+# sv boot_targets "mmc0 pxe dhcp"
+# sv bootcmd "run distro_bootcmd"
+# sv bootcmd_dhcp "run boot_net_usb_start\; if dhcp \$\{scriptaddr\} \$\{boot_script_dhcp\}\; then source \$\{scriptaddr\}\; fi\;"
+# sv bootcmd_host0 "setenv devnum 0\; run host_boot"
+# sv bootcmd_mmc0 "setenv devnum 0\; run mmc_boot"
+# sv bootcmd_pxe "run boot_net_usb_start\; dhcp\; if pxe get\; then pxe boot\; fi"
+# sv bootm_size 0xa000000
+# sv cpu armv7
+# sv fdt_addr_r 0x02000000
+# sv fdtfile "socfpga_cyclone5_${1}.dtb"
+# sv host_boot "if host dev \$\{devnum\}\; then setenv devtype host\; run scan_dev_for_boot_part\; fi"
+# sv kernel_addr_r 0x01000000
+# sv loadaddr 0x01000000
+# sv mmc_boot "if mmc dev \$\{devnum\}\; then setenv devtype mmc\; run scan_dev_for_boot_part\; fi"
+# sv pxefile_addr_r x02200000
+# sv ramdisk_addr_r 0x02300000
+# sv scan_dev_for_boot "echo Scanning \$\{devtype\} \$\{devnum\}\:\$\{distro_bootpart\}\.\.\.\; for prefix in \$\{boot_prefixes\}\; do run scan_dev_for_extlinux\; run scan_dev_for_scripts\; done\;"
+# sv scriptaddr 0x02100000
+# sv soc socfpga
+# sv usb_boot "usb start\; if usb dev \$\{devnum\}\; then setenv devtype usb\; run scan_dev_for_boot_part\; fi"
+# sv vendor terasic
+#
+# # set hostname:
+# sv hostname ${HOST_NAME}
+# if [ "${DESKTOP}" == "yes" ]; then
+# # load fpga:
+# echo ""
+# echo "NOTE:  Now setting uboot fpga load variables"
+# sv axibridge ffd0501c
+# sv axibridge_handoff 0x00000000
+# sv bitimage /boot/DE1_SOC_Linux_FB.rbf
+# sv boot_extlinux "run fpgaload\; run bridge_enable_handoff\; sysboot \$\{devtype\} \$\{devnum\}:\$\{distro_bootpart\} any \$\{scriptaddr\} \$\{prefix\}extlinux/extlinux.conf"
+# sv bridge_enable_handoff "mw \$\{fpgaintf\} \$\{fpgaintf_handoff\}\; mw \$\{fpga2sdram\} \$\{fpga2sdram_handoff\}\; mw \$\{axibridge\} \$\{axibridge_handoff\}\; mw \$\{l3remap\} \$\{l3remap_handoff\}"
+# sv fpga2sdram ffc25080
+# sv fpga2sdram_apply 3ff795a4
+# sv fpga2sdram_handoff 0x00000000
+# sv fpgaintf ffd08028
+# sv fpgaintf_handoff 0x00000000
+# sv fpgaload "mmc rescan\; load mmc 0\:\$\{distro_bootpart\} \$\{loadaddr\} \$\{bitimage\}\; fpga load 0 \$\{loadaddr\} \$\{filesize\}"
+# sv l3remap ff800000
+# sv l3remap_handoff 0x00000019
+# fi
+# echo ""
+# echo "NOTE:  u boot variables set OK"
+# }
 
 # parameters: 1: local destination 2: rootfs mount, 3: board name
-set_fw_uboot_env(){
+set_fw_uboot_env_mnt(){
 echo ""
 echo "NOTE:  Will now generate ${2}/etc/fw_env.config"
 echo ""
@@ -1108,11 +1125,6 @@ cat <<EOT > ${CURRENT_DIR}/fw_env.config
 # MMC device name       Device offset   Env. size       Flash sector size       Number of sectors
 ${1}            0x4000          0x2000
 EOT
-
-# gen_uboot_env_vars "${3}"
-# sudo sh -c 'fw_printenv -c '${CURRENT_DIR}'/fw_env.config > '${2}'/boot/fw_env.txt'
-# echo ""
-# echo "NOTE: Saved uboot environment variables to /boot/fw_env.txt in sd image"
 
 }
 
@@ -1140,34 +1152,31 @@ make_bmap_image() {
     echo ""
 }
 
+## parameters: 1: dev mount name
 inst_qt_build_deps(){
 echo ""
 echo "Script_MSG: Installing Qt Build Deps"
 echo ""
 
-sudo cp -f ${ROOTFS_MNT}/etc/apt/sources.list-local ${ROOTFS_MNT}/etc/apt/sources.list
+sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
 
-sudo rm -f ${ROOTFS_MNT}/etc/resolv.conf
-sudo cp -f /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
+sudo rm -f ${1}/etc/resolv.conf
+sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
 
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' update'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install --reinstall libharfbuzz0b libc6 libc6-dev'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libpcre2-32-0 libpcre2-dev x11proto-core-dev libsm6 libsm-dev libgtk-3-common libgtk-3-0 libgtk-3-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' update'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install --reinstall libharfbuzz0b libc6 libc6-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libpcre2-32-0 libpcre2-dev x11proto-core-dev libsm6 libsm-dev libgtk-3-common libgtk-3-0 libgtk-3-dev'
 
 set +e
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y build-dep qt5-default'
-#sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install qtbase5-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y build-dep qt5-default'
+#sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install qtbase5-dev'
 
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install --reinstall "^libxcb.*" libxcb1-dev libx11-xcb-dev libxrender-dev libxi-dev libglu1-mesa-dev libinput10 libinput-pad1 libinput-dev libinput-pad-dev'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libharfbuzz-dev libxcb-xkb1 libxkbcommon-dev libxkbcommon-x11-0 libxkbcommon-x11-dev libxkbcommon0 libxkbfile-dev libxkbfile1 libasound2-dev libmtdev1 libmtdev-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install --reinstall "^libxcb.*" libxcb1-dev libx11-xcb-dev libxrender-dev libxi-dev libglu1-mesa-dev libinput10 libinput-pad1 libinput-dev libinput-pad-dev'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libharfbuzz-dev libxcb-xkb1 libxkbcommon-dev libxkbcommon-x11-0 libxkbcommon-x11-dev libxkbcommon0 libxkbfile-dev libxkbfile1 libasound2-dev libmtdev1 libmtdev-dev'
 #libgtk2.0-0 libgtk2.0-common libgtk2.0-dev libgtk-3-common libgtk-3-0 libgtk-3-dev libgdk-pixbuf2.0-dev libhunspell-1.3-0 libhunspell-dev hunspell-en-us libgl1-mesa-dev libglu1-mesa-dev
 #libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync0-dev libxcb-sync-dev libxcb-xfixes0-dev libxrender-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-glx0-dev libxcb-xinerama0-dev libfontconfig1 libevdev2 libevdev-dev libudev1 libudev-dev libfontconfig1-dev'
-
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libqwt-qt5-6 libqwt-qt5-dev'
-
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install cadence-data cadence-unity-support cadence-tools cadence caterina claudia catia'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libxcb1 libxcb1-dev libx11-xcb1 libx11-xcb-dev libxcb-keysyms1 libxcb-keysyms1-dev libxcb-image0 libxcb-image0-dev libxcb-shm0 libxcb-shm0-dev libxcb-icccm4 libxcb-icccm4-dev libxcb-sync1 libxcb-sync0-dev libxcb-sync-dev libxcb-xfixes0-dev libxrender-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0 libxcb-render-util0-dev libxcb-glx0-dev libxcb-xinerama0-dev libfontconfig1 libevdev2 libevdev-dev libudev1 libudev-dev libfontconfig1-dev'
 
 #libegl1-mesa-dev libgegl-dev
 
@@ -1176,10 +1185,35 @@ sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'$
 # echo ""
 cd ${CURRENT_DIR}
 
-sudo cp -f ${ROOTFS_MNT}/etc/apt/sources.list-final ${ROOTFS_MNT}/etc/apt/sources.list
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/rm -f /etc/resolv.conf
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
+sudo chroot --userspec=root:root ${1} /bin/rm -f /etc/resolv.conf
+sudo chroot --userspec=root:root ${1} /bin/ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 }
+
+
+## parameters: 1: dev mount name
+inst_cadence(){
+echo ""
+echo "Script_MSG: Installing Cadence"
+echo ""
+
+sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
+
+sudo rm -f ${1}/etc/resolv.conf
+sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
+
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' update'
+
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libqwt-qt5-6 libqwt-qt5-dev'
+
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install cadence-data cadence-tools cadence claudia catia'
+
+sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
+sudo chroot --userspec=root:root ${1} /bin/rm -f /etc/resolv.conf
+sudo chroot --userspec=root:root ${1} /bin/ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+}
+
+
 #
 # qt_build(){
 # echo ""
@@ -1371,42 +1405,42 @@ if [[ "${INSTALL_QT}" ==  "${OK}" ]]; then
 fi
 }
 
-configure_for_qt_qwt(){
-echo ""
-echo "Script_MSG: Setting up QWT"
-sudo cp -r ${QWT_PREFIX} ${QT_ROOTFS_MNT}/usr/local
-sudo sh -c 'echo "'${QWT_PREFIX}'/lib" > '${QT_ROOTFS_MNT}'/etc/ld.so.conf.d/qt.conf'
-
-sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/etc/profile'
-sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.bashrc'
-sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.profile'
-
-sudo chroot --userspec=root:root ${QT_ROOTFS_MNT} /sbin/ldconfig
-}
-
-# parameters: 1: plugin name
-build_qt_plugins(){
+# configure_for_qt_qwt(){
+# echo ""
+# echo "Script_MSG: Setting up QWT"
+# sudo cp -r ${QWT_PREFIX} ${QT_ROOTFS_MNT}/usr/local
+# sudo sh -c 'echo "'${QWT_PREFIX}'/lib" > '${QT_ROOTFS_MNT}'/etc/ld.so.conf.d/qt.conf'
 #
-BUILD_QWT="yes";
-
-CONFIGURE_FOR_QWT="yes";
-#CONFIGURE_FOR_QWT="no";
-QWT_PREFIX="/usr/local/qwt-6.3.0-svn"
-
-if [[ "${BUILD_QWT}" ==  "${OK}" ]]; then
-    export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/pkgconfig
-    export PKG_CONFIG_SYSROOT_DIR=${QT_ROOTFS_MNT}
-    export CROSS_COMPILE=${QT_CC}
-    sudo rm -Rf ${QWTDIR}/../build
-    mkdir -p ${QWTDIR}/../build
-    cd ${QWTDIR}/../build
-#    "/usr/local/lib/qt-${QT_VER}-altera-soc/bin/qmake ${QWTDIR}/qwt.pro" 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_qmake-log.txt
-#    qmake -makefile -qtconf /tmp/qmake.conf QMAKE_CC=arm-linux-gnueabihf-gcc QMAKE_CXX=arm-linux-gnueabihf-g++ QMAKE_LINK=arm-linux-gnueabihf-g++ ${QWTDIR}/qwt.pro 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
-    ${QT_ROOTFS_MNT}/${QT_PREFIX}/bin/qmake ${QWTDIR}/qwt.pro 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
-    make -j${NCORES} 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
-    sudo make install 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_install-log.txt
-fi
-if [[ "${CONFIGURE_FOR_QWT}" ==  "${OK}" ]]; then
-    configure_for_qt_qwt
-fi
-}
+# sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/etc/profile'
+# sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.bashrc'
+# sudo sh -c 'echo "\nexport LD_LIBRARY_PATH=$PATH:'${QWT_PREFIX}'/lib\n" >> '${QT_ROOTFS_MNT}'/.profile'
+#
+# sudo chroot --userspec=root:root ${QT_ROOTFS_MNT} /sbin/ldconfig
+# }
+#
+# # parameters: 1: plugin name
+# build_qt_plugins(){
+# #
+# BUILD_QWT="yes";
+#
+# CONFIGURE_FOR_QWT="yes";
+# #CONFIGURE_FOR_QWT="no";
+# QWT_PREFIX="/usr/local/qwt-6.3.0-svn"
+#
+# if [[ "${BUILD_QWT}" ==  "${OK}" ]]; then
+#     export PKG_CONFIG_PATH=${QT_ROOTFS_MNT}/usr/lib/linux-arm-gnueabihf/pkgconfig
+#     export PKG_CONFIG_SYSROOT_DIR=${QT_ROOTFS_MNT}
+#     export CROSS_COMPILE=${QT_CC}
+#     sudo rm -Rf ${QWTDIR}/../build
+#     mkdir -p ${QWTDIR}/../build
+#     cd ${QWTDIR}/../build
+# #    "/usr/local/lib/qt-${QT_VER}-altera-soc/bin/qmake ${QWTDIR}/qwt.pro" 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_qmake-log.txt
+# #    qmake -makefile -qtconf /tmp/qmake.conf QMAKE_CC=arm-linux-gnueabihf-gcc QMAKE_CXX=arm-linux-gnueabihf-g++ QMAKE_LINK=arm-linux-gnueabihf-g++ ${QWTDIR}/qwt.pro 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
+#     ${QT_ROOTFS_MNT}/${QT_PREFIX}/bin/qmake ${QWTDIR}/qwt.pro 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
+#     make -j${NCORES} 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_build-log.txt
+#     sudo make install 2>&1| tee ${CURRENT_DIR}/Qt_logs/qwt_install-log.txt
+# fi
+# if [[ "${CONFIGURE_FOR_QWT}" ==  "${OK}" ]]; then
+#     configure_for_qt_qwt
+# fi
+# }

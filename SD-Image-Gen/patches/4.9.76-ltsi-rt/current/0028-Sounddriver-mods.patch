@@ -1,7 +1,7 @@
-From fba445bb60eac29fa817cd8a292c893f0a1951d1 Mon Sep 17 00:00:00 2001
+From 4fd688767adf342824404065c23f9ed1d8bfc629 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 11 Jun 2018 16:18:22 +0200
-Subject: [PATCH 28/28] Sounddriver mods
+Subject: [PATCH 28/29] Sounddriver mods
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

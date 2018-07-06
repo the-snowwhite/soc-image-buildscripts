@@ -1,7 +1,7 @@
-From 1deab2089609954ff25735b2753e2d062df282fd Mon Sep 17 00:00:00 2001
+From 54920f739c5b63553631c7a8fe6f589310e563f8 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 18:13:46 +0200
-Subject: [PATCH 26/28] Usb core fixes
+Subject: [PATCH 26/29] Usb core fixes
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
