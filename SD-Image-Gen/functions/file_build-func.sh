@@ -43,6 +43,15 @@ install_crossbuild_armhf() {
     sudo apt -y install --reinstall lib32stdc++6 gcc-arm-linux-gnueabihf
 }
 
+install_crossbuild_arm64() {
+# install deps for u-boot build
+    sudo apt -y build-dep linux
+    sudo apt -y install
+    sudo dpkg --add-architecture arm64
+    sudo apt -y install --no-install-recommends build-essential crossbuild-essential-arm64
+    sudo apt -y install --reinstall libstdc++6-arm64-cross gcc-5-aarch64-linux-gnu-base gcc-5-aarch64-linux-gnu
+}
+
 install_uboot_dep() {
 # install deps for u-boot build
     sudo ${apt_cmd} -y install lib32z1 device-tree-compiler bc u-boot-tools
@@ -73,7 +82,7 @@ echo "Kernel Custom Patch added"
 #cd ${RT_KERNEL_BUILD_DIR}
 #Uio Config additions:
 if [ "${KERNEL_PKG_VERSION}" == "0.1" ]; then
-cat <<EOT >> ${RT_KERNEL_BUILD_DIR}/arch/arm/configs/${KERNEL_CONF}
+cat <<EOT >> ${RT_KERNEL_BUILD_DIR}/arch/arm/configs/${ALT_KERNEL_CONF}
 CONFIG_LBDAF=y
 CONFIG_DEBUG_INFO=n
 CONFIG_FPGA_REGION=y
@@ -302,7 +311,7 @@ CONFIG_RD_LZO=y
 CONFIG_RD_LZ4=y
 EOT
 else
-cat <<EOT >> ${RT_KERNEL_BUILD_DIR}/arch/arm/configs/${KERNEL_CONF}
+cat <<EOT >> ${RT_KERNEL_BUILD_DIR}/arch/arm/configs/${ALT_KERNEL_CONF}
 CONFIG_LBDAF=y
 CONFIG_DEBUG_INFO=n
 CONFIG_FPGA_REGION=y
@@ -608,7 +617,7 @@ armhf_build() {
     cd ${1}
     ## configure - compile
     export ARCH=arm
-    export PATH=$CC_DIR/bin/:$PATH
+#    export PATH=$CC_DIR/bin/:$PATH
     export CROSS_COMPILE=$CC
 
     echo "MSG: configuring ${1}"
@@ -628,6 +637,35 @@ armhf_build() {
         fi
     else
         make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION=2 deb-pkg
+    fi
+}
+
+## parameters: 1: folder name, 2: config string 3: build string 4: env_tools
+arm64_build() {
+#    set -x
+    cd ${1}
+    ## configure - compile
+    export ARCH=arm64
+#    export PATH=$CC_DIR/bin/:$PATH
+    export CROSS_COMPILE=$CC_64
+
+    echo "MSG: configuring ${1}"
+    echo "MSG: as ${2}"
+    make -j${NCORES} mrproper
+    if [ ! -z "${3}" ]; then
+        echo "MSG: compiling ${1}"
+        if [ "${3}" == "deb-pkg" ]; then
+            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="${GIT_KERNEL_VERSION}" deb-pkg
+        else
+            make -j${NCORES} "${2}"
+            echo "MSG: building ${1}"
+            make -j$NCORES "${3}"
+            if [ ! -z "${4}" ]; then
+                make CROSS_COMPILE=$CC_64 -j$NCORES "${4}"
+            fi
+        fi
+    else
+        make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION=2 deb-pkg
     fi
 }
 

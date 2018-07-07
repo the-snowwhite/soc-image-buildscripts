@@ -58,7 +58,7 @@ mkfs_options=""
 
 
 ## Select board
-BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit")
+BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit" "ultra96")
 #BOARD=de10_nano
 #BOARD=de0_nano_soc
 #BOARD=de1_soc
@@ -67,10 +67,13 @@ BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit")
 ## Select u-boot version:
 #UBOOT_VERSION="v2016.09"
 UBOOT_VERSION="v2018.01"
-#UBOOT_VERSION="v2018.03"
+#XIL_UBOOT_VERSION="v2018.07"
+#XIL_UBOOT_VERSION="v2018.07-rc3"
+XIL_UBOOT_VERSION="xilinx-v2018.2"
 #UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
-UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"
+="u-boot-with-spl.sfp"
+XIL_UBOOT_IMG_FILENAME="u-boot"
 
 ## Select user name / function
 USERS=("machinekit" "holosynth" "ubuntu")
@@ -81,18 +84,22 @@ USERS=("machinekit" "holosynth" "ubuntu")
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
 
-GIT_KERNEL_VERSION="4.9.76"
-GIT_KERNEL_REV="-ltsi-rt"
-#GIT_KERNEL_VERSION="4.15"
-#GIT_KERNEL_REV=""
+ALT_GIT_KERNEL_VERSION="4.9.76"
+ALT_GIT_KERNEL_REV="-ltsi-rt"
+XIL_GIT_KERNEL_VERSION="xilinx"
+XIL_GIT_KERNEL_REV="-v2018.2"
+#ALT_GIT_KERNEL_VERSION="4.15"
+#ALT_GIT_KERNEL_REV=""
 
-SD_KERNEL_VERSION=${GIT_KERNEL_VERSION}
+SD_KERNEL_VERSION=${ALT_GIT_KERNEL_VERSION}
 #SD_KERNEL_VERSION=${RT_KERNEL_VERSION}
 
 #RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
 #RT_PATCH_REV="ltsi-rt23"
-KERNEL_CONF="socfpga_defconfig"
-ALT_GIT_KERNEL_VERSION="${GIT_KERNEL_VERSION}${GIT_KERNEL_REV}"
+ALT_KERNEL_CONF="socfpga_defconfig"
+XIL_KERNEL_CONF="xilinx_zynqmp_defconfig"
+ALT_GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}${ALT_GIT_KERNEL_REV}"
+XIL_GIT_KERNEL_TAG="${XIL_GIT_KERNEL_VERSION}${XIL_GIT_KERNEL_REV}"
 
 QT_VER=5.7.1
 QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
@@ -134,23 +141,24 @@ DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev"
 
 ## ----------------------------  Toolchain   -----------------------------##
 CROSS_GNU_ARCH="arm-linux-gnueabihf"
+CROSS_GNU_ARCH_64="aarch64-linux-gnu"
 
 #GCC v6
 #http://releases.linaro.org/components/toolchain/binaries/6.3-2017.05/arm-linux-gnueabihf/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf.tar.xz
-GCC_REL="6.3"
-GCC_VER="1"
-GCC_REV="2017.05"
-PCH63_CC_FOLDER_NAME="gcc-linaro-${GCC_REL}.${GCC_VER}-${GCC_REV}-x86_64_${CROSS_GNU_ARCH}"
-PCH63_CC_FILE="${PCH63_CC_FOLDER_NAME}.tar.xz"
-PCH63_CC_URL="http://releases.linaro.org/components/toolchain/binaries/${GCC_REL}-${GCC_REV}/${CROSS_GNU_ARCH}/${PCH63_CC_FILE}"
+#GCC_REL="6.3"
+#GCC_VER="1"
+#GCC_REV="2017.05"
+#PCH63_CC_FOLDER_NAME="gcc-linaro-${GCC_REL}.${GCC_VER}-${GCC_REV}-x86_64_${CROSS_GNU_ARCH}"
+#PCH63_CC_FILE="${PCH63_CC_FOLDER_NAME}.tar.xz"
+#PCH63_CC_URL="http://releases.linaro.org/components/toolchain/binaries/${GCC_REL}-${GCC_REV}/${CROSS_GNU_ARCH}/${PCH63_CC_FILE}"
 
 
 #GCC v5
-PCH52_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_${CROSS_GNU_ARCH}"
-PCH52_CC_FILE="${PCH52_CC_FOLDER_NAME}.tar.xz"
-PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/${CROSS_GNU_ARCH}/${PCH52_CC_FILE}"
+#PCH52_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_${CROSS_GNU_ARCH}"
+#PCH52_CC_FILE="${PCH52_CC_FOLDER_NAME}.tar.xz"
+#PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/${CROSS_GNU_ARCH}/${PCH52_CC_FILE}"
 
-TOOLCHAIN_DIR=${HOME}/bin
+#TOOLCHAIN_DIR=${HOME}/bin
 
 QT_CFLAGS="-march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard"
 
@@ -167,9 +175,8 @@ QT_CC="/usr/bin/${CROSS_GNU_ARCH}-"
 
 RT_KERNEL_TAG="${RT_KERNEL_VERSION}-${RT_PATCH_REV}"
 RT_KERNEL_LOCALVERSION="socfpga-${RT_KERNEL_TAG}"
-GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}"
-GIT_KERNEL_LOCALVERSION="socfpga-${GIT_KERNEL_TAG}"
-#SD_KERNEL_TAG="socfpga${GIT_KERNEL_REV}"
+#GIT_KERNEL_LOCALVERSION="socfpga-${ALT_GIT_KERNEL_TAG}"
+#SD_KERNEL_TAG="socfpga${ALT_GIT_KERNEL_REV}"
 SD_KERNEL_TAG="socfpga-rt-ltsi"
 
 RT_KERNEL_FOLDER="linux-${RT_KERNEL_VERSION}"
@@ -179,24 +186,32 @@ RT_PATCH_FILE="patch-${RT_KERNEL_TAG}.patch.xz"
 RT_PATCH_URL="https://cdn.kernel.org/pub/linux/kernel/projects/rt/4.9/${RT_PATCH_FILE}"
 
 
-GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${ALT_GIT_KERNEL_VERSION}-gnueabifh-kernel"
+ALT_GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${ALT_GIT_KERNEL_TAG}-gnueabifh-kernel"
+XIL_GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${XIL_GIT_KERNEL_TAG}-gnueabifh-kernel"
+
 RT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${RT_KERNEL_VERSION}-gnueabifh-kernel"
 RT_KERNEL_BUILD_DIR="${RT_KERNEL_PARENT_DIR}/${RT_KERNEL_FOLDER}"
-GIT_KERNEL_BUILD_DIR="${GIT_KERNEL_PARENT_DIR}/linux"
+ALT_GIT_KERNEL_BUILD_DIR="${ALT_GIT_KERNEL_PARENT_DIR}/linux"
+XIL_GIT_KERNEL_BUILD_DIR="${XIL_GIT_KERNEL_PARENT_DIR}/linux"
 SD_KERNEL_PARANT_DIR="${CURRENT_DIR}/arm-linux-${SD_KERNEL_VERSION}-gnueabifh-kernel"
 
 #ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
 ALT_GIT_KERNEL_URL="https://github.com/the-snowwhite/linux-socfpga.git"
-ALT_GIT_KERNEL_BRANCH="socfpga-${GIT_KERNEL_TAG}"
+XIL_GIT_KERNEL_URL="https://github.com/the-snowwhite/linux-xlnx.git"
+ALT_GIT_KERNEL_BRANCH="socfpga-${ALT_GIT_KERNEL_TAG}"
 ALT_GIT_KERNEL_PATCH_FILE="${ALT_GIT_KERNEL_BRANCH}-changeset.patch"
+#XIL_GIT_KERNEL_PATCH_FILE="${ALT_GIT_KERNEL_BRANCH}-changeset.patch"
+XIL_GIT_KERNEL_PATCH_FILE=""
 GIT_KERNEL_DIR=linux
 
 # ------------------------------  Uboot  --------------------------------##
 
 UBOOT_GIT_URL="git://git.denx.de/u-boot.git"
+XIL_UBOOT_GIT_URL="https://github.com/Xilinx/u-boot-xlnx.git"
 UBOOT_DIR=uboot
 UBOOT_PARENT_DIR="${CURRENT_DIR}/${UBOOT_DIR}"
 UBOOT_BUILD_DIR="$UBOOT_PARENT_DIR/${UBOOT_VERSION}"
+XIL_UBOOT_BUILD_DIR="$UBOOT_PARENT_DIR/${XIL_UBOOT_VERSION}"
 UBOOT_CHKOUT_OPTIONS='-b tmp'
 #UBOOT_CHKOUT_OPTIONS=""
 
@@ -204,7 +219,7 @@ HOLOSYNTH_QUAR_PROJ_FOLDER='/home/mib/Developer/the-snowwhite_git/HolosynthV/Qua
 
 #-----  select global toolchain  ------#
 
-CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
+#CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
 #CC_URL=${PCH63_CC_URL}
 
 #------------------------------------------------------------------------------------------------------
@@ -212,17 +227,17 @@ CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
 #------------------------------------------------------------------------------------------------------
 
 #------------  Toolchain  -------------#
-CC_DIR="${TOOLCHAIN_DIR}/${CC_FOLDER_NAME}"
+#CC_DIR="${TOOLCHAIN_DIR}/${CC_FOLDER_NAME}"
 #CC_FILE="${CC_FOLDER_NAME}.tar.xz"
-CC="${CC_DIR}/bin/${CROSS_GNU_ARCH}-"
-#CC="/usr/bin/${CROSS_GNU_ARCH}-"
+#CC="${CC_DIR}/bin/${CROSS_GNU_ARCH}-"
+CC="${CROSS_GNU_ARCH}-"
+CC_64="${CROSS_GNU_ARCH_64}-"
 
 NCORES=`nproc`
 
 #--------------  Kernel  --------------#
 
-KERNEL_PRE_CONFIGSTRING="${KERNEL_CONF}"
-#GIT_KERNEL_PRE_CONFIGSTRING=" NAME=\"Michael Brown\" EMAIL=\"producer@holotronic.dk\" KBUILD_DEBARCH=armhf LOCALVERSION=-${GIT_KERNEL_LOCALVERSION} KDEB_PKGVERSION=${ALT_GIT_KERNEL_VERSION}-${KERNEL_PKG_VERSION}"
+KERNEL_PRE_CONFIGSTRING="${ALT_KERNEL_CONF}"
 
 POLICY_FILE=${1}/usr/sbin/policy-rc.d
 
@@ -281,6 +296,7 @@ install_deps() {
 #         echo ""
 #     fi
     install_crossbuild_armhf
+    install_crossbuild_arm64
     install_uboot_dep
     install_kernel_dep
     sudo ${apt_cmd} install kpartx
@@ -293,12 +309,21 @@ build_uboot() {
     contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
-        # patches:
-#        UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-${1}-changeset.patch"
-        UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-de0-de10_nano-de1_soc-changeset.patch"
-        git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
-        UBOOT_BOARD_CONFIG="socfpga_${1}_defconfig"
-        armhf_build ${UBOOT_BUILD_DIR} "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}" "envtools"
+        if [ "${1}" == "ultra96" ]; then
+#            XIL_UBOOT_PATCH_FILE="u-boot-${XIL_UBOOT_VERSION}-ultra96-changeset.patch"
+            XIL_UBOOT_PATCH_FILE=""
+#            git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}        
+            git_fetch ${UBOOT_PARENT_DIR} ${XIL_UBOOT_GIT_URL} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_PATCH_FILE}        
+            UBOOT_BOARD_CONFIG="xilinx_zynqmp_zcu100_revC_defconfig"
+            arm64_build  "$UBOOT_PARENT_DIR/${XIL_UBOOT_VERSION}" "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}" "envtools"
+        else
+            # patches:
+    #        UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-${1}-changeset.patch"
+            UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-de0-de10_nano-de1_soc-changeset.patch"
+            git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
+            UBOOT_BOARD_CONFIG="socfpga_${1}_defconfig"
+            armhf_build "$UBOOT_PARENT_DIR/${UBOOT_VERSION}" "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}" "envtools"
+        fi
     elif [ "${1}" == "c" ]; then
         git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
     else
@@ -310,29 +335,30 @@ build_uboot() {
 }
 
 build_git_kernel() {
-    contains ${USERS[@]} ${1}
+    contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
-        echo "Valid username = ${1} given"
-        if [ "${1}" == "machinekit" ]; then
+        echo "Valid boardname = ${1} given"
+        if [ "${1}" == "ultra96" ]; then
             KERNEL_PKG_VERSION="0.1"
-        elif [ "${1}" == "holosynth" ]; then
-            KERNEL_PKG_VERSION="1.1"
+            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR} ${XIL_GIT_KERNEL_PATCH_FILE}
+            arm64_build "${XIL_GIT_KERNEL_BUILD_DIR}" ${XIL_KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/xil_git_kernel_deb_rt-log.txt
         else
-            KERNEL_PKG_VERSION="0.01"
+            KERNEL_PKG_VERSION="1.0"
+            git_fetch ${ALT_GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${ALT_GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
+            armhf_build "${ALT_GIT_KERNEL_BUILD_DIR}" ${ALT_KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/alt_git_kernel_deb_rt-log.txt
         fi
-        git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
-        armhf_build "${GIT_KERNEL_BUILD_DIR}" ${KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/git_kernel_deb_rt-log.txt
+        
     else
         if [ "${1}" != "c" ]; then
             echo "--build_git_kernel bad argument --> ${1}"
-            echo "Use =username or =c --> configure and patch only"
-            echo "Valid usernames are:"
-            echo " ${USERS[@]}"
+            echo "Use =boardname or =c --> configure and patch only"
+            echo "Valid boardnames are:"
+            echo " ${BOARDS[@]}"
         else
             echo ""
             echo "MSG: kernel configure and patching only"
             echo ""
-            git_fetch ${GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
+            git_fetch ${ALT_GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${ALT_GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
             echo "MSG: kernel configure and patch finish"
             echo ""
         fi
@@ -509,12 +535,16 @@ assemble_full_sd_img() {
                 echo "step 1 create ${SD_IMG_FILE}"
                 create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
                 echo "step 2 mount:"
-                mount_sd_imagefile ${SD_IMG_FILE} ${1} ${media_rootfs_partition}
-                extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
-                set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
-                unmount_binded ${1}
-                unmount_loopdev
-                install_uboot ${UBOOT_BUILD_DIR} ${UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
+#                mount_sd_imagefile ${SD_IMG_FILE} ${1} ${media_rootfs_partition}
+#                extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
+#                set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
+#                unmount_binded ${1}
+#                unmount_loopdev
+                if [ "${3}" == "ultra96" ]; then
+                    install_uboot ${XIL_UBOOT_BUILD_DIR} ${XIL_UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
+                else
+                    install_uboot ${UBOOT_BUILD_DIR} ${UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
+                fi
                 make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
             else
                 echo "--assemble_full_sd_img= bad argument --> ${5}"
@@ -576,8 +606,8 @@ while [ "$1" != "" ]; do
 #             build_rt_ltsi_kernel ${VALUE}
 #            ;;
         --gitkernel2repo)
-            add2repo ${VALUE} ${GIT_KERNEL_PARENT_DIR} "linux-"
-#            add2repo ${distro} ${GIT_KERNEL_PARENT_DIR} ${GIT_KERNEL_TAG}
+            add2repo ${VALUE} ${ALT_GIT_KERNEL_PARENT_DIR} "linux-"
+#            add2repo ${distro} ${ALT_GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_TAG}
             ;;
 #        --rtkernel2repo)
 #            add2repo ${distro} ${RT_KERNEL_PARENT_DIR} ${RT_KERNEL_TAG}
