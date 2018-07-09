@@ -868,7 +868,7 @@ n
 p
 1
 
-+1M
++1G
 t
 a2
 n
@@ -945,8 +945,14 @@ elif [ "${1}" = "2" ] || [ "${1}" = "3" ]; then
     echo "SubScript_MSG: creating file systems"
     echo ""
 
-    mkfs_partition="${LOOP_DEV}${media_rootfs_partition}"
-    sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
+    if [ "${1}" = "2" ]; then
+        sudo sh -c "LC_ALL=C mkfs -t vfat -n boot ${LOOP_DEV}p1"
+        mkfs_partition="${LOOP_DEV}p2"
+        sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
+    elif [ "${1}" = "3" ]; then
+        mkfs_partition="${LOOP_DEV}${4}"
+        sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
+    fi
 
     if [ "${1}" = "3" ]; then
         sudo mkswap -f ${LOOP_DEV}${media_swap_partition}

@@ -72,7 +72,6 @@ UBOOT_VERSION="v2018.01"
 XIL_UBOOT_VERSION="xilinx-v2018.2"
 #UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
-="u-boot-with-spl.sfp"
 XIL_UBOOT_IMG_FILENAME="u-boot"
 
 ## Select user name / function
@@ -533,7 +532,25 @@ assemble_full_sd_img() {
                 SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
 
                 echo "step 1 create ${SD_IMG_FILE}"
-                create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
+                if [ "${3}" == "ultra96" ]; then
+                    create_img "2" "${SD_IMG_FILE}" "${1}" "p2"
+                    mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
+                    echo "Copying files to boot partition"
+                    sudo cp /home/mib/xilproj/xilinx-ultra96-reva-2018.2/images/linux/BOOT.BIN ${1}
+                    sudo cp /home/mib/xilproj/xilinx-ultra96-reva-2018.2/images/linux/image.ub ${1}
+#                    sudo dd if=/home/mib/xilproj/xilinx-ultra96-reva-2018.2/images/linux/rootfs.ext4 of="${LOOP_DEV}p2"
+                    echo "Unmounting boot partition"
+                    unmount_binded ${1}
+                    unmount_loopdev
+                    echo "mounting rootfs partition"
+                    mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
+                    echo "Extracting to rootfs partition"
+                    sudo tar xfjS /home/mib/xilproj/xilinx-ultra96-reva-2018.2/images/linux/rootfs.tar.bz2 -C ${1}
+                    unmount_binded ${1}
+                    unmount_loopdev
+                else
+                    create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
+                fi
                 echo "step 2 mount:"
 #                mount_sd_imagefile ${SD_IMG_FILE} ${1} ${media_rootfs_partition}
 #                extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
@@ -541,7 +558,8 @@ assemble_full_sd_img() {
 #                unmount_binded ${1}
 #                unmount_loopdev
                 if [ "${3}" == "ultra96" ]; then
-                    install_uboot ${XIL_UBOOT_BUILD_DIR} ${XIL_UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
+                    echo "No dd uboot install"
+#                    install_uboot ${XIL_UBOOT_BUILD_DIR} ${XIL_UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
                 else
                     install_uboot ${UBOOT_BUILD_DIR} ${UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
                 fi
