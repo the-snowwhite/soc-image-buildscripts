@@ -65,10 +65,7 @@ mkfs_options=""
 
 ## Select board
 BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit" "ultra96")
-#BOARD=de10_nano
-#BOARD=de0_nano_soc
-#BOARD=de1_soc
-#BOARD=sockit
+DIST_ARCHS=("armhf" "arm64")
 
 ## Select u-boot version:
 #UBOOT_VERSION="v2016.09"
@@ -389,49 +386,60 @@ build_git_kernel() {
 #     fi
 # }
 
-## parameters: 1: mount dev name, 2: image name, 3: distro name
+## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
 gen_rootfs_image() {
     zero=0;
     contains ${DISTROS[@]} ${3}
     if [ "$?" -eq 0 ]; then
         echo "Valid distroname = ${3} given"
-        create_img "1" ${2}
-        mount_imagefile ${2} ${1}
-        . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
-        echo ""
-        if [ "${DESKTOP}" == "yes" ]; then
-            if [ "${3}" == "bionic" ]; then
-                run_qemu_debootstrap_bionic ${1} ${3} ${ROOT_REPO_URL}
-                echo "Script_MSG: run_qemu_debootstrap_bionic function return value was --> ${output}"
-            else
-                run_desktop_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-                echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) function return value was --> ${output}"
-            fi
-        else
-            run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL}
-            echo "Script_MSG: run_qemu_debootstrap (${3}) function return value was --> ${output}"
-        fi
-        echo ""
-        if [[ $output -gt $zero ]]; then
-            echo "Script_MSG: debootstrap failed"
-            unmount_binded ${1}
-            exit 1
-        else
+        contains ${DIST_ARCHS[@]} ${4}
+        if [ "$?" -eq 0 ]; then
+            echo "Valid distarch = ${4} given"
+            create_img "1" ${2}
+            mount_imagefile ${2} ${1}
+            . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
+            echo ""
             if [ "${DESKTOP}" == "yes" ]; then
-                compress_rootfs ${CURRENT_DIR} ${1} "qemu_debootstrap-only-desktop" ${3}
+                if [ "${3}" == "bionic" ]; then
+                    run_qemu_debootstrap_bionic ${1} ${3} ${ROOT_REPO_URL} ${4}
+                    echo "Script_MSG: run_qemu_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
+                else
+                    run_desktop_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL} ${4}
+                    echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                fi
             else
-                compress_rootfs ${CURRENT_DIR} ${1} "qemu_debootstrap-only" ${3}
+                run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL} ${4}
+                echo "Script_MSG: run_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
             fi
-            echo "Script_MSG: finished qemu_debootstrap-only with success ... !"
-            unmount_binded ${1}
-            cp ${2} "${2}-base-qemu"
-            echo "Script_MSG: copied ${2} to --> ${2}-base-qemu as a backup"
+            echo ""
+            if [[ $output -gt $zero ]]; then
+                echo "Script_MSG: debootstrap failed"
+                unmount_binded ${1}
+                exit 1
+            else
+                if [ "${DESKTOP}" == "yes" ]; then
+                    compress_rootfs ${CURRENT_DIR} ${1} "qemu_debootstrap-only-desktop" ${3}
+                else
+                    compress_rootfs ${CURRENT_DIR} ${1} "qemu_debootstrap-only" ${3}
+                fi
+                echo "Script_MSG: finished qemu_debootstrap-only with success ... !"
+                unmount_binded ${1}
+                cp ${2} "${2}-base-qemu"
+                echo "Script_MSG: copied ${2} to --> ${2}-base-qemu as a backup"
+            fi
+        else
+            echo "--gen_rootfs_image= bad argument --> ${4}"
+            echo "Use =distroname=distarch"
+            echo "Valid distarchss are:"
+            echo " ${DIST_ARCHS[@]}"
         fi
     else
         echo "--gen_rootfs_image= bad argument --> ${3}"
         echo "Use =distroname"
         echo "Valid distrosnames are:"
         echo " ${DISTROS[@]}"
+        echo "Valid distarchss are:"
+        echo " ${DIST_ARCHS[@]}"
     fi
 }
 
@@ -631,21 +639,24 @@ while [ "$1" != "" ]; do
 #             build_rt_ltsi_kernel ${VALUE}
 #            ;;
         --gitkernel2repo)
-            add2repo ${VALUE} ${ALT_GIT_KERNEL_PARENT_DIR} "linux-"
-#            add2repo ${distro} ${ALT_GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_TAG}
+            if [ "${VALUE1}" = "arm64" ]; then
+                add2repo ${VALUE} ${XIL_GIT_KERNEL_PARENT_DIR} ${VALUE1} "linux-"
+            else
+                add2repo ${VALUE} ${ALT_GIT_KERNEL_PARENT_DIR} ${VALUE1} "linux-"
+            fi
             ;;
 #        --rtkernel2repo)
 #            add2repo ${distro} ${RT_KERNEL_PARENT_DIR} ${RT_KERNEL_TAG}
 #            add2repo "stretch" ${RT_KERNEL_PARENT_DIR} "${RT_KERNEL_TAG}-socfpga-${KERNEL_PKG_VERSION}|linux-libc-dev"
 #            ;;
         --mk2repo)
-            add2repo ${VALUE} "/home/mib/Development/Docker" "machinekit"
+            add2repo ${VALUE} "/home/mib/Development/Docker" ${VALUE1} "machinekit"
             ;;
         --cadence2repo)
-            add2repo ${VALUE} "/home/mib/Development/deb_comp/Cadence" "cadence|claudia|catia|catarina"
+            add2repo ${VALUE} "/home/mib/Development/deb_comp/Cadence" ${VALUE1} "cadence|claudia|catia|catarina"
             ;;
         --carla2repo)
-            add2repo ${VALUE} "/home/mib/Development/Deb-Pkg/carla_debs" "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler|carla"
+            add2repo ${VALUE} "/home/mib/Development/Deb-Pkg/carla_debs" ${VALUE1} "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler|carla"
             ;;
         --gen-base-qemu-rootfs)
             gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/${ROOTFS_IMG}" ${VALUE} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt

@@ -669,85 +669,96 @@ arm64_build() {
     fi
 }
 
-## parameters: 1: distro name, 2: dir, 3: file filter
+## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
 add2repo(){
 #sudo systemctl stop apache2
     contains ${DISTROS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid distroname = ${1} given"
+        contains ${DIST_ARCHS[@]} ${3}
+        if [ "$?" -eq 0 ]; then
+            echo "Valid distarch = ${3} given"
 
-        echo ""
-        echo "Script_MSG: Repo content before -->"
-        echo ""
-        LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} --list-format='''${package}\n''' list ${1} | { grep -E "${3}" || true; }`
-        echo "Got list1"
-        REPO_LIST1=$"${LIST1}"
-
-        echo "REPO_LIST1"
-
-        echo "${REPO_LIST1}"
-        echo "Script_MSG: Contents of REPO_LIST1 -->"
-        echo "${REPO_LIST1}"
-
-        echo ""
-
-        if [ ! -z "${REPO_LIST1}" ]; then
             echo ""
-            echo "Script_MSG: Will remove former version from repo"
+            echo "Script_MSG: Repo content before -->"
             echo ""
-            reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} remove ${1} ${REPO_LIST1}
-            reprepro -b ${HOME_REPO_DIR} export ${1}
-            echo "Script_MSG: Restarting web server"
+            LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A ${3} --list-format='''${package}\n''' list ${1} | { grep -E "${4}" || true; }`
+            echo "Got list1"
+            REPO_LIST1=$"${LIST1}"
 
-            sudo systemctl restart apache2
+            echo "REPO_LIST1"
+
+            echo "${REPO_LIST1}"
+            echo "Script_MSG: Contents of REPO_LIST1 -->"
+            echo "${REPO_LIST1}"
+
+            echo ""
+
+            if [ ! -z "${REPO_LIST1}" ]; then
+                echo ""
+                echo "Script_MSG: Will remove former version from repo"
+                echo ""
+                reprepro -b ${HOME_REPO_DIR} -C main -A ${3} remove ${1} ${REPO_LIST1}
+                reprepro -b ${HOME_REPO_DIR} export ${1}
+                echo "Script_MSG: Restarting web server"
+
+                sudo systemctl restart apache2
+                reprepro -b ${HOME_REPO_DIR} export ${1}
+            else
+                echo ""
+                echo "Script_MSG: Former version not found"
+                echo ""
+            fi
+            echo ""
+
+            #
+            # if [[ "${CLEAN_KERNELREPO}" ==  "${OK}" ]]; then
+            # CLEAN_ALL_LIST=`reprepro -b ${HOME_REPO_DIR} -C main -A ${3} --list-format='''${package}\n''' list ${1}`
+            #
+            # JESSIE_CLEAN_ALL_LIST=$"${CLEAN_ALL_LIST}"
+            #
+            # 	if [ ! -z "${JESSIE_CLEAN_ALL_LIST}" ]; then
+            # 		echo ""
+            # 		echo "Script_MSG: Will clean repo"
+            # 		echo ""
+            # 		reprepro -b ${HOME_REPO_DIR} -C main -A ${3} remove ${1} ${JESSIE_CLEAN_ALL_LIST}
+            #                 reprepro -b ${HOME_REPO_DIR} export ${1}
+            #                 echo "Script_MSG: Restarting web server"
+            #                 sudo systemctl restart apache2
+            # 	else
+            # 		echo ""
+            # 		echo "Script_MSG: Repo is empty"
+            # 		echo ""
+            # 	fi
+            # 	echo ""
+            # fi
+            #
+            reprepro -b ${HOME_REPO_DIR} -C main -A ${3} includedeb ${1} ${2}/*.deb
             reprepro -b ${HOME_REPO_DIR} export ${1}
+            reprepro -b ${HOME_REPO_DIR} list ${1}
+
+            LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A ${4} --list-format='''${package}\n''' list ${1}`
+            REPO_LIST2=$"${LIST2}"
+            echo  "${REPO_LIST2}"
+            echo ""
+            echo "Script_MSG: Repo content After: -->"
+            echo ""
+            echo  "${REPO_LIST2}"
+            echo ""
+            echo "#--->       Repo updated                                                  <---#"
         else
-            echo ""
-            echo "Script_MSG: Former version not found"
-            echo ""
+            echo "--xxx2repo bad argument --> ${4}"
+            echo "Use =distroname=distarch"
+            echo "Valid distarchss are:"
+            echo " ${DIST_ARCHS[@]}"
         fi
-        echo ""
-
-        #
-        # if [[ "${CLEAN_KERNELREPO}" ==  "${OK}" ]]; then
-        # CLEAN_ALL_LIST=`reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} --list-format='''${package}\n''' list ${1}`
-        #
-        # JESSIE_CLEAN_ALL_LIST=$"${CLEAN_ALL_LIST}"
-        #
-        # 	if [ ! -z "${JESSIE_CLEAN_ALL_LIST}" ]; then
-        # 		echo ""
-        # 		echo "Script_MSG: Will clean repo"
-        # 		echo ""
-        # 		reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} remove ${1} ${JESSIE_CLEAN_ALL_LIST}
-        #                 reprepro -b ${HOME_REPO_DIR} export ${1}
-        #                 echo "Script_MSG: Restarting web server"
-        #                 sudo systemctl restart apache2
-        # 	else
-        # 		echo ""
-        # 		echo "Script_MSG: Repo is empty"
-        # 		echo ""
-        # 	fi
-        # 	echo ""
-        # fi
-        #
-        reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} includedeb ${1} ${2}/*.deb
-        reprepro -b ${HOME_REPO_DIR} export ${1}
-        reprepro -b ${HOME_REPO_DIR} list ${1}
-
-        LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} --list-format='''${package}\n''' list ${1}`
-        REPO_LIST2=$"${LIST2}"
-        echo  "${REPO_LIST2}"
-        echo ""
-        echo "Script_MSG: Repo content After: -->"
-        echo ""
-        echo  "${REPO_LIST2}"
-        echo ""
-        echo "#--->       Repo updated                                                  <---#"
     else
         echo "--xxx2repo bad argument --> ${1}"
-        echo "Use =distroname"
+        echo "Use =distroname=distarch"
         echo "Valid distrosnames are:"
         echo " ${DISTROS[@]}"
+        echo "Valid distarchss are:"
+        echo " ${DIST_ARCHS[@]}"
     fi
 }
 
