@@ -29,6 +29,10 @@ DISTROS=("stretch" "buster" "bionic")
 ### Ubuntu based:
 #distro=bionic
 #distro=xenial
+
+#DIST_ARCH=armhf
+DIST_ARCH=arm64
+
 #HOME_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
 HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
 
@@ -37,11 +41,13 @@ shell_cmd="/bin/bash"
 
 #ROOT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
 #ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
-ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
+#ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
+ROOT_REPO_URL="http://deb.debian.org//debian/"
 #final_repo="http://ftp.dk.debian.org/debian/"
 final_repo="http://deb.debian.org//debian/"
-local_repo=${HOME_MIRR_REPO_URL}
-local_ws=kdeneon-ws
+#local_repo=${HOME_MIRR_REPO_URL}
+local_repo="http://deb.debian.org//debian/"
+local_ws=neon-ws
 local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
 
 
@@ -73,6 +79,7 @@ XIL_UBOOT_VERSION="xilinx-v2018.2"
 #UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
 XIL_UBOOT_IMG_FILENAME="u-boot"
+XIL_BOOT_FILES_LOC=/home/mib/Development/Docker/petalinux-docker
 
 ## Select user name / function
 USERS=("machinekit" "holosynth" "ubuntu")
@@ -536,18 +543,18 @@ assemble_full_sd_img() {
                     create_img "2" "${SD_IMG_FILE}" "${1}" "p2"
                     mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
                     echo "Copying files to boot partition"
-                    sudo cp /home/mib/xilproj/xilinx-ultra96-reva-2018.2/images/linux/BOOT.BIN ${1}
-                    sudo cp /home/mib/xilproj/xilinx-ultra96-reva-2018.2/images/linux/image.ub ${1}
+                    sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
+#                    sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
 #                    sudo dd if=/home/mib/xilproj/xilinx-ultra96-reva-2018.2/images/linux/rootfs.ext4 of="${LOOP_DEV}p2"
                     echo "Unmounting boot partition"
                     unmount_binded ${1}
                     unmount_loopdev
-                    echo "mounting rootfs partition"
-                    mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
-                    echo "Extracting to rootfs partition"
-                    sudo tar xfjS /home/mib/xilproj/xilinx-ultra96-reva-2018.2/images/linux/rootfs.tar.bz2 -C ${1}
-                    unmount_binded ${1}
-                    unmount_loopdev
+#                     echo "mounting rootfs partition"
+#                     mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
+#                     echo "Extracting to rootfs partition"
+#                     sudo tar xfjS ${XIL_BOOT_FILES_LOC}/rootfs.tar.bz2 -C ${1}
+#                     unmount_binded ${1}
+#                     unmount_loopdev
                 else
                     create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
                 fi

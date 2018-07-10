@@ -679,7 +679,7 @@ add2repo(){
         echo ""
         echo "Script_MSG: Repo content before -->"
         echo ""
-        LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1} | { grep -E "${3}" || true; }`
+        LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} --list-format='''${package}\n''' list ${1} | { grep -E "${3}" || true; }`
         echo "Got list1"
         REPO_LIST1=$"${LIST1}"
 
@@ -695,7 +695,7 @@ add2repo(){
             echo ""
             echo "Script_MSG: Will remove former version from repo"
             echo ""
-            reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${REPO_LIST1}
+            reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} remove ${1} ${REPO_LIST1}
             reprepro -b ${HOME_REPO_DIR} export ${1}
             echo "Script_MSG: Restarting web server"
 
@@ -710,7 +710,7 @@ add2repo(){
 
         #
         # if [[ "${CLEAN_KERNELREPO}" ==  "${OK}" ]]; then
-        # CLEAN_ALL_LIST=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1}`
+        # CLEAN_ALL_LIST=`reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} --list-format='''${package}\n''' list ${1}`
         #
         # JESSIE_CLEAN_ALL_LIST=$"${CLEAN_ALL_LIST}"
         #
@@ -718,7 +718,7 @@ add2repo(){
         # 		echo ""
         # 		echo "Script_MSG: Will clean repo"
         # 		echo ""
-        # 		reprepro -b ${HOME_REPO_DIR} -C main -A armhf remove ${1} ${JESSIE_CLEAN_ALL_LIST}
+        # 		reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} remove ${1} ${JESSIE_CLEAN_ALL_LIST}
         #                 reprepro -b ${HOME_REPO_DIR} export ${1}
         #                 echo "Script_MSG: Restarting web server"
         #                 sudo systemctl restart apache2
@@ -730,11 +730,11 @@ add2repo(){
         # 	echo ""
         # fi
         #
-        reprepro -b ${HOME_REPO_DIR} -C main -A armhf includedeb ${1} ${2}/*.deb
+        reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} includedeb ${1} ${2}/*.deb
         reprepro -b ${HOME_REPO_DIR} export ${1}
         reprepro -b ${HOME_REPO_DIR} list ${1}
 
-        LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A armhf --list-format='''${package}\n''' list ${1}`
+        LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A $DIST_ARCH} --list-format='''${package}\n''' list ${1}`
         REPO_LIST2=$"${LIST2}"
         echo  "${REPO_LIST2}"
         echo ""
