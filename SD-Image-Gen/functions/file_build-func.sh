@@ -21,7 +21,7 @@ exit_fail() {
 
 extract_xz() {
     echo "MSG: using tar for xz extract"
-    tar xfS ${1}
+    tar xfS ${1} --use-compress-program lbzip2
 }
 
 ## parameters: 1: folder name, 2: url, 3: file name
@@ -626,7 +626,7 @@ armhf_build() {
     if [ ! -z "${3}" ]; then
         echo "MSG: compiling ${1}"
         if [ "${3}" == "deb-pkg" ]; then
-            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="${GIT_KERNEL_VERSION}" deb-pkg
+            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="1" deb-pkg
         else
             make -j${NCORES} "${2}"
             echo "MSG: building ${1}"
@@ -636,7 +636,7 @@ armhf_build() {
             fi
         fi
     else
-        make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION=2 deb-pkg
+        make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="1" deb-pkg
     fi
 }
 
@@ -655,7 +655,8 @@ arm64_build() {
     if [ ! -z "${3}" ]; then
         echo "MSG: compiling ${1}"
         if [ "${3}" == "deb-pkg" ]; then
-            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="${GIT_KERNEL_VERSION}" deb-pkg
+            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 KBUILD_IMAGE=arch/arm64/boot/Image LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="2" deb-pkg
+#            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 KBUILD_IMAGE=Image LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="2" deb-pkg
         else
             make -j${NCORES} "${2}"
             echo "MSG: building ${1}"
@@ -665,7 +666,7 @@ arm64_build() {
             fi
         fi
     else
-        make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION=2 deb-pkg
+        make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 KBUILD_IMAGE=arch/arm64/boot/Image LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="2" deb-pkg
     fi
 }
 
@@ -675,7 +676,7 @@ add2repo(){
     contains ${DISTROS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid distroname = ${1} given"
-        contains ${DIST_ARCHS[@]} ${3}
+        contains ${DISTARCHS[@]} ${3}
         if [ "$?" -eq 0 ]; then
             echo "Valid distarch = ${3} given"
 
@@ -737,7 +738,7 @@ add2repo(){
             reprepro -b ${HOME_REPO_DIR} export ${1}
             reprepro -b ${HOME_REPO_DIR} list ${1}
 
-            LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A ${4} --list-format='''${package}\n''' list ${1}`
+            LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A ${3} --list-format='''${package}\n''' list ${1}`
             REPO_LIST2=$"${LIST2}"
             echo  "${REPO_LIST2}"
             echo ""
@@ -747,18 +748,18 @@ add2repo(){
             echo ""
             echo "#--->       Repo updated                                                  <---#"
         else
-            echo "--xxx2repo bad argument --> ${4}"
+            echo "--xxx2repo bad argument --> ${3}"
             echo "Use =distroname=distarch"
-            echo "Valid distarchss are:"
-            echo " ${DIST_ARCHS[@]}"
+            echo "Valid distarchs are:"
+            echo " ${DISTARCHS[@]}"
         fi
     else
         echo "--xxx2repo bad argument --> ${1}"
         echo "Use =distroname=distarch"
         echo "Valid distrosnames are:"
         echo " ${DISTROS[@]}"
-        echo "Valid distarchss are:"
-        echo " ${DIST_ARCHS[@]}"
+        echo "Valid distarchs are:"
+        echo " ${DISTARCHS[@]}"
     fi
 }
 
@@ -766,6 +767,7 @@ add2repo(){
 inst_kernel_from_local_repo(){
 
 cd ${CURRENT_DIR}
+
 sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
 sudo rm -f ${1}/etc/resolv.conf
 sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
@@ -868,7 +870,7 @@ echo "#---------------    +++ creating blank rootfs image  zzz  +++ .......  ---
 echo "#-----------------------------   wait   ----------------------------------------#"
 echo "#-------------------------------------------------------------------------------#"
 
-sudo dd if=/dev/zero of=${1}  bs=4K count=1000K
+sudo dd if=/dev/zero of=${1}  bs=4K count=1500K
 sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${1} ${mkfs_label}"
 }
 
@@ -1071,8 +1073,8 @@ compress_rootfs(){
     echo " ${1}/${COMPNAME}_rootfs.tar.bz2"
     echo "----------------------------------------------------------------------------#"
     cd ${2}
-#	sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys --exclude=tmp .
-    sudo tar -cjSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys .
+#	sudo tar -cSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys --exclude=tmp . --use-compress-program lbzip2
+    sudo tar -cSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys . --use-compress-program lbzip2
     cd ${1}
     echo "#                                                                           #"
     echo "#Script_MSG:                                                                   #"
@@ -1093,7 +1095,7 @@ if [ ! -z "${3}" ]; then
     echo "Script_MSG: Into imagefile"
     echo "Rootfs configured ... extracting  ${COMPNAME} rootfs into image...."
     ## extract rootfs into image:
-    sudo tar xfjS ${1}/${COMPNAME}_rootfs.tar.bz2 -C ${2}
+    sudo tar xfS ${1}/${COMPNAME}_rootfs.tar.bz2 -C ${2} --use-compress-program lbzip2
     echo "${1}/${COMPNAME}_rootfs.tar.bz2 rootfs extraction finished .."
 fi
 }
@@ -1201,7 +1203,7 @@ make_bmap_image() {
     echo ""
     cd ${1}
     bmaptool create -o ${2}.bmap ${2}
-    tar -cjSf ${2}.tar.bz2 ${2}
+    tar -cSf ${2}.tar.bz2 ${2} --use-compress-program lbzip2
     echo ""
     echo "NOTE:  Bmap image created"
     echo ""

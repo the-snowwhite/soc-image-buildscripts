@@ -22,7 +22,7 @@
 #------------------------------------------------------------------------------------------------------
 
 ## Select distro:
-DISTROS=("stretch" "buster" "bionic")
+DISTROS=("stretch" "buster" "bionic" "petalinux")
 ### Debian based:
 #distro="stretch"
 #distro="buster"
@@ -30,8 +30,7 @@ DISTROS=("stretch" "buster" "bionic")
 #distro=bionic
 #distro=xenial
 
-#DIST_ARCH=armhf
-DIST_ARCH=arm64
+DISTARCHS=("armhf" "arm64")
 
 #HOME_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
 HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
@@ -42,11 +41,14 @@ shell_cmd="/bin/bash"
 #ROOT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
 #ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
 #ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
-ROOT_REPO_URL="http://deb.debian.org//debian/"
+DEB_ROOT_REPO_URL="http://deb.debian.org//debian/"
+UB_ROOT_REPO_URL="http://ports.ubuntu.com/ubuntu-ports/"
 #final_repo="http://ftp.dk.debian.org/debian/"
-final_repo="http://deb.debian.org//debian/"
+final_deb_repo="http://deb.debian.org//debian/"
+final_ub_repo="http://ports.ubuntu.com/ubuntu-ports/"
 #local_repo=${HOME_MIRR_REPO_URL}
-local_repo="http://deb.debian.org//debian/"
+local_deb_repo="http://deb.debian.org//debian/"
+local_ub_repo="http://ports.ubuntu.com/ubuntu-ports/"
 local_ws=neon-ws
 local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
 
@@ -65,7 +67,6 @@ mkfs_options=""
 
 ## Select board
 BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit" "ultra96")
-DIST_ARCHS=("armhf" "arm64")
 
 ## Select u-boot version:
 #UBOOT_VERSION="v2016.09"
@@ -79,7 +80,7 @@ XIL_UBOOT_IMG_FILENAME="u-boot"
 XIL_BOOT_FILES_LOC=/home/mib/Development/Docker/petalinux-docker
 
 ## Select user name / function
-USERS=("machinekit" "holosynth" "ubuntu")
+USERS=("machinekit" "holosynth" "ubuntu" "vivado")
 #USER_NAME=ubuntu;
 #USER_NAME=machinekit;
 #USER_NAME=holosynth;
@@ -91,6 +92,7 @@ ALT_GIT_KERNEL_VERSION="4.9.76"
 ALT_GIT_KERNEL_REV="-ltsi-rt"
 XIL_GIT_KERNEL_VERSION="xilinx"
 XIL_GIT_KERNEL_REV="-v2018.2"
+#XIL_GIT_KERNEL_REV="-v2017.3"
 #ALT_GIT_KERNEL_VERSION="4.15"
 #ALT_GIT_KERNEL_REV=""
 
@@ -179,8 +181,6 @@ QT_CC="/usr/bin/${CROSS_GNU_ARCH}-"
 RT_KERNEL_TAG="${RT_KERNEL_VERSION}-${RT_PATCH_REV}"
 RT_KERNEL_LOCALVERSION="socfpga-${RT_KERNEL_TAG}"
 #GIT_KERNEL_LOCALVERSION="socfpga-${ALT_GIT_KERNEL_TAG}"
-#SD_KERNEL_TAG="socfpga${ALT_GIT_KERNEL_REV}"
-SD_KERNEL_TAG="socfpga-rt-ltsi"
 
 RT_KERNEL_FOLDER="linux-${RT_KERNEL_VERSION}"
 RT_KERNEL_FILE_NAME="${RT_KERNEL_FOLDER}.tar.xz"
@@ -202,9 +202,9 @@ SD_KERNEL_PARANT_DIR="${CURRENT_DIR}/arm-linux-${SD_KERNEL_VERSION}-gnueabifh-ke
 ALT_GIT_KERNEL_URL="https://github.com/the-snowwhite/linux-socfpga.git"
 XIL_GIT_KERNEL_URL="https://github.com/the-snowwhite/linux-xlnx.git"
 ALT_GIT_KERNEL_BRANCH="socfpga-${ALT_GIT_KERNEL_TAG}"
+XIL_GIT_KERNEL_BRANCH="socfpga64-${XIL_GIT_KERNEL_TAG}"
 ALT_GIT_KERNEL_PATCH_FILE="${ALT_GIT_KERNEL_BRANCH}-changeset.patch"
-#XIL_GIT_KERNEL_PATCH_FILE="${ALT_GIT_KERNEL_BRANCH}-changeset.patch"
-XIL_GIT_KERNEL_PATCH_FILE=""
+XIL_GIT_KERNEL_PATCH_FILE="${XIL_GIT_KERNEL_BRANCH}-changeset.patch"
 GIT_KERNEL_DIR=linux
 
 # ------------------------------  Uboot  --------------------------------##
@@ -259,15 +259,16 @@ usage()
     echo "    --uboot   Will clone, patch and build uboot (add =c to skip build)"
     echo "    --build_git-kernel   Will clone, patch and build kernel from git (add =c to skip build)"
 #     echo "    --build_rt-ltsi-kernel   Will download rt-ltsi kernel, patch and build kernel (add =c to skip build)"
-    echo "    --gitkernel2repo   Will add kernel .debs to local repo"
+    echo "    --gitkernel2repo   Will add kernel .debs to local repo Use =distroname=distarch"
 #     echo "    --rtkernel2repo   Will add kernel .debs to local repo"
-    echo "    --mk2repo   Will add machinekit .debs to local repo"
-    echo "    --cadence2repo   Will add cadence .debs to local repo"
-    echo "    --carla2repo   Will add carla .debs to local repo"
-    echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs"
-    echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs"
-    echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience"
-    echo "    --finalize-desktop-rootfs   Will create user and configure  rootfs with desktop for fully working out of the box experience"
+    echo "    --mk2repo   Will add machinekit .debs to local repo Use =distroname=distarch"
+    echo "    --cadence2repo   Will add cadence .debs to local repo Use =distroname=distarch"
+    echo "    --carla2repo   Will add carla .debs to local repo Use =distroname=distarch"
+    echo "    --xf86-video-armsoc2repo   Will add xf86-video-armsoc .debs to local repo Use =distroname=distarch"
+    echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
+    echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
+    echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience Use =distroname=username=distarch"
+    echo "    --finalize-desktop-rootfs   Will create user and configure  rootfs with desktop for fully working out of the box experience Use =distroname=username=distarch"
     echo "    --inst_repo_kernel   Will install kernel from local repo"
     echo "    --inst_repo_kernel-desktop   Will install kernel from local repo in desktop version"
     echo "    --bindmount_rootfsimg    Will mount rootfs image"
@@ -313,8 +314,7 @@ build_uboot() {
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
         if [ "${1}" == "ultra96" ]; then
-#            XIL_UBOOT_PATCH_FILE="u-boot-${XIL_UBOOT_VERSION}-ultra96-changeset.patch"
-            XIL_UBOOT_PATCH_FILE=""
+            XIL_UBOOT_PATCH_FILE="u-boot-${XIL_UBOOT_VERSION}-ultra96-changeset.patch"
 #            git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}        
             git_fetch ${UBOOT_PARENT_DIR} ${XIL_UBOOT_GIT_URL} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_PATCH_FILE}        
             UBOOT_BOARD_CONFIG="xilinx_zynqmp_zcu100_revC_defconfig"
@@ -337,12 +337,17 @@ build_uboot() {
     fi
 }
 
+## parameters: 1: board name, 2: distro name
 build_git_kernel() {
     contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
         if [ "${1}" == "ultra96" ]; then
-            KERNEL_PKG_VERSION="0.1"
+            if [ "${2}" == "bionic" ]; then
+                KERNEL_PKG_VERSION="2.1"
+            else
+                KERNEL_PKG_VERSION="0.1"
+            fi
             git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR} ${XIL_GIT_KERNEL_PATCH_FILE}
             arm64_build "${XIL_GIT_KERNEL_BUILD_DIR}" ${XIL_KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/xil_git_kernel_deb_rt-log.txt
         else
@@ -392,7 +397,7 @@ gen_rootfs_image() {
     contains ${DISTROS[@]} ${3}
     if [ "$?" -eq 0 ]; then
         echo "Valid distroname = ${3} given"
-        contains ${DIST_ARCHS[@]} ${4}
+        contains ${DISTARCHS[@]} ${4}
         if [ "$?" -eq 0 ]; then
             echo "Valid distarch = ${4} given"
             create_img "1" ${2}
@@ -401,14 +406,14 @@ gen_rootfs_image() {
             echo ""
             if [ "${DESKTOP}" == "yes" ]; then
                 if [ "${3}" == "bionic" ]; then
-                    run_qemu_debootstrap_bionic ${1} ${3} ${ROOT_REPO_URL} ${4}
-                    echo "Script_MSG: run_qemu_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
+                    run_desktop_qemu_debootstrap_bionic ${1} ${3} ${UB_ROOT_REPO_URL} ${4}
+                    echo "Script_MSG: run_desktop_qemu_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
                 else
-                    run_desktop_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL} ${4}
+                    run_desktop_qemu_debootstrap ${1} ${3} ${DEB_ROOT_REPO_URL} ${4}
                     echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
                 fi
             else
-                run_qemu_debootstrap ${1} ${3} ${ROOT_REPO_URL} ${4}
+                run_qemu_debootstrap ${1} ${3} ${DEB_ROOT_REPO_URL} ${4}
                 echo "Script_MSG: run_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
             fi
             echo ""
@@ -418,11 +423,13 @@ gen_rootfs_image() {
                 exit 1
             else
                 if [ "${DESKTOP}" == "yes" ]; then
-                    compress_rootfs ${CURRENT_DIR} ${1} "qemu_debootstrap-only-desktop" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "qemu_${4}_debootstrap-only-desktop" ${3}
+                    # parameters: 1: work dir, 2: mount dev name, 3: comp prefix, 4 distro name
                 else
-                    compress_rootfs ${CURRENT_DIR} ${1} "qemu_debootstrap-only" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "qemu_${4}_debootstrap-only" ${3}
+                    # parameters: 1: work dir, 2: mount dev name, 3: comp prefix, 4 distro name
                 fi
-                echo "Script_MSG: finished qemu_debootstrap-only with success ... !"
+                echo "Script_MSG: finished qemu_${4}_debootstrap-only with success ... !"
                 unmount_binded ${1}
                 cp ${2} "${2}-base-qemu"
                 echo "Script_MSG: copied ${2} to --> ${2}-base-qemu as a backup"
@@ -430,98 +437,152 @@ gen_rootfs_image() {
         else
             echo "--gen_rootfs_image= bad argument --> ${4}"
             echo "Use =distroname=distarch"
-            echo "Valid distarchss are:"
-            echo " ${DIST_ARCHS[@]}"
+            echo "Valid distarchs are:"
+            echo " ${DISTARCHS[@]}"
         fi
     else
         echo "--gen_rootfs_image= bad argument --> ${3}"
-        echo "Use =distroname"
+        echo "Use =distroname=distarch"
         echo "Valid distrosnames are:"
         echo " ${DISTROS[@]}"
-        echo "Valid distarchss are:"
-        echo " ${DIST_ARCHS[@]}"
+        echo "Valid distarchs are:"
+        echo " ${DISTARCHS[@]}"
     fi
 }
 
-## parameters: 1: mount dev name, 2: image name, 3: distro name, 4 user name
+## parameters: 1: mount dev name, 2: image name, 3: distro name, 4 user name, 5: distro arch
 finalize_rootfs_image() {
+#    set -x
     contains ${DISTROS[@]} ${3}
     if [ "$?" -eq 0 ]; then
         echo "Valid distroname = ${3} given"
         contains ${USERS[@]} ${4}
         if [ "$?" -eq 0 ]; then
             echo "Valid user name = ${4} given"
-            if [ "$(ls -A ${1})" ]; then
-                echo "Script_MSG: !! Found ${1} mounted .. will unmount now"
+            contains ${DISTARCHS[@]} ${5}
+            if [ "$?" -eq 0 ]; then
+                echo "Valid distarch = ${5} given"
+                if [ "$(ls -A ${1})" ]; then
+                    echo "Script_MSG: !! Found ${1} mounted .. will unmount now"
+                    unmount_binded ${1}
+                fi
+                create_img "1" ${2}
+                mount_imagefile "${2}" ${1}
+                bind_mounted ${1}
+                . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
+                if [ "${DESKTOP}" == "yes" ]; then
+                    extract_rootfs ${CURRENT_DIR} ${1} "qemu_${5}_debootstrap-only-desktop" ${3}
+                else
+                    extract_rootfs ${CURRENT_DIR} ${1} "qemu_${5}_debootstrap-only" ${3}
+                fi
+                echo "Script_MSG: will now run final setup_configfiles with user name: ${4}"
+                setup_configfiles ${1} ${4} ${3} ${5}
+                echo "Script_MSG: configfiles setup finished"
+                initial_rootfs_user_setup_sh ${1} ${4} ${3} ${5}
+                finalize ${1} ${4} ${3} ${5}
+                sudo sync
+                if [ "${DESKTOP}" == "yes" ]; then
+                    compress_rootfs ${CURRENT_DIR} ${1} "${4}_finalized-fully-configured-desktop" ${3}
+                else
+                    compress_rootfs ${CURRENT_DIR} ${1} "${4}_finalized-fully-configured" ${3}
+                fi
+                set +e
+                sudo sync
                 unmount_binded ${1}
-            fi
-            create_img "1" ${2}
-            mount_imagefile "${2}" ${1}
-            bind_mounted ${1}
-            . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
-            if [ "${DESKTOP}" == "yes" ]; then
-                extract_rootfs ${CURRENT_DIR} ${1} "qemu_debootstrap-only-desktop" ${3}
+                cp ${2} "${2}-fully-configured"
+                sudo sync
             else
-                extract_rootfs ${CURRENT_DIR} ${1} "qemu_debootstrap-only" ${3}
-            fi
-            echo "Script_MSG: will now run final setup_configfiles with user name: ${4}"
-            setup_configfiles ${1} ${4} ${3}
-            echo "Script_MSG: configfiles setup finished"
-            initial_rootfs_user_setup_sh ${1} ${4} ${3}
-            finalize ${1} ${4} ${3}
-            if [ "${DESKTOP}" == "yes" ]; then
-                compress_rootfs ${CURRENT_DIR} ${1} "${4}_finalized-fully-configured-desktop" ${3}
-            else
-                compress_rootfs ${CURRENT_DIR} ${1} "${4}_finalized-fully-configured" ${3}
-            fi
-            set +e
-            unmount_binded ${1}
-            cp ${2} "${2}-fin-conf"
+                echo "--finalize_rootfs_image= bad argument --> ${5}"
+                echo "Use =distroname=username=distarch"
+                echo "Valid distarchs are:"
+                echo " ${DISTARCHS[@]}"
+            fi                
         else
             echo "--finalize_rootfs_image= bad argument --> ${4}"
             echo "missing username"
+            echo "Use =distroname=username=distarch"
+            echo "Valid distrosnames are:"
+            echo " ${DISTROS[@]}"
+            echo "Valid usernames are:"
+            echo " ${USERS[@]}"
+            echo "Valid distarchs are:"
+            echo " ${DISTARCHS[@]}"
         fi
     else
         echo "--finalize_rootfs_image= bad argument --> ${3}"
-        echo "Use =distroname=username"
+        echo "Use =distroname=username=distarch"
         echo "Valid distrosnames are:"
         echo " ${DISTROS[@]}"
+        echo "Valid usernames are:"
+        echo " ${USERS[@]}"
+        echo "Valid distarchs are:"
+        echo " ${DISTARCHS[@]}"
     fi
 }
 
-## parameters: 1: mount dev name, 2: kernel image tag, 3: rootfs image path, 4: distroname, 5: user name
+## parameters: 1: mount dev name, 2: kernel image tag, 3: rootfs image path, 4: distroname, 5: distro arch, 5: user name
 inst_repo_kernel() {
     contains ${DISTROS[@]} ${4}
     if [ "$?" -eq 0 ]; then
         echo "Valid distroname = ${4} given"
-        contains ${USERS[@]} ${5}
+        contains ${DISTARCHS[@]} ${5}
         if [ "$?" -eq 0 ]; then
-            echo "Valid user name = ${5} given"
-            if [ "$(ls -A ${1})" ]; then
-                echo "Script_MSG: !! Found ${1} mounted .. will unmount now"
+            echo "Valid distarch = ${5} given"
+            contains ${USERS[@]} ${6}
+            if [ "$?" -eq 0 ]; then
+                echo "Valid user name = ${6} given"
+                if [ "$(ls -A ${1})" ]; then
+                    echo "Script_MSG: !! Found ${1} mounted .. will unmount now"
+                    unmount_binded ${1}
+                fi
+                create_img "1" ${3}
+                mount_imagefile "${3}" ${1}
+                bind_mounted ${1}
+                if [ "${DESKTOP}" == "yes" ]; then
+                    extract_rootfs ${CURRENT_DIR} ${1} "${6}_finalized-fully-configured-desktop" ${4}
+                else
+                    extract_rootfs ${CURRENT_DIR} ${1} "${6}_finalized-fully-configured" ${4}
+                fi
+                echo "Script_MSG: will now install kernel"
+                if [ "${5}" == "arm64" ]; then
+                    if [ "${4}" == "bionic" ]; then
+                        SD_KERNEL_TAG="*socfpga64-2.1"
+                    else
+                        SD_KERNEL_TAG="*socfpga64-0.1"
+                    fi
+                else
+                    SD_KERNEL_TAG="socfpga-rt-ltsi"
+                fi
+                inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
+                compress_rootfs ${CURRENT_DIR} ${1} "${6}_${2}" ${4}
                 unmount_binded ${1}
-            fi
-            create_img "1" ${3}
-            mount_imagefile "${3}" ${1}
-            bind_mounted ${1}
-            if [ "${DESKTOP}" == "yes" ]; then
-                extract_rootfs ${CURRENT_DIR} ${1} "${5}_finalized-fully-configured-desktop" ${4}
             else
-                extract_rootfs ${CURRENT_DIR} ${1} "${5}_finalized-fully-configured" ${4}
+                echo "--inst_repo_kernel= bad argument --> ${6}"
+                echo "wrong user name"
+                echo "Use =distroname=distarch=username"
+                echo "Valid user names are:"
+                echo " ${USERS[@]}"
+                echo " ${DISTARCHS[@]}"
+                echo "Valid distrosnames are:"
+                echo " ${DISTROS[@]}"
             fi
-            echo "Script_MSG: will now install kernel"
-            inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
-            compress_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
-            unmount_binded ${1}
         else
             echo "--inst_repo_kernel= bad argument --> ${5}"
-            echo "wrong user name"
+            echo "Use =distroname=distarch=username"
             echo "Valid user names are:"
             echo " ${USERS[@]}"
-         fi
+            echo "Valid distarchs are:"
+            echo " ${DISTARCHS[@]}"
+            echo "Valid distrosnames are:"
+            echo " ${DISTROS[@]}"
+        fi
     else
         echo "--inst_repo_kernel= bad argument --> ${4}"
-        echo "Use =distroname=username"
+        echo "Use =distroname=distarch=username"
+        echo "Valid user names are:"
+        echo " ${USERS[@]}"
+        echo "Valid distarchs are:"
+        echo " ${DISTARCHS[@]}"
         echo "Valid distrosnames are:"
         echo " ${DISTROS[@]}"
     fi
@@ -550,32 +611,75 @@ assemble_full_sd_img() {
                 if [ "${3}" == "ultra96" ]; then
                     create_img "2" "${SD_IMG_FILE}" "${1}" "p2"
                     mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
-                    echo "Copying files to boot partition"
-                    sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
-#                    sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
-#                    sudo dd if=/home/mib/xilproj/xilinx-ultra96-reva-2018.2/images/linux/rootfs.ext4 of="${LOOP_DEV}p2"
-                    echo "Unmounting boot partition"
-                    unmount_binded ${1}
-                    unmount_loopdev
-#                     echo "mounting rootfs partition"
-#                     mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
-#                     echo "Extracting to rootfs partition"
-#                     sudo tar xfjS ${XIL_BOOT_FILES_LOC}/rootfs.tar.bz2 -C ${1}
-#                     unmount_binded ${1}
-#                     unmount_loopdev
+                    if [ "${4}" == "petalinux" ]; then
+                        echo "Copying files to boot partition"
+                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+                        echo "Unmounting boot partition"
+                        unmount_binded ${1}
+                        unmount_loopdev
+                        echo "mounting rootfs partition"
+                        mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
+                        echo "Extracting to rootfs partition"
+                        sudo tar xfS ${XIL_BOOT_FILES_LOC}/rootfs.tar.bz2 -C ${1} --use-compress-program lbzip2
+                        unmount_binded ${1}
+                        unmount_loopdev
+                        echo "No dd uboot install"
+                    else
+                        echo "Copying files to boot partition"
+                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
+    #                    sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+                        echo "Unmounting boot partition"
+                        unmount_binded ${1}
+                        unmount_loopdev
+                        echo "mounting rootfs partition"
+                        mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
+                        echo "Extracting to rootfs partition"
+    #                     sudo tar xfS ${XIL_BOOT_FILES_LOC}/rootfs.tar.bz2 -C ${1} --use-compress-program lbzip2
+                        extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
+                        if [ "${4}" == "bionic" ]; then
+                            bind_mounted ${1}
+                            sudo sync
+                            sudo rm -f ${1}/etc/resolv.conf
+                            sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
+                            sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
+                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+#                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-armsoc xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra'
+#                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev xserver-xorg-video-armsoc-exynos xserver-xorg-video-armsoc lua-inotify inotify-tools'
+                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev lua-inotify inotify-tools'
+                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
+                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/mv /etc/X11/xorg.conf /etc/X11/xorg.conf-armsoc'
+sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
+Section "Device"
+    Identifier      "Frame Buffer"
+    Driver  "fbdev"
+    Option "Rotate" "off"
+EndSection
+
+Section "ServerLayout"
+    Identifier "ServerLayout0"
+    Option "BlankTime"   "0"
+    Option "StandbyTime" "0"
+    Option "SuspendTime" "0"
+    Option "OffTime" "0"
+EndSection
+
+EOF'
+                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
+                            sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
+                        fi
+                        unmount_binded ${1}
+                        unmount_loopdev
+                        echo "No dd uboot install"
+                    fi                    
                 else
                     create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
-                fi
-                echo "step 2 mount:"
-#                mount_sd_imagefile ${SD_IMG_FILE} ${1} ${media_rootfs_partition}
-#                extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
-#                set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
-#                unmount_binded ${1}
-#                unmount_loopdev
-                if [ "${3}" == "ultra96" ]; then
-                    echo "No dd uboot install"
-#                    install_uboot ${XIL_UBOOT_BUILD_DIR} ${XIL_UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
-                else
+                    echo "step 2 mount:"
+                    mount_sd_imagefile ${SD_IMG_FILE} ${1} ${media_rootfs_partition}
+                    extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
+                    set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
+                    unmount_binded ${1}
+                    unmount_loopdev
                     install_uboot ${UBOOT_BUILD_DIR} ${UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
                 fi
                 make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
@@ -616,7 +720,7 @@ fi
 
 while [ "$1" != "" ]; do
     PARAM=`echo $1 | awk -F= '{print $1}'`
-    VALUE=`echo $1 | awk -F= '{print $2}'`
+    VALUE1=`echo $1 | awk -F= '{print $2}'`
     VALUE2=`echo $1 | awk -F= '{print $3}'`
     VALUE3=`echo $1 | awk -F= '{print $4}'`
     case $PARAM in
@@ -630,19 +734,39 @@ while [ "$1" != "" ]; do
             install_deps
             ;;
         --uboot)
-            build_uboot ${VALUE}
+            build_uboot "${VALUE1}"
             ;;
         --build_git-kernel)
-            build_git_kernel ${VALUE}
+            contains ${DISTROS[@]} ${VALUE1}
+            if [ "$?" -eq 0 ]; then
+                echo "Valid distarch = ${VALUE1} given"
+                build_git_kernel "${VALUE2}" "${VALUE1}"
+            else
+                echo "--gitkernel2repo bad argument --> ${VALUE1}"
+                echo "Use =distroname=boardname"
+                echo "Valid distonames are:"
+                echo " ${DISTROS[@]}"
+            fi
             ;;
 #         --build_rt-ltsi-kernel)
-#             build_rt_ltsi_kernel ${VALUE}
+#             build_rt_ltsi_kernel "${VALUE1}"
 #            ;;
         --gitkernel2repo)
-            if [ "${VALUE1}" = "arm64" ]; then
-                add2repo ${VALUE} ${XIL_GIT_KERNEL_PARENT_DIR} ${VALUE1} "linux-"
+            contains ${DISTARCHS[@]} ${VALUE2}
+            if [ "$?" -eq 0 ]; then
+                echo "Valid distarch = ${VALUE2} given"
+                if [ ""${VALUE2}"" = "arm64" ]; then
+                    ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+                    add2repo "${VALUE1}" ${XIL_GIT_KERNEL_PARENT_DIR} "${VALUE2}" "linux-"
+                else
+                    ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+                    add2repo "${VALUE1}" ${ALT_GIT_KERNEL_PARENT_DIR} "${VALUE2}" "linux-"
+                fi
             else
-                add2repo ${VALUE} ${ALT_GIT_KERNEL_PARENT_DIR} ${VALUE1} "linux-"
+                echo "--gitkernel2repo bad argument --> ${VALUE2}"
+                echo "Use =distroname=distarch"
+                echo "Valid distarchs are:"
+                echo " ${DISTARCHS[@]}"
             fi
             ;;
 #        --rtkernel2repo)
@@ -650,34 +774,45 @@ while [ "$1" != "" ]; do
 #            add2repo "stretch" ${RT_KERNEL_PARENT_DIR} "${RT_KERNEL_TAG}-socfpga-${KERNEL_PKG_VERSION}|linux-libc-dev"
 #            ;;
         --mk2repo)
-            add2repo ${VALUE} "/home/mib/Development/Docker" ${VALUE1} "machinekit"
+            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+            add2repo "${VALUE1}" "/home/mib/Development/Docker" "${VALUE2}" "machinekit"
             ;;
         --cadence2repo)
-            add2repo ${VALUE} "/home/mib/Development/deb_comp/Cadence" ${VALUE1} "cadence|claudia|catia|catarina"
+            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+            add2repo "${VALUE1}" "/home/mib/Development/deb_comp/Cadence" "${VALUE2}" "cadence|claudia|catia|catarina"
             ;;
         --carla2repo)
-            add2repo ${VALUE} "/home/mib/Development/Deb-Pkg/carla_debs" ${VALUE1} "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler|carla"
+            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+            add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/carla_debs" "${VALUE2}" "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler|carla"
             ;;
-        --gen-base-qemu-rootfs)
-            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/${ROOTFS_IMG}" ${VALUE} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
+        --xf86-video-armsoc2repo)
+            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+            add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/armsoc_debs" "${VALUE2}" "xserver-xorg-video-armsoc"
+            ;;
+        --gen-base-qemu-rootfs) 
+            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
+            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-qemu-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
             ;;
         --gen-base-qemu-rootfs-desktop)
             DESKTOP="yes"
-            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/desktop-${ROOTFS_IMG}" ${VALUE} | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
+            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
+            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-qemu-${VALUE2}-desktop_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
             ;;
         --finalize-rootfs)
-            finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/${ROOTFS_IMG}" ${VALUE} ${VALUE2} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/qemu-${VALUE3}-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4 user name, 5: distro arch
             ;;
         --finalize-desktop-rootfs)
             DESKTOP="yes"
-            finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/desktop-${ROOTFS_IMG}" ${VALUE} ${VALUE2} | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/qemu-${VALUE3}-desktop-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4 user name, 5: distro arch
             ;;
         --inst_repo_kernel)
-            inst_repo_kernel ${ROOTFS_MNT} "finalized-fully-configured-with-kernel" "${CURRENT_DIR}/${ROOTFS_IMG}" ${VALUE} ${VALUE2}
+            inst_repo_kernel ${ROOTFS_MNT} "finalized-fully-configured-with-kernel" "${CURRENT_DIR}/finalized-with-kernel-${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ;;
         --inst_repo_kernel-desktop)
             DESKTOP="yes"
-            inst_repo_kernel ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" "${CURRENT_DIR}/desktop-kernel-${ROOTFS_IMG}" ${VALUE} ${VALUE2}
+            inst_repo_kernel ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" "${CURRENT_DIR}/finalized-with-kernel-and-desktop-${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ;;
         --bindmount_rootfsimg)
             mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
@@ -687,11 +822,11 @@ while [ "$1" != "" ]; do
             unmount_binded ${ROOTFS_MNT}
             ;;
         --assemble_sd_img)
-            assemble_full_sd_img ${ROOTFS_MNT} "finalized-fully-configured-with-kernel" ${VALUE} ${VALUE2} ${VALUE3}
+            assemble_full_sd_img ${ROOTFS_MNT} "finalized-fully-configured-with-kernel" "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ;;
         --assemble_desktop_sd_img)
             DESKTOP="yes"
-            assemble_full_sd_img ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" ${VALUE} ${VALUE2} ${VALUE3}
+            assemble_full_sd_img ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ;;
         --inst_hs_aud_stuff)
             if [ "$(ls -A ${ROOTFS_MNT})" ]; then
@@ -739,8 +874,8 @@ while [ "$1" != "" ]; do
         --assemble_qt_dev_sd_img)
             DESKTOP="yes"
 #            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-installed"
-#            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt-and-qt-plugins" ${VALUE}
-            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps" ${VALUE}
+#            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt-and-qt-plugins" "${VALUE1}"
+            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps" "${VALUE1}"
             ;;
     *)
             echo "ERROR: unknown parameter \"$PARAM\""

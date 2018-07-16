@@ -2,9 +2,20 @@
 
 # lightdm,lxqt
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
-## E: Couldn't find these debs: libdirectfb-1.7-7 libssh2-1 cgroupfs-mount gnupg2 ntp leafpad avahi-discover traceroute ifupdown2
+## E: Couldn't find these debs: libdirectfb-1.7-7 libssh2-1 cgroupfs-mount gnupg2 ntp avahi-discover traceroute ifupdown2,cgmanager
 run_qemu_debootstrap_bionic() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd --include=sudo,locales,wget,nano,apt-utils,rsyslog,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,iproute2,avahi-daemon,uuid-runtime,libnss-mdns,strace,u-boot-tools,initramfs-tools,dirmngr,git,curl,xorg,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,git,curl,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}
+output=${?}
+}
+
+# lightdm,lxqt
+# ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+## E: Couldn't find these debs: libdirectfb-1.7-7 libssh2-1 cgroupfs-mount gnupg2 ntp leafpad avahi-discover traceroute ifupdown2
+#I: Checking component main on http://ports.ubuntu.com/ubuntu-ports...
+#E: Couldn't find these debs: leafpad gnupg2 avahi-discover traceroute cgroupfs-mount ntp
+
+run_desktop_qemu_debootstrap_bionic() {
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,libnss-mdns,strace,u-boot-tools,initramfs-tools,dirmngr,wget,git,curl,xorg,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}
 output=${?}
 }
 
@@ -101,25 +112,77 @@ EOT'
 
 # parameters: 1: mount dev name, 2: distro
 gen_final_sources_list() {
+if [ "${2}" == "bionic" ]; then
+sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-final
+#------------------------------------------------------------------------------#
+#                   OFFICIAL UBUNTU REPOS
+#------------------------------------------------------------------------------#
+
+deb [arch=arm64] '${final_ub_repo}' '${2}' main restricted
+deb-src [arch=arm64]  '${final_ub_repo}' '${2}' main restricted
+
+deb [arch=arm64]  '${final_ub_repo}' '${2}'-updates main restricted
+deb-src [arch=arm64] '${final_ub_repo}' '${2}'-updates main restricted
+
+deb [arch=arm64] '${final_ub_repo}' '${2}' universe
+deb-src [arch=arm64] '${final_ub_repo}' '${2}' universe
+deb [arch=arm64] '${final_ub_repo}' '${2}'-updates universe
+deb-src [arch=arm64] '${final_ub_repo}' '${2}'-updates universe
+
+deb [arch=arm64] '${final_ub_repo}' '${2}' multiverse
+deb-src [arch=arm64] '${final_ub_repo}' '${2}' multiverse
+deb [arch=arm64] '${final_ub_repo}' '${2}'-updates multiverse
+deb-src [arch=arm64] '${final_ub_repo}' '${2}'-updates multiverse
+
+EOT'
+else
 sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-final
 #------------------------------------------------------------------------------#
 #                   OFFICIAL DEBIAN REPOS
 #------------------------------------------------------------------------------#
 
 ###### Debian Main Repos
-deb '${final_repo}' '${2}' main contrib non-free
-deb-src '${final_repo}' '${2}' main
+deb '${final_deb_repo}' '${2}' main contrib non-free
+deb-src '${final_deb_repo}' '${2}' main
 
 ###### Debian Update Repos
 deb http://security.debian.org/ '${2}'/updates main contrib non-free
+deb http://ftp.debian.org/debian '${2}'-backports main
 
 EOT'
-
+fi
 }
 
 # parameters: 1: mount dev name, 2: distro
 gen_local_sources_list() {
 
+if [ "${2}" == "bionic" ]; then
+sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-local
+#------------------------------------------------------------------------------#
+#                   OFFICIAL UBUNTU REPOS
+#------------------------------------------------------------------------------#
+
+##### Local mirror
+deb '${local_kernel_repo}' '${2}' main
+
+deb [arch=arm64] '${local_ub_repo}' '${2}' main restricted
+deb-src [arch=arm64]  '${local_ub_repo}' '${2}' main restricted
+
+deb [arch=arm64]  '${local_ub_repo}' '${2}'-updates main restricted
+deb-src [arch=arm64] '${local_ub_repo}' '${2}'-updates main restricted
+
+deb [arch=arm64] '${local_ub_repo}' '${2}' universe
+deb-src [arch=arm64] '${local_ub_repo}' '${2}' universe
+deb [arch=arm64] '${local_ub_repo}' '${2}'-updates universe
+deb-src [arch=arm64] '${local_ub_repo}' '${2}'-updates universe
+
+deb [arch=arm64] '${local_ub_repo}' '${2}' multiverse
+deb-src [arch=arm64] '${local_ub_repo}' '${2}' multiverse
+deb [arch=arm64] '${local_ub_repo}' '${2}'-updates multiverse
+deb-src [arch=arm64] '${local_ub_repo}' '${2}'-updates multiverse
+
+EOT'
+else
 sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-local
 #------------------------------------------------------------------------------#
 #                   OFFICIAL DEBIAN REPOS
@@ -128,14 +191,17 @@ sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-local
 
 ##### Local Debian mirror
 deb '${local_kernel_repo}' '${2}' main
-deb '${local_repo}' '${2}' main contrib non-free
+deb '${local_deb_repo}' '${2}' main contrib non-free
 #deb-src '${local_kernel_repo}' '${2}' main
-#deb-src '${local_repo}' '${2}' main
+#deb-src '${local_deb_repo}' '${2}' main
 
 ###### Debian Update Repos
 deb http://security.debian.org/ '${2}'/updates main contrib non-free
+deb http://ftp.debian.org/debian '${2}'-backports main
 
 EOT'
+fi
+
 echo ""
 echo "Script_MSG: Created new sources.list to local apt mirror"
 echo ""
@@ -154,11 +220,12 @@ EOT'
 
 }
 
+#1: net adapter name
 gen_network_interface_setup() {
 
 sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/systemd/network/20-dhcp.network
 [Match]
-Name=eth0
+Name='${1}'
 
 [Network]
 LinkLocalAddressing=ipv4
@@ -420,7 +487,7 @@ en_US.UTF-8 UTF-8
 # gez_ER UTF-8
 # gez_ER@abegede UTF-8
 # gez_ET UTF-8
-# gez_ET@abegede UTF-8
+# gez_ET@abegede UTF-8etup_configfiles
 # gl_ES ISO-8859-1
 # gl_ES.UTF-8 UTF-8
 # gl_ES@euro ISO-8859-15
@@ -683,16 +750,16 @@ sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' '${shell_cm
 # parameters: 1: mount dev name, 2: user name
 gen_add_user_sh() {
 echo "------------------------------------------"
-echo "generating add_user.sh chroot config script"
+echo "generating add_user.sh chroot config script"etup_configfiles
 echo "------------------------------------------"
 export DEFGROUPS="sudo,kmem,adm,dialout,${2},video,plugdev,netdev"
 
 sudo sh -c 'cat <<EOF > '${1}'/home/add_user.sh
 #!/bin/bash
 
-set -x
+#set -x
 
-export DEFGROUPS="sudo,kmem,adm,dialout,'${2}',video,plugdev,netdev"
+export DEFGROUPS="sudo,kmem,adm,dialout,'${2}',video,plugdev,netdev,audio"
 export LANG=C
 
 '${apt_cmd}' -y update
@@ -745,7 +812,7 @@ EOF'
 
 sudo chmod +x ${1}/home/add_user.sh
 
-sudo sh -c 'LANG=C.UTF-8  chroot --userspec=root:root '${1}' /usr/sbin/locale-gen en_GB.UTF-8 en_US.UTF-8,da_DK.UTF-8'
+sudo sh -c 'LANG=C.UTF-8  chroot --userspec=root:root '${1}' /usr/sbin/locale-gen en_GB.UTF-8 en_US.UTF-8 da_DK.UTF-8'
 
 }
 
@@ -758,7 +825,7 @@ echo "------------------------------------------"
 sudo sh -c 'cat <<EOF > '${1}'/home/initial.sh
 #!/bin/bash
 
-set -x
+#set -x
 
 ln -s /proc/mounts /etc/mtab
 
@@ -772,8 +839,8 @@ cat << EOT >/etc/fstab
 tmpfs				/tmp				tmpfs	defaults					0 0
 none				/dev/shm			tmpfs	rw,nosuid,nodev,noexec		0 0
 /sys/kernel/config	/config				none	bind						0 0
-/dev/mmcblk0p2		swap				swap	defaults					0 0
-debugfs				/sys/kernel/debug	debugfs	defaults					0 0
+#/dev/mmcblk0p2		swap				swap	defaults					0 0
+#debugfs				/sys/kernel/debug	debugfs	defaults					0 0
 EOT
 
 
@@ -784,22 +851,22 @@ echo "ECHO: Will now run '${apt_cmd}' update, upgrade"
 rm -f /etc/resolv.conf
 
 # enable systemd-networkd
-if [ ! -L '/lib/systemd/system/systemd-networkd.service' ]; then
-    echo ""
-    echo "ECHO:--> Enabling Systemd Networkd"
-    echo ""
-    ln -s /lib/systemd/system/systemd-networkd.service '${EnableSystemdNetworkedLink}'
-fi
-
-enable systemd-resolved
-if [ ! -L '/lib/systemd/system/systemd-resolved.service' ]; then
-    echo ""
-    echo "ECHO:--> Enabling Systemd Resolved"
-    echo ""
-    ln -s /lib/systemd/system/systemd-resolved.service '${EnableSystemdResolvedLink}'
-    rm -f /etc/resolv.conf
-    ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
-fi
+# if [ ! -L '/lib/systemd/system/systemd-networkd.service' ]; then
+#     echo ""
+#     echo "ECHO:--> Enabling Systemd Networkd"
+#     echo ""
+#     ln -s '${EnableSystemdNetworkedLink}' /lib/systemd/system/systemd-networkd.service
+# fi
+# 
+# enable systemd-resolved
+# if [ ! -L '/lib/systemd/system/systemd-resolved.service' ]; then
+#     echo ""
+#     echo "ECHO:--> Enabling Systemd Resolved"
+#     echo ""
+#     ln -s '${EnableSystemdResolvedLink}' /lib/systemd/system/systemd-resolved.service
+#     rm -f /etc/resolv.conf
+#     ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+# fi
 
 exit
 EOF'
@@ -819,7 +886,7 @@ fi
 sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 }
 
-# parameters: 1: mount dev name, 2: user name, 3: distro
+# parameters: 1: mount dev name, 2: user name, 3: distro, 4: distro arch
 setup_configfiles() {
 
 echo "Setting up config files "
@@ -842,11 +909,15 @@ gen_hosts ${1} ${HOST_NAME}
 
 sudo mkdir -p ${1}/etc/systemd/network
 
-gen_network_interface_setup
+if [[ "${4}" == "arm64" ]]; then
+    gen_network_interface_setup "wlan0"
+else
+    gen_network_interface_setup "eth0"
+fi
 
 sudo sh -c 'echo T0:2345:respawn:rootfs/sbin/getty -L ttyS0 115200 vt100 >> '${1}'/etc/inittab'
 
-conf_timezone_locale
+#conf_timezone_locale
 
 sudo sh -c 'cat <<EOT > '${1}'/etc/locale.conf
 LANG=en_US.UTF-8 UTF-8
@@ -855,7 +926,7 @@ LC_TIME=en_GB.UTF-8
 EOT'
 }
 
-# parameters: 1: mount dev name, 2: user name, 3: distro
+# parameters: 1: mount dev name, 2: user name, 3: distro, 4: distro arch
 initial_rootfs_user_setup_sh() {
 echo "------------------------------------------------------------"
 echo "----  running initial_rootfs_user_setup_sh      ------------"
@@ -874,7 +945,23 @@ sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}
 if [ "${3}" == "buster" ]; then
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install debconf gnupg2 sudo wget apt-utils kmod'
 fi
-sudo chroot --userspec=root:root ${1} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
+if [ "${3}" == "bionic" ]; then
+
+#export DEBIAN_FRONTEND=noninteractive
+#apt-get install -y tzdata
+#ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+#dpkg-reconfigure --frontend noninteractive tzdata
+
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tzdata'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -fs /usr/share/zoneinfo/Europe/Copenhagen /etc/localtime'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install leafpad gnupg2 avahi-discover traceroute cgroupfs-mount ntp'
+fi
+
+sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}.holotronic.lan/debian/socfpgakernel.gpg.key
+sudo chroot --userspec=root:root ${1} /usr/bin/apt-key add socfpgakernel.gpg.key
+sudo chroot --userspec=root:root ${1} /bin/rm socfpgakernel.gpg.key
+
 sudo cp ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
 gen_add_user_sh ${1} ${2}
 echo "Script_MSG: gen_add_user_sh finished ... will now run in chroot"
@@ -899,8 +986,17 @@ fi
 if [ "${DESKTOP}" == "yes" ]; then
     echo "Scr_MSG: Installing lxqt"
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' --no-install-recommends -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' --no-install-recommends -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
+    if [[ "${4}" == "arm64" ]]; then
+        if [ "${3}" == "bionic" ]; then
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install linux-firmware'
+        else
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y -t '${3}'-backports install firmware-ti-connectivity'
+        fi
+    fi
     if [[ "${2}" == "holosynth" ]]; then
         echo "Scr_MSG: Installing Cadence deps"
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
@@ -935,17 +1031,52 @@ echo "Script_MSG: initial_rootfs_user_setup_sh finished .. ok .."
 
 }
 
-# parameters: 1: mount dev name, 2: user name, 3: distro
+# parameters: 1: mount dev name, 2: user name, 3: distro, 4: distro arch
 finalize(){
 if [[ "${2}" == "holosynth" ]]; then
-    sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/output_files/DE1_SOC_Linux_FB.rbf ${1}/boot
+#    sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/output_files/DE1_SOC_Linux_FB.rbf ${1}/boot
 #	sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/socfpga.dtb ${R1}/boot
-    echo ""
-    echo "# --------->   Flip framebuffer upside down and no blanking fix    <--------------- ---------"
-    echo ""
-    sudo sh -c 'cat <<EOF >> '${1}'/boot/uEnv.txt
-mmcboot=setenv bootargs console=ttyS0,115200 root=\${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz \${loadaddr} - \${fdt_addr}
+#    echo ""
+#    echo "# --------->   Flip framebuffer upside down and no blanking fix    <--------------- ---------"
+#    echo ""
+#     sudo sh -c 'cat <<EOF >> '${1}'/boot/uEnv.txt
+# mmcboot=setenv bootargs console=ttyS0,115200 root=\${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz \${loadaddr} - \${fdt_addr}
+# EOF'
+
+    if [[ "${4}" == "arm64" ]]; then
+sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf-armsoc
+Section "InputDevice"
+	Identifier	"System Mouse"
+	Driver		"mouse"
+	Option		"Device" "/dev/input/mouse0"
+EndSection
+
+Section "InputDevice"
+	Identifier	"System Keyboard"
+	Driver		"kbd"
+	Option		"Device" "/dev/input/event0"
+EndSection
+
+Section "Device"
+        Identifier      "ZynqMP"
+        Driver          "armsoc"
+        Option          "DRI2"                  "true"
+        Option          "DRI2_PAGE_FLIP"        "false"
+        Option          "DRI2_WAIT_VSYNC"       "true"
+        Option          "SWcursorLCD"           "false"
+        Option          "DEBUG"                 "false"
+EndSection
+
+Section "Screen"
+        Identifier      "DefaultScreen"
+        Device          "ZynqMP"
+        DefaultDepth    30
+	SubSection "Display"
+	    Modes "1920x1080"
+	EndSubSection
+EndSection
 EOF'
+
 
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
 Section "Device"
@@ -963,13 +1094,33 @@ Section "ServerLayout"
 EndSection
 
 EOF'
-    if [[ "${3}" == "stretch" ]]; then
-        sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/.xsessionrc
-xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
-EOF'
+    else
 
-    sudo mkdir -p ${1}/home/holosynth/Desktop
-    sudo sh -c 'cat <<EOF > '${1}'/usr/share/applications/holosynthed.desktop
+sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
+Section "Device"
+    Identifier      "Frame Buffer"
+    Driver  "fbdev"
+    Option "Rotate" "off"
+EndSection
+
+Section "ServerLayout"
+    Identifier "ServerLayout0"
+    Option "BlankTime"   "0"
+    Option "StandbyTime" "0"
+    Option "SuspendTime" "0"
+    Option "OffTime" "0"
+EndSection
+
+EOF'
+    fi
+#    if [[ "${3}" == "stretch" ]]; then
+#         sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/.xsessionrc
+# xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
+# EOF'
+
+    mkdir -p ${1}/home/holosynth/Desktop
+    mkdir -p ${1}/home/holosynth/.local/share/applications
+    sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/.local/share/applications/holosynthed.desktop
 [Desktop Entry]
 Name=HolosynthVEd
 GenericName=HolosynthVEd
@@ -977,7 +1128,7 @@ Comment=Synth Editor for HolosynthV
 Exec=/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
 Icon=catia
 Terminal=false
-Type=Applicatio
+Type=Application
 Categories=AudioVideo;AudioEditing;Qt
 EOF'
 
@@ -985,10 +1136,9 @@ EOF'
 /home/holosynth/prg/HolosynthVEd -nograb -platform xcb
 EOF'
 
-    fi
+#    fi
     sudo chmod +x ${1}/home/holosynth/Desktop/HolosynthVEd.sh
-    sudo chown -R mib:mib ${1}/home/holosynth/Desktop
-
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/chown  -R '${2}':'${2}' /home/'${2}''
 fi
 
 if [ "${2}" == "machinekit" ]; then
@@ -1029,8 +1179,8 @@ EOT'
 fi
 fi
 
-sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '${1}'/etc/modprobe.d/uioreg.conf'
-sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '${1}'/etc/udev/rules.d/10-local.rules'
+# sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '${1}'/etc/modprobe.d/uioreg.conf'
+# sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '${1}'/etc/udev/rules.d/10-local.rules'
 
 echo ""
 echo "# --------->       Removing qemu policy file          <--------------- ---------"
