@@ -21,34 +21,32 @@
 # Variables Custom settings
 #------------------------------------------------------------------------------------------------------
 
-## Select distro:
-DISTROS=("stretch" "buster" "bionic" "petalinux")
-### Debian based:
-#distro="stretch"
-#distro="buster"
-### Ubuntu based:
-#distro=bionic
-#distro=xenial
+## Valid boards:
+BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit" "ultra96")
 
+## Valid distros:
+DISTROS=("stretch" "buster" "bionic" "petalinux")
+
+## Valid archs:
 DISTARCHS=("armhf" "arm64")
 
-#HOME_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
-HOME_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
+## Valid user names
+USERS=("machinekit" "holosynth" "ubuntu" "vivado")
+
+#HOME_DEB_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
+HOME_DEB_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
 
 shell_cmd="/bin/bash"
-#shell_cmd="/bin/sh"
 
-#ROOT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
-#ROOT_REPO_URL=http://ports.ubuntu.com/ubuntu-ports
-#ROOT_REPO_URL=${HOME_MIRR_REPO_URL}
-DEB_ROOT_REPO_URL="http://deb.debian.org//debian/"
-UB_ROOT_REPO_URL="http://ports.ubuntu.com/ubuntu-ports/"
+DEB_EXT_REPO_URL="http://deb.debian.org//debian/"
+#UB_EXT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
+UB_EXT_REPO_URL="http://ports.ubuntu.com/ubuntu-ports/"
 #final_repo="http://ftp.dk.debian.org/debian/"
-final_deb_repo="http://deb.debian.org//debian/"
-final_ub_repo="http://ports.ubuntu.com/ubuntu-ports/"
-#local_repo=${HOME_MIRR_REPO_URL}
-local_deb_repo="http://deb.debian.org//debian/"
-local_ub_repo="http://ports.ubuntu.com/ubuntu-ports/"
+final_deb_repo=
+final_ub_repo=${UB_EXT_REPO_URL}
+#local_deb_repo=${HOME_DEB_MIRR_REPO_URL}
+local_deb_repo=${DEB_EXT_REPO_URL}
+local_ub_repo=${UB_EXT_REPO_URL}
 local_ws=neon-ws
 local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
 
@@ -65,9 +63,6 @@ ext4_options="-O ^metadata_csum,^64bit"
 mkfs_options=""
 
 
-## Select board
-BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit" "ultra96")
-
 ## Select u-boot version:
 #UBOOT_VERSION="v2016.09"
 UBOOT_VERSION="v2018.01"
@@ -79,12 +74,6 @@ UBOOT_MAKE_CONFIG="all"
 XIL_UBOOT_IMG_FILENAME="u-boot"
 XIL_BOOT_FILES_LOC=/home/mib/Development/Docker/petalinux-docker
 
-## Select user name / function
-USERS=("machinekit" "holosynth" "ubuntu" "vivado")
-#USER_NAME=ubuntu;
-#USER_NAME=machinekit;
-#USER_NAME=holosynth;
-
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
 
@@ -94,10 +83,6 @@ XIL_GIT_KERNEL_VERSION="xilinx"
 XIL_GIT_KERNEL_REV="-v2018.2"
 #XIL_GIT_KERNEL_REV="-v2017.3"
 #ALT_GIT_KERNEL_VERSION="4.15"
-#ALT_GIT_KERNEL_REV=""
-
-SD_KERNEL_VERSION=${ALT_GIT_KERNEL_VERSION}
-#SD_KERNEL_VERSION=${RT_KERNEL_VERSION}
 
 #RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
 #RT_PATCH_REV="ltsi-rt23"
@@ -121,7 +106,7 @@ QWTDIR="/home/mib/Developer/ext-repos/qwt/qwt"
 #apt_cmd=apt
 apt_cmd="apt-get"
 #------------------------------------------------------------------------------------------------------
-WORK_DIR=${1}
+WORK_DIR=$(pwd)
 
 #HOME_REPO_DIR="/var/www/repos/apt/debian"
 HOME_REPO_DIR="/var/www/debian"
@@ -147,23 +132,6 @@ DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev"
 ## ----------------------------  Toolchain   -----------------------------##
 CROSS_GNU_ARCH="arm-linux-gnueabihf"
 CROSS_GNU_ARCH_64="aarch64-linux-gnu"
-
-#GCC v6
-#http://releases.linaro.org/components/toolchain/binaries/6.3-2017.05/arm-linux-gnueabihf/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf.tar.xz
-#GCC_REL="6.3"
-#GCC_VER="1"
-#GCC_REV="2017.05"
-#PCH63_CC_FOLDER_NAME="gcc-linaro-${GCC_REL}.${GCC_VER}-${GCC_REV}-x86_64_${CROSS_GNU_ARCH}"
-#PCH63_CC_FILE="${PCH63_CC_FOLDER_NAME}.tar.xz"
-#PCH63_CC_URL="http://releases.linaro.org/components/toolchain/binaries/${GCC_REL}-${GCC_REV}/${CROSS_GNU_ARCH}/${PCH63_CC_FILE}"
-
-
-#GCC v5
-#PCH52_CC_FOLDER_NAME="gcc-linaro-5.2-2015.11-1-x86_64_${CROSS_GNU_ARCH}"
-#PCH52_CC_FILE="${PCH52_CC_FOLDER_NAME}.tar.xz"
-#PCH52_CC_URL="http://releases.linaro.org/components/toolchain/binaries/5.2-2015.11-1/${CROSS_GNU_ARCH}/${PCH52_CC_FILE}"
-
-#TOOLCHAIN_DIR=${HOME}/bin
 
 QT_CFLAGS="-march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard"
 
@@ -196,7 +164,6 @@ RT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${RT_KERNEL_VERSION}-gnueabifh-ke
 RT_KERNEL_BUILD_DIR="${RT_KERNEL_PARENT_DIR}/${RT_KERNEL_FOLDER}"
 ALT_GIT_KERNEL_BUILD_DIR="${ALT_GIT_KERNEL_PARENT_DIR}/linux"
 XIL_GIT_KERNEL_BUILD_DIR="${XIL_GIT_KERNEL_PARENT_DIR}/linux"
-SD_KERNEL_PARANT_DIR="${CURRENT_DIR}/arm-linux-${SD_KERNEL_VERSION}-gnueabifh-kernel"
 
 #ALT_GIT_KERNEL_URL="https://github.com/altera-opensource/linux-socfpga.git"
 ALT_GIT_KERNEL_URL="https://github.com/the-snowwhite/linux-socfpga.git"
@@ -258,9 +225,7 @@ usage()
     echo "    --deps    Will install build deps"
     echo "    --uboot   Will clone, patch and build uboot (add =c to skip build)"
     echo "    --build_git-kernel   Will clone, patch and build kernel from git (add =c to skip build)"
-#     echo "    --build_rt-ltsi-kernel   Will download rt-ltsi kernel, patch and build kernel (add =c to skip build)"
     echo "    --gitkernel2repo   Will add kernel .debs to local repo Use =distroname=distarch"
-#     echo "    --rtkernel2repo   Will add kernel .debs to local repo"
     echo "    --mk2repo   Will add machinekit .debs to local repo Use =distroname=distarch"
     echo "    --cadence2repo   Will add cadence .debs to local repo Use =distroname=distarch"
     echo "    --carla2repo   Will add carla .debs to local repo Use =distroname=distarch"
@@ -276,9 +241,6 @@ usage()
     echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file"
     echo "    --assemble_desktop_sd_img   Will generate full populated fb sd imagefile and bmap file"
     echo "    --inst_hs_aud_stuff  Will install holosynth audio stuff in rootfs image"
-#     echo "    --build_qt_cross  Will build and install qt in rootfs image"
-#     echo "    --crossbuild_qt_plugins  Will build and install qt plugins in qt_rootfs image"
-    echo "    --assemble_qt_dev_sd_img   Will generate full populated sd imagefile with QT-dev and bmap file"
     echo ""
 }
 
@@ -373,24 +335,6 @@ build_git_kernel() {
     fi
 }
 
-# build_rt_ltsi_kernel() {
-#     distro="stretch"
-#     if [ -d ${RT_KERNEL_BUILD_DIR} ]; then
-#         echo the kernel target directory ${RT_KERNEL_BUILD_DIR} already exists cleaning ...
-#         rm -R ${RT_KERNEL_BUILD_DIR}
-#         cd ${RT_KERNEL_PARENT_DIR}
-#         extract_xz ${RT_KERNEL_FILE_NAME}
-#     else
-#         mkdir -p ${RT_KERNEL_PARENT_DIR}
-#         cd ${RT_KERNEL_PARENT_DIR}
-#         get_and_extract ${RT_KERNEL_PARENT_DIR} ${KERNEL_URL} ${RT_KERNEL_FILE_NAME}
-#     fi
-#     rt_patch_kernel
-#     if [ "${1}" != "c" ]; then
-#     armhf_build "${RT_KERNEL_BUILD_DIR}" "${KERNEL_PRE_CONFIGSTRING}"
-#     fi
-# }
-
 ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
 gen_rootfs_image() {
     zero=0;
@@ -406,14 +350,14 @@ gen_rootfs_image() {
             echo ""
             if [ "${DESKTOP}" == "yes" ]; then
                 if [ "${3}" == "bionic" ]; then
-                    run_desktop_qemu_debootstrap_bionic ${1} ${3} ${UB_ROOT_REPO_URL} ${4}
+                    run_desktop_qemu_debootstrap_bionic ${1} ${3} ${UB_EXT_REPO_URL} ${4}
                     echo "Script_MSG: run_desktop_qemu_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
                 else
-                    run_desktop_qemu_debootstrap ${1} ${3} ${DEB_ROOT_REPO_URL} ${4}
+                    run_desktop_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
                     echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
                 fi
             else
-                run_qemu_debootstrap ${1} ${3} ${DEB_ROOT_REPO_URL} ${4}
+                run_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
                 echo "Script_MSG: run_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
             fi
             echo ""
@@ -599,11 +543,16 @@ assemble_full_sd_img() {
             contains ${USERS[@]} ${5}
             if [ "$?" -eq 0 ]; then
                 echo "Valid user name = ${5} given"
-                SD_FILE_PRELUDE=socfpga_${4}_${5}_${SD_KERNEL_VERSION}-${REL_DATE}
-                if [ "${DESKTOP}" == "yes" ]; then
-                    SD_IMG_NAME="${SD_FILE_PRELUDE}-${3}_desktop_sd.img"
+                if [ "${3}" == "ultra96" ]; then
+                    SD_KERNEL_VERSION=${XIL_GIT_KERNEL_TAG}
                 else
-                    SD_IMG_NAME="${SD_FILE_PRELUDE}-${3}_sd.img"
+                    SD_KERNEL_VERSION=${ALT_GIT_KERNEL_TAG}
+                fi
+                SD_FILE_PRELUDE="socfpga_${4}_${5}_${SD_KERNEL_VERSION}-${3}"
+                if [ "${DESKTOP}" == "yes" ]; then
+                    SD_IMG_NAME="${SD_FILE_PRELUDE}_desktop_sd_${REL_DATE}.img"
+                else
+                    SD_IMG_NAME="${SD_FILE_PRELUDE}_sd_${REL_DATE}.img"
                 fi
                 SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
 
@@ -646,7 +595,8 @@ assemble_full_sd_img() {
                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
 #                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-armsoc xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra'
 #                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev xserver-xorg-video-armsoc-exynos xserver-xorg-video-armsoc lua-inotify inotify-tools'
-                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev lua-inotify inotify-tools'
+#                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev lua-inotify inotify-tools'
+                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-fbdev'
                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/mv /etc/X11/xorg.conf /etc/X11/xorg.conf-armsoc'
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
@@ -748,9 +698,6 @@ while [ "$1" != "" ]; do
                 echo " ${DISTROS[@]}"
             fi
             ;;
-#         --build_rt-ltsi-kernel)
-#             build_rt_ltsi_kernel "${VALUE1}"
-#            ;;
         --gitkernel2repo)
             contains ${DISTARCHS[@]} ${VALUE2}
             if [ "$?" -eq 0 ]; then
@@ -769,10 +716,6 @@ while [ "$1" != "" ]; do
                 echo " ${DISTARCHS[@]}"
             fi
             ;;
-#        --rtkernel2repo)
-#            add2repo ${distro} ${RT_KERNEL_PARENT_DIR} ${RT_KERNEL_TAG}
-#            add2repo "stretch" ${RT_KERNEL_PARENT_DIR} "${RT_KERNEL_TAG}-socfpga-${KERNEL_PKG_VERSION}|linux-libc-dev"
-#            ;;
         --mk2repo)
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
             add2repo "${VALUE1}" "/home/mib/Development/Docker" "${VALUE2}" "machinekit"
@@ -788,15 +731,6 @@ while [ "$1" != "" ]; do
         --xf86-video-armsoc2repo)
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
             add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/armsoc_debs" "${VALUE2}" "xserver-xorg-video-armsoc"
-            ;;
-        --gen-base-qemu-rootfs) 
-            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
-            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-qemu-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
-            ;;
-        --gen-base-qemu-rootfs-desktop)
-            DESKTOP="yes"
-            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
-            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-qemu-${VALUE2}-desktop_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
             ;;
         --finalize-rootfs)
             finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/qemu-${VALUE3}-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
@@ -844,38 +778,6 @@ while [ "$1" != "" ]; do
             inst_cadence ${ROOTFS_MNT} 2>&1| tee ${CURRENT_DIR}/Qt_logs/install_cadence-log.txt
             compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
             unmount_binded ${ROOTFS_MNT}
-            ;;
-#         --build_qt_cross)
-#             if [ "$(ls -A ${QT_1})" ]; then
-#                 echo "Script_MSG: !! Found ${QT_1} mounted .. will unmount now"
-#                 unmount_binded ${QT_1}
-#             fi
-#             create_img "1" "${CURRENT_DIR}/${ROOTFS_IMG}"
-#             mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${QT_1}
-#             bind_mounted ${QT_1}
-#             extract_rootfs ${CURRENT_DIR} ${QT_1} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
-#             qt_build
-#             compress_rootfs ${CURRENT_DIR} ${QT_1} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt"
-#             unmount_binded ${QT_1}
-#             ;;
-#         --crossbuild_qt_plugins)
-#             if [ "$(ls -A ${QT_1})" ]; then
-#                 echo "Script_MSG: !! Found ${QT_1} mounted .. will unmount now"
-#                 unmount_binded ${QT_1}
-#             fi
-#             create_img "1" "${CURRENT_DIR}/${QT_ROOTFS_IMG}"
-#             mount_imagefile "${CURRENT_DIR}/${QT_ROOTFS_IMG}" ${QT_1}
-#             bind_mounted ${QT_ROOTFS_MNT}
-#             extract_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt"
-#             build_qt_plugins
-#             compress_rootfs ${CURRENT_DIR} ${QT_ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt-and-qt-plugins"
-#             unmount_binded ${QT_ROOTFS_MNT}
-#             ;;
-        --assemble_qt_dev_sd_img)
-            DESKTOP="yes"
-#            assemble_full_sd_img "finalized-fully-configured-with-kernel-and-qt-installed"
-#            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qtbuilt-and-qt-plugins" "${VALUE1}"
-            assemble_full_sd_img "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps" "${VALUE1}"
             ;;
     *)
             echo "ERROR: unknown parameter \"$PARAM\""

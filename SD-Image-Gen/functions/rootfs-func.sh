@@ -10,10 +10,6 @@ output=${?}
 
 # lightdm,lxqt
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
-## E: Couldn't find these debs: libdirectfb-1.7-7 libssh2-1 cgroupfs-mount gnupg2 ntp leafpad avahi-discover traceroute ifupdown2
-#I: Checking component main on http://ports.ubuntu.com/ubuntu-ports...
-#E: Couldn't find these debs: leafpad gnupg2 avahi-discover traceroute cgroupfs-mount ntp
-
 run_desktop_qemu_debootstrap_bionic() {
 sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,libnss-mdns,strace,u-boot-tools,initramfs-tools,dirmngr,wget,git,curl,xorg,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}
 output=${?}
@@ -43,24 +39,6 @@ run_desktop_qemu_debootstrap() {
 sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid ${2} ${1} ${3}
 output=${?}
 }
-#,task-lxde-desktop,lxsession,xinput
-
-# run_qt_qemu_debootstrap() {
-# sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid ${2} ${1} ${3}
-# output=${?}
-# }
-#,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge
-#
-# ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
-# run_qt_qemu_debootstrap() {
-# sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,policykit-1,gtk2-engines-pixbuf,budgie-indicator-applet,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,busybox,openbox,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge,fontconfig,fontconfig-config ${2} ${1} ${3}
-# output=${?}
-# }
-#
-#
-# run_qt_qemu_debootstrap() {
-# sudo qemu-debootstrap --foreign --arch=${4}--variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,xorg,busybox,openbox,lxsession,task-lxde-desktop,xinput,policykit-1,gtk2-engines-pixbuf,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,cgroupfs-mount,ntp,autofs,u-boot-tools,initramfs-tools,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron  ${2} ${1} ${3}
-# }
 
 # parameters: 1: mount dev name
 gen_policy_rc_d() {
@@ -942,10 +920,11 @@ sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /tmp
 sudo chroot --userspec=root:root ${1} /bin/mkdir -p /var/tmp
 sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /var/tmp
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
-if [ "${3}" == "buster" ]; then
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
+#if [ "${3}" == "buster" ]; then
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install debconf gnupg2 sudo wget apt-utils kmod'
-fi
-if [ "${3}" == "bionic" ]; then
+#fi
+#if [ "${3}" == "bionic" ]; then
 
 #export DEBIAN_FRONTEND=noninteractive
 #apt-get install -y tzdata
@@ -956,7 +935,7 @@ if [ "${3}" == "bionic" ]; then
     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -fs /usr/share/zoneinfo/Europe/Copenhagen /etc/localtime'
     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install leafpad gnupg2 avahi-discover traceroute cgroupfs-mount ntp'
-fi
+#fi
 
 sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}.holotronic.lan/debian/socfpgakernel.gpg.key
 sudo chroot --userspec=root:root ${1} /usr/bin/apt-key add socfpgakernel.gpg.key
@@ -985,21 +964,41 @@ fi
 
 if [ "${DESKTOP}" == "yes" ]; then
     echo "Scr_MSG: Installing lxqt"
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
-#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' --no-install-recommends -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+    if [ "${3}" == "bionic" ]; then
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
+        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/tasksel install kubuntu-desktop'
+    else
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install openbox pcmanfm-qt lxqt-admin lxqt-common lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+    #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y '
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-addons'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install  kwin-style-breeze'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze-icon-theme'
+    fi
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' --no-install-recommends -y install kde-window-manager kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kwin-wayland'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/add-apt-repository -y ppa:lubuntu-dev/lubuntu-daily'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt openbox xfwm4'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4 xfwm4-theme-breeze'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
+
     if [[ "${4}" == "arm64" ]]; then
         if [ "${3}" == "bionic" ]; then
             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install linux-firmware'
         else
             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y -t '${3}'-backports install firmware-ti-connectivity'
         fi
+        sudo cp ${WORK_DIR}/../bt/TIInit_11.8.32.bts ${1}/lib/firmware/ti-connectivity/        
     fi
     if [[ "${2}" == "holosynth" ]]; then
         echo "Scr_MSG: Installing Cadence deps"
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
 #        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_9.5.1~kxstudio3_all.deb'
 #        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/dpkg -i kxstudio-repos_9.5.1~kxstudio3_all.deb'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libglibmm-2.4-1v5'
@@ -1018,7 +1017,7 @@ if [ "${DESKTOP}" == "yes" ]; then
 fi
 
 gen_initial_sh ${1}
-echo "Script_MSG: gen_initial.sh finhed ... will now run in chroot"
+echo "Script_MSG: gen_initial.sh finished ... will now run in chroot"
 
 sudo chroot ${1} ${shell_cmd} -c /home/initial.sh
 
