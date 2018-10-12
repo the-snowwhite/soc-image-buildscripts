@@ -1,7 +1,7 @@
-From 2574ce8bd3437ea177795640d57d3dadc41f301e Mon Sep 17 00:00:00 2001
+From 23587f1b5448674aff2b527b068a464d90e79665 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
-Subject: [PATCH 09/29] add spidev in dts so driver is loaded
+Subject: [PATCH 09/30] add spidev in dts so driver is loaded
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
-index 3de276d..dce1143 100644
+index 3de276d42114..dce11432fcbd 100644
 --- a/arch/arm/boot/dts/socfpga.dtsi
 +++ b/arch/arm/boot/dts/socfpga.dtsi
 @@ -804,8 +804,17 @@
@@ -32,5 +32,5 @@ index 3de276d..dce1143 100644
  
  		sysmgr: sysmgr@ffd08000 {
 -- 
-2.7.4
+2.17.1
 

@@ -1,4 +1,4 @@
-From de6adf6b2aeeb63b2dd952ff31295ea1be030b32 Mon Sep 17 00:00:00 2001
+From df5f91d2752d99adf92b55039fb2483748accc25 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
 Subject: [PATCH 09/18] Added DE-10 Nano with/without framebuffer dts dtb
@@ -6,9 +6,9 @@ Subject: [PATCH 09/18] Added DE-10 Nano with/without framebuffer dts dtb
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                         |   2 +
- arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts   | 112 +++++++++++
- .../arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts | 215 +++++++++++++++++++++
- 3 files changed, 329 insertions(+)
+ arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts   | 112 +++++++++
+ .../arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts | 252 +++++++++++++++++++++
+ 3 files changed, 366 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
 
@@ -145,25 +145,25 @@ index 0000000..7645340
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
 new file mode 100644
-index 0000000..8fc5730
+index 0000000..83b3013
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
-@@ -0,0 +1,215 @@
+@@ -0,0 +1,252 @@
 +/*
-+ * Copyright Intel Corporation (C) 2017. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
++* Copyright Intel Corporation (C) 2017. All rights reserved.
++*
++* This program is free software; you can redistribute it and/or modify
++* it under the terms and conditions of the GNU General Public License,
++* version 2, as published by the Free Software Foundation.
++*
++* This program is distributed in the hope it will be useful, but WITHOUT
++* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++* more details.
++*
++* You should have received a copy of the GNU General Public License along with
++* this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
 +
 +#include "socfpga_cyclone5.dtsi"
 +
@@ -212,6 +212,42 @@ index 0000000..8fc5730
 +		};
 +	};
 +
++	sound {
++		compatible = "opencores,de10soc-hsynthpcm5102-audio-midi";
++		i2s-controller = <&i2s>;
++		audio-codec = <&hsynthpcm5102_codec>;
++	};
++
++	clk48: clk48 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <24576000>;
++		clock-output-names = "clk48";
++	};
++
++	clk44: clk44 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <33868800>;
++		clock-output-names = "clk44";
++	};
++
++	i2s: i2s@0x0 {
++		#sound-dai-cells = <1>;
++		compatible = "opencores,i2s";
++		reg = <0xff200000 0x20>, <0xff200020 0x20>;
++		clocks = <&clk44>, <&clk48>;
++		clock-names = "clk44", "clk48";
++		dmas = <&pdma 0>, <&pdma 1>;
++		dma-names = "tx", "rx";
++	};
++
++	hsynthpcm5102_codec: hsynthpcm5102-codec {
++	#sound-dai-cells = <0>;
++		compatible = "holotr,hsynthpcm5102";
++		status = "okay";
++	};
++
 +	bridge@0xc0000000 {
 +		compatible = "altr,bridge-15.1", "simple-bus";
 +		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
@@ -222,9 +258,10 @@ index 0000000..8fc5730
 +				<0x00000001 0x00003000 0xff203000 0x00000010>,
 +				<0x00000001 0x00004000 0xff204000 0x00000010>,
 +				<0x00000001 0x00005000 0xff205000 0x00000010>,
-+				<0x00000001 0x00050000 0xff250000 0x00000100>,
-+				<0x00000001 0x00051000 0xff251000 0x00000080>,
-+				<0x00000001 0x00040000 0xff240000 0x00010000>;
++				<0x00000001 0x00030000 0xff230000 0x00000100>,
++				<0x00000001 0x00031000 0xff231000 0x00000080>,
++				<0x00000001 0x00040000 0xff240000 0x00010000>,
++				<0x00000001 0x00050000 0xff250000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -276,9 +313,9 @@ index 0000000..8fc5730
 +			gpio-controller;
 +		};
 +
-+		ilc@0x100003000 {
++		ilc@0x100030000 {
 +			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
-+			reg = <0x00000001 0x00050000 0x00000100>;
++			reg = <0x00000001 0x00030000 0x00000100>;
 +			interrupt-controller;
 +			#interrupt-cells = <0x1>;
 +			altr,sw-fifo-depth = <0x20>;
@@ -286,16 +323,16 @@ index 0000000..8fc5730
 +
 +		vip@0x100031000 {
 +			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-9.1";
-+			reg = <0x00000001 0x00051000 0x00000080>;
-+			max-width = <0x400>;
-+			max-height = <0x300>;
++			reg = <0x00000001 0x00031000 0x00000080>;
++			max-width = <1366>;
++			max-height = <768>;
 +			bits-per-color = <0x8>;
 +			colors-per-beat = <0x4>;
 +			beats-per-pixel = <0x1>;
 +			mem-word-width = <0x80>;
 +		};
 +
-+		hm2-socfpga0@0x100040000 {
++		uio-socfpg0@0x100040000 {
 +			compatible = "generic-uio,ui_pdrv";
 +			reg = <0x00000001 0x00040000 0x00010000>;
 +			interrupt-parent = <0x2>;

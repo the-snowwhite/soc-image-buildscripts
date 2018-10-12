@@ -1,20 +1,20 @@
-From 99e5ef7320c37afa04117b2331c6c2f17b4d7a4e Mon Sep 17 00:00:00 2001
+From a898f2a224c1c68ec3fb681e893280e6c45293a9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 30 May 2018 12:33:08 +0200
-Subject: [PATCH 19/29] Terasic dev boards: Make core addresses in qsys
+Subject: [PATCH 19/30] Terasic dev boards: Make core addresses in qsys
  devicetrees consistant
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- .../socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 16 ++---
- .../boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 14 ++---
- .../dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts   | 14 ++---
- arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts     | 71 ++++++++++++----------
- .../arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts | 40 ++++++------
+ ...pga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 16 ++---
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 14 ++--
+ .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 14 ++--
+ .../arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 71 +++++++++++--------
+ .../dts/socfpga_cyclone5_de1_soc_fbii.dts     | 40 +++++------
  5 files changed, 82 insertions(+), 73 deletions(-)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
-index 7e1acf9..1bf0892 100644
+index 7e1acf94ba6b..1bf089216f35 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 @@ -103,14 +103,14 @@
@@ -41,7 +41,7 @@ index 7e1acf9..1bf0892 100644
  		sysid@0x100001000 {
  			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
-index be476a1..c05a7f7 100644
+index be476a1031fd..c05a7f799d5b 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 @@ -67,13 +67,13 @@
@@ -66,7 +66,7 @@ index be476a1..c05a7f7 100644
  		sysid@0x100001000 {
  			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
-index f6ba2c6..ce568a0 100644
+index f6ba2c68e527..ce568a0efbfd 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
 @@ -67,13 +67,13 @@
@@ -91,7 +91,7 @@ index f6ba2c6..ce568a0 100644
  		sysid@0x100001000 {
  			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
-index d2b80e6..4925f44 100644
+index d2b80e6d9044..4925f44d0043 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 @@ -117,44 +117,34 @@
@@ -207,7 +207,7 @@ index d2b80e6..4925f44 100644
  			compatible = "generic-uio,ui_pdrv";
  			reg = <0x00000001 0x00040000 0x00010000>;
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
-index 225e461..c6aaacc 100644
+index 225e46161c5c..c6aaacc3496e 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
 @@ -117,33 +117,33 @@
@@ -285,5 +285,5 @@ index 225e461..c6aaacc 100644
  			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
  			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
 -- 
-2.7.4
+2.17.1
 

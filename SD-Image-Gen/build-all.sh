@@ -72,7 +72,7 @@ XIL_UBOOT_VERSION="xilinx-v2018.2"
 #UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
 XIL_UBOOT_IMG_FILENAME="u-boot"
-XIL_BOOT_FILES_LOC=/home/mib/Development/Docker/petalinux-docker
+XIL_BOOT_FILES_LOC="/home/mib/Development/Docker/petalinux-docker"
 
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
@@ -558,33 +558,34 @@ assemble_full_sd_img() {
 
                 echo "step 1 create ${SD_IMG_FILE}"
                 if [ "${3}" == "ultra96" ]; then
-                    create_img "2" "${SD_IMG_FILE}" "${1}" "p2"
-                    mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
                     if [ "${4}" == "petalinux" ]; then
+                        create_img "2" "${SD_IMG_FILE}" "${1}" "p2" "1"
+                        mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
                         echo "Copying files to boot partition"
-                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
-                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/BOOT.BIN ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/image.ub ${1}
                         echo "Unmounting boot partition"
                         unmount_binded ${1}
                         unmount_loopdev
                         echo "mounting rootfs partition"
                         mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
                         echo "Extracting to rootfs partition"
-                        sudo tar xfS ${XIL_BOOT_FILES_LOC}/rootfs.tar.bz2 -C ${1} --use-compress-program lbzip2
+                        sudo tar xfS ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/rootfs.tar.bz2 -C ${1} --use-compress-program lbzip2
                         unmount_binded ${1}
                         unmount_loopdev
                         echo "No dd uboot install"
                     else
+                        create_img "2" "${SD_IMG_FILE}" "${1}" "p2" "2"
+                        mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
                         echo "Copying files to boot partition"
-                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
-    #                    sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/boot_files/BOOT.BIN ${1}
+#                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
                         echo "Unmounting boot partition"
                         unmount_binded ${1}
                         unmount_loopdev
                         echo "mounting rootfs partition"
                         mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
                         echo "Extracting to rootfs partition"
-    #                     sudo tar xfS ${XIL_BOOT_FILES_LOC}/rootfs.tar.bz2 -C ${1} --use-compress-program lbzip2
                         extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
                         if [ "${4}" == "bionic" ]; then
                             bind_mounted ${1}
@@ -596,7 +597,9 @@ assemble_full_sd_img() {
 #                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-armsoc xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra'
 #                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev xserver-xorg-video-armsoc-exynos xserver-xorg-video-armsoc lua-inotify inotify-tools'
 #                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev lua-inotify inotify-tools'
+                            set -x
                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-fbdev'
+                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils'
                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/mv /etc/X11/xorg.conf /etc/X11/xorg.conf-armsoc'
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
@@ -621,6 +624,7 @@ EOF'
                         unmount_binded ${1}
                         unmount_loopdev
                         echo "No dd uboot install"
+                        set +x
                     fi                    
                 else
                     create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"

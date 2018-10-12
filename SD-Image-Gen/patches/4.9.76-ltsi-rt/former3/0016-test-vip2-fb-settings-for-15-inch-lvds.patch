@@ -1,4 +1,4 @@
-From 0d83a637fbeea3395e5b95de6dd2e69fb7647ca6 Mon Sep 17 00:00:00 2001
+From fef8ad9886fffa2f7b661eee21646899bd3790f9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 4 May 2018 14:32:56 +0200
 Subject: [PATCH 16/18] test vip2 fb settings for 15 inch lvds

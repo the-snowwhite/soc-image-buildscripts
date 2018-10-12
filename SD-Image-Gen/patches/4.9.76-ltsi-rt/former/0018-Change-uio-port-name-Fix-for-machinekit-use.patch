@@ -1,0 +1,40 @@
+From 810213051362d67e664e2c6c81ebcc410cd983d0 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sat, 26 May 2018 21:36:55 +0200
+Subject: [PATCH 18/29] Change uio port name Fix: for machinekit use
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts    | 2 +-
+ arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
+index 074a589..be476a1 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
+@@ -144,7 +144,7 @@
+ 			mem-word-width = <0x80>;
+ 		};
+ 
+-		uio-socfpg0@0x100040000 {
++		hm2-socfpga0@0x100040000 {
+ 			compatible = "generic-uio,ui_pdrv";
+ 			reg = <0x00000001 0x00040000 0x00010000>;
+ 			interrupt-parent = <0x2>;
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
+index bfb2898..f6ba2c6 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
+@@ -144,7 +144,7 @@
+ 			mem-word-width = <0x80>;
+ 		};
+ 
+-		uio-socfpg0@0x100040000 {
++		hm2-socfpga0@0x100040000 {
+ 			compatible = "generic-uio,ui_pdrv";
+ 			reg = <0x00000001 0x00040000 0x00010000>;
+ 			interrupt-parent = <0x2>;
+-- 
+2.7.4
+

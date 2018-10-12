@@ -1,27 +1,27 @@
-From d30b0c95fd569c9da99e9f203d7e851845e7a1f3 Mon Sep 17 00:00:00 2001
+From f6091a4690f9437e6f47a20e5d454acab68939f0 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 17 May 2018 10:58:21 +0200
-Subject: [PATCH 15/29] Add Hsynth audio driver with Phat(pcm5102) audio output
+Subject: [PATCH 15/30] Add Hsynth audio driver with Phat(pcm5102) audio output
  Add vipii fb,pidac/hsynth audio dtb for DE10 Nano HD HDMI
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/boot/dts/Makefile                         |   1 +
- .../socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 261 ++++++++++++
- arch/arm/configs/socfpga_defconfig                 |   1 +
- sound/soc/codecs/Kconfig                           |   5 +-
- sound/soc/codecs/Makefile                          |   2 +
- sound/soc/codecs/hsynthpcm5102.c                   | 124 ++++++
- sound/soc/socsynth/Kconfig                         |   7 +-
- sound/soc/socsynth/Makefile                        |   3 +
- sound/soc/socsynth/pcm5102-hsynth.c                | 438 +++++++++++++++++++++
+ arch/arm/boot/dts/Makefile                    |   1 +
+ ...pga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 261 +++++++++++
+ arch/arm/configs/socfpga_defconfig            |   1 +
+ sound/soc/codecs/Kconfig                      |   5 +-
+ sound/soc/codecs/Makefile                     |   2 +
+ sound/soc/codecs/hsynthpcm5102.c              | 124 +++++
+ sound/soc/socsynth/Kconfig                    |   7 +-
+ sound/soc/socsynth/Makefile                   |   3 +
+ sound/soc/socsynth/pcm5102-hsynth.c           | 438 ++++++++++++++++++
  9 files changed, 840 insertions(+), 2 deletions(-)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
  create mode 100644 sound/soc/codecs/hsynthpcm5102.c
  create mode 100644 sound/soc/socsynth/pcm5102-hsynth.c
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index 3ddb76d..b80aa1c 100644
+index 3ddb76dff383..b80aa1c22d5d 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
 @@ -702,6 +702,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
@@ -34,7 +34,7 @@ index 3ddb76d..b80aa1c 100644
  	socfpga_cyclone5_sockit.dtb \
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 new file mode 100644
-index 0000000..7e1acf9
+index 000000000000..7e1acf94ba6b
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 @@ -0,0 +1,261 @@
@@ -300,7 +300,7 @@ index 0000000..7e1acf9
 +	status = "okay";
 +};
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index d090fe7..25f92bd 100644
+index d090fe7cd7c5..25f92bd18920 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -311,6 +311,7 @@ CONFIG_SND_VIRMIDI=m
@@ -312,7 +312,7 @@ index d090fe7..25f92bd 100644
  CONFIG_REGMAP_I2C=y
  CONFIG_REGMAP_SPI=y
 diff --git a/sound/soc/codecs/Kconfig b/sound/soc/codecs/Kconfig
-index 49e8c24..6162113 100644
+index 49e8c241583d..616211318a2d 100644
 --- a/sound/soc/codecs/Kconfig
 +++ b/sound/soc/codecs/Kconfig
 @@ -73,6 +73,7 @@ config SND_SOC_ALL_CODECS
@@ -336,7 +336,7 @@ index 49e8c24..6162113 100644
  config SND_SOC_ES8328
  	tristate "Everest Semi ES8328 CODEC"
 diff --git a/sound/soc/codecs/Makefile b/sound/soc/codecs/Makefile
-index be562a4..2c4c3f5 100644
+index be562a487dd2..2c4c3f5d7cb1 100644
 --- a/sound/soc/codecs/Makefile
 +++ b/sound/soc/codecs/Makefile
 @@ -67,6 +67,7 @@ snd-soc-es8328-spi-objs := es8328-spi.o
@@ -357,7 +357,7 @@ index be562a4..2c4c3f5 100644
  obj-$(CONFIG_SND_SOC_ISABELLE)	+= snd-soc-isabelle.o
 diff --git a/sound/soc/codecs/hsynthpcm5102.c b/sound/soc/codecs/hsynthpcm5102.c
 new file mode 100644
-index 0000000..dd97160
+index 000000000000..dd97160ac437
 --- /dev/null
 +++ b/sound/soc/codecs/hsynthpcm5102.c
 @@ -0,0 +1,124 @@
@@ -486,7 +486,7 @@ index 0000000..dd97160
 +MODULE_DESCRIPTION("HSYNTH7002 Dummy Soc synthesizer codec-driver driver");
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
-index 83cc386..5d71a4e 100644
+index 83cc38697b9e..5d71a4ee1f62 100644
 --- a/sound/soc/socsynth/Kconfig
 +++ b/sound/soc/socsynth/Kconfig
 @@ -27,5 +27,10 @@ config SND_SOC_DE1_WM8731_HSYNTH
@@ -502,7 +502,7 @@ index 83cc386..5d71a4e 100644
 +       select SND_SOC_GENERIC_DMAENGINE_PCM
         select REGMAP_MMIO
 diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
-index aa55f56..2043f43d 100644
+index aa55f564c844..2043f43d0400 100644
 --- a/sound/soc/socsynth/Makefile
 +++ b/sound/soc/socsynth/Makefile
 @@ -9,3 +9,6 @@ obj-$(CONFIG_SND_SOC_HSYNTHDMA) += snd-soc-hsynthdma.o
@@ -514,7 +514,7 @@ index aa55f56..2043f43d 100644
 +obj-$(CONFIG_SND_SOC_PCM5102_HSYNTH) += snd-pcm5102-hsynth.o
 diff --git a/sound/soc/socsynth/pcm5102-hsynth.c b/sound/soc/socsynth/pcm5102-hsynth.c
 new file mode 100644
-index 0000000..2d56f0b
+index 000000000000..2d56f0b83f5a
 --- /dev/null
 +++ b/sound/soc/socsynth/pcm5102-hsynth.c
 @@ -0,0 +1,438 @@
@@ -957,5 +957,5 @@ index 0000000..2d56f0b
 +MODULE_DESCRIPTION("ALSA SoC DE10-SoC_PWM5102");
 +MODULE_LICENSE("GPL");
 -- 
-2.7.4
+2.17.1
 

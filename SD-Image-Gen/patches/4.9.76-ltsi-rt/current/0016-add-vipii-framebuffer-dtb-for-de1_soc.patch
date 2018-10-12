@@ -1,17 +1,17 @@
-From 8c2dc6e1026334b7a8a93552847f7cea687e1d21 Mon Sep 17 00:00:00 2001
+From d6ed34dd4ca74d4affb26ea44cb5a773de14c93c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 4 May 2018 14:32:56 +0200
-Subject: [PATCH 16/29] add vipii framebuffer dtb for de1_soc
+Subject: [PATCH 16/30] add vipii framebuffer dtb for de1_soc
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/boot/dts/Makefile                         |   1 +
- .../arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts | 285 +++++++++++++++++++++
+ arch/arm/boot/dts/Makefile                    |   1 +
+ .../dts/socfpga_cyclone5_de1_soc_fbii.dts     | 285 ++++++++++++++++++
  2 files changed, 286 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index b80aa1c..748b068 100644
+index b80aa1c22d5d..748b0684137c 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
 @@ -705,6 +705,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
@@ -24,7 +24,7 @@ index b80aa1c..748b068 100644
  	socfpga_cyclone5_sodia.dtb \
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
 new file mode 100644
-index 0000000..225e461
+index 000000000000..225e46161c5c
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
 @@ -0,0 +1,285 @@
@@ -314,5 +314,5 @@ index 0000000..225e461
 +	status = "okay";
 +};
 -- 
-2.7.4
+2.17.1
 

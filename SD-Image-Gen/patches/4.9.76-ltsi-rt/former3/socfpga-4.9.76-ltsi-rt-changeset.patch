@@ -1,4 +1,4 @@
-From 9700952b9687b01830c9be6f63605392eb6bf5c2 Mon Sep 17 00:00:00 2001
+From b2b1c7072e1e482529490bf07dce0b721fb6f5ee Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
 Subject: [PATCH 01/18] disable debug package gen
@@ -25,7 +25,7 @@ index 98b007e..efc9ed9 100644
 2.7.4
 
 
-From 615c9abcc8796bc049083fec297848419f1f838c Mon Sep 17 00:00:00 2001
+From d3ce982ee0b14662cffeca5f996e475ed92dde60 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 1 May 2018 16:02:19 +0200
 Subject: [PATCH 02/18] Remove gittag from kernel (file) name(s)
@@ -48,7 +48,7 @@ index efc9ed9..f2b597b 100644
 2.7.4
 
 
-From 972c489dcffeeaedc06971e3ddb0bf0a0bea8770 Mon Sep 17 00:00:00 2001
+From a847aa46dc762401ad01e347c7c9fdce141c4ff0 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
 Subject: [PATCH 03/18] add ext4 root fs support and autofs4 module
@@ -87,7 +87,7 @@ index f2b597b..b167ffa7 100644
 2.7.4
 
 
-From 12d4b3a4fb5859ad8df9382e3daf45acee57e768 Mon Sep 17 00:00:00 2001
+From e5b71ab4e8e81623be7c55577ba915893058663b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
 Subject: [PATCH 04/18] add .dtd files to kernel-image .deb
@@ -125,7 +125,7 @@ index 3c575cd0..d67c791 100755
 2.7.4
 
 
-From 6361d30aab91a5ec9e73cf4281bbf78454d668cd Mon Sep 17 00:00:00 2001
+From d53415d1b801b2e1aa5fbaa197e2596b8142bc71 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
 Subject: [PATCH 05/18] add generate /boot/extlinux/extlinux.conf and
@@ -172,7 +172,7 @@ index d67c791..d6a4058 100755
 2.7.4
 
 
-From 9b2c66c0eebf59d7184194da201f7ea22bc44063 Mon Sep 17 00:00:00 2001
+From 31d9a45d09d05993ecda75ec0746e1ed81bec43c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
 Subject: [PATCH 06/18] add configfs and fpgacfg dts entities, and dynamic dts
@@ -212,7 +212,7 @@ index b167ffa7..a831d0c 100644
 2.7.4
 
 
-From 2b72cb6927c080c2c85fcc7f64c4e71d48539a7b Mon Sep 17 00:00:00 2001
+From f6979754546fcb1b888b7c3755c9f3028406fade Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
 Subject: [PATCH 07/18] rename kernel package names to *-socfpga-rt-ltsi
@@ -243,7 +243,7 @@ index d6a4058..ee58811 100755
 2.7.4
 
 
-From 7fdf44a125d2c7c8f80da7743766f5f944c61adc Mon Sep 17 00:00:00 2001
+From c4d7b694f7c02ffb70d39fcc6826f572e0e02f5b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
 Subject: [PATCH 08/18] add spidev in dts so driver is loaded
@@ -280,7 +280,7 @@ index 595eb4f..6dcff22 100644
 2.7.4
 
 
-From de6adf6b2aeeb63b2dd952ff31295ea1be030b32 Mon Sep 17 00:00:00 2001
+From df5f91d2752d99adf92b55039fb2483748accc25 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
 Subject: [PATCH 09/18] Added DE-10 Nano with/without framebuffer dts dtb
@@ -288,9 +288,9 @@ Subject: [PATCH 09/18] Added DE-10 Nano with/without framebuffer dts dtb
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                         |   2 +
- arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts   | 112 +++++++++++
- .../arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts | 215 +++++++++++++++++++++
- 3 files changed, 329 insertions(+)
+ arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts   | 112 +++++++++
+ .../arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts | 252 +++++++++++++++++++++
+ 3 files changed, 366 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
 
@@ -427,25 +427,25 @@ index 0000000..7645340
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
 new file mode 100644
-index 0000000..8fc5730
+index 0000000..83b3013
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_fb.dts
-@@ -0,0 +1,215 @@
+@@ -0,0 +1,252 @@
 +/*
-+ * Copyright Intel Corporation (C) 2017. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
++* Copyright Intel Corporation (C) 2017. All rights reserved.
++*
++* This program is free software; you can redistribute it and/or modify
++* it under the terms and conditions of the GNU General Public License,
++* version 2, as published by the Free Software Foundation.
++*
++* This program is distributed in the hope it will be useful, but WITHOUT
++* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++* more details.
++*
++* You should have received a copy of the GNU General Public License along with
++* this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
 +
 +#include "socfpga_cyclone5.dtsi"
 +
@@ -494,6 +494,42 @@ index 0000000..8fc5730
 +		};
 +	};
 +
++	sound {
++		compatible = "opencores,de10soc-hsynthpcm5102-audio-midi";
++		i2s-controller = <&i2s>;
++		audio-codec = <&hsynthpcm5102_codec>;
++	};
++
++	clk48: clk48 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <24576000>;
++		clock-output-names = "clk48";
++	};
++
++	clk44: clk44 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <33868800>;
++		clock-output-names = "clk44";
++	};
++
++	i2s: i2s@0x0 {
++		#sound-dai-cells = <1>;
++		compatible = "opencores,i2s";
++		reg = <0xff200000 0x20>, <0xff200020 0x20>;
++		clocks = <&clk44>, <&clk48>;
++		clock-names = "clk44", "clk48";
++		dmas = <&pdma 0>, <&pdma 1>;
++		dma-names = "tx", "rx";
++	};
++
++	hsynthpcm5102_codec: hsynthpcm5102-codec {
++	#sound-dai-cells = <0>;
++		compatible = "holotr,hsynthpcm5102";
++		status = "okay";
++	};
++
 +	bridge@0xc0000000 {
 +		compatible = "altr,bridge-15.1", "simple-bus";
 +		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
@@ -504,9 +540,10 @@ index 0000000..8fc5730
 +				<0x00000001 0x00003000 0xff203000 0x00000010>,
 +				<0x00000001 0x00004000 0xff204000 0x00000010>,
 +				<0x00000001 0x00005000 0xff205000 0x00000010>,
-+				<0x00000001 0x00050000 0xff250000 0x00000100>,
-+				<0x00000001 0x00051000 0xff251000 0x00000080>,
-+				<0x00000001 0x00040000 0xff240000 0x00010000>;
++				<0x00000001 0x00030000 0xff230000 0x00000100>,
++				<0x00000001 0x00031000 0xff231000 0x00000080>,
++				<0x00000001 0x00040000 0xff240000 0x00010000>,
++				<0x00000001 0x00050000 0xff250000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -558,9 +595,9 @@ index 0000000..8fc5730
 +			gpio-controller;
 +		};
 +
-+		ilc@0x100003000 {
++		ilc@0x100030000 {
 +			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
-+			reg = <0x00000001 0x00050000 0x00000100>;
++			reg = <0x00000001 0x00030000 0x00000100>;
 +			interrupt-controller;
 +			#interrupt-cells = <0x1>;
 +			altr,sw-fifo-depth = <0x20>;
@@ -568,16 +605,16 @@ index 0000000..8fc5730
 +
 +		vip@0x100031000 {
 +			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-9.1";
-+			reg = <0x00000001 0x00051000 0x00000080>;
-+			max-width = <0x400>;
-+			max-height = <0x300>;
++			reg = <0x00000001 0x00031000 0x00000080>;
++			max-width = <1366>;
++			max-height = <768>;
 +			bits-per-color = <0x8>;
 +			colors-per-beat = <0x4>;
 +			beats-per-pixel = <0x1>;
 +			mem-word-width = <0x80>;
 +		};
 +
-+		hm2-socfpga0@0x100040000 {
++		uio-socfpg0@0x100040000 {
 +			compatible = "generic-uio,ui_pdrv";
 +			reg = <0x00000001 0x00040000 0x00010000>;
 +			interrupt-parent = <0x2>;
@@ -650,7 +687,7 @@ index 0000000..8fc5730
 2.7.4
 
 
-From 88053afec4813099afb49221082836e9cdb18331 Mon Sep 17 00:00:00 2001
+From 34068902981b1cb4e5e0d383ed8d88519533d6eb Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
 Subject: [PATCH 10/18] set ACL secutity
@@ -693,7 +730,7 @@ index a831d0c..a6b5b70 100644
 2.7.4
 
 
-From 671c41422b4760123cefa9f9d2318b603ba583d7 Mon Sep 17 00:00:00 2001
+From 9c1697f02a20c01972ebbcbb354ca364dfd84fe1 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 30 Mar 2018 20:41:53 +0200
 Subject: [PATCH 11/18] Enable altvip framebuffer
@@ -839,7 +876,7 @@ index a6b5b70..05ad8d5 100644
 2.7.4
 
 
-From 5dff577754301f671b800c9cfc75ada63d3cbd40 Mon Sep 17 00:00:00 2001
+From 7f0b0e5540e898780b77eb378ea09b8a0f21ef22 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
 Subject: [PATCH 12/18] Add audio and midi drivers for holosynth and builtin
@@ -2541,7 +2578,7 @@ index 0000000..1f4268c
 2.7.4
 
 
-From 76fa48f49331214edbc6cc7c8ff3ead25ba0aebb Mon Sep 17 00:00:00 2001
+From 3547c17d247367e0b7c767eaf98057fdb597c3bb Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 23:01:49 +0200
 Subject: [PATCH 13/18] Enable bridges in dtb's and add framebuffer,audio and
@@ -2931,7 +2968,7 @@ index 05ad8d5..f340c40 100644
 2.7.4
 
 
-From 15c7aa1f34f3f0c87c6ddda81cb1a26a3e103cb1 Mon Sep 17 00:00:00 2001
+From 39563fc82e71ca433cf2a9cbb8de88716c868a0f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 29 Apr 2018 02:00:12 +0200
 Subject: [PATCH 14/18] Convert de1-soc-wm8731 to de1-soc-wm8731-midi hsynth
@@ -4189,7 +4226,7 @@ index 60104716d..0000000
 2.7.4
 
 
-From 8726d1ed5620757c390ba72b23fae0c9a605b1ce Mon Sep 17 00:00:00 2001
+From 82c7e11efebe74fa5ad73558034ed58fec226b86 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 1 May 2018 18:59:35 +0200
 Subject: [PATCH 15/18] Add framebuffer II and fbii device tree change fb1
@@ -4519,7 +4556,7 @@ index dbb07f2..eccb192 100644
 2.7.4
 
 
-From 0d83a637fbeea3395e5b95de6dd2e69fb7647ca6 Mon Sep 17 00:00:00 2001
+From fef8ad9886fffa2f7b661eee21646899bd3790f9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 4 May 2018 14:32:56 +0200
 Subject: [PATCH 16/18] test vip2 fb settings for 15 inch lvds
@@ -4557,7 +4594,7 @@ index e6d3b1c..879b9bd 100644
 2.7.4
 
 
-From a45e8a3d649290da906757e922417978fb952ec5 Mon Sep 17 00:00:00 2001
+From f774edadd6fca3690431d6c8537b2332742a8cf4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 15 May 2018 17:21:56 +0200
 Subject: [PATCH 17/18] Added audio codec for pihatdac and holosynth audio
@@ -4834,7 +4871,7 @@ index eccb192..d383114 100644
 2.7.4
 
 
-From 9c821d9b4a7c15d7fe6d7c9802dc6a6f70720ac7 Mon Sep 17 00:00:00 2001
+From 692bbec0e969c169f267f76c1368e33b6ca2e816 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 17 May 2018 10:58:21 +0200
 Subject: [PATCH 18/18] Add Hsynth midi/audio driver with Phat(pcm5102) audio

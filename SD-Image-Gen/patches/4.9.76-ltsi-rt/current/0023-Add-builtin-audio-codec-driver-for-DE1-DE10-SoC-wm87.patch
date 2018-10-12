@@ -1,26 +1,26 @@
-From 7accbe151db602d238ad8ec466076efc4c7c8c78 Mon Sep 17 00:00:00 2001
+From 24a199b2d37e5b756ae7df4223bd2c6bd7de637f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 2 Jun 2018 22:56:31 +0200
-Subject: [PATCH 23/29] Add builtin audio codec driver for DE1/DE10 SoC
+Subject: [PATCH 23/30] Add builtin audio codec driver for DE1/DE10 SoC
  (wm8731) Add Audio and framebuffer Supporting device trees xga and hd
  versions
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/boot/dts/Makefile                         |   2 +
- .../boot/dts/socfpga_cyclone5_de1_soc_aud_fb.dts   | 194 ++++++++++++++++
- .../dts/socfpga_cyclone5_de1_soc_aud_fb_hd.dts     | 194 ++++++++++++++++
- arch/arm/configs/socfpga_defconfig                 |   3 +-
- sound/soc/socsynth/Kconfig                         |   9 +-
- sound/soc/socsynth/Makefile                        |   5 +-
- sound/soc/socsynth/de1x-soc-wm8731.c               | 251 +++++++++++++++++++++
+ arch/arm/boot/dts/Makefile                    |   2 +
+ .../dts/socfpga_cyclone5_de1_soc_aud_fb.dts   | 194 ++++++++++++++
+ .../socfpga_cyclone5_de1_soc_aud_fb_hd.dts    | 194 ++++++++++++++
+ arch/arm/configs/socfpga_defconfig            |   3 +-
+ sound/soc/socsynth/Kconfig                    |   9 +-
+ sound/soc/socsynth/Makefile                   |   5 +-
+ sound/soc/socsynth/de1x-soc-wm8731.c          | 251 ++++++++++++++++++
  7 files changed, 655 insertions(+), 3 deletions(-)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc_aud_fb.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc_aud_fb_hd.dts
  create mode 100644 sound/soc/socsynth/de1x-soc-wm8731.c
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index 748b068..cd54d8e 100644
+index 748b0684137c..cd54d8e8f8fe 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
 @@ -705,6 +705,8 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
@@ -34,7 +34,7 @@ index 748b068..cd54d8e 100644
  	socfpga_cyclone5_socrates.dtb \
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_aud_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_aud_fb.dts
 new file mode 100644
-index 0000000..4fb724a
+index 000000000000..4fb724a505c7
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_aud_fb.dts
 @@ -0,0 +1,194 @@
@@ -234,7 +234,7 @@ index 0000000..4fb724a
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_aud_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_aud_fb_hd.dts
 new file mode 100644
-index 0000000..ecebb6e
+index 000000000000..ecebb6e9cd19
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_aud_fb_hd.dts
 @@ -0,0 +1,194 @@
@@ -433,7 +433,7 @@ index 0000000..ecebb6e
 +	status = "okay";
 +};
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 25f92bd..4917baf 100644
+index 25f92bd18920..4917bafcd7ae 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -308,7 +308,8 @@ CONFIG_SND_SOC_SSM2602=m
@@ -447,7 +447,7 @@ index 25f92bd..4917baf 100644
  CONFIG_SND_SOC_PCM5102A=m
  CONFIG_SND_SOC_PCM5102_HSYNTH=m
 diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
-index 5d71a4e..b6b7dec 100644
+index 5d71a4ee1f62..b6b7dec7364c 100644
 --- a/sound/soc/socsynth/Kconfig
 +++ b/sound/soc/socsynth/Kconfig
 @@ -16,7 +16,7 @@ config SND_SOC_HSYNTHDMA
@@ -471,7 +471,7 @@ index 5d71a4e..b6b7dec 100644
 +       select SND_SOC_GENERIC_DMAENGINE_PCM
 +       select REGMAP_MMIO
 diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
-index 2043f43d..69fb2aa 100644
+index 2043f43d0400..69fb2aa3b284 100644
 --- a/sound/soc/socsynth/Makefile
 +++ b/sound/soc/socsynth/Makefile
 @@ -2,7 +2,7 @@ snd-soc-opencores_i2s-objs := opencores_i2s.o
@@ -492,7 +492,7 @@ index 2043f43d..69fb2aa 100644
 +obj-$(CONFIG_SND_SOC_DE1x_WM8731) += snd-soc-de1x-soc-wm8731.o
 diff --git a/sound/soc/socsynth/de1x-soc-wm8731.c b/sound/soc/socsynth/de1x-soc-wm8731.c
 new file mode 100644
-index 0000000..e297ef4
+index 000000000000..e297ef4b0c0c
 --- /dev/null
 +++ b/sound/soc/socsynth/de1x-soc-wm8731.c
 @@ -0,0 +1,251 @@
@@ -748,5 +748,5 @@ index 0000000..e297ef4
 +MODULE_DESCRIPTION("ALSA SoC DE1-SoC_WM8731");
 +MODULE_LICENSE("GPL");
 -- 
-2.7.4
+2.17.1
 

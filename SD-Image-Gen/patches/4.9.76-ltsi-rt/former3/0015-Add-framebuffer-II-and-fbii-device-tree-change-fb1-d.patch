@@ -1,4 +1,4 @@
-From 8726d1ed5620757c390ba72b23fae0c9a605b1ce Mon Sep 17 00:00:00 2001
+From 82c7e11efebe74fa5ad73558034ed58fec226b86 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 1 May 2018 18:59:35 +0200
 Subject: [PATCH 15/18] Add framebuffer II and fbii device tree change fb1

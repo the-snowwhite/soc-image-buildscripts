@@ -1,15 +1,15 @@
-From 2765ad14a51766aee094a4cc277e45531ea6c732 Mon Sep 17 00:00:00 2001
+From e5526302fb62bffa3d11c9f670ab5cadf1648ba9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 17:24:54 +0200
-Subject: [PATCH 25/29] Add irq to De10 Nano vipii fb
+Subject: [PATCH 25/30] Add irq to De10 Nano vipii fb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 6 ++++--
+ .../boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
-index 4b8b813..723f2a3 100644
+index 4b8b81316cf6..723f2a38e136 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 @@ -169,8 +169,8 @@
@@ -33,5 +33,5 @@ index 4b8b813..723f2a3 100644
  			max-height = <1080>;
  			bits-per-color = <0x8>;
 -- 
-2.7.4
+2.17.1
 

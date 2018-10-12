@@ -1,4 +1,4 @@
-From 9c821d9b4a7c15d7fe6d7c9802dc6a6f70720ac7 Mon Sep 17 00:00:00 2001
+From 692bbec0e969c169f267f76c1368e33b6ca2e816 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 17 May 2018 10:58:21 +0200
 Subject: [PATCH 18/18] Add Hsynth midi/audio driver with Phat(pcm5102) audio

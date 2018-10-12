@@ -1,4 +1,4 @@
-From a45e8a3d649290da906757e922417978fb952ec5 Mon Sep 17 00:00:00 2001
+From f774edadd6fca3690431d6c8537b2332742a8cf4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 15 May 2018 17:21:56 +0200
 Subject: [PATCH 17/18] Added audio codec for pihatdac and holosynth audio

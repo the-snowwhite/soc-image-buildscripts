@@ -1,35 +1,33 @@
-From 82c7e11efebe74fa5ad73558034ed58fec226b86 Mon Sep 17 00:00:00 2001
+From 8c2dc6e1026334b7a8a93552847f7cea687e1d21 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
-Date: Tue, 1 May 2018 18:59:35 +0200
-Subject: [PATCH 15/18] Add framebuffer II and fbii device tree change fb1
- driver to module
+Date: Fri, 4 May 2018 14:32:56 +0200
+Subject: [PATCH 16/29] add vipii framebuffer dtb for de1_soc
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                         |   1 +
- .../arm/boot/dts/socfpga_cyclone5_de1_soc_fbII.dts | 274 +++++++++++++++++++++
- arch/arm/configs/socfpga_defconfig                 |   2 +-
- 3 files changed, 276 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbII.dts
+ .../arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts | 285 +++++++++++++++++++++
+ 2 files changed, 286 insertions(+)
+ create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index 7638a3f..cf2d59a 100644
+index b80aa1c..748b068 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -701,6 +701,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
- 	socfpga_cyclone5_socdk.dtb \
- 	socfpga_cyclone5_de0_sockit.dtb \
- 	socfpga_cyclone5_de1_soc.dtb \
-+	socfpga_cyclone5_de1_soc_fbII.dtb \
- 	socfpga_cyclone5_de10_nano_fb.dtb \
+@@ -705,6 +705,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
+ 	socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dtb \
  	socfpga_cyclone5_de10_nano.dtb \
+ 	socfpga_cyclone5_de1_soc.dtb \
++	socfpga_cyclone5_de1_soc_fbii.dtb \
  	socfpga_cyclone5_sockit.dtb \
-diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbII.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbII.dts
+ 	socfpga_cyclone5_socrates.dtb \
+ 	socfpga_cyclone5_sodia.dtb \
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
 new file mode 100644
-index 0000000..558994d
+index 0000000..225e461
 --- /dev/null
-+++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbII.dts
-@@ -0,0 +1,274 @@
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
+@@ -0,0 +1,285 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -150,11 +148,11 @@ index 0000000..558994d
 +		#address-cells = <0x2>;
 +		#size-cells = <0x1>;
 +		ranges = <0x00000001 0x00020000 0xff220000 0x00000008>,
-+			<0x00000001 0x00000200 0xff200200 0x00000040>,
 +			<0x00000001 0x00010000 0xff210000 0x00000008>,
 +			<0x00000001 0x000100c0 0xff2100c0 0x00000010>,
 +			<0x00000001 0x00010080 0xff210080 0x00000010>,
 +			<0x00000001 0x00010040 0xff210040 0x00000010>,
++			<0x00000001 0x00031000 0xff231000 0x00000080>,
 +			<0x00000001 0x00040000 0xff240000 0x00010000>,
 +			<0x00000001 0x00050000 0xff250000 0x00010000>;
 +
@@ -165,15 +163,6 @@ index 0000000..558994d
 +			interrupts = <0 40 4>;
 +			clocks = <0x2>;
 +		}; //end serial@0x100020000 (jtag_uart)
-+
-+		vip@0x100000200 {
-+			compatible = "altr,vip-17.1", "altr,vip-frame-buffer-2.0";
-+			reg = <0x00000001 0x00000200 0x00000040>;
-+			altr,bits-per-symbol = <8>;
-+			altr,max-height = <768>;
-+			altr,max-width = <1366>;
-+			altr,mem-port-width = <128>;
-+		};
 +
 +		sysid@0x100010000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -224,6 +213,17 @@ index 0000000..558994d
 +			gpio-controller;
 +		}; //end gpio@0x100010040 (led_pio)
 +
++		vip@0x100031000 {
++			compatible = "altr,vip-frame-buffer-ii-2.0";
++			reg = <0x00000001 0x00031000 0x00000080>;
++			max-width = <1366>;
++			max-height = <768>;
++			bits-per-color = <0x8>;
++			colors-per-beat = <0x4>;
++			beats-per-pixel = <0x1>;
++			mem-word-width = <0x80>;
++		};
++
 +		uio-socfpg0@0x100040000 {
 +			compatible = "generic-uio,ui_pdrv";
 +			reg = <0x00000001 0x00040000 0x00010000>;
@@ -231,6 +231,15 @@ index 0000000..558994d
 +			interrupts = <0 43 4>;
 +			address_width = <14>;
 +			data_width = <32>;
++		};
++
++		socmidi@0x100050000 {
++			compatible = "holotr,socsynth-midi";
++			reg = <0x00000001 0x00050000 0x00010000>;
++			interrupt-parent = <0x2>;
++/*			interrupts = <0 44 4>;*/
++			address_width = <3>;   /* embeddedsw.dts.params.address_width type NUMBER */
++			data_width = <8>;      /* embeddedsw.dts.params.data_width type NUMBER */
 +		};
 +	};
 +};
@@ -304,26 +313,6 @@ index 0000000..558994d
 +&usb1 {
 +	status = "okay";
 +};
-diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index dbb07f2..eccb192 100644
---- a/arch/arm/configs/socfpga_defconfig
-+++ b/arch/arm/configs/socfpga_defconfig
-@@ -116,6 +116,7 @@ CONFIG_MFD_STMPE=y
- CONFIG_REGULATOR=y
- CONFIG_REGULATOR_FIXED_VOLTAGE=y
- CONFIG_FB=y
-+CONFIG_FB_ALTERA_VIP=m
- CONFIG_FB_ALTERA_VIP_FB2_PLAT=m
- CONFIG_FRAMEBUFFER_CONSOLE=y
- CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
-@@ -276,7 +277,6 @@ CONFIG_FB_NOTIFY=y
- CONFIG_FB_CFB_FILLRECT=y
- CONFIG_FB_CFB_COPYAREA=y
- CONFIG_FB_CFB_IMAGEBLIT=y
--CONFIG_FB_ALTERA_VIP=y
- CONFIG_DUMMY_CONSOLE=y
- CONFIG_FRAMEBUFFER_CONSOLE=y
- CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
 -- 
 2.7.4
 

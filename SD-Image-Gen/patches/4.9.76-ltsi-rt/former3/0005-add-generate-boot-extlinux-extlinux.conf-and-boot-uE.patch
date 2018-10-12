@@ -1,4 +1,4 @@
-From 6361d30aab91a5ec9e73cf4281bbf78454d668cd Mon Sep 17 00:00:00 2001
+From d53415d1b801b2e1aa5fbaa197e2596b8142bc71 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
 Subject: [PATCH 05/18] add generate /boot/extlinux/extlinux.conf and

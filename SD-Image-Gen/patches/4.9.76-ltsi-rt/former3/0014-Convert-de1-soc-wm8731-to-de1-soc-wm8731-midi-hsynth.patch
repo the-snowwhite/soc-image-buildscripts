@@ -1,4 +1,4 @@
-From 15c7aa1f34f3f0c87c6ddda81cb1a26a3e103cb1 Mon Sep 17 00:00:00 2001
+From 39563fc82e71ca433cf2a9cbb8de88716c868a0f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 29 Apr 2018 02:00:12 +0200
 Subject: [PATCH 14/18] Convert de1-soc-wm8731 to de1-soc-wm8731-midi hsynth

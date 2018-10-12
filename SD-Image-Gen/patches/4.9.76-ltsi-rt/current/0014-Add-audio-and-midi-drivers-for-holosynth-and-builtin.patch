@@ -1,25 +1,25 @@
-From 5f661984c2aee267e20693be3fe8bc5460ce0d1f Mon Sep 17 00:00:00 2001
+From df8eb3e6d258b96faaf9a0a40dcfa856b8926da0 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
-Subject: [PATCH 14/29] Add audio and midi drivers for holosynth and builtin
+Subject: [PATCH 14/30] Add audio and midi drivers for holosynth and builtin
  audio codec on de1 board
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/boot/dts/Makefile                     |   1 +
- arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 285 +++++++++++++++
- arch/arm/configs/socfpga_defconfig             |  64 +++-
- sound/soc/Kconfig                              |   3 +-
- sound/soc/Makefile                             |   1 +
- sound/soc/codecs/Kconfig                       |   5 +
- sound/soc/codecs/Makefile                      |   2 +
- sound/soc/codecs/hsynth7002.c                  | 115 +++++++
- sound/soc/socsynth/Kconfig                     |  31 ++
- sound/soc/socsynth/Makefile                    |  11 +
- sound/soc/socsynth/de1-soc-wm8731-hsynth.c     | 458 +++++++++++++++++++++++++
- sound/soc/socsynth/hsynth-midi.c               | 296 ++++++++++++++++
- sound/soc/socsynth/hsynthdma.c                 | 418 ++++++++++++++++++++++
- sound/soc/socsynth/opencores_i2s.c             | 436 +++++++++++++++++++++++
+ arch/arm/boot/dts/Makefile                    |   1 +
+ .../arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 285 +++++++++++
+ arch/arm/configs/socfpga_defconfig            |  64 ++-
+ sound/soc/Kconfig                             |   3 +-
+ sound/soc/Makefile                            |   1 +
+ sound/soc/codecs/Kconfig                      |   5 +
+ sound/soc/codecs/Makefile                     |   2 +
+ sound/soc/codecs/hsynth7002.c                 | 115 +++++
+ sound/soc/socsynth/Kconfig                    |  31 ++
+ sound/soc/socsynth/Makefile                   |  11 +
+ sound/soc/socsynth/de1-soc-wm8731-hsynth.c    | 458 ++++++++++++++++++
+ sound/soc/socsynth/hsynth-midi.c              | 296 +++++++++++
+ sound/soc/socsynth/hsynthdma.c                | 418 ++++++++++++++++
+ sound/soc/socsynth/opencores_i2s.c            | 436 +++++++++++++++++
  14 files changed, 2122 insertions(+), 4 deletions(-)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
  create mode 100644 sound/soc/codecs/hsynth7002.c
@@ -31,7 +31,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  create mode 100644 sound/soc/socsynth/opencores_i2s.c
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index 24fc153..3ddb76d 100644
+index 24fc153474bb..3ddb76dff383 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
 @@ -703,6 +703,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
@@ -44,7 +44,7 @@ index 24fc153..3ddb76d 100644
  	socfpga_cyclone5_sodia.dtb \
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 new file mode 100644
-index 0000000..d2b80e6
+index 000000000000..d2b80e6d9044
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 @@ -0,0 +1,285 @@
@@ -334,7 +334,7 @@ index 0000000..d2b80e6
 +	status = "okay";
 +};
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index cb504b6..d090fe7 100644
+index cb504b62a019..d090fe7cd7c5 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -280,7 +280,6 @@ CONFIG_FB_NOTIFY=y
@@ -413,7 +413,7 @@ index cb504b6..d090fe7 100644
 +CONFIG_SND_SOC_I2C_AND_SPI=y
 +CONFIG_HZ_1000=y
 diff --git a/sound/soc/Kconfig b/sound/soc/Kconfig
-index 182d92e..48d18da 100644
+index 182d92efc7c8..48d18daab20e 100644
 --- a/sound/soc/Kconfig
 +++ b/sound/soc/Kconfig
 @@ -13,7 +13,7 @@ menuconfig SND_SOC
@@ -434,7 +434,7 @@ index 182d92e..48d18da 100644
  source "sound/soc/sunxi/Kconfig"
  source "sound/soc/tegra/Kconfig"
 diff --git a/sound/soc/Makefile b/sound/soc/Makefile
-index 9a30f21..c802f47 100644
+index 9a30f21d16ee..c802f476183f 100644
 --- a/sound/soc/Makefile
 +++ b/sound/soc/Makefile
 @@ -42,6 +42,7 @@ obj-$(CONFIG_SND_SOC)	+= samsung/
@@ -446,7 +446,7 @@ index 9a30f21..c802f47 100644
  obj-$(CONFIG_SND_SOC)	+= sunxi/
  obj-$(CONFIG_SND_SOC)	+= tegra/
 diff --git a/sound/soc/codecs/Kconfig b/sound/soc/codecs/Kconfig
-index c67667b..49e8c24 100644
+index c67667bb970f..49e8c241583d 100644
 --- a/sound/soc/codecs/Kconfig
 +++ b/sound/soc/codecs/Kconfig
 @@ -72,6 +72,7 @@ config SND_SOC_ALL_CODECS
@@ -469,7 +469,7 @@ index c67667b..49e8c24 100644
  	tristate "Everest Semi ES8328 CODEC"
  
 diff --git a/sound/soc/codecs/Makefile b/sound/soc/codecs/Makefile
-index 958cd49..be562a4 100644
+index 958cd4912fbc..be562a487dd2 100644
 --- a/sound/soc/codecs/Makefile
 +++ b/sound/soc/codecs/Makefile
 @@ -66,6 +66,7 @@ snd-soc-es8328-i2c-objs := es8328-i2c.o
@@ -490,7 +490,7 @@ index 958cd49..be562a4 100644
  obj-$(CONFIG_SND_SOC_ISABELLE)	+= snd-soc-isabelle.o
 diff --git a/sound/soc/codecs/hsynth7002.c b/sound/soc/codecs/hsynth7002.c
 new file mode 100644
-index 0000000..b1898b3
+index 000000000000..b1898b3a5379
 --- /dev/null
 +++ b/sound/soc/codecs/hsynth7002.c
 @@ -0,0 +1,115 @@
@@ -611,7 +611,7 @@ index 0000000..b1898b3
 +MODULE_LICENSE("GPL v2");
 diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
 new file mode 100644
-index 0000000..83cc386
+index 000000000000..83cc38697b9e
 --- /dev/null
 +++ b/sound/soc/socsynth/Kconfig
 @@ -0,0 +1,31 @@
@@ -648,7 +648,7 @@ index 0000000..83cc386
 +       select REGMAP_MMIO
 diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
 new file mode 100644
-index 0000000..aa55f56
+index 000000000000..aa55f564c844
 --- /dev/null
 +++ b/sound/soc/socsynth/Makefile
 @@ -0,0 +1,11 @@
@@ -665,7 +665,7 @@ index 0000000..aa55f56
 +obj-$(CONFIG_SND_SOC_HSYNTH_MIDI) += snd-soc-hsynth-midi.o
 diff --git a/sound/soc/socsynth/de1-soc-wm8731-hsynth.c b/sound/soc/socsynth/de1-soc-wm8731-hsynth.c
 new file mode 100644
-index 0000000..ba83a112
+index 000000000000..ba83a1120d6c
 --- /dev/null
 +++ b/sound/soc/socsynth/de1-soc-wm8731-hsynth.c
 @@ -0,0 +1,458 @@
@@ -1129,7 +1129,7 @@ index 0000000..ba83a112
 +MODULE_LICENSE("GPL");
 diff --git a/sound/soc/socsynth/hsynth-midi.c b/sound/soc/socsynth/hsynth-midi.c
 new file mode 100644
-index 0000000..e226bd8
+index 000000000000..e226bd80cc41
 --- /dev/null
 +++ b/sound/soc/socsynth/hsynth-midi.c
 @@ -0,0 +1,296 @@
@@ -1431,7 +1431,7 @@ index 0000000..e226bd8
 +MODULE_LICENSE("GPL");
 diff --git a/sound/soc/socsynth/hsynthdma.c b/sound/soc/socsynth/hsynthdma.c
 new file mode 100644
-index 0000000..afb4850
+index 000000000000..afb4850d98ed
 --- /dev/null
 +++ b/sound/soc/socsynth/hsynthdma.c
 @@ -0,0 +1,418 @@
@@ -1855,7 +1855,7 @@ index 0000000..afb4850
 +MODULE_LICENSE("GPL");
 diff --git a/sound/soc/socsynth/opencores_i2s.c b/sound/soc/socsynth/opencores_i2s.c
 new file mode 100644
-index 0000000..1f4268c
+index 000000000000..1f4268c7387f
 --- /dev/null
 +++ b/sound/soc/socsynth/opencores_i2s.c
 @@ -0,0 +1,436 @@
@@ -2296,5 +2296,5 @@ index 0000000..1f4268c
 +MODULE_DESCRIPTION("I2S driver for core at https://github.com/bsteinsbo/i2s.git");
 +MODULE_LICENSE("GPL");
 -- 
-2.7.4
+2.17.1
 

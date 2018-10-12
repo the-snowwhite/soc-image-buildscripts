@@ -1,4 +1,4 @@
-From 76fa48f49331214edbc6cc7c8ff3ead25ba0aebb Mon Sep 17 00:00:00 2001
+From 3547c17d247367e0b7c767eaf98057fdb597c3bb Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 23:01:49 +0200
 Subject: [PATCH 13/18] Enable bridges in dtb's and add framebuffer,audio and

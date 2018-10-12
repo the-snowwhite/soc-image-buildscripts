@@ -1,20 +1,20 @@
-From 4fd688767adf342824404065c23f9ed1d8bfc629 Mon Sep 17 00:00:00 2001
+From ff495f28be811ac580f480d59acb523670ee42c5 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 11 Jun 2018 16:18:22 +0200
-Subject: [PATCH 28/29] Sounddriver mods
+Subject: [PATCH 28/30] Sounddriver mods
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- .../socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts |  4 +-
- arch/arm/configs/socfpga_defconfig                 |  4 +-
- sound/soc/socsynth/Kconfig                         |  4 +-
- sound/soc/socsynth/Makefile                        |  8 +--
- .../socsynth/{pcm5102-hsynth.c => hsynth-phdac.c}  | 78 +++++++++++-----------
+ ...pga_cyclone5_de10_nano_uio_aud_fbii_hd.dts |  4 +-
+ arch/arm/configs/socfpga_defconfig            |  4 +-
+ sound/soc/socsynth/Kconfig                    |  4 +-
+ sound/soc/socsynth/Makefile                   |  8 +-
+ .../{pcm5102-hsynth.c => hsynth-phdac.c}      | 78 +++++++++----------
  5 files changed, 49 insertions(+), 49 deletions(-)
  rename sound/soc/socsynth/{pcm5102-hsynth.c => hsynth-phdac.c} (85%)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
-index 317c9c5..75a9d7a 100644
+index 317c9c5a97c3..75a9d7a94c78 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 @@ -62,7 +62,7 @@
@@ -36,7 +36,7 @@ index 317c9c5..75a9d7a 100644
  		compatible = "holotr,hsynthpcm5102";
  		status = "okay";
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 4ca9912..14cf5aa 100644
+index 4ca99129e968..14cf5aad9574 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -263,7 +263,7 @@ CONFIG_USB_GSPCA_SQ905C=y
@@ -58,7 +58,7 @@ index 4ca9912..14cf5aa 100644
  CONFIG_REGMAP_I2C=y
  CONFIG_REGMAP_SPI=y
 diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
-index b6b7dec..9a0516c 100644
+index b6b7dec7364c..9a0516c7f60f 100644
 --- a/sound/soc/socsynth/Kconfig
 +++ b/sound/soc/socsynth/Kconfig
 @@ -16,7 +16,7 @@ config SND_SOC_HSYNTHDMA
@@ -80,7 +80,7 @@ index b6b7dec..9a0516c 100644
         select SND_SOC_HSYNTHPCM5102
         select SND_SOC_OC_I2S
 diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
-index 69fb2aa..caac9d6 100644
+index 69fb2aa3b284..caac9d6e9318 100644
 --- a/sound/soc/socsynth/Makefile
 +++ b/sound/soc/socsynth/Makefile
 @@ -1,8 +1,8 @@
@@ -109,7 +109,7 @@ diff --git a/sound/soc/socsynth/pcm5102-hsynth.c b/sound/soc/socsynth/hsynth-phd
 similarity index 85%
 rename from sound/soc/socsynth/pcm5102-hsynth.c
 rename to sound/soc/socsynth/hsynth-phdac.c
-index 3011c2b..c99a5b4 100644
+index 3011c2b42579..c99a5b485fee 100644
 --- a/sound/soc/socsynth/pcm5102-hsynth.c
 +++ b/sound/soc/socsynth/hsynth-phdac.c
 @@ -161,7 +161,7 @@
@@ -323,5 +323,5 @@ index 3011c2b..c99a5b4 100644
  /* Module information */
  MODULE_AUTHOR("Bjarne Steinsbo <bsteinsbo@gmail.com>");
 -- 
-2.7.4
+2.17.1
 

@@ -1,7 +1,7 @@
-From 4e922d0e776aea1bbe5d148d88b454e9c9167fbd Mon Sep 17 00:00:00 2001
+From 755ad17cce93a67baf083e8047a2f8d3e433f5e8 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 8 Jun 2018 16:50:10 +0200
-Subject: [PATCH 24/29] Rename Hsynth stream names
+Subject: [PATCH 24/30] Rename Hsynth stream names
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/sound/soc/codecs/hsynthpcm5102.c b/sound/soc/codecs/hsynthpcm5102.c
-index 4144146..bf40ad2 100644
+index 414414670f15..bf40ad2dd911 100644
 --- a/sound/soc/codecs/hsynthpcm5102.c
 +++ b/sound/soc/codecs/hsynthpcm5102.c
 @@ -21,8 +21,8 @@ static const struct snd_soc_dapm_widget hsynthpcm5102_widgets[] = {
@@ -42,5 +42,5 @@ index 4144146..bf40ad2 100644
  		.channels_max = 2,
  		.rates = SNDRV_PCM_RATE_8000_96000,
 -- 
-2.7.4
+2.17.1
 

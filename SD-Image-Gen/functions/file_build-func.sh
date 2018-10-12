@@ -874,7 +874,7 @@ sudo dd if=/dev/zero of=${1}  bs=4K count=1500K
 sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${1} ${mkfs_label}"
 }
 
-## parameters: 1: loop dev name
+## parameters: 1: loop dev name, 2: boot partition 
 fdisk_2part() {
 sudo fdisk ${1} << EOF
 n
@@ -890,7 +890,7 @@ p
 
 
 a
-2
+${2}
 w
 EOF
 }
@@ -924,7 +924,7 @@ w
 EOF
 }
 
-## parameters: 1: no of partitions, 2: img file name, 3: mount dev name, 4: rootfs partition
+## parameters: 1: no of partitions, 2: img file name, 3: mount dev name, 4: rootfs partition, 5: boot partition
 create_img() {
 #--------------- Initial sd-card image - partitioned --------------
 echo "#-------------------------------------------------------------------------------#"
@@ -944,7 +944,7 @@ elif [ "${1}" = "2" ] || [ "${1}" = "3" ]; then
     mount_sd_imagefile ${2} ${3}
     if [ "${1}" = "2" ]; then
         echo "# Script_MSG: 2 part sd image"
-        fdisk_2part ${LOOP_DEV}
+        fdisk_2part ${LOOP_DEV} ${5}
     elif [ "${1}" = "3" ]; then
         echo "# Script_MSG: 3 part sd image"
         fdisk_3part_swap ${LOOP_DEV}
