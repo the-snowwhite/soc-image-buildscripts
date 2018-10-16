@@ -1,7 +1,7 @@
-From f06d0ae159ad7c48697f2cfeb223b0026d60065b Mon Sep 17 00:00:00 2001
+From e2aff53446e8ab627f9e916ce002bbbdc4ff4a6b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
-Subject: [PATCH 01/30] disable debug package gen
+Subject: [PATCH 01/31] disable debug package gen
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -25,10 +25,10 @@ index 5c8c02ffd864..31148aa2e935 100644
 2.17.1
 
 
-From 6a1e965d174e57a65bbca29673dad28a49b1e01c Mon Sep 17 00:00:00 2001
+From de5c67d1051d367d166aee1315d9eb54c0ec14fa Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 1 May 2018 16:02:19 +0200
-Subject: [PATCH 02/30] Remove gittag from kernel (file) name(s)
+Subject: [PATCH 02/31] Remove gittag from kernel (file) name(s)
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -48,10 +48,10 @@ index 31148aa2e935..d5758c68e455 100644
 2.17.1
 
 
-From b137ef4960aaa4785d0dde157e6f3c516fc6aab9 Mon Sep 17 00:00:00 2001
+From 172b4e91cba3df36bd3332cc1f4926dff606a672 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
-Subject: [PATCH 03/30] add ext4 root fs support and autofs4 module
+Subject: [PATCH 03/31] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -87,10 +87,10 @@ index d5758c68e455..5ac78d2ef09e 100644
 2.17.1
 
 
-From 001919547417cce42c9e89248510e35d11fff06e Mon Sep 17 00:00:00 2001
+From d68fd9bc392407caa95bb42f4fd5dfde391d066e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
-Subject: [PATCH 04/30] add .dtd files to kernel-image .deb
+Subject: [PATCH 04/31] add .dtd files to kernel-image .deb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -125,10 +125,10 @@ index 3c575cd07888..d67c791ddc2d 100755
 2.17.1
 
 
-From 768b0c1f17ccce9bdc65d42e2c8a7fd3092d0725 Mon Sep 17 00:00:00 2001
+From fac8d0c32d265f96dd87013ca26b2ded4e67ea00 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
-Subject: [PATCH 05/30] add generate /boot/extlinux/extlinux.conf and
+Subject: [PATCH 05/31] add generate /boot/extlinux/extlinux.conf and
  /boot/uEnv.txt for uboot boot info
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -172,10 +172,10 @@ index d67c791ddc2d..d6a4058377f4 100755
 2.17.1
 
 
-From e80b9163ad8fd441f241a609e4746c40ebd05ddd Mon Sep 17 00:00:00 2001
+From 67fd72ba3e9572de757a7fd34a9dff042dff7cae Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
-Subject: [PATCH 06/30] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 06/31] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -212,10 +212,10 @@ index 5ac78d2ef09e..44eb99105dcd 100644
 2.17.1
 
 
-From 86f40878f9b350e080fd9d9a6b83c91a077e2830 Mon Sep 17 00:00:00 2001
+From 4f1b27798ba1696deb00cadb6c360438430d3905 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
-Subject: [PATCH 07/30] rename kernel package names to *-socfpga-rt-ltsi
+Subject: [PATCH 07/31] rename kernel package names to *-socfpga-rt-ltsi
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -243,10 +243,10 @@ index d6a4058377f4..ee58811e94d0 100755
 2.17.1
 
 
-From 9e53b59ba6f6004bc1bb45983c84d7dec280c1f8 Mon Sep 17 00:00:00 2001
+From 913781f1bfb246e56b593ba6d43ca7b557ec1ca4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 21 May 2018 13:19:43 +0200
-Subject: [PATCH 08/30] Enable bridges in dtb's
+Subject: [PATCH 08/31] Enable bridges in dtb's
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -277,10 +277,10 @@ index 595eb4f1a761..3de276d42114 100644
 2.17.1
 
 
-From 23587f1b5448674aff2b527b068a464d90e79665 Mon Sep 17 00:00:00 2001
+From f577f9fb1549cb578766c66f0002270ff0df17f2 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
-Subject: [PATCH 09/30] add spidev in dts so driver is loaded
+Subject: [PATCH 09/31] add spidev in dts so driver is loaded
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -314,10 +314,10 @@ index 3de276d42114..dce11432fcbd 100644
 2.17.1
 
 
-From 9063e25353f993a5efab91c0e835cda517619b53 Mon Sep 17 00:00:00 2001
+From 76d51ce2a009ab358822111d3d64b6b2185b3b89 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
-Subject: [PATCH 10/30] set ACL secutity
+Subject: [PATCH 10/31] set ACL secutity
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -357,10 +357,10 @@ index 44eb99105dcd..bce72c27b9d5 100644
 2.17.1
 
 
-From 26b527e1d7d1d61948dca1633c73b945da76b240 Mon Sep 17 00:00:00 2001
+From e9d403ce8a6b00293562e4dc35876c58acb5a37d Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 30 Mar 2018 20:41:53 +0200
-Subject: [PATCH 11/30] Enable altvip framebuffer
+Subject: [PATCH 11/31] Enable altvip framebuffer
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -503,10 +503,10 @@ index bce72c27b9d5..ad7ca9d21361 100644
 2.17.1
 
 
-From ae1d8b2ce522b17c4b553949065f1674d3be2f94 Mon Sep 17 00:00:00 2001
+From 4469df79b9914297f8bffc57bd231d27db498150 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 12/30] Added DE-10 Nano with uio, with/without framebuffer
+Subject: [PATCH 12/31] Added DE-10 Nano with uio, with/without framebuffer
  1024x768 and 1920x1080(hd) dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -1098,10 +1098,10 @@ index 000000000000..bfb289855be1
 2.17.1
 
 
-From 1da4037f4cf34191b2c6e018477f8613578e269b Mon Sep 17 00:00:00 2001
+From 7c7221bfd8cb4a51ee7ce1d629302218802d1378 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 18 May 2018 20:35:35 +0200
-Subject: [PATCH 13/30] Add framebuffer-ii core driver based on Mister, and
+Subject: [PATCH 13/31] Add framebuffer-ii core driver based on Mister, and
  enable it
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -2006,10 +2006,10 @@ index 000000000000..a80ae1a714f7
 2.17.1
 
 
-From df8eb3e6d258b96faaf9a0a40dcfa856b8926da0 Mon Sep 17 00:00:00 2001
+From c98758fbb8cdd7804839bec00ba27182f89ddcc3 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
-Subject: [PATCH 14/30] Add audio and midi drivers for holosynth and builtin
+Subject: [PATCH 14/31] Add audio and midi drivers for holosynth and builtin
  audio codec on de1 board
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -4307,10 +4307,10 @@ index 000000000000..1f4268c7387f
 2.17.1
 
 
-From f6091a4690f9437e6f47a20e5d454acab68939f0 Mon Sep 17 00:00:00 2001
+From 503dc73d8dd94589c83ada44f8ab48bf9e6898d1 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 17 May 2018 10:58:21 +0200
-Subject: [PATCH 15/30] Add Hsynth audio driver with Phat(pcm5102) audio output
+Subject: [PATCH 15/31] Add Hsynth audio driver with Phat(pcm5102) audio output
  Add vipii fb,pidac/hsynth audio dtb for DE10 Nano HD HDMI
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -5269,10 +5269,10 @@ index 000000000000..2d56f0b83f5a
 2.17.1
 
 
-From d6ed34dd4ca74d4affb26ea44cb5a773de14c93c Mon Sep 17 00:00:00 2001
+From 6b6d4cb8a06447888d0269151fb68f44f7fab822 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 4 May 2018 14:32:56 +0200
-Subject: [PATCH 16/30] add vipii framebuffer dtb for de1_soc
+Subject: [PATCH 16/31] add vipii framebuffer dtb for de1_soc
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -5588,10 +5588,10 @@ index 000000000000..225e46161c5c
 2.17.1
 
 
-From 6181d880f31443d4e14031b4705393ae3768623b Mon Sep 17 00:00:00 2001
+From 16077cbc75e6914c9f27e1fac45cc710a863d16e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 24 May 2018 12:18:18 +0200
-Subject: [PATCH 17/30] div codec mods
+Subject: [PATCH 17/31] div codec mods
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -5741,10 +5741,10 @@ index 2d56f0b83f5a..3011c2b42579 100644
 2.17.1
 
 
-From 389873542be203c74891b6222b233386dd655a5e Mon Sep 17 00:00:00 2001
+From b16e972a9444ca1d66c21a8743d1a076d38a3f1e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 26 May 2018 21:36:55 +0200
-Subject: [PATCH 18/30] Change uio port name Fix: for machinekit use
+Subject: [PATCH 18/31] Change uio port name Fix: for machinekit use
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -5782,10 +5782,10 @@ index bfb289855be1..f6ba2c68e527 100644
 2.17.1
 
 
-From a898f2a224c1c68ec3fb681e893280e6c45293a9 Mon Sep 17 00:00:00 2001
+From aded61830e22fa8092bd8e3052d9b7845079c756 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 30 May 2018 12:33:08 +0200
-Subject: [PATCH 19/30] Terasic dev boards: Make core addresses in qsys
+Subject: [PATCH 19/31] Terasic dev boards: Make core addresses in qsys
  devicetrees consistant
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -6072,10 +6072,10 @@ index 225e46161c5c..c6aaacc3496e 100644
 2.17.1
 
 
-From 67545d006683f9f2664f7a9323bc5803e2ef4010 Mon Sep 17 00:00:00 2001
+From c3172a04f756626b2ba0d390549e07b87193b82c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 31 May 2018 13:46:11 +0200
-Subject: [PATCH 20/30] Test Improve dtb
+Subject: [PATCH 20/31] Test Improve dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -6161,10 +6161,10 @@ index 1bf089216f35..65d1a56a8a23 100644
 2.17.1
 
 
-From 4af8b87fa589f2e30bf33840c8b8ab031f2c64bf Mon Sep 17 00:00:00 2001
+From 82841a7e82665b11165443289fce4b1fb8c4b42d Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 31 May 2018 18:08:43 +0200
-Subject: [PATCH 21/30] Add missing .ops to synthpcm5102 codec
+Subject: [PATCH 21/31] Add missing .ops to synthpcm5102 codec
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -6284,10 +6284,10 @@ index 9791ae3c9608..414414670f15 100644
 2.17.1
 
 
-From a83e86d5a70c357c3cab1aa3e3f0350b436659c3 Mon Sep 17 00:00:00 2001
+From 39079d38e5cddd84c44674b2ea2639717569f97c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 1 Jun 2018 12:52:57 +0200
-Subject: [PATCH 22/30] Make DE1x Devicetree qsys core addresses consistant
+Subject: [PATCH 22/31] Make DE1x Devicetree qsys core addresses consistant
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -6600,10 +6600,10 @@ index 4925f44d0043..11f0a9cd94db 100644
 2.17.1
 
 
-From 24a199b2d37e5b756ae7df4223bd2c6bd7de637f Mon Sep 17 00:00:00 2001
+From 04b214b2240349e7c08d96ef435ea9d4c4c59f45 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 2 Jun 2018 22:56:31 +0200
-Subject: [PATCH 23/30] Add builtin audio codec driver for DE1/DE10 SoC
+Subject: [PATCH 23/31] Add builtin audio codec driver for DE1/DE10 SoC
  (wm8731) Add Audio and framebuffer Supporting device trees xga and hd
  versions
 
@@ -7353,10 +7353,10 @@ index 000000000000..e297ef4b0c0c
 2.17.1
 
 
-From 755ad17cce93a67baf083e8047a2f8d3e433f5e8 Mon Sep 17 00:00:00 2001
+From 48cdac01fa523046080e2bca60c2a7a2b690b8c9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 8 Jun 2018 16:50:10 +0200
-Subject: [PATCH 24/30] Rename Hsynth stream names
+Subject: [PATCH 24/31] Rename Hsynth stream names
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7400,10 +7400,10 @@ index 414414670f15..bf40ad2dd911 100644
 2.17.1
 
 
-From e5526302fb62bffa3d11c9f670ab5cadf1648ba9 Mon Sep 17 00:00:00 2001
+From cd1b2978d8ac768dbaaf188920cbb77a24abfc58 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 17:24:54 +0200
-Subject: [PATCH 25/30] Add irq to De10 Nano vipii fb
+Subject: [PATCH 25/31] Add irq to De10 Nano vipii fb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7438,10 +7438,10 @@ index 4b8b81316cf6..723f2a38e136 100644
 2.17.1
 
 
-From 54650575d8177170113e7d467ac55611aad3d9bb Mon Sep 17 00:00:00 2001
+From 9de9f3880edbdfa9cf5050d2f571b89aa33514a7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 18:13:46 +0200
-Subject: [PATCH 26/30] Usb core fixes
+Subject: [PATCH 26/31] Usb core fixes
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7528,10 +7528,10 @@ index fe2fc57bbc90..2de69d5df962 100644
 2.17.1
 
 
-From 3746fc3b66e932375b18576b8e96998485974b96 Mon Sep 17 00:00:00 2001
+From 61e328942a45b136f2e7a1c049a465eb5f24aba7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 23:18:17 +0200
-Subject: [PATCH 27/30] Add kernel debug stuff
+Subject: [PATCH 27/31] Add kernel debug stuff
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7556,10 +7556,10 @@ index 4917bafcd7ae..4ca99129e968 100644
 2.17.1
 
 
-From ff495f28be811ac580f480d59acb523670ee42c5 Mon Sep 17 00:00:00 2001
+From 2c941ef8af47ab6acd774e2326e3449893352c4a Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 11 Jun 2018 16:18:22 +0200
-Subject: [PATCH 28/30] Sounddriver mods
+Subject: [PATCH 28/31] Sounddriver mods
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7884,10 +7884,10 @@ index 3011c2b42579..c99a5b485fee 100644
 2.17.1
 
 
-From afe2b3b72bc9e5bfb028849c56994b7e84d5c208 Mon Sep 17 00:00:00 2001
+From 0e67ba514bf573390333f4bb913847f13fdf4d5f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 15 Jun 2018 02:48:57 +0200
-Subject: [PATCH 29/30] update DE10 devicetrees
+Subject: [PATCH 29/31] update DE10 devicetrees
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -8068,10 +8068,10 @@ index cc62324122c7..ac06b3c2f5cb 100644
 2.17.1
 
 
-From 08a005a963d4f026040b6ed1b25a30aac046d99d Mon Sep 17 00:00:00 2001
+From 06e1ed416dd5cd947bb69ae3e8b55d2e8c8f03be Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 12 Oct 2018 20:51:17 +0200
-Subject: [PATCH 30/30] Add devicetree for DE10 Nano Touch screen Quartus
+Subject: [PATCH 30/31] Add devicetree for DE10 Nano Touch screen Quartus
  project
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -8368,6 +8368,326 @@ index 000000000000..7b1a16e1909e
 +&usb1 {
 +	disable-over-current;
 +	dr_mode = "host";
++	status = "okay";
++};
+-- 
+2.17.1
+
+
+From dc3f788739cc57aa9d43991adedf84876e89b303 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Tue, 16 Oct 2018 12:46:21 +0200
+Subject: [PATCH 31/31] Add devicetree for DE1 Nano Touch screen Quartus
+ project
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/Makefile                    |   1 +
+ .../dts/socfpga_cyclone5_de1_soc_fb_ts.dts    | 285 ++++++++++++++++++
+ 2 files changed, 286 insertions(+)
+ create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fb_ts.dts
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index 9f43fb195c1a..3c6d56869ff2 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -709,6 +709,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
+ 	socfpga_cyclone5_de1_soc_aud_fb.dtb \
+ 	socfpga_cyclone5_de1_soc_aud_fb_hd.dtb \
+ 	socfpga_cyclone5_de1_soc_fbii.dtb \
++	socfpga_cyclone5_de1_soc_fb_ts.dtb \
+ 	socfpga_cyclone5_sockit.dtb \
+ 	socfpga_cyclone5_socrates.dtb \
+ 	socfpga_cyclone5_sodia.dtb \
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fb_ts.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fb_ts.dts
+new file mode 100644
+index 000000000000..5d39b86b2caa
+--- /dev/null
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fb_ts.dts
+@@ -0,0 +1,285 @@
++/*
++* Copyright Intel Corporation (C) 2017. All rights reserved.
++*
++* This program is free software; you can redistribute it and/or modify
++* it under the terms and conditions of the GNU General Public License,
++* version 2, as published by the Free Software Foundation.
++*
++* This program is distributed in the hope it will be useful, but WITHOUT
++* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++* more details.
++*
++* You should have received a copy of the GNU General Public License along with
++* this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
++
++#include "socfpga_cyclone5.dtsi"
++
++/ {
++	model = "Terasic DE1-SoC";
++	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
++
++	chosen {
++		bootargs = "earlyprintk";
++		stdout-path = "serial0:115200n8";
++	};
++
++	memory {
++		name = "memory";
++		device_type = "memory";
++		reg = <0x0 0x40000000>; /* 1GB */
++	};
++
++	aliases {
++		ethernet0 = &gmac1;
++	};
++
++	regulator_3_3v: 3-3-v-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++	};
++
++	leds {
++		compatible = "gpio-leds";
++		hps0 {
++			label = "hps_led0";
++			gpios = <&portb 24 0>;
++			linux,default-trigger = "heartbeat";
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys";
++		hps0 {
++			label = "hps_key0";
++			gpios = <&portb 25 0>;
++			linux,code = <63>;
++			debounce-interval = <50>;
++		};
++	};
++
++	sound {
++		compatible = "opencores,de1soc-wm8731-audio-midi";
++		i2s-controller = <&i2s>;
++		audio-codec = <&wm8731>;
++		i2c-mux-gpio = <&portb 19 0>;
++		dmalink-controller = <&dmalink>;
++		synth-codec = <&hsynth7002_codec>;
++	};
++
++	clk48: clk48 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <24576000>;
++		clock-output-names = "clk48";
++	};
++
++	clk44: clk44 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <33868800>;
++		clock-output-names = "clk44";
++	};
++
++	i2s: i2s@0x0 {
++		#sound-dai-cells = <1>;
++		compatible = "opencores,i2s";
++		reg = <0xff200000 0x20>, <0xff200040 0x20>;
++		clocks = <&clk44>, <&clk48>;
++		clock-names = "clk44", "clk48";
++		dmas = <&pdma 0>, <&pdma 1>, <&pdma 2>;
++		dma-names = "tx", "rx", "rx";
++	};
++
++	dmalink: dmalink@0x20 {
++		#sound-dai-cells = <1>;
++		compatible = "holotr,dmalink";
++		reg = <0xff200020 0x20>, <0xff200060 0x20>;
++		clocks = <&clk44>;
++		clock-names = "clk44";
++		dmas = <&pdma 2>;
++		dma-names = "rx";
++	};
++
++	hsynth7002_codec: hsynth7002-codec {
++	#sound-dai-cells = <0>;
++		compatible = "holotr,hsynth7002";
++/*     IOVDD-supply = <&supply>;*/
++		status = "okay";
++	};
++
++	bridge@0xc0000000 {
++		compatible = "altr,bridge-15.1", "simple-bus";
++		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
++		bridge-enable = <1>;
++		#address-cells = <0x2>;
++		#size-cells = <0x1>;
++		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
++			<0x00000001 0x00031000 0xff231000 0x00000080>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00010000>;
++
++		sysid@0x100001000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00001000 0x00000008>;
++			id = <2899645186>;
++			timestamp = <1524157570>;
++		};
++
++		serial@0x100002000 {
++			compatible = "altr,juart-17.1", "altr,juart-1.0";
++			reg = <0x00000001 0x00002000 0x00000008>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 40 4>;
++			clocks = <0x2>;
++		}; //end serial@0x100020000 (jtag_uart)
++
++		gpio@0x100003000 {
++			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00003000 0x00000010>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 41 1>;
++			clocks = <0x2>;
++			altr,gpio-bank-width = <2>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++			altr,interrupt-type = <2>;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
++			altr,interrupt_type = <2>;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
++			edge_type = <1>;	/* embeddedsw.dts.params.edge_type type NUMBER */
++			level_trigger = <0>;	/* embeddedsw.dts.params.level_trigger type NUMBER */
++			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++			#gpio-cells = <2>;
++			gpio-controller;
++		}; //end gpio@0x1000100c0 (button_pio)
++
++		gpio@0x100004000 {
++			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00004000 0x00000010>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 42 1>;
++			clocks = <0x2>;
++			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++			altr,interrupt-type = <3>;	/* embeddedsw.dts.params.altr,interrupt-type type NUMBER */
++			altr,interrupt_type = <3>;	/* embeddedsw.dts.params.altr,interrupt_type type NUMBER */
++			edge_type = <2>;	/* embeddedsw.dts.params.edge_type type NUMBER */
++			level_trigger = <0>;	/* embeddedsw.dts.params.level_trigger type NUMBER */
++			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++			#gpio-cells = <2>;
++			gpio-controller;
++		}; //end gpio@0x100010080 (dipsw_pio)
++
++		gpio@0x100005000 {
++			compatible = "altr,pio-17.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00005000 0x00000010>;
++			clocks = <0x2>;
++			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
++			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
++			#gpio-cells = <2>;
++			gpio-controller;
++		}; //end gpio@0x100010040 (led_pio)
++
++		vip@0x100031000 {
++			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-14.0";
++			reg = <0x00000001 0x00031000 0x00000080>;
++			max-width = <1366>;
++			max-height = <768>;
++			bits-per-color = <0x8>;
++			colors-per-beat = <0x4>;
++			beats-per-pixel = <0x1>;
++			mem-word-width = <0x80>;
++		};
++
++		uio-socfpg0@0x100040000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <0x2>;
++			interrupts = <0 43 4>;
++			address_width = <14>;
++			data_width = <32>;
++		};
++
++		socmidi@0x100050000 {
++			compatible = "holotr,socsynth-midi";
++			reg = <0x00000001 0x00050000 0x00010000>;
++			interrupt-parent = <0x2>;
++/*			interrupts = <0 44 4>;*/
++			address_width = <3>;   /* embeddedsw.dts.params.address_width type NUMBER */
++			data_width = <8>;      /* embeddedsw.dts.params.data_width type NUMBER */
++		};
++	};
++};
++
++&gmac1 {
++	status = "okay";
++	phy-mode = "rgmii";
++
++	txd0-skew-ps = <0>; /* -420ps */
++	txd1-skew-ps = <0>; /* -420ps */
++	txd2-skew-ps = <0>; /* -420ps */
++	txd3-skew-ps = <0>; /* -420ps */
++	rxd0-skew-ps = <420>; /* 0ps */
++	rxd1-skew-ps = <420>; /* 0ps */
++	rxd2-skew-ps = <420>; /* 0ps */
++	rxd3-skew-ps = <420>; /* 0ps */
++	txen-skew-ps = <0>; /* -420ps */
++	txc-skew-ps = <1860>; /* 960ps */
++	rxdv-skew-ps = <420>; /* 0ps */
++	rxc-skew-ps = <1680>; /* 780ps */
++
++	max-frame-size = <3800>;
++};
++
++&gpio0 {
++	status = "okay";
++};
++
++&gpio1 {
++	status = "okay";
++};
++
++&gpio2 {
++	status = "okay";
++};
++
++&i2c0 {
++	status = "okay";
++	speed-mode = <0>;
++
++	wm8731: wm8731@34 {
++		#sound-dai-cells = <0>;
++		compatible = "wlf,wm8731";
++		reg = <0x1a>;
++	};
++
++	adxl345: adxl345@0 {
++		compatible = "adi,adxl345";
++		reg = <0x53>;
++
++		interrupt-parent = <&portc>;
++		interrupts = <3 2>;
++	};
++};
++
++&i2c1 {
++	status = "okay";
++	speed-mode = <0>;
++};
++
++&mmc0 {
++	vmmc-supply = <&regulator_3_3v>;
++	vqmmc-supply = <&regulator_3_3v>;
++	status = "okay";
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&usb1 {
 +	status = "okay";
 +};
 -- 

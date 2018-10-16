@@ -1,32 +1,33 @@
-From 6b6d4cb8a06447888d0269151fb68f44f7fab822 Mon Sep 17 00:00:00 2001
+From dc3f788739cc57aa9d43991adedf84876e89b303 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
-Date: Fri, 4 May 2018 14:32:56 +0200
-Subject: [PATCH 16/31] add vipii framebuffer dtb for de1_soc
+Date: Tue, 16 Oct 2018 12:46:21 +0200
+Subject: [PATCH 31/31] Add devicetree for DE1 Nano Touch screen Quartus
+ project
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                    |   1 +
- .../dts/socfpga_cyclone5_de1_soc_fbii.dts     | 285 ++++++++++++++++++
+ .../dts/socfpga_cyclone5_de1_soc_fb_ts.dts    | 285 ++++++++++++++++++
  2 files changed, 286 insertions(+)
- create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
+ create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fb_ts.dts
 
 diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index b80aa1c22d5d..748b0684137c 100644
+index 9f43fb195c1a..3c6d56869ff2 100644
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -705,6 +705,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
- 	socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dtb \
- 	socfpga_cyclone5_de10_nano.dtb \
- 	socfpga_cyclone5_de1_soc.dtb \
-+	socfpga_cyclone5_de1_soc_fbii.dtb \
+@@ -709,6 +709,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
+ 	socfpga_cyclone5_de1_soc_aud_fb.dtb \
+ 	socfpga_cyclone5_de1_soc_aud_fb_hd.dtb \
+ 	socfpga_cyclone5_de1_soc_fbii.dtb \
++	socfpga_cyclone5_de1_soc_fb_ts.dtb \
  	socfpga_cyclone5_sockit.dtb \
  	socfpga_cyclone5_socrates.dtb \
  	socfpga_cyclone5_sodia.dtb \
-diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fb_ts.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fb_ts.dts
 new file mode 100644
-index 000000000000..225e46161c5c
+index 000000000000..5d39b86b2caa
 --- /dev/null
-+++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fb_ts.dts
 @@ -0,0 +1,285 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
@@ -147,33 +148,33 @@ index 000000000000..225e46161c5c
 +		bridge-enable = <1>;
 +		#address-cells = <0x2>;
 +		#size-cells = <0x1>;
-+		ranges = <0x00000001 0x00020000 0xff220000 0x00000008>,
-+			<0x00000001 0x00010000 0xff210000 0x00000008>,
-+			<0x00000001 0x000100c0 0xff2100c0 0x00000010>,
-+			<0x00000001 0x00010080 0xff210080 0x00000010>,
-+			<0x00000001 0x00010040 0xff210040 0x00000010>,
++		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
 +			<0x00000001 0x00031000 0xff231000 0x00000080>,
 +			<0x00000001 0x00040000 0xff240000 0x00010000>,
 +			<0x00000001 0x00050000 0xff250000 0x00010000>;
 +
-+		serial@0x100020000 {
++		sysid@0x100001000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00001000 0x00000008>;
++			id = <2899645186>;
++			timestamp = <1524157570>;
++		};
++
++		serial@0x100002000 {
 +			compatible = "altr,juart-17.1", "altr,juart-1.0";
-+			reg = <0x00000001 0x00020000 0x00000008>;
++			reg = <0x00000001 0x00002000 0x00000008>;
 +			interrupt-parent = <0x2>;
 +			interrupts = <0 40 4>;
 +			clocks = <0x2>;
 +		}; //end serial@0x100020000 (jtag_uart)
 +
-+		sysid@0x100010000 {
-+			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
-+			reg = <0x00000001 0x00010000 0x00000008>;
-+			id = <2899645186>;
-+			timestamp = <1524157570>;
-+		};
-+
-+		gpio@0x1000100c0 {
++		gpio@0x100003000 {
 +			compatible = "altr,pio-17.1", "altr,pio-1.0";
-+			reg = <0x00000001 0x000100c0 0x00000010>;
++			reg = <0x00000001 0x00003000 0x00000010>;
 +			interrupt-parent = <0x2>;
 +			interrupts = <0 41 1>;
 +			clocks = <0x2>;
@@ -187,9 +188,9 @@ index 000000000000..225e46161c5c
 +			gpio-controller;
 +		}; //end gpio@0x1000100c0 (button_pio)
 +
-+		gpio@0x100010080 {
++		gpio@0x100004000 {
 +			compatible = "altr,pio-17.1", "altr,pio-1.0";
-+			reg = <0x00000001 0x00010080 0x00000010>;
++			reg = <0x00000001 0x00004000 0x00000010>;
 +			interrupt-parent = <0x2>;
 +			interrupts = <0 42 1>;
 +			clocks = <0x2>;
@@ -203,9 +204,9 @@ index 000000000000..225e46161c5c
 +			gpio-controller;
 +		}; //end gpio@0x100010080 (dipsw_pio)
 +
-+		gpio@0x100010040 {
++		gpio@0x100005000 {
 +			compatible = "altr,pio-17.1", "altr,pio-1.0";
-+			reg = <0x00000001 0x00010040 0x00000010>;
++			reg = <0x00000001 0x00005000 0x00000010>;
 +			clocks = <0x2>;
 +			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
 +			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
@@ -214,7 +215,7 @@ index 000000000000..225e46161c5c
 +		}; //end gpio@0x100010040 (led_pio)
 +
 +		vip@0x100031000 {
-+			compatible = "altr,vip-frame-buffer-ii-2.0";
++			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-14.0";
 +			reg = <0x00000001 0x00031000 0x00000080>;
 +			max-width = <1366>;
 +			max-height = <768>;

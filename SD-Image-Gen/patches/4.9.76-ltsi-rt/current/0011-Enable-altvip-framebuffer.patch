@@ -1,7 +1,7 @@
-From 26b527e1d7d1d61948dca1633c73b945da76b240 Mon Sep 17 00:00:00 2001
+From e9d403ce8a6b00293562e4dc35876c58acb5a37d Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 30 Mar 2018 20:41:53 +0200
-Subject: [PATCH 11/30] Enable altvip framebuffer
+Subject: [PATCH 11/31] Enable altvip framebuffer
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

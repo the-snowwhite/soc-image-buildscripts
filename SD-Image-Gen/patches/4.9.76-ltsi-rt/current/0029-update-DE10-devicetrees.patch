@@ -1,7 +1,7 @@
-From afe2b3b72bc9e5bfb028849c56994b7e84d5c208 Mon Sep 17 00:00:00 2001
+From 0e67ba514bf573390333f4bb913847f13fdf4d5f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 15 Jun 2018 02:48:57 +0200
-Subject: [PATCH 29/30] update DE10 devicetrees
+Subject: [PATCH 29/31] update DE10 devicetrees
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

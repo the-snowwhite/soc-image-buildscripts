@@ -1,7 +1,7 @@
-From 755ad17cce93a67baf083e8047a2f8d3e433f5e8 Mon Sep 17 00:00:00 2001
+From 48cdac01fa523046080e2bca60c2a7a2b690b8c9 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 8 Jun 2018 16:50:10 +0200
-Subject: [PATCH 24/30] Rename Hsynth stream names
+Subject: [PATCH 24/31] Rename Hsynth stream names
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

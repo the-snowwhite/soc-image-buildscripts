@@ -1,7 +1,7 @@
-From e5526302fb62bffa3d11c9f670ab5cadf1648ba9 Mon Sep 17 00:00:00 2001
+From cd1b2978d8ac768dbaaf188920cbb77a24abfc58 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 17:24:54 +0200
-Subject: [PATCH 25/30] Add irq to De10 Nano vipii fb
+Subject: [PATCH 25/31] Add irq to De10 Nano vipii fb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

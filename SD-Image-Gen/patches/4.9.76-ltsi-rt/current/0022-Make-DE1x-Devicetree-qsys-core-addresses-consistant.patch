@@ -1,7 +1,7 @@
-From a83e86d5a70c357c3cab1aa3e3f0350b436659c3 Mon Sep 17 00:00:00 2001
+From 39079d38e5cddd84c44674b2ea2639717569f97c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 1 Jun 2018 12:52:57 +0200
-Subject: [PATCH 22/30] Make DE1x Devicetree qsys core addresses consistant
+Subject: [PATCH 22/31] Make DE1x Devicetree qsys core addresses consistant
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
