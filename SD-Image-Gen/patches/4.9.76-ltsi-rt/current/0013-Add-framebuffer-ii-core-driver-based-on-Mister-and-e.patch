@@ -1,4 +1,4 @@
-From 7c7221bfd8cb4a51ee7ce1d629302218802d1378 Mon Sep 17 00:00:00 2001
+From de453e438539160ba15487a85f495b2ccb832348 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 18 May 2018 20:35:35 +0200
 Subject: [PATCH 13/31] Add framebuffer-ii core driver based on Mister, and

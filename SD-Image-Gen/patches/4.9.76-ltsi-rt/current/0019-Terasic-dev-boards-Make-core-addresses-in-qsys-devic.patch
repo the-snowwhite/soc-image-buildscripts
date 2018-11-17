@@ -1,4 +1,4 @@
-From aded61830e22fa8092bd8e3052d9b7845079c756 Mon Sep 17 00:00:00 2001
+From 490d07f514c87a2bab18edbf72d6c0019e6f3f16 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 30 May 2018 12:33:08 +0200
 Subject: [PATCH 19/31] Terasic dev boards: Make core addresses in qsys

@@ -959,7 +959,7 @@ elif [ "${1}" = "2" ] || [ "${1}" = "3" ]; then
     echo ""
 
     if [ "${1}" = "2" ]; then
-        sudo sh -c "LC_ALL=C mkfs -t vfat -n boot ${LOOP_DEV}p1"
+        sudo sh -c "LC_ALL=C mkfs -t vfat -n BOOT ${LOOP_DEV}p1"
         mkfs_partition="${LOOP_DEV}p2"
         sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
     elif [ "${1}" = "3" ]; then

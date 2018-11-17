@@ -1,4 +1,4 @@
-From 06e1ed416dd5cd947bb69ae3e8b55d2e8c8f03be Mon Sep 17 00:00:00 2001
+From 937fc4a8e4da91d092de97f20b69895e82843947 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 12 Oct 2018 20:51:17 +0200
 Subject: [PATCH 30/31] Add devicetree for DE10 Nano Touch screen Quartus
@@ -25,7 +25,7 @@ index cd54d8e8f8fe..9f43fb195c1a 100644
  	socfpga_cyclone5_de1_soc_aud_fb.dtb \
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_ts.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_ts.dts
 new file mode 100644
-index 000000000000..7b1a16e1909e
+index 000000000000..d18c9bea582c
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_ts.dts
 @@ -0,0 +1,271 @@
@@ -139,7 +139,7 @@ index 000000000000..7b1a16e1909e
 +			<0x00000001 0x00004000 0xff204000 0x00000010>,
 +			<0x00000001 0x00005000 0xff205000 0x00000010>,
 +			<0x00000001 0x00030000 0xff230000 0x00000100>,
-+			<0x00000001 0x00031000 0xff231000 0x00000080>,
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
 +			<0x00000001 0x00040000 0xff240000 0x00010000>,
 +			<0x00000001 0x00050000 0xff250000 0x00010000>;
 +
@@ -209,7 +209,7 @@ index 000000000000..7b1a16e1909e
 +
 +		vip@0x100031000 {
 +			compatible = "altr,vip-frame-buffer-ii-2.0";
-+			reg = <0x00000001 0x00031000 0x00000080>;
++			reg = <0x00000001 0x00031000 0x00000040>;
 +			interrupt-parent = <&intc>;
 +			interrupts = <0 45 4>;
 +			max-width = <1366>;

@@ -1,4 +1,4 @@
-From f577f9fb1549cb578766c66f0002270ff0df17f2 Mon Sep 17 00:00:00 2001
+From 0f2a38dc74eafd24ab8c8384ae2bc5048c80df3f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
 Subject: [PATCH 09/31] add spidev in dts so driver is loaded

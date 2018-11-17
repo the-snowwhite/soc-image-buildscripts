@@ -1,4 +1,4 @@
-From 503dc73d8dd94589c83ada44f8ab48bf9e6898d1 Mon Sep 17 00:00:00 2001
+From fb9d96a5fd90231db01520f8ca3a36f7c68bdd3b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 17 May 2018 10:58:21 +0200
 Subject: [PATCH 15/31] Add Hsynth audio driver with Phat(pcm5102) audio output

@@ -1,4 +1,4 @@
-From 9de9f3880edbdfa9cf5050d2f571b89aa33514a7 Mon Sep 17 00:00:00 2001
+From 96b779110bc7c462df4bd4a6f1843f24781be0dc Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 18:13:46 +0200
 Subject: [PATCH 26/31] Usb core fixes
