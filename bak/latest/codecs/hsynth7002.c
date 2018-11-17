@@ -16,13 +16,13 @@
 #include <sound/soc.h>
 
 static const struct snd_soc_dapm_widget hsynth7002_widgets[] = {
-	SND_SOC_DAPM_INPUT("PDM_DAT"),
-	SND_SOC_DAPM_REGULATOR_SUPPLY("IOVDD", 0, 0),
+	SND_SOC_DAPM_INPUT("HSYNTH"),
+//	SND_SOC_DAPM_REGULATOR_SUPPLY("IOVDD", 0, 0),
 };
 
 static const struct snd_soc_dapm_route hsynth7002_routes[] = {
-	{ "Capture", NULL, "PDM_DAT" },
-	{ "Capture", NULL, "IOVDD" },
+	{ "Capture", NULL, "HSYNTH" },
+//	{ "Capture", NULL, "IOVDD" },
 };
 
 static int hsynth7002_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)

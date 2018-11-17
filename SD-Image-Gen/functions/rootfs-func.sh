@@ -1,58 +1,48 @@
 #!/bin/bash
 
 # lightdm,lxqt
-# ## parameters: 1: mount dev name, 2: distro name, 3: repo url
-run_qemu_debootstrap_buster() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=sudo,locales,wget ${2} ${1} ${3}
+# ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+## E: Couldn't find these debs: libdirectfb-1.7-7 libssh2-1 cgroupfs-mount gnupg2 ntp avahi-discover traceroute ifupdown2,cgmanager
+run_qemu_debootstrap_bionic() {
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,git,curl,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}
 output=${?}
 }
 
-# ## parameters: 1: mount dev name, 2: distro name, 3: repo url
+# lightdm,lxqt
+# ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+run_desktop_qemu_debootstrap_bionic() {
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,libnss-mdns,strace,u-boot-tools,initramfs-tools,dirmngr,wget,git,curl,xorg,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}
+output=${?}
+}
+
+# ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 #run_qemu_debootstrap_buster() {
-#sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,xserver-xorg-video-dummy ${2} ${1} ${3}
+#sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,xserver-xorg-video-dummy ${2} ${1} ${3}
 #output=${?}
 #}
 
-# ## parameters: 1: mount dev name, 2: distro name, 3: repo url
-run_qemu_debootstrap_buster_lxqt() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid,lxqt-core,lxqt,task-lxqt-desktop ${2} ${1} ${3}
-output=${?}
-}
-
-
-# ## parameters: 1: mount dev name, 2: distro name, 3: repo url
-run_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}
-output=${?}
-}
-
-## parameters: 1: mount dev name, 2: distro name, 3: repo url
-run_desktop_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid ${2} ${1} ${3}
-output=${?}
-}
-#,task-lxde-desktop,lxsession,xinput
-
-run_qt_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge ${2} ${1} ${3}
-output=${?}
-}
-
-#
-# ## parameters: 1: mount dev name, 2: distro name, 3: repo url
-# run_qt_qemu_debootstrap() {
-# sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd --include=cgmanager,cgroupfs-mount,ntp,autofs,policykit-1,gtk2-engines-pixbuf,budgie-indicator-applet,sudo,locales,nano,apt-utils,adduser,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh-4,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,upower,xorg,busybox,openbox,lxsession,xinput,udev,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron,jackd2,qjackctl,jack-tools,meterbridge,fontconfig,fontconfig-config ${2} ${1} ${3}
+# # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+# run_qemu_debootstrap_buster_lxqt() {
+# sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofsfuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid,lxqt-core,lxqt,task-lxqt-desktop ${2} ${1} ${3}
 # output=${?}
 # }
-#
-#
-# run_qt_qemu_debootstrap() {
-# sudo qemu-debootstrap --foreign --arch=armhf --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,console-setup,fbset,libdirectfb-1.2-9,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,x11-xserver-utils,xorg,busybox,openbox,lxsession,task-lxde-desktop,xinput,policykit-1,gtk2-engines-pixbuf,gksu,net-tools,lsof,less,accountsservice,iputils-ping,python,ifupdown,iproute2,dhcpcd5,acpid,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,cgroupfs-mount,ntp,autofs,u-boot-tools,initramfs-tools,alsa-utils,alsamixergui,midish,midisnoop,multimedia-midi,anacron  ${2} ${1} ${3}
-# }
+#,dhcpcd5,open-iscsi,
 
-#
+# ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+run_qemu_debootstrap() {
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}
+output=${?}
+}
+
+## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+run_desktop_qemu_debootstrap() {
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid ${2} ${1} ${3}
+output=${?}
+}
+
+# parameters: 1: mount dev name
 gen_policy_rc_d() {
-sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/usr/sbin/policy-rc.d
+sudo sh -c 'cat <<EOT > '${1}'/usr/sbin/policy-rc.d
 echo "************************************" >&2
 echo "All rc.d operations denied by policy" >&2
 echo "************************************" >&2
@@ -60,8 +50,9 @@ exit 101
 EOT'
 }
 
+# parameters: 1: mount dev name, 2: user name
 gen_sudoers() {
-sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/sudoers
+sudo sh -c 'cat <<EOT > '${1}'/etc/sudoers
 #
 # This file MUST be edited with the 'visudo' command as root.
 #
@@ -82,7 +73,7 @@ Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/
 
 # User privilege specification
 root    ALL=(ALL:ALL) ALL
-'${USER_NAME}'    ALL=(ALL:ALL) ALL
+'${2}'    ALL=(ALL:ALL) ALL
 
 # Allow members of group sudo to execute any command
 %sudo   ALL=(ALL:ALL) ALL
@@ -91,73 +82,133 @@ root    ALL=(ALL:ALL) ALL
 
 #includedir /etc/sudoers.d
 
-'${USER_NAME}' ALL=(ALL:ALL) NOPASSWD: ALL
-%'${USER_NAME}' ALL=(ALL:ALL) NOPASSWD: ALL
+'${2}' ALL=(ALL:ALL) NOPASSWD: ALL
+%'${2}' ALL=(ALL:ALL) NOPASSWD: ALL
 EOT'
 
 }
 
-
+# parameters: 1: mount dev name, 2: distro
 gen_final_sources_list() {
-sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/apt/sources.list-final
+if [ "${2}" == "bionic" ]; then
+sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-final
+#------------------------------------------------------------------------------#
+#                   OFFICIAL UBUNTU REPOS
+#------------------------------------------------------------------------------#
+
+deb [arch=arm64] '${final_ub_repo}' '${2}' main restricted
+deb-src [arch=arm64]  '${final_ub_repo}' '${2}' main restricted
+
+deb [arch=arm64]  '${final_ub_repo}' '${2}'-updates main restricted
+deb-src [arch=arm64] '${final_ub_repo}' '${2}'-updates main restricted
+
+deb [arch=arm64] '${final_ub_repo}' '${2}' universe
+deb-src [arch=arm64] '${final_ub_repo}' '${2}' universe
+deb [arch=arm64] '${final_ub_repo}' '${2}'-updates universe
+deb-src [arch=arm64] '${final_ub_repo}' '${2}'-updates universe
+
+deb [arch=arm64] '${final_ub_repo}' '${2}' multiverse
+deb-src [arch=arm64] '${final_ub_repo}' '${2}' multiverse
+deb [arch=arm64] '${final_ub_repo}' '${2}'-updates multiverse
+deb-src [arch=arm64] '${final_ub_repo}' '${2}'-updates multiverse
+
+EOT'
+else
+sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-final
 #------------------------------------------------------------------------------#
 #                   OFFICIAL DEBIAN REPOS
 #------------------------------------------------------------------------------#
 
 ###### Debian Main Repos
-deb '${final_repo}' '$distro' main contrib non-free
-deb-src '${final_repo}' '$distro' main
+deb '${final_deb_repo}' '${2}' main contrib non-free
+deb-src '${final_deb_repo}' '${2}' main
 
 ###### Debian Update Repos
-deb http://security.debian.org/ '$distro'/updates main contrib non-free
+deb http://security.debian.org/ '${2}'/updates main contrib non-free
+deb http://ftp.debian.org/debian '${2}'-backports main
 
 EOT'
-
+fi
 }
 
+# parameters: 1: mount dev name, 2: distro
 gen_local_sources_list() {
 
-sudo sh -c 'cat <<EOT > '$ROOTFS_MNT'/etc/apt/sources.list-local
+if [ "${2}" == "bionic" ]; then
+sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-local
+#------------------------------------------------------------------------------#
+#                   OFFICIAL UBUNTU REPOS
+#------------------------------------------------------------------------------#
+
+##### Local mirror
+deb '${local_kernel_repo}' '${2}' main
+
+deb [arch=arm64] '${local_ub_repo}' '${2}' main restricted
+deb-src [arch=arm64]  '${local_ub_repo}' '${2}' main restricted
+
+deb [arch=arm64]  '${local_ub_repo}' '${2}'-updates main restricted
+deb-src [arch=arm64] '${local_ub_repo}' '${2}'-updates main restricted
+
+deb [arch=arm64] '${local_ub_repo}' '${2}' universe
+deb-src [arch=arm64] '${local_ub_repo}' '${2}' universe
+deb [arch=arm64] '${local_ub_repo}' '${2}'-updates universe
+deb-src [arch=arm64] '${local_ub_repo}' '${2}'-updates universe
+
+deb [arch=arm64] '${local_ub_repo}' '${2}' multiverse
+deb-src [arch=arm64] '${local_ub_repo}' '${2}' multiverse
+deb [arch=arm64] '${local_ub_repo}' '${2}'-updates multiverse
+deb-src [arch=arm64] '${local_ub_repo}' '${2}'-updates multiverse
+
+EOT'
+else
+sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-local
 #------------------------------------------------------------------------------#
 #                   OFFICIAL DEBIAN REPOS
 #------------------------------------------------------------------------------#
 
 
 ##### Local Debian mirror
-deb '${local_kernel_repo}' '$distro' main
-deb '${local_repo}' '$distro' main contrib non-free
-#deb-src '${local_kernel_repo}' '$distro' main
-#deb-src '${local_repo}' '$distro' main
+deb '${local_kernel_repo}' '${2}' main
+deb '${local_deb_repo}' '${2}' main contrib non-free
+#deb-src '${local_kernel_repo}' '${2}' main
+#deb-src '${local_deb_repo}' '${2}' main
 
 ###### Debian Update Repos
-deb http://security.debian.org/ '$distro'/updates main contrib non-free
+deb http://security.debian.org/ '${2}'/updates main contrib non-free
+deb http://ftp.debian.org/debian '${2}'-backports main
 
 EOT'
+fi
+
 echo ""
 echo "Script_MSG: Created new sources.list to local apt mirror"
 echo ""
 
 }
 
+# parameters: 1: img mount, 2: hostname
 gen_hosts() {
 
-sudo sh -c 'echo '${HOST_NAME}' > '${ROOTFS_MNT}'/etc/hostname'
+sudo sh -c 'echo '${2}' > '${1}'/etc/hostname'
 
-sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/hosts
-127.0.0.1   localhost.localdomain   localhost       '${HOST_NAME}'
-127.0.1.1   '${HOST_NAME}'.local    '${HOST_NAME}'
+sudo sh -c 'cat <<EOT > '${1}'/etc/hosts
+127.0.0.1   localhost.localdomain   localhost       '${2}'
+127.0.1.1   '${2}'.local    '${2}'
 EOT'
 
 }
 
+#1: net adapter name
 gen_network_interface_setup() {
 
 sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/systemd/network/20-dhcp.network
 [Match]
-Name=eth0
+Name='${1}'
 
 [Network]
-DHCP=v4
+LinkLocalAddressing=ipv4
+IPv6AcceptRA=no
+DHCP=ipv4
 MTU=1500
 
 [DHCP]
@@ -414,7 +465,7 @@ en_US.UTF-8 UTF-8
 # gez_ER UTF-8
 # gez_ER@abegede UTF-8
 # gez_ET UTF-8
-# gez_ET@abegede UTF-8
+# gez_ET@abegede UTF-8etup_configfiles
 # gl_ES ISO-8859-1
 # gl_ES.UTF-8 UTF-8
 # gl_ES@euro ISO-8859-15
@@ -674,44 +725,45 @@ sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' '${shell_cm
 
 }
 
+# parameters: 1: mount dev name, 2: user name
 gen_add_user_sh() {
 echo "------------------------------------------"
-echo "generating add_user.sh chroot config script"
+echo "generating add_user.sh chroot config script"etup_configfiles
 echo "------------------------------------------"
-export DEFGROUPS="sudo,kmem,adm,dialout,${USER_NAME},video,plugdev,netdev"
+export DEFGROUPS="sudo,kmem,adm,dialout,${2},video,plugdev,netdev"
 
-sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/add_user.sh
+sudo sh -c 'cat <<EOF > '${1}'/home/add_user.sh
 #!/bin/bash
 
-set -x
+#set -x
 
-export DEFGROUPS="sudo,kmem,adm,dialout,'${USER_NAME}',video,plugdev,netdev"
+export DEFGROUPS="sudo,kmem,adm,dialout,'${2}',video,plugdev,netdev,audio"
 export LANG=C
 
 '${apt_cmd}' -y update
 '${apt_cmd}' -y --assume-yes upgrade
-echo "root:'${USER_NAME}'" | chpasswd
+echo "root:'${2}'" | chpasswd
 
-echo "ECHO: " "Will add user '${USER_NAME}' pw: '${USER_NAME}'"
-/usr/sbin/useradd -s '${shell_cmd}' -d /home/'${USER_NAME}' -m '${USER_NAME}'
-echo "'${USER_NAME}':'${USER_NAME}'" | chpasswd
-adduser '${USER_NAME}' sudo
-chsh -s '${shell_cmd}' '${USER_NAME}'
+echo "ECHO: " "Will add user '${2}' pw: '${2}'"
+/usr/sbin/useradd -s '${shell_cmd}' -d /home/'${2}' -m '${2}'
+echo "'${2}':'${2}'" | chpasswd
+adduser '${2}' sudo
+chsh -s '${shell_cmd}' '${2}'
 
-echo "ECHO: ""User '${USER_NAME}' Added"
+echo "ECHO: ""User '${2}' Added"
 
 echo "ECHO: ""Will now add user to groups"
-usermod -a -G '${DEFGROUPS}' '${USER_NAME}'
+usermod -a -G '${DEFGROUPS}' '${2}'
 sync
 
-cat <<EOT >> /home/'${USER_NAME}'/.bashrc
+cat <<EOT >> /home/'${2}'/.bashrc
 
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 EOT
 
-cat <<EOT >> /home/'${USER_NAME}'/.profile
+cat <<EOT >> /home/'${2}'/.profile
 
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
@@ -736,21 +788,22 @@ EOT
 exit
 EOF'
 
-sudo chmod +x ${ROOTFS_MNT}/home/add_user.sh
+sudo chmod +x ${1}/home/add_user.sh
 
-sudo sh -c 'LANG=C.UTF-8  chroot --userspec=root:root '${ROOTFS_MNT}' /usr/sbin/locale-gen en_GB.UTF-8 en_US.UTF-8,da_DK.UTF-8'
+sudo sh -c 'LANG=C.UTF-8  chroot --userspec=root:root '${1}' /usr/sbin/locale-gen en_GB.UTF-8 en_US.UTF-8 da_DK.UTF-8'
 
 }
 
+# parameters: 1: mount dev name
 gen_initial_sh() {
 echo "------------------------------------------"
 echo "generating initial.sh chroot config script"
 echo "------------------------------------------"
 
-sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/initial.sh
+sudo sh -c 'cat <<EOF > '${1}'/home/initial.sh
 #!/bin/bash
 
-set -x
+#set -x
 
 ln -s /proc/mounts /etc/mtab
 
@@ -764,8 +817,8 @@ cat << EOT >/etc/fstab
 tmpfs				/tmp				tmpfs	defaults					0 0
 none				/dev/shm			tmpfs	rw,nosuid,nodev,noexec		0 0
 /sys/kernel/config	/config				none	bind						0 0
-/dev/mmcblk0p2		swap				swap	defaults					0 0
-debugfs				/sys/kernel/debug	debugfs	defaults					0 0
+#/dev/mmcblk0p2		swap				swap	defaults					0 0
+#debugfs				/sys/kernel/debug	debugfs	defaults					0 0
 EOT
 
 
@@ -776,135 +829,262 @@ echo "ECHO: Will now run '${apt_cmd}' update, upgrade"
 rm -f /etc/resolv.conf
 
 # enable systemd-networkd
-if [ ! -L '/lib/systemd/system/systemd-networkd.service' ]; then
-    echo ""
-    echo "ECHO:--> Enabling Systemd Networkd"
-    echo ""
-    ln -s /lib/systemd/system/systemd-networkd.service '${EnableSystemdNetworkedLink}'
-fi
-
-enable systemd-resolved
-if [ ! -L '/lib/systemd/system/systemd-resolved.service' ]; then
-    echo ""
-    echo "ECHO:--> Enabling Systemd Resolved"
-    echo ""
-    ln -s /lib/systemd/system/systemd-resolved.service '${EnableSystemdResolvedLink}'
-    rm -f /etc/resolv.conf
-    ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
-fi
+# if [ ! -L '/lib/systemd/system/systemd-networkd.service' ]; then
+#     echo ""
+#     echo "ECHO:--> Enabling Systemd Networkd"
+#     echo ""
+#     ln -s '${EnableSystemdNetworkedLink}' /lib/systemd/system/systemd-networkd.service
+# fi
+# 
+# enable systemd-resolved
+# if [ ! -L '/lib/systemd/system/systemd-resolved.service' ]; then
+#     echo ""
+#     echo "ECHO:--> Enabling Systemd Resolved"
+#     echo ""
+#     ln -s '${EnableSystemdResolvedLink}' /lib/systemd/system/systemd-resolved.service
+#     rm -f /etc/resolv.conf
+#     ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+# fi
 
 exit
 EOF'
 
-sudo chmod +x ${ROOTFS_MNT}/home/initial.sh
+sudo chmod +x ${1}/home/initial.sh
 }
 
+# parameters: 1: mount dev name, 2: user name, 3: distro
 add_mk_repo(){
 echo "ECHO: adding mk sources.list"
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 43DDF224
-if [ "${distro}" == "buster" ]; then
-    sudo sh -c 'echo "deb http://deb.machinekit.io/debian stretch main" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/'${USER_NAME}'.list'
+sudo chroot --userspec=root:root ${1} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 43DDF224
+if [ "${3}" == "buster" ]; then
+    sudo sh -c 'echo "deb http://deb.machinekit.io/debian stretch main" > '${1}'/etc/apt/sources.list.d/'${2}'.list'
 else
-    sudo sh -c 'echo "deb http://deb.machinekit.io/debian '${distro}' main" > '${ROOTFS_MNT}'/etc/apt/sources.list.d/'${USER_NAME}'.list'
+    sudo sh -c 'echo "deb http://deb.machinekit.io/debian '${3}' main" > '${1}'/etc/apt/sources.list.d/'${2}'.list'
 fi
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /usr/bin/${apt_cmd} -y update
+sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 }
 
+# parameters: 1: mount dev name, 2: user name, 3: distro, 4: distro arch
+setup_configfiles() {
+
+echo "Setting up config files "
+
+gen_policy_rc_d ${1}
+
+gen_sudoers ${1} ${2}
+
+gen_final_sources_list ${1} ${3}
+gen_local_sources_list ${1} ${3}
+sudo cp ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
+
+if [ "${2}" == "machinekit" ]; then
+    HOST_NAME="mksocfpga-nano-soc"
+elif [ "${2}" == "holosynth" ]; then
+    HOST_NAME="holosynthv"
+fi
+
+gen_hosts ${1} ${HOST_NAME}
+
+sudo mkdir -p ${1}/etc/systemd/network
+
+if [[ "${4}" == "arm64" ]]; then
+    gen_network_interface_setup "wlan0"
+else
+    gen_network_interface_setup "eth0"
+fi
+
+sudo sh -c 'echo T0:2345:respawn:rootfs/sbin/getty -L ttyS0 115200 vt100 >> '${1}'/etc/inittab'
+
+#conf_timezone_locale
+
+sudo sh -c 'cat <<EOT > '${1}'/etc/locale.conf
+LANG=en_US.UTF-8 UTF-8
+LC_COLLATE=C
+LC_TIME=en_GB.UTF-8
+EOT'
+}
+
+# parameters: 1: mount dev name, 2: user name, 3: distro, 4: distro arch
 initial_rootfs_user_setup_sh() {
 echo "------------------------------------------------------------"
 echo "----  running initial_rootfs_user_setup_sh      ------------"
 echo "------------------------------------------------------------"
 set -e
+set -x
 
-sudo rm -f ${ROOTFS_MNT}/etc/resolv.conf
-sudo cp /etc/resolv.conf ${ROOTFS_MNT}/etc/resolv.conf
+sudo rm -f ${1}/etc/resolv.conf
+sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
 
-echo "Script_MSG: Now adding user: ${USER_NAME}"
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir -p /tmp
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /tmp
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/mkdir -p /var/tmp
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/chmod 1777 /var/tmp
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y update'
-if [ "${distro}" == "buster" ]; then
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install debconf gnupg2 sudo wget apt-utils kmod'
-fi
-sudo chroot --userspec=root:root ${ROOTFS_MNT} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
-sudo cp ${ROOTFS_MNT}/etc/apt/sources.list-local ${ROOTFS_MNT}/etc/apt/sources.list
-gen_add_user_sh
+echo "Script_MSG: Now adding user: ${2}"
+sudo chroot --userspec=root:root ${1} /bin/mkdir -p /tmp
+sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /tmp
+sudo chroot --userspec=root:root ${1} /bin/mkdir -p /var/tmp
+sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /var/tmp
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
+#if [ "${3}" == "buster" ]; then
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install debconf gnupg2 sudo wget apt-utils kmod'
+#fi
+#if [ "${3}" == "bionic" ]; then
+
+#export DEBIAN_FRONTEND=noninteractive
+#apt-get install -y tzdata
+#ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+#dpkg-reconfigure --frontend noninteractive tzdata
+
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tzdata'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -fs /usr/share/zoneinfo/Europe/Copenhagen /etc/localtime'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install leafpad gnupg2 avahi-discover traceroute cgroupfs-mount ntp'
+#fi
+
+sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}.holotronic.lan/debian/socfpgakernel.gpg.key
+sudo chroot --userspec=root:root ${1} /usr/bin/apt-key add socfpgakernel.gpg.key
+sudo chroot --userspec=root:root ${1} /bin/rm socfpgakernel.gpg.key
+
+sudo cp ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
+gen_add_user_sh ${1} ${2}
 echo "Script_MSG: gen_add_user_sh finished ... will now run in chroot"
 
-sudo sh -c 'LANG=C.UTF-8 chroot '${ROOTFS_MNT}' '${shell_cmd}' -c /home/add_user.sh'
+sudo sh -c 'LANG=C.UTF-8 chroot '${1}' '${shell_cmd}' -c /home/add_user.sh'
 
-if [ "${distro}" == "buster" ]; then
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install iputils-ping dhcpcd5 xorg libpam-systemd systemd-sysv'
+if [ "${3}" == "buster" ]; then
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install iputils-ping xorg libpam-systemd systemd-sysv'
 fi
 echo ""
 echo "Scr_MSG: fix no sudo user ping:"
 echo ""
-sudo chmod u+s ${ROOTFS_MNT}/bin/ping ${ROOTFS_MNT}/bin/ping6
+sudo chmod u+s ${1}/bin/ping ${1}/bin/ping6
 echo "Script_MSG: installing apt-transport-https"
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y update'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install apt-transport-https'
-if [[ "${USER_NAME}" == "machinekit" ]]; then
-    add_mk_repo
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install apt-transport-https'
+if [[ "${2}" == "machinekit" ]]; then
+    add_mk_repo ${1} ${2} ${3}
 fi
 
 if [ "${DESKTOP}" == "yes" ]; then
     echo "Scr_MSG: Installing lxqt"
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install lxqt'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' --no-install-recommends -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
-    if [[ "${USER_NAME}" == "holosynth" ]]; then
-        echo "Scr_MSG: Installing kxstudio"
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_9.5.1~kxstudio3_all.deb'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/dpkg -i kxstudio-repos_9.5.1~kxstudio3_all.deb'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libglibmm-2.4-1v5'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/dpkg -i kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y update'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install a2jmidid jackmeter carla-data lmms audacity'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install kxstudio-menu'
+    if [ "${3}" == "bionic" ]; then
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm-theme-breeze ark lxqt lxqt-panel'
+#        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/tasksel install lubuntu-qt-desktop'
+    else
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install openbox pcmanfm-qt lxqt-admin lxqt-common lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo'
+    #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y '
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-addons'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install  kwin-style-breeze'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze-icon-theme'
+    fi
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' --no-install-recommends -y install kde-window-manager kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kwin-wayland'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/add-apt-repository -y ppa:lubuntu-dev/lubuntu-daily'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt openbox xfwm4'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4 xfwm4-theme-breeze'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
 
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install libjack-dev libqt4-dev qt4-dev-tools'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install python-qt4-dev python3-pyqt4 pyqt4-dev-tools'
+    if [[ "${4}" == "arm64" ]]; then
+        if [ "${3}" == "bionic" ]; then
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install linux-firmware'
+        else
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y -t '${3}'-backports install firmware-ti-connectivity'
+        fi
+        sudo cp ${WORK_DIR}/../bt/TIInit_11.8.32.bts ${1}/lib/firmware/ti-connectivity/        
+    fi
+    if [[ "${2}" == "holosynth" ]]; then
+        echo "Scr_MSG: Installing Cadence deps"
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_9.5.1~kxstudio3_all.deb'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/dpkg -i kxstudio-repos_9.5.1~kxstudio3_all.deb'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libglibmm-2.4-1v5'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/dpkg -i kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install a2jmidid jackmeter carla-data lmms audacity'
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kxstudio-menu'
+#
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libjack-dev libqt4-dev qt4-dev-tools'
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install python-qt4-dev python3-pyqt4 pyqt4-dev-tools'
 
-#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/'${apt_cmd}' -y install git'
-#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' /usr/bin/git clone https://github.com/falkTX/Cadence.git'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install git'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/git clone https://github.com/falkTX/Cadence.git'
     fi
 fi
 
-gen_initial_sh
-echo "Script_MSG: gen_initial.sh finhed ... will now run in chroot"
+gen_initial_sh ${1}
+echo "Script_MSG: gen_initial.sh finished ... will now run in chroot"
 
-sudo chroot ${ROOTFS_MNT} ${shell_cmd} -c /home/initial.sh
+sudo chroot ${1} ${shell_cmd} -c /home/initial.sh
 
 sudo sync
 
 cd ${CURRENT_DIR}
-sudo cp -f ${ROOTFS_MNT}/etc/apt/sources.list-final ${ROOTFS_MNT}/etc/apt/sources.list
+sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
 
 echo "Script_MSG: initial_rootfs_user_setup_sh finished .. ok .."
 
 }
 
+# parameters: 1: mount dev name, 2: user name, 3: distro, 4: distro arch
 finalize(){
-if [[ "${USER_NAME}" == "holosynth" ]]; then
-    sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/output_files/DE1_SOC_Linux_FB.rbf ${ROOTFS_MNT}/boot
-#	sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/socfpga.dtb ${ROOTFS_MNT}/boot
-    echo ""
-    echo "# --------->   Flip framebuffer upside down and no blanking fix    <--------------- ---------"
-    echo ""
-    sudo sh -c 'cat <<EOF >> '${ROOTFS_MNT}'/boot/uEnv.txt
-mmcboot=setenv bootargs console=ttyS0,115200 root=\${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz \${loadaddr} - \${fdt_addr}
+if [[ "${2}" == "holosynth" ]]; then
+#    sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/output_files/DE1_SOC_Linux_FB.rbf ${1}/boot
+#	sudo cp ${HOLOSYNTH_QUAR_PROJ_FOLDER}/socfpga.dtb ${R1}/boot
+#    echo ""
+#    echo "# --------->   Flip framebuffer upside down and no blanking fix    <--------------- ---------"
+#    echo ""
+#     sudo sh -c 'cat <<EOF >> '${1}'/boot/uEnv.txt
+# mmcboot=setenv bootargs console=ttyS0,115200 root=\${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz \${loadaddr} - \${fdt_addr}
+# EOF'
+
+    if [[ "${4}" == "arm64" ]]; then
+sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf-armsoc
+Section "InputDevice"
+	Identifier	"System Mouse"
+	Driver		"mouse"
+	Option		"Device" "/dev/input/mouse0"
+EndSection
+
+Section "InputDevice"
+	Identifier	"System Keyboard"
+	Driver		"kbd"
+	Option		"Device" "/dev/input/event0"
+EndSection
+
+Section "Device"
+        Identifier      "ZynqMP"
+        Driver          "armsoc"
+        Option          "DRI2"                  "true"
+        Option          "DRI2_PAGE_FLIP"        "false"
+        Option          "DRI2_WAIT_VSYNC"       "true"
+        Option          "SWcursorLCD"           "false"
+        Option          "DEBUG"                 "false"
+EndSection
+
+Section "Screen"
+        Identifier      "DefaultScreen"
+        Device          "ZynqMP"
+        DefaultDepth    30
+	SubSection "Display"
+	    Modes "1920x1080"
+	EndSubSection
+EndSection
 EOF'
 
-sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/etc/X11/xorg.conf
+
+sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
 Section "Device"
     Identifier      "Frame Buffer"
     Driver  "fbdev"
-    Option "Rotate" "UD"
+    Option "Rotate" "off"
 EndSection
 
 Section "ServerLayout"
@@ -916,28 +1096,57 @@ Section "ServerLayout"
 EndSection
 
 EOF'
-    if [[ "${distro}" == "stretch" ]]; then
-        sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/.xsessionrc
-xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
+    else
+
+sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
+Section "Device"
+    Identifier      "Frame Buffer"
+    Driver  "fbdev"
+    Option "Rotate" "off"
+EndSection
+
+Section "ServerLayout"
+    Identifier "ServerLayout0"
+    Option "BlankTime"   "0"
+    Option "StandbyTime" "0"
+    Option "SuspendTime" "0"
+    Option "OffTime" "0"
+EndSection
+
 EOF'
-
-        sudo mkdir -p ${ROOTFS_MNT}/home/holosynth/Desktop
-        sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/home/holosynth/Desktop/HolosynthVEd.sh
-#xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
-/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
-
-EOF'
-
     fi
-    sudo chmod +x ${ROOTFS_MNT}/home/holosynth/Desktop/HolosynthVEd.sh
-    sudo chown -R mib:mib ${ROOTFS_MNT}/home/holosynth/Desktop
+#    if [[ "${3}" == "stretch" ]]; then
+#         sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/.xsessionrc
+# xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
+# EOF'
 
+    mkdir -p ${1}/home/holosynth/Desktop
+    mkdir -p ${1}/home/holosynth/.local/share/applications
+    sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/.local/share/applications/holosynthed.desktop
+[Desktop Entry]
+Name=HolosynthVEd
+GenericName=HolosynthVEd
+Comment=Synth Editor for HolosynthV
+Exec=/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
+Icon=catia
+Terminal=false
+Type=Application
+Categories=AudioVideo;AudioEditing;Qt
+EOF'
+
+    sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/Desktop/HolosynthVEd.sh
+/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
+EOF'
+
+#    fi
+    sudo chmod +x ${1}/home/holosynth/Desktop/HolosynthVEd.sh
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/chown  -R '${2}':'${2}' /home/'${2}''
 fi
 
-if [ "${USER_NAME}" == "machinekit" ]; then
+if [ "${2}" == "machinekit" ]; then
 
 if [ "${DESKTOP}" == "yes" ]; then
-    sudo sh -c 'cat <<EOF > '${ROOTFS_MNT}'/etc/X11/xorg.conf
+    sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
 Section "Device"
     Identifier      "Frame Buffer"
     Driver  "fbdev"
@@ -954,7 +1163,7 @@ EndSection
 
 EOF'
 else
-sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/X11/xorg.conf
+sudo sh -c 'cat <<EOT > '${1}'/etc/X11/xorg.conf
 
 Section "Screen"
     Identifier   "Default Screen"
@@ -972,8 +1181,8 @@ EOT'
 fi
 fi
 
-sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '$ROOTFS_MNT'/etc/modprobe.d/uioreg.conf'
-sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '$ROOTFS_MNT'/etc/udev/rules.d/10-local.rules'
+# sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '${1}'/etc/modprobe.d/uioreg.conf'
+# sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '${1}'/etc/udev/rules.d/10-local.rules'
 
 echo ""
 echo "# --------->       Removing qemu policy file          <--------------- ---------"
@@ -986,8 +1195,8 @@ fi
 echo ""
 echo "# --------->       Restoring resolv.conf link         <--------------- ---------"
 echo ""
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/rm -f /etc/resolv.conf
-sudo chroot --userspec=root:root ${ROOTFS_MNT} /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf
+sudo chroot --userspec=root:root ${1} /bin/rm -f /etc/resolv.conf
+sudo chroot --userspec=root:root ${1} /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf
 
 echo ""
 echo "Script_MSG:  All Config files genetated"
@@ -995,33 +1204,4 @@ echo ""
 echo ""
 echo "# --------- ------------>   Finalized    --- --------- --------------- ---------"
 echo ""
-}
-
-setup_configfiles() {
-
-echo "Setting up config files "
-
-gen_policy_rc_d
-
-gen_sudoers
-
-gen_final_sources_list
-gen_local_sources_list
-sudo cp ${ROOTFS_MNT}/etc/apt/sources.list-final ${ROOTFS_MNT}/etc/apt/sources.list
-
-gen_hosts
-
-sudo mkdir -p ${ROOTFS_MNT}/etc/systemd/network
-
-gen_network_interface_setup
-
-sudo sh -c 'echo T0:2345:respawn:rootfs/sbin/getty -L ttyS0 115200 vt100 >> '${ROOTFS_MNT}'/etc/inittab'
-
-conf_timezone_locale
-
-sudo sh -c 'cat <<EOT > '${ROOTFS_MNT}'/etc/locale.conf
-LANG=en_US.UTF-8 UTF-8
-LC_COLLATE=C
-LC_TIME=en_GB.UTF-8
-EOT'
 }

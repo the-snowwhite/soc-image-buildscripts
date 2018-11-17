@@ -1,0 +1,289 @@
+From 490d07f514c87a2bab18edbf72d6c0019e6f3f16 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Wed, 30 May 2018 12:33:08 +0200
+Subject: [PATCH 19/31] Terasic dev boards: Make core addresses in qsys
+ devicetrees consistant
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ ...pga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 16 ++---
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 14 ++--
+ .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 14 ++--
+ .../arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 71 +++++++++++--------
+ .../dts/socfpga_cyclone5_de1_soc_fbii.dts     | 40 +++++------
+ 5 files changed, 82 insertions(+), 73 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+index 7e1acf94ba6b..1bf089216f35 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+@@ -103,14 +103,14 @@
+ 		#address-cells = <0x2>;
+ 		#size-cells = <0x1>;
+ 		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
+-				<0x00000001 0x00002000 0xff202000 0x00000008>,
+-				<0x00000001 0x00003000 0xff203000 0x00000010>,
+-				<0x00000001 0x00004000 0xff204000 0x00000010>,
+-				<0x00000001 0x00005000 0xff205000 0x00000010>,
+-				<0x00000001 0x00030000 0xff230000 0x00000100>,
+-				<0x00000001 0x00031000 0xff231000 0x00000080>,
+-				<0x00000001 0x00040000 0xff240000 0x00010000>,
+-				<0x00000001 0x00050000 0xff250000 0x00010000>;
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
++			<0x00000001 0x00030000 0xff230000 0x00000100>,
++			<0x00000001 0x00031000 0xff231000 0x00000080>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00010000>;
+ 
+ 		sysid@0x100001000 {
+ 			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
+index be476a1031fd..c05a7f799d5b 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
+@@ -67,13 +67,13 @@
+ 		#address-cells = <0x2>;
+ 		#size-cells = <0x1>;
+ 		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
+-				<0x00000001 0x00002000 0xff202000 0x00000008>,
+-				<0x00000001 0x00003000 0xff203000 0x00000010>,
+-				<0x00000001 0x00004000 0xff204000 0x00000010>,
+-				<0x00000001 0x00005000 0xff205000 0x00000010>,
+-				<0x00000001 0x00030000 0xff230000 0x00000100>,
+-				<0x00000001 0x00031000 0xff231000 0x00000080>,
+-				<0x00000001 0x00040000 0xff240000 0x00010000>;
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
++			<0x00000001 0x00030000 0xff230000 0x00000100>,
++			<0x00000001 0x00031000 0xff231000 0x00000080>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>;
+ 
+ 		sysid@0x100001000 {
+ 			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
+index f6ba2c68e527..ce568a0efbfd 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
+@@ -67,13 +67,13 @@
+ 		#address-cells = <0x2>;
+ 		#size-cells = <0x1>;
+ 		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
+-				<0x00000001 0x00002000 0xff202000 0x00000008>,
+-				<0x00000001 0x00003000 0xff203000 0x00000010>,
+-				<0x00000001 0x00004000 0xff204000 0x00000010>,
+-				<0x00000001 0x00005000 0xff205000 0x00000010>,
+-				<0x00000001 0x00030000 0xff230000 0x00000100>,
+-				<0x00000001 0x00031000 0xff231000 0x00000080>,
+-				<0x00000001 0x00040000 0xff240000 0x00010000>;
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
++			<0x00000001 0x00030000 0xff230000 0x00000100>,
++			<0x00000001 0x00031000 0xff231000 0x00000080>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>;
+ 
+ 		sysid@0x100001000 {
+ 			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+index d2b80e6d9044..4925f44d0043 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
+@@ -117,44 +117,34 @@
+ 		bridge-enable = <1>;
+ 		#address-cells = <0x2>;
+ 		#size-cells = <0x1>;
+-		ranges = <0x00000001 0x00020000 0xff220000 0x00000008>,
++		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
++			<0x00000001 0x00030000 0xff230000 0x00000100>,
+ 			<0x00000001 0x00031000 0xff231000 0x00000080>,
+-			<0x00000001 0x00010000 0xff210000 0x00000008>,
+-			<0x00000001 0x000100c0 0xff2100c0 0x00000010>,
+-			<0x00000001 0x00010080 0xff210080 0x00000010>,
+-			<0x00000001 0x00010040 0xff210040 0x00000010>,
+ 			<0x00000001 0x00040000 0xff240000 0x00010000>,
+ 			<0x00000001 0x00050000 0xff250000 0x00010000>;
+ 
+-		serial@0x100020000 {
++		sysid@0x100001000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00001000 0x00000008>;
++			id = <2899645186>;
++			timestamp = <1524157570>;
++		};
++
++		serial@0x100002000 {
+ 			compatible = "altr,juart-17.1", "altr,juart-1.0";
+-			reg = <0x00000001 0x00020000 0x00000008>;
++			reg = <0x00000001 0x00002000 0x00000008>;
+ 			interrupt-parent = <0x2>;
+ 			interrupts = <0 40 4>;
+ 			clocks = <0x2>;
+ 		}; //end serial@0x100020000 (jtag_uart)
+ 
+-		vip@0x100031000 {
+-			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-14.0";
+-			reg = <0x00000001 0x00031000 0x00000080>;
+-			max-width = <0x556>;
+-			max-height = <0x300>;
+-			bits-per-color = <0x8>;
+-			colors-per-beat = <0x4>;
+-			beats-per-pixel = <0x1>;
+-			mem-word-width = <0x80>;
+-		};
+-
+-		sysid@0x100010000 {
+-			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
+-			reg = <0x00000001 0x00010000 0x00000008>;
+-			id = <2899645186>;
+-			timestamp = <1524157570>;
+-		};
+-
+-		gpio@0x1000100c0 {
++		gpio@0x100003000 {
+ 			compatible = "altr,pio-17.1", "altr,pio-1.0";
+-			reg = <0x00000001 0x000100c0 0x00000010>;
++			reg = <0x00000001 0x00003000 0x00000010>;
+ 			interrupt-parent = <0x2>;
+ 			interrupts = <0 41 1>;
+ 			clocks = <0x2>;
+@@ -168,9 +158,9 @@
+ 			gpio-controller;
+ 		}; //end gpio@0x1000100c0 (button_pio)
+ 
+-		gpio@0x100010080 {
++		gpio@0x100004000 {
+ 			compatible = "altr,pio-17.1", "altr,pio-1.0";
+-			reg = <0x00000001 0x00010080 0x00000010>;
++			reg = <0x00000001 0x00004000 0x00000010>;
+ 			interrupt-parent = <0x2>;
+ 			interrupts = <0 42 1>;
+ 			clocks = <0x2>;
+@@ -184,9 +174,9 @@
+ 			gpio-controller;
+ 		}; //end gpio@0x100010080 (dipsw_pio)
+ 
+-		gpio@0x100010040 {
++		gpio@0x100005000 {
+ 			compatible = "altr,pio-17.1", "altr,pio-1.0";
+-			reg = <0x00000001 0x00010040 0x00000010>;
++			reg = <0x00000001 0x00005000 0x00000010>;
+ 			clocks = <0x2>;
+ 			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+ 			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+@@ -194,6 +184,25 @@
+ 			gpio-controller;
+ 		}; //end gpio@0x100010040 (led_pio)
+ 
++		ilc@0x100030000 {
++			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
++			reg = <0x00000001 0x00030000 0x00000100>;
++			interrupt-controller;
++			#interrupt-cells = <0x1>;
++			altr,sw-fifo-depth = <0x20>;
++		};
++
++		vip@0x100031000 {
++			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-14.0";
++			reg = <0x00000001 0x00031000 0x00000080>;
++			max-width = <0x556>;
++			max-height = <0x300>;
++			bits-per-color = <0x8>;
++			colors-per-beat = <0x4>;
++			beats-per-pixel = <0x1>;
++			mem-word-width = <0x80>;
++		};
++
+ 		uio-socfpg0@0x100040000 {
+ 			compatible = "generic-uio,ui_pdrv";
+ 			reg = <0x00000001 0x00040000 0x00010000>;
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
+index 225e46161c5c..c6aaacc3496e 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc_fbii.dts
+@@ -117,33 +117,33 @@
+ 		bridge-enable = <1>;
+ 		#address-cells = <0x2>;
+ 		#size-cells = <0x1>;
+-		ranges = <0x00000001 0x00020000 0xff220000 0x00000008>,
+-			<0x00000001 0x00010000 0xff210000 0x00000008>,
+-			<0x00000001 0x000100c0 0xff2100c0 0x00000010>,
+-			<0x00000001 0x00010080 0xff210080 0x00000010>,
+-			<0x00000001 0x00010040 0xff210040 0x00000010>,
++		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
+ 			<0x00000001 0x00031000 0xff231000 0x00000080>,
+ 			<0x00000001 0x00040000 0xff240000 0x00010000>,
+ 			<0x00000001 0x00050000 0xff250000 0x00010000>;
+ 
+-		serial@0x100020000 {
++		sysid@0x100001000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00001000 0x00000008>;
++			id = <2899645186>;
++			timestamp = <1524157570>;
++		};
++
++		serial@0x100002000 {
+ 			compatible = "altr,juart-17.1", "altr,juart-1.0";
+-			reg = <0x00000001 0x00020000 0x00000008>;
++			reg = <0x00000001 0x00002000 0x00000008>;
+ 			interrupt-parent = <0x2>;
+ 			interrupts = <0 40 4>;
+ 			clocks = <0x2>;
+ 		}; //end serial@0x100020000 (jtag_uart)
+ 
+-		sysid@0x100010000 {
+-			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
+-			reg = <0x00000001 0x00010000 0x00000008>;
+-			id = <2899645186>;
+-			timestamp = <1524157570>;
+-		};
+-
+-		gpio@0x1000100c0 {
++		gpio@0x100003000 {
+ 			compatible = "altr,pio-17.1", "altr,pio-1.0";
+-			reg = <0x00000001 0x000100c0 0x00000010>;
++			reg = <0x00000001 0x00003000 0x00000010>;
+ 			interrupt-parent = <0x2>;
+ 			interrupts = <0 41 1>;
+ 			clocks = <0x2>;
+@@ -157,9 +157,9 @@
+ 			gpio-controller;
+ 		}; //end gpio@0x1000100c0 (button_pio)
+ 
+-		gpio@0x100010080 {
++		gpio@0x100004000 {
+ 			compatible = "altr,pio-17.1", "altr,pio-1.0";
+-			reg = <0x00000001 0x00010080 0x00000010>;
++			reg = <0x00000001 0x00004000 0x00000010>;
+ 			interrupt-parent = <0x2>;
+ 			interrupts = <0 42 1>;
+ 			clocks = <0x2>;
+@@ -173,9 +173,9 @@
+ 			gpio-controller;
+ 		}; //end gpio@0x100010080 (dipsw_pio)
+ 
+-		gpio@0x100010040 {
++		gpio@0x100005000 {
+ 			compatible = "altr,pio-17.1", "altr,pio-1.0";
+-			reg = <0x00000001 0x00010040 0x00000010>;
++			reg = <0x00000001 0x00005000 0x00000010>;
+ 			clocks = <0x2>;
+ 			altr,gpio-bank-width = <10>;	/* embeddedsw.dts.params.altr,gpio-bank-width type NUMBER */
+ 			resetvalue = <0>;	/* embeddedsw.dts.params.resetvalue type NUMBER */
+-- 
+2.17.1
+

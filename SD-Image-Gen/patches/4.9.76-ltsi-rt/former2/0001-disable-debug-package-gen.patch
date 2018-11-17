@@ -1,7 +1,7 @@
-From a9390c8e8d16c168f5424ee413d22a8e5cb54087 Mon Sep 17 00:00:00 2001
+From 2c901dd120fccc8a101e59a8ae1ccb48c832edb7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
-Subject: [PATCH 1/9] disable debug package gen
+Subject: [PATCH 01/16] disable debug package gen
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

@@ -1,0 +1,33 @@
+From aecf06a0db7993896a474283d4375fa001787271 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 21 May 2018 13:19:43 +0200
+Subject: [PATCH 08/29] Enable bridges in dtb's
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index 595eb4f..3de276d 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -526,6 +526,7 @@
+ 			reg = <0xff400000 0x100000>;
+ 			resets = <&rst LWHPS2FPGA_RESET>;
+ 			clocks = <&l4_main_clk>;
++            bridge-enable = <1>;
+ 		};
+ 
+ 		fpga_bridge1: fpga_bridge@ff500000 {
+@@ -533,6 +534,7 @@
+ 			reg = <0xff500000 0x10000>;
+ 			resets = <&rst HPS2FPGA_RESET>;
+ 			clocks = <&l4_main_clk>;
++            bridge-enable = <1>;
+ 		};
+ 
+ 		fpgamgr0: fpgamgr@ff706000 {
+-- 
+2.7.4
+

@@ -1,0 +1,46 @@
+From 4e922d0e776aea1bbe5d148d88b454e9c9167fbd Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Fri, 8 Jun 2018 16:50:10 +0200
+Subject: [PATCH 24/29] Rename Hsynth stream names
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ sound/soc/codecs/hsynthpcm5102.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/sound/soc/codecs/hsynthpcm5102.c b/sound/soc/codecs/hsynthpcm5102.c
+index 4144146..bf40ad2 100644
+--- a/sound/soc/codecs/hsynthpcm5102.c
++++ b/sound/soc/codecs/hsynthpcm5102.c
+@@ -21,8 +21,8 @@ static const struct snd_soc_dapm_widget hsynthpcm5102_widgets[] = {
+ };
+ 
+ static const struct snd_soc_dapm_route hsynthpcm5102_routes[] = {
+-	{ "Playback", NULL, "PCMOUT" },
+-    { "Capture", NULL, "HSYNTH" },
++	{ "PcmOut", NULL, "PCMOUT" },
++    { "HSynth", NULL, "HSYNTH" },
+ };
+ 
+ static int hsynthpcm5102_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
+@@ -110,7 +110,7 @@ static const struct snd_soc_dai_ops hsynthpcm5102_dai_ops = {
+ static struct snd_soc_dai_driver hsynthpcm5102_dai = {
+ 	.name = "hsynthpcm5102-hifi",
+ 	.playback = {
+-		.stream_name = "Playback",
++		.stream_name = "PcmOut",
+ 		.channels_min = 2,
+ 		.channels_max = 2,
+ 		.rates = SNDRV_PCM_RATE_8000_96000,
+@@ -118,7 +118,7 @@ static struct snd_soc_dai_driver hsynthpcm5102_dai = {
+ 			SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S32_LE,
+ 	},
+     .capture = {
+-		.stream_name = "Capture",
++		.stream_name = "HSynth",
+ 		.channels_min = 2,
+ 		.channels_max = 2,
+ 		.rates = SNDRV_PCM_RATE_8000_96000,
+-- 
+2.7.4
+

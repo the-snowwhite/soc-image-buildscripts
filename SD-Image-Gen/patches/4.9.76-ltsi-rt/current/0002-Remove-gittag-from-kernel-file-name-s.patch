@@ -1,0 +1,22 @@
+From 8ddb35bb8f54f809a7ba947a77a4c33f99c8da4d Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Tue, 1 May 2018 16:02:19 +0200
+Subject: [PATCH 02/31] Remove gittag from kernel (file) name(s)
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 31148aa2e935..d5758c68e455 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -1,3 +1,4 @@
++CONFIG_LOCALVERSION_AUTO=n
+ CONFIG_SYSVIPC=y
+ CONFIG_HIGH_RES_TIMERS=y
+ CONFIG_IKCONFIG=y
+-- 
+2.17.1
+
