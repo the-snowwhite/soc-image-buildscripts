@@ -683,7 +683,12 @@ add2repo(){
             echo ""
             echo "Script_MSG: Repo content before -->"
             echo ""
-            LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A ${3} --list-format='''${package}\n''' list ${1} | { grep -E "${4}" || true; }`
+            if [[ "${1}" == "bionic" ]]; then
+                dist_flavor=ubuntu
+            else
+                dist_flavor=debian
+            fi
+            LIST1=`reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} --list-format='''${package}\n''' list ${1} | { grep -E "${4}" || true; }`
             echo "Got list1"
             REPO_LIST1=$"${LIST1}"
 
@@ -699,12 +704,12 @@ add2repo(){
                 echo ""
                 echo "Script_MSG: Will remove former version from repo"
                 echo ""
-                reprepro -b ${HOME_REPO_DIR} -C main -A ${3} remove ${1} ${REPO_LIST1}
-                reprepro -b ${HOME_REPO_DIR} export ${1}
+                reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} remove ${1} ${REPO_LIST1}
+                reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" export ${1}
                 echo "Script_MSG: Restarting web server"
 
                 sudo systemctl restart apache2
-                reprepro -b ${HOME_REPO_DIR} export ${1}
+                reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" export ${1}
             else
                 echo ""
                 echo "Script_MSG: Former version not found"
@@ -714,7 +719,7 @@ add2repo(){
 
             #
             # if [[ "${CLEAN_KERNELREPO}" ==  "${OK}" ]]; then
-            # CLEAN_ALL_LIST=`reprepro -b ${HOME_REPO_DIR} -C main -A ${3} --list-format='''${package}\n''' list ${1}`
+            # CLEAN_ALL_LIST=`reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} --list-format='''${package}\n''' list ${1}`
             #
             # JESSIE_CLEAN_ALL_LIST=$"${CLEAN_ALL_LIST}"
             #
@@ -722,8 +727,8 @@ add2repo(){
             # 		echo ""
             # 		echo "Script_MSG: Will clean repo"
             # 		echo ""
-            # 		reprepro -b ${HOME_REPO_DIR} -C main -A ${3} remove ${1} ${JESSIE_CLEAN_ALL_LIST}
-            #                 reprepro -b ${HOME_REPO_DIR} export ${1}
+            # 		reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} remove ${1} ${JESSIE_CLEAN_ALL_LIST}
+            #                 reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" export ${1}
             #                 echo "Script_MSG: Restarting web server"
             #                 sudo systemctl restart apache2
             # 	else
@@ -734,11 +739,11 @@ add2repo(){
             # 	echo ""
             # fi
             #
-            reprepro -b ${HOME_REPO_DIR} -C main -A ${3} includedeb ${1} ${2}/*.deb
-            reprepro -b ${HOME_REPO_DIR} export ${1}
-            reprepro -b ${HOME_REPO_DIR} list ${1}
+            reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} includedeb ${1} ${2}/*.deb
+            reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" export ${1}
+            reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" list ${1}
 
-            LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A ${3} --list-format='''${package}\n''' list ${1}`
+            LIST2=`reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} --list-format='''${package}\n''' list ${1}`
             REPO_LIST2=$"${LIST2}"
             echo  "${REPO_LIST2}"
             echo ""
@@ -939,7 +944,8 @@ if [ "${1}" = "1" ]; then
     echo "# Script_MSG: 1 part rootfs image"
     create_rootfs_img ${2}
 elif [ "${1}" = "2" ] || [ "${1}" = "3" ]; then
-    sudo dd if=/dev/zero of=${2} bs=4K count=1700K
+#    sudo dd if=/dev/zero of=${2} bs=4K count=1700K
+    sudo dd if=/dev/zero of=${2} bs=4K count=3525K
     echo "Now mounting sd-image file"
     mount_sd_imagefile ${2} ${3}
     if [ "${1}" = "2" ]; then

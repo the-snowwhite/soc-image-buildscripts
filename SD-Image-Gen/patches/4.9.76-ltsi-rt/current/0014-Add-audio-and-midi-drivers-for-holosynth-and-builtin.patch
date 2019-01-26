@@ -1,7 +1,7 @@
-From ac16dda0451d6d73f56629afca4f90311cc2d5ab Mon Sep 17 00:00:00 2001
+From ca4835c1d3ff31515598b5d263ba60241aee7bea Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
-Subject: [PATCH 14/31] Add audio and midi drivers for holosynth and builtin
+Subject: [PATCH 14/33] Add audio and midi drivers for holosynth and builtin
  audio codec on de1 board
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>

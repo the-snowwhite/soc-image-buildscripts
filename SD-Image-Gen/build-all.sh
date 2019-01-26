@@ -42,13 +42,14 @@ DEB_EXT_REPO_URL="http://deb.debian.org//debian/"
 #UB_EXT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
 UB_EXT_REPO_URL="http://ports.ubuntu.com/ubuntu-ports/"
 #final_repo="http://ftp.dk.debian.org/debian/"
-final_deb_repo=
+final_deb_repo=${DEB_EXT_REPO_URL}
 final_ub_repo=${UB_EXT_REPO_URL}
 #local_deb_repo=${HOME_DEB_MIRR_REPO_URL}
 local_deb_repo=${DEB_EXT_REPO_URL}
 local_ub_repo=${UB_EXT_REPO_URL}
-local_ws=neon-ws
+local_ws=kdeneon-ws
 local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
+local_ub_kernel_repo="http://${local_ws}.holotronic.lan/ubuntu/"
 
 
 ## 3 part Expandable image with swap in p2
@@ -72,15 +73,16 @@ XIL_UBOOT_VERSION="xilinx-v2018.2"
 #UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
 XIL_UBOOT_IMG_FILENAME="u-boot"
-XIL_BOOT_FILES_LOC="/home/mib/Development/Docker/petalinux-docker"
-
+#XIL_BOOT_FILES_LOC="/home/mib/Development/Docker/petalinux-docker"
+XIL_BOOT_FILES_LOC='/home/mib/Development/Holosynth_arm64_image_build/bak/BOOT'
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
 
 ALT_GIT_KERNEL_VERSION="4.9.76"
 ALT_GIT_KERNEL_REV="-ltsi-rt"
 XIL_GIT_KERNEL_VERSION="xilinx"
-XIL_GIT_KERNEL_REV="-v2018.2"
+#XIL_GIT_KERNEL_REV="-v2018.2"
+XIL_GIT_KERNEL_REV="-v2018.3"
 #XIL_GIT_KERNEL_REV="-v2017.3"
 #ALT_GIT_KERNEL_VERSION="4.15"
 
@@ -109,7 +111,8 @@ apt_cmd="apt-get"
 WORK_DIR=$(pwd)
 
 #HOME_REPO_DIR="/var/www/repos/apt/debian"
-HOME_REPO_DIR="/var/www/debian"
+#HOME_REPO_DIR="/var/www/debian"
+HOME_REPO_DIR="/var/www/repos/apt"
 
 MAIN_SCRIPT_DIR="$(cd $(dirname $0) && pwd)"
 SUB_SCRIPT_DIR=${MAIN_SCRIPT_DIR}/subscripts
@@ -229,6 +232,8 @@ usage()
     echo "    --mk2repo   Will add machinekit .debs to local repo Use =distroname=distarch"
     echo "    --cadence2repo   Will add cadence .debs to local repo Use =distroname=distarch"
     echo "    --carla2repo   Will add carla .debs to local repo Use =distroname=distarch"
+    echo "    --lv22repo   Will add lv2plugin .debs to local repo Use =distroname=distarch"
+    echo "    --jackd22repo   Will add Jackd2 .debs to local repo Use =distroname=distarch"
     echo "    --xf86-video-armsoc2repo   Will add xf86-video-armsoc .debs to local repo Use =distroname=distarch"
     echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
     echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
@@ -277,8 +282,8 @@ build_uboot() {
         echo "Valid boardname = ${1} given"
         if [ "${1}" == "ultra96" ]; then
             XIL_UBOOT_PATCH_FILE="u-boot-${XIL_UBOOT_VERSION}-ultra96-changeset.patch"
-#            git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}        
-            git_fetch ${UBOOT_PARENT_DIR} ${XIL_UBOOT_GIT_URL} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_PATCH_FILE}        
+#            git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
+            git_fetch ${UBOOT_PARENT_DIR} ${XIL_UBOOT_GIT_URL} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_PATCH_FILE}
             UBOOT_BOARD_CONFIG="xilinx_zynqmp_zcu100_revC_defconfig"
             arm64_build  "$UBOOT_PARENT_DIR/${XIL_UBOOT_VERSION}" "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}" "envtools"
         else
@@ -310,14 +315,16 @@ build_git_kernel() {
             else
                 KERNEL_PKG_VERSION="0.1"
             fi
-            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR} ${XIL_GIT_KERNEL_PATCH_FILE}
+¤            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR} ${XIL_GIT_KERNEL_PATCH_FILE}
+#            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR}
+            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "work2" ${GIT_KERNEL_DIR}
             arm64_build "${XIL_GIT_KERNEL_BUILD_DIR}" ${XIL_KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/xil_git_kernel_deb_rt-log.txt
         else
             KERNEL_PKG_VERSION="1.0"
             git_fetch ${ALT_GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${ALT_GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
             armhf_build "${ALT_GIT_KERNEL_BUILD_DIR}" ${ALT_KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/alt_git_kernel_deb_rt-log.txt
         fi
-        
+
     else
         if [ "${1}" != "c" ]; then
             echo "--build_git_kernel bad argument --> ${1}"
@@ -353,8 +360,13 @@ gen_rootfs_image() {
                     run_desktop_qemu_debootstrap_bionic ${1} ${3} ${UB_EXT_REPO_URL} ${4}
                     echo "Script_MSG: run_desktop_qemu_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
                 else
-                    run_desktop_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                    echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                    if [ "${3}" == "buster" ]; then
+                        run_desktop_qemu_debootstrap_buster ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                        echo "Script_MSG: run_desktop_qemu_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                    else
+                        run_desktop_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                        echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                    fi
                 fi
             else
                 run_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
@@ -430,7 +442,7 @@ finalize_rootfs_image() {
                 else
                     compress_rootfs ${CURRENT_DIR} ${1} "${4}_finalized-fully-configured" ${3}
                 fi
-                set +e
+ #               set +e
                 sudo sync
                 unmount_binded ${1}
                 cp ${2} "${2}-fully-configured"
@@ -440,7 +452,7 @@ finalize_rootfs_image() {
                 echo "Use =distroname=username=distarch"
                 echo "Valid distarchs are:"
                 echo " ${DISTARCHS[@]}"
-            fi                
+            fi
         else
             echo "--finalize_rootfs_image= bad argument --> ${4}"
             echo "missing username"
@@ -464,7 +476,7 @@ finalize_rootfs_image() {
     fi
 }
 
-## parameters: 1: mount dev name, 2: kernel image tag, 3: rootfs image path, 4: distroname, 5: distro arch, 5: user name
+## parameters: 1: mount dev name, 2: kernel image tag, 3: rootfs image path, 4: distroname, 5: distro arch, 6: user name
 inst_repo_kernel() {
     contains ${DISTROS[@]} ${4}
     if [ "$?" -eq 0 ]; then
@@ -489,7 +501,7 @@ inst_repo_kernel() {
                 fi
                 echo "Script_MSG: will now install kernel"
                 if [ "${5}" == "arm64" ]; then
-                    if [ "${4}" == "bionic" ]; then
+                    if [ "${4}" == "bionic" ] || [ "${4}" == "buster" ]; then
                         SD_KERNEL_TAG="*socfpga64-2.1"
                     else
                         SD_KERNEL_TAG="*socfpga64-0.1"
@@ -578,8 +590,8 @@ assemble_full_sd_img() {
                         create_img "2" "${SD_IMG_FILE}" "${1}" "p2" "2"
                         mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
                         echo "Copying files to boot partition"
-                        sudo cp ${XIL_BOOT_FILES_LOC}/boot_files/BOOT.BIN ${1}
-#                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
                         echo "Unmounting boot partition"
                         unmount_binded ${1}
                         unmount_loopdev
@@ -587,34 +599,62 @@ assemble_full_sd_img() {
                         mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
                         echo "Extracting to rootfs partition"
                         extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
-                        if [ "${4}" == "bionic" ]; then
+                        if [ "${4}" == "bionic" ] || [ "${4}" == "buster" ]; then
+                            echo ""
+                            echo "Script_MSG: Arm64 detected"
+                            echo ""
                             bind_mounted ${1}
-                            sudo sync
-                            sudo rm -f ${1}/etc/resolv.conf
-                            sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
-                            sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
-                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
-#                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-armsoc xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra'
+                             sudo sync
+                             sudo rm -f ${1}/etc/resolv.conf
+                             sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
+                             sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
+                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
+                             set -x
+                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y lxmenu-data  lxqt-globalkeys  lxqt-panel lxqt'
 #                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev xserver-xorg-video-armsoc-exynos xserver-xorg-video-armsoc lua-inotify inotify-tools'
 #                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev lua-inotify inotify-tools'
-                            set -x
-                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-fbdev'
-                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils'
-                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
-                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/mv /etc/X11/xorg.conf /etc/X11/xorg.conf-armsoc'
+#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-fbdev xserver-xorg-video-armsoc'
+                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-fbdev'
+#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils'
+#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install --reinstall kwin-x11 kwin-addons'
+#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install  --reinstall kwin-style-breeze'
+#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
+#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install --reinstall breeze-icon-theme'
+                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
+                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/mv /etc/X11/xorg.conf /etc/X11/xorg.conf-armsoc-bak'
+
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
-Section "Device"
-    Identifier      "Frame Buffer"
-    Driver  "fbdev"
-    Option "Rotate" "off"
+Section "Files"
+    ModulePath "/usr/local/lib/xorg/modules,/usr/lib/xorg/modules"
 EndSection
 
-Section "ServerLayout"
-    Identifier "ServerLayout0"
-    Option "BlankTime"   "0"
-    Option "StandbyTime" "0"
-    Option "SuspendTime" "0"
-    Option "OffTime" "0"
+Section "InputDevice"
+	Identifier	"System Mouse"
+	Driver		"mouse"
+	Option		"Device" "/dev/input/mouse0"
+EndSection
+
+Section "InputDevice"
+	Identifier	"System Keyboard"
+	Driver		"kbd"
+	Option		"Device" "/dev/input/event0"
+EndSection
+
+Section "Device"
+        Identifier      "ZynqMP"
+        Driver          "armsoc"
+        Option          "DRI2"                  "true"
+        Option          "DRI2_PAGE_FLIP"        "false"
+        Option          "DRI2_WAIT_VSYNC"       "true"
+        Option          "SWcursorLCD"           "false"
+        Option          "DEBUG"                 "false"
+EndSection
+
+Section "Screen"
+        Identifier      "DefaultScreen"
+        Device          "ZynqMP"
+        DefaultDepth    16
 EndSection
 
 EOF'
@@ -625,7 +665,7 @@ EOF'
                         unmount_loopdev
                         echo "No dd uboot install"
                         set +x
-                    fi                    
+                    fi
                 else
                     create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
                     echo "step 2 mount:"
@@ -726,17 +766,50 @@ while [ "$1" != "" ]; do
             ;;
         --cadence2repo)
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
-            add2repo "${VALUE1}" "/home/mib/Development/deb_comp/Cadence" "${VALUE2}" "cadence|claudia|catia|catarina"
+            if [ "${VALUE1}" == "bionic" ]; then
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Cadence" "${VALUE2}" "cadence|claudia|catia|catarina"
+            else
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Cadence" "${VALUE2}" "cadence|claudia|catia|catarina"
+            fi
             ;;
         --carla2repo)
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
-            add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/carla_debs" "${VALUE2}" "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler|carla"
-            ;;
-        --xf86-video-armsoc2repo)
+            if [ "${VALUE1}" == "bionic" ]; then
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Carla" "${VALUE2}" "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler-static|carla"
+            else
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Carla" "${VALUE2}" "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler-static|carla"
+            fi
+             ;;
+        --lv22repo)
+            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+            if [ "${VALUE1}" == "bionic" ]; then
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Lv2-plugins" "${VALUE2}" "vs2sdk|sqlite3-static|linuxsampler-lv2|linuxsampler-dssi|linuxsampler-vst|hexter"
+            else
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Lv2-plugins" "${VALUE2}" "vs2sdk|sqlite3-static|linuxsampler-lv2|linuxsampler-dssi|linuxsampler-vst"
+            fi
+             ;;
+        --jackd22repo)
+            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+            if [ "${VALUE1}" == "bionic" ]; then
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Jackd2" "${VALUE2}" "libopus-custom-static"
+            else
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Jackd2" "${VALUE2}" ""
+            fi
+             ;;
+       --xf86-video-armsoc2repo)
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
             add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/armsoc_debs" "${VALUE2}" "xserver-xorg-video-armsoc"
             ;;
-        --finalize-rootfs)
+        --gen-base-qemu-rootfs)
+            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
+            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-qemu-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
+            ;;
+        --gen-base-qemu-rootfs-desktop)
+            DESKTOP="yes"
+            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
+            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-qemu-${VALUE2}-desktop_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
+            ;;
+       --finalize-rootfs)
             finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/qemu-${VALUE3}-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
             ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4 user name, 5: distro arch
             ;;

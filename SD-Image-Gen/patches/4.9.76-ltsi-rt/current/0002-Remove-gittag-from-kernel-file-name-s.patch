@@ -1,7 +1,7 @@
-From 8ddb35bb8f54f809a7ba947a77a4c33f99c8da4d Mon Sep 17 00:00:00 2001
+From 9d651948c4bad162eac64a6ecf5b4691dfb989cc Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 1 May 2018 16:02:19 +0200
-Subject: [PATCH 02/31] Remove gittag from kernel (file) name(s)
+Subject: [PATCH 02/33] Remove gittag from kernel (file) name(s)
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
