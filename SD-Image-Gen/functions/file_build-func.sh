@@ -556,8 +556,8 @@ xzcat ../${RT_PATCH_FILE} | patch -p1
 echo "rt-Patch applied"
 ## Uio Patch:
 uiomod_kernel
-#cp /home/mib/intelFPGA/QuartusProjects/DE1-Soc/DE1-SoC-Sound/socfpga_cyclone5_DE1-SoC-FB.dts /home/mib/Development/HolosynthV-Image-gen/arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts
-#cp /home/mib/intelFPGA/QuartusProjects/DE1-Soc/DE1-SoC-Sound/Makefile-dtb /home/mib/Development/HolosynthV-Image-gen/arm-linux-4.9.33-gnueabifh-kernel/linux-4.9.33/arch/arm/boot/dts/Makefile
+#cp /home/mib/intelFPGA/QuartusProjects/DE1-Soc/DE1-SoC-Sound/socfpga_cyclone5_DE1-SoC-FB.dts /home/mib/Development/HolosynthV-Image-gen/arm-linux-4.9.33-gnueabihf-kernel/linux-4.9.33/arch/arm/boot/dts
+#cp /home/mib/intelFPGA/QuartusProjects/DE1-Soc/DE1-SoC-Sound/Makefile-dtb /home/mib/Development/HolosynthV-Image-gen/arm-linux-4.9.33-gnueabihf-kernel/linux-4.9.33/arch/arm/boot/dts/Makefile
 }
 
 ## parameters: 1: folder name, 2: patch file name
@@ -673,6 +673,7 @@ arm64_build() {
 ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
 add2repo(){
 #sudo systemctl stop apache2
+set -x
     contains ${DISTROS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid distroname = ${1} given"
@@ -683,7 +684,12 @@ add2repo(){
             echo ""
             echo "Script_MSG: Repo content before -->"
             echo ""
-            LIST1=`reprepro -b ${HOME_REPO_DIR} -C main -A ${3} --list-format='''${package}\n''' list ${1} | { grep -E "${4}" || true; }`
+            if [[ "${1}" == "bionic" ]]; then
+                dist_flavor=ubuntu
+            else
+                dist_flavor=debian
+            fi
+            LIST1=`reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} --list-format='''${package}\n''' list ${1} | { grep -E "${4}" || true; }`
             echo "Got list1"
             REPO_LIST1=$"${LIST1}"
 
@@ -699,12 +705,12 @@ add2repo(){
                 echo ""
                 echo "Script_MSG: Will remove former version from repo"
                 echo ""
-                reprepro -b ${HOME_REPO_DIR} -C main -A ${3} remove ${1} ${REPO_LIST1}
-                reprepro -b ${HOME_REPO_DIR} export ${1}
+                reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} remove ${1} ${REPO_LIST1}
+                reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" export ${1}
                 echo "Script_MSG: Restarting web server"
 
                 sudo systemctl restart apache2
-                reprepro -b ${HOME_REPO_DIR} export ${1}
+                reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" export ${1}
             else
                 echo ""
                 echo "Script_MSG: Former version not found"
@@ -714,7 +720,7 @@ add2repo(){
 
             #
             # if [[ "${CLEAN_KERNELREPO}" ==  "${OK}" ]]; then
-            # CLEAN_ALL_LIST=`reprepro -b ${HOME_REPO_DIR} -C main -A ${3} --list-format='''${package}\n''' list ${1}`
+            # CLEAN_ALL_LIST=`reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} --list-format='''${package}\n''' list ${1}`
             #
             # JESSIE_CLEAN_ALL_LIST=$"${CLEAN_ALL_LIST}"
             #
@@ -722,8 +728,8 @@ add2repo(){
             # 		echo ""
             # 		echo "Script_MSG: Will clean repo"
             # 		echo ""
-            # 		reprepro -b ${HOME_REPO_DIR} -C main -A ${3} remove ${1} ${JESSIE_CLEAN_ALL_LIST}
-            #                 reprepro -b ${HOME_REPO_DIR} export ${1}
+            # 		reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} remove ${1} ${JESSIE_CLEAN_ALL_LIST}
+            #                 reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" export ${1}
             #                 echo "Script_MSG: Restarting web server"
             #                 sudo systemctl restart apache2
             # 	else
@@ -734,11 +740,11 @@ add2repo(){
             # 	echo ""
             # fi
             #
-            reprepro -b ${HOME_REPO_DIR} -C main -A ${3} includedeb ${1} ${2}/*.deb
-            reprepro -b ${HOME_REPO_DIR} export ${1}
-            reprepro -b ${HOME_REPO_DIR} list ${1}
+            reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} includedeb ${1} ${2}/*.deb
+            reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" export ${1}
+            reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" list ${1}
 
-            LIST2=`reprepro -b ${HOME_REPO_DIR} -C main -A ${3} --list-format='''${package}\n''' list ${1}`
+            LIST2=`reprepro -b "${HOME_REPO_DIR}/${dist_flavor}" -C main -A ${3} --list-format='''${package}\n''' list ${1}`
             REPO_LIST2=$"${LIST2}"
             echo  "${REPO_LIST2}"
             echo ""
@@ -874,7 +880,7 @@ sudo dd if=/dev/zero of=${1}  bs=4K count=1500K
 sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${1} ${mkfs_label}"
 }
 
-## parameters: 1: loop dev name, 2: boot partition 
+## parameters: 1: loop dev name, 2: boot partition
 fdisk_2part() {
 sudo fdisk ${1} << EOF
 n
@@ -939,7 +945,8 @@ if [ "${1}" = "1" ]; then
     echo "# Script_MSG: 1 part rootfs image"
     create_rootfs_img ${2}
 elif [ "${1}" = "2" ] || [ "${1}" = "3" ]; then
-    sudo dd if=/dev/zero of=${2} bs=4K count=1700K
+    sudo dd if=/dev/zero of=${2} bs=4K count=1850K
+#    sudo dd if=/dev/zero of=${2} bs=4K count=3525K
     echo "Now mounting sd-image file"
     mount_sd_imagefile ${2} ${3}
     if [ "${1}" = "2" ]; then
@@ -1118,10 +1125,10 @@ EOT'
 echo ""
 echo "NOTE:  Generated ${2}/etc/fw_env.config"
 
-cat <<EOT > ${CURRENT_DIR}/fw_env.config
+#cat <<EOT > ${CURRENT_DIR}/fw_env.config
 # MMC device name       Device offset   Env. size       Flash sector size       Number of sectors
-${1}            0x4000          0x2000
-EOT
+#${1}            0x4000          0x2000
+#EOT
 
 }
 
@@ -1144,6 +1151,7 @@ make_bmap_image() {
     cd ${1}
     bmaptool create -o ${2}.bmap ${2}
     tar -cSf ${2}.tar.bz2 ${2} --use-compress-program lbzip2
+    md5sum ${2}.tar.bz2 > ${2}.tar.bz2.md5
     echo ""
     echo "NOTE:  Bmap image created"
     echo ""

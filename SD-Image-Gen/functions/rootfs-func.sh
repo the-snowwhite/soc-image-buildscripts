@@ -16,10 +16,10 @@ output=${?}
 }
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
-#run_qemu_debootstrap_buster() {
-#sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,dhcpcd5,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,open-iscsi,xserver-xorg-video-dummy ${2} ${1} ${3}
-#output=${?}
-#}
+run_desktop_qemu_debootstrap_buster() {
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}
+output=${?}
+}
 
 # # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 # run_qemu_debootstrap_buster_lxqt() {
@@ -141,7 +141,7 @@ sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-local
 #------------------------------------------------------------------------------#
 
 ##### Local mirror
-deb '${local_kernel_repo}' '${2}' main
+deb '${local_ub_kernel_repo}' '${2}' main
 
 deb [arch=arm64] '${local_ub_repo}' '${2}' main restricted
 deb-src [arch=arm64]  '${local_ub_repo}' '${2}' main restricted
@@ -737,7 +737,7 @@ sudo sh -c 'cat <<EOF > '${1}'/home/add_user.sh
 
 #set -x
 
-export DEFGROUPS="sudo,kmem,adm,dialout,'${2}',video,plugdev,netdev,audio"
+export DEFGROUPS="sudo,kmem,adm,dialout,'${2}',video,plugdev,netdev,audio,tty"
 export LANG=C
 
 '${apt_cmd}' -y update
@@ -794,12 +794,12 @@ sudo sh -c 'LANG=C.UTF-8  chroot --userspec=root:root '${1}' /usr/sbin/locale-ge
 
 }
 
-# parameters: 1: mount dev name
+# parameters: 1: mount dev name, 2: distro arch
 gen_initial_sh() {
 echo "------------------------------------------"
 echo "generating initial.sh chroot config script"
 echo "------------------------------------------"
-
+if [[ "${2}" == "arm64" ]]; then
 sudo sh -c 'cat <<EOF > '${1}'/home/initial.sh
 #!/bin/bash
 
@@ -829,26 +829,58 @@ echo "ECHO: Will now run '${apt_cmd}' update, upgrade"
 rm -f /etc/resolv.conf
 
 # enable systemd-networkd
-# if [ ! -L '/lib/systemd/system/systemd-networkd.service' ]; then
-#     echo ""
-#     echo "ECHO:--> Enabling Systemd Networkd"
-#     echo ""
-#     ln -s '${EnableSystemdNetworkedLink}' /lib/systemd/system/systemd-networkd.service
-# fi
-# 
+ if [ ! -L '/lib/systemd/system/systemd-networkd.service' ]; then
+     echo ""
+     echo "ECHO:--> Enabling Systemd Networkd"
+     echo ""
+     ln -s '${EnableSystemdNetworkedLink}' /lib/systemd/system/systemd-networkd.service
+ fi
+
 # enable systemd-resolved
-# if [ ! -L '/lib/systemd/system/systemd-resolved.service' ]; then
-#     echo ""
-#     echo "ECHO:--> Enabling Systemd Resolved"
-#     echo ""
-#     ln -s '${EnableSystemdResolvedLink}' /lib/systemd/system/systemd-resolved.service
-#     rm -f /etc/resolv.conf
-#     ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
-# fi
+ if [ ! -L '/lib/systemd/system/systemd-resolved.service' ]; then
+     echo ""
+     echo "ECHO:--> Enabling Systemd Resolved"
+     echo ""
+     ln -s '${EnableSystemdResolvedLink}' /lib/systemd/system/systemd-resolved.service
+     rm -f /etc/resolv.conf
+     ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+ fi
 
 exit
 EOF'
+else
+sudo sh -c 'cat <<EOF > '${1}'/home/initial.sh
+#!/bin/bash
 
+#set -x
+
+ln -s /proc/mounts /etc/mtab
+
+
+
+cat << EOT >/etc/fstab
+# /etc/fstab: static file system information.
+#
+# <file system>		<mount point>		<type>	<options>				<dump>	<pass>
+/dev/root			/					ext4	noatime,errors=remount-ro	0 1
+tmpfs				/tmp				tmpfs	defaults					0 0
+none				/dev/shm			tmpfs	rw,nosuid,nodev,noexec		0 0
+/sys/kernel/config	/config				none	bind						0 0
+/dev/mmcblk0p2		swap				swap	defaults					0 0
+debugfs				/sys/kernel/debug	debugfs	defaults					0 0
+EOT
+
+
+echo "ECHO: Will now run '${apt_cmd}' update, upgrade"
+'${apt_cmd}' -y update
+'${apt_cmd}' -y --assume-yes upgrade
+'${apt_cmd}' -y install connman
+
+rm -f /etc/resolv.conf
+
+exit
+EOF'
+fi
 sudo chmod +x ${1}/home/initial.sh
 }
 
@@ -880,22 +912,28 @@ sudo cp ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
 if [ "${2}" == "machinekit" ]; then
     HOST_NAME="mksocfpga-nano-soc"
 elif [ "${2}" == "holosynth" ]; then
-    HOST_NAME="holosynthv"
+    if [ "${4}" == "arm64" ]; then
+        HOST_NAME="holosynthv-u96"
+    else
+        HOST_NAME="holosynthv"
+    fi
+elif [ "${2}" == "ubuntu" ]; then
+    HOST_NAME="ultra96"
 fi
 
 gen_hosts ${1} ${HOST_NAME}
 
 sudo mkdir -p ${1}/etc/systemd/network
 
-if [[ "${4}" == "arm64" ]]; then
-    gen_network_interface_setup "wlan0"
-else
+ if [[ "${4}" == "arm64" ]]; then
+     gen_network_interface_setup "enx*"
+ else
     gen_network_interface_setup "eth0"
-fi
+ fi
 
 sudo sh -c 'echo T0:2345:respawn:rootfs/sbin/getty -L ttyS0 115200 vt100 >> '${1}'/etc/inittab'
 
-#conf_timezone_locale
+conf_timezone_locale
 
 sudo sh -c 'cat <<EOT > '${1}'/etc/locale.conf
 LANG=en_US.UTF-8 UTF-8
@@ -909,8 +947,8 @@ initial_rootfs_user_setup_sh() {
 echo "------------------------------------------------------------"
 echo "----  running initial_rootfs_user_setup_sh      ------------"
 echo "------------------------------------------------------------"
-set -e
-set -x
+# set -e
+# set -x
 
 sudo rm -f ${1}/etc/resolv.conf
 sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
@@ -937,8 +975,12 @@ sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}
     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install leafpad gnupg2 avahi-discover traceroute cgroupfs-mount ntp'
 #fi
+if [ "${3}" == "bionic" ]; then
+    sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}.holotronic.lan/ubuntu/socfpgakernel.gpg.key
+else
+    sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}.holotronic.lan/debian/socfpgakernel.gpg.key
+fi
 
-sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}.holotronic.lan/debian/socfpgakernel.gpg.key
 sudo chroot --userspec=root:root ${1} /usr/bin/apt-key add socfpgakernel.gpg.key
 sudo chroot --userspec=root:root ${1} /bin/rm socfpgakernel.gpg.key
 
@@ -965,13 +1007,19 @@ fi
 
 if [ "${DESKTOP}" == "yes" ]; then
     echo "Scr_MSG: Installing lxqt"
-    if [ "${3}" == "bionic" ]; then
+    if [ "${3}" == "bionic" ] || [ "${3}" == "buster" ]; then
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm-theme-breeze ark lxqt lxqt-panel'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt openbox lxmenu-data  lxqt-globalkeys  lxqt-panel lxqt-policykit lxqt'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm-theme-breeze ark lxqt lxqt-panel'
 #        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/tasksel install lubuntu-qt-desktop'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt openbox lxmenu-data pcmanfm-qt lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core openbox lxqt-sudo'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
     else
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install openbox pcmanfm-qt lxqt-admin lxqt-common lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install openbox lxmenu-data pcmanfm-qt lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo'
     #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y '
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-addons'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install  kwin-style-breeze'
@@ -979,8 +1027,8 @@ if [ "${DESKTOP}" == "yes" ]; then
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze-icon-theme'
     fi
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils mesa-utils-extra'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
 #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' --no-install-recommends -y install kde-window-manager kwin-x11 kwin-style-breeze kwin-addons systemsettings'
 #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi'
@@ -998,7 +1046,7 @@ if [ "${DESKTOP}" == "yes" ]; then
         else
             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y -t '${3}'-backports install firmware-ti-connectivity'
         fi
-        sudo cp ${WORK_DIR}/../bt/TIInit_11.8.32.bts ${1}/lib/firmware/ti-connectivity/        
+        sudo cp ${WORK_DIR}/../bt/TIInit_11.8.32.bts ${1}/lib/firmware/ti-connectivity/
     fi
     if [[ "${2}" == "holosynth" ]]; then
         echo "Scr_MSG: Installing Cadence deps"
@@ -1019,7 +1067,7 @@ if [ "${DESKTOP}" == "yes" ]; then
     fi
 fi
 
-gen_initial_sh ${1}
+gen_initial_sh ${1} ${4}
 echo "Script_MSG: gen_initial.sh finished ... will now run in chroot"
 
 sudo chroot ${1} ${shell_cmd} -c /home/initial.sh
@@ -1045,6 +1093,33 @@ if [[ "${2}" == "holosynth" ]]; then
 # mmcboot=setenv bootargs console=ttyS0,115200 root=\${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz \${loadaddr} - \${fdt_addr}
 # EOF'
 
+#    if [[ "${3}" == "stretch" ]]; then
+#         sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/.xsessionrc
+# xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
+# EOF'
+
+    mkdir -p ${1}/home/holosynth/Desktop
+    mkdir -p ${1}/home/holosynth/.local/share/applications
+    sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/.local/share/applications/holosynthed.desktop
+[Desktop Entry]
+Name=HolosynthVEd
+GenericName=HolosynthVEd
+Comment=Synth Editor for HolosynthV
+Exec=/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
+Icon=catia
+Terminal=false
+Type=Application
+Categories=AudioVideo;AudioEditing;Qt
+EOF'
+
+    sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/Desktop/HolosynthVEd.sh
+/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
+EOF'
+
+#    fi
+    sudo chmod +x ${1}/home/holosynth/Desktop/HolosynthVEd.sh
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/chown  -R '${2}':'${2}' /home/'${2}''
+fi
     if [[ "${4}" == "arm64" ]]; then
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf-armsoc
 Section "InputDevice"
@@ -1079,6 +1154,7 @@ Section "Screen"
 EndSection
 EOF'
 
+else
 
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
 Section "Device"
@@ -1096,51 +1172,6 @@ Section "ServerLayout"
 EndSection
 
 EOF'
-    else
-
-sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
-Section "Device"
-    Identifier      "Frame Buffer"
-    Driver  "fbdev"
-    Option "Rotate" "off"
-EndSection
-
-Section "ServerLayout"
-    Identifier "ServerLayout0"
-    Option "BlankTime"   "0"
-    Option "StandbyTime" "0"
-    Option "SuspendTime" "0"
-    Option "OffTime" "0"
-EndSection
-
-EOF'
-    fi
-#    if [[ "${3}" == "stretch" ]]; then
-#         sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/.xsessionrc
-# xinput set-prop 'eGalax Inc. eGalaxTouch EXC7910-1026-13.00.00' 'Coordinate Transformation Matrix' -1 0 1 0 -1 1 0 0 1
-# EOF'
-
-    mkdir -p ${1}/home/holosynth/Desktop
-    mkdir -p ${1}/home/holosynth/.local/share/applications
-    sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/.local/share/applications/holosynthed.desktop
-[Desktop Entry]
-Name=HolosynthVEd
-GenericName=HolosynthVEd
-Comment=Synth Editor for HolosynthV
-Exec=/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
-Icon=catia
-Terminal=false
-Type=Application
-Categories=AudioVideo;AudioEditing;Qt
-EOF'
-
-    sudo sh -c 'cat <<EOF > '${1}'/home/holosynth/Desktop/HolosynthVEd.sh
-/home/holosynth/prg/HolosynthVEd -nograb -platform xcb
-EOF'
-
-#    fi
-    sudo chmod +x ${1}/home/holosynth/Desktop/HolosynthVEd.sh
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/chown  -R '${2}':'${2}' /home/'${2}''
 fi
 
 if [ "${2}" == "machinekit" ]; then
