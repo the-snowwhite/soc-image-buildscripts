@@ -22,7 +22,7 @@
 #------------------------------------------------------------------------------------------------------
 
 ## Valid boards:
-BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "sockit" "ultra96")
+BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "DExx" "ultra96")
 
 ## Valid distros:
 DISTROS=("stretch" "buster" "bionic" "petalinux")
@@ -72,6 +72,7 @@ UBOOT_VERSION="v2018.01"
 XIL_UBOOT_VERSION="xilinx-v2018.2"
 #UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
+UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"
 XIL_UBOOT_IMG_FILENAME="u-boot"
 #XIL_BOOT_FILES_LOC="/home/mib/Development/Docker/petalinux-docker"
 XIL_BOOT_FILES_LOC='/home/mib/Development/Holosynth_arm64_image_build/bak/BOOT'
@@ -160,10 +161,10 @@ RT_PATCH_FILE="patch-${RT_KERNEL_TAG}.patch.xz"
 RT_PATCH_URL="https://cdn.kernel.org/pub/linux/kernel/projects/rt/4.9/${RT_PATCH_FILE}"
 
 
-ALT_GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${ALT_GIT_KERNEL_TAG}-gnueabifh-kernel"
-XIL_GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${XIL_GIT_KERNEL_TAG}-gnueabifh-kernel"
+ALT_GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${ALT_GIT_KERNEL_TAG}-gnueabihf-kernel"
+XIL_GIT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${XIL_GIT_KERNEL_TAG}-aarch64-kernel"
 
-RT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${RT_KERNEL_VERSION}-gnueabifh-kernel"
+RT_KERNEL_PARENT_DIR="${CURRENT_DIR}/arm-linux-${RT_KERNEL_VERSION}-gnueabihf-kernel"
 RT_KERNEL_BUILD_DIR="${RT_KERNEL_PARENT_DIR}/${RT_KERNEL_FOLDER}"
 ALT_GIT_KERNEL_BUILD_DIR="${ALT_GIT_KERNEL_PARENT_DIR}/linux"
 XIL_GIT_KERNEL_BUILD_DIR="${XIL_GIT_KERNEL_PARENT_DIR}/linux"
@@ -234,6 +235,8 @@ usage()
     echo "    --carla2repo   Will add carla .debs to local repo Use =distroname=distarch"
     echo "    --lv22repo   Will add lv2plugin .debs to local repo Use =distroname=distarch"
     echo "    --jackd22repo   Will add Jackd2 .debs to local repo Use =distroname=distarch"
+    echo "    --hikey2repo   Will add Hikey kernel .debs to local repo Use =distroname=distarch"
+    echo "    --dexed2repo   Will add Dexed and plugin .debs to local repo Use =distroname=distarch"
     echo "    --xf86-video-armsoc2repo   Will add xf86-video-armsoc .debs to local repo Use =distroname=distarch"
     echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
     echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
@@ -306,7 +309,7 @@ build_uboot() {
 
 ## parameters: 1: board name, 2: distro name
 build_git_kernel() {
-    contains ${BOARDS[@]} ${1}
+contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
         if [ "${1}" == "ultra96" ]; then
@@ -564,7 +567,7 @@ assemble_full_sd_img() {
                 if [ "${DESKTOP}" == "yes" ]; then
                     SD_IMG_NAME="${SD_FILE_PRELUDE}_desktop_sd_${REL_DATE}.img"
                 else
-                    SD_IMG_NAME="${SD_FILE_PRELUDE}_sd_${REL_DATE}.img"
+                    SD_IMG_NAME="${SD_FILE_PRELUDE}_console_sd_${REL_DATE}.img"
                 fi
                 SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
 
@@ -674,7 +677,7 @@ EOF'
                     set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
                     unmount_binded ${1}
                     unmount_loopdev
-                    install_uboot ${UBOOT_BUILD_DIR} ${UBOOT_IMG_FILENAME} ${SD_IMG_FILE}
+                    install_uboot "${UBOOT_BUILD_DIR}" "${UBOOT_IMG_FILENAME}" "${SD_IMG_FILE}"
                 fi
                 make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
             else
@@ -783,7 +786,7 @@ while [ "$1" != "" ]; do
         --lv22repo)
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
             if [ "${VALUE1}" == "bionic" ]; then
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Lv2-plugins" "${VALUE2}" "vs2sdk|sqlite3-static|linuxsampler-lv2|linuxsampler-dssi|linuxsampler-vst|hexter"
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Lv2-plugins" "${VALUE2}" "vs2sdk|sqlite3-static|linuxsampler-lv2|linuxsampler-dssi|linuxsampler-vst|hexter|premake"
             else
                 add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Lv2-plugins" "${VALUE2}" "vs2sdk|sqlite3-static|linuxsampler-lv2|linuxsampler-dssi|linuxsampler-vst"
             fi
@@ -791,9 +794,25 @@ while [ "$1" != "" ]; do
         --jackd22repo)
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
             if [ "${VALUE1}" == "bionic" ]; then
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Jackd2" "${VALUE2}" "libopus-custom-static"
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Jackd2" "${VALUE2}" "libopus-custom-static|jackd2|ardour"
             else
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Jackd2" "${VALUE2}" ""
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Jackd2" "${VALUE2}" ""
+            fi
+             ;;
+        --hikey2repo)
+            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+            if [ "${VALUE1}" == "stretch" ]; then
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Stretch/Hikey" "${VALUE2}" "hikey"
+            else
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Jackd2" "${VALUE2}" ""
+            fi
+             ;;
+        --dexed2repo)
+            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
+            if [ "${VALUE1}" == "bionic" ]; then
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Dexed" "${VALUE2}" "kxstudio3"
+            else
+                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Dexed" "${VALUE2}" ""
             fi
              ;;
        --xf86-video-armsoc2repo)

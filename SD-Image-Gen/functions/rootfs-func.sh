@@ -874,6 +874,7 @@ EOT
 echo "ECHO: Will now run '${apt_cmd}' update, upgrade"
 '${apt_cmd}' -y update
 '${apt_cmd}' -y --assume-yes upgrade
+'${apt_cmd}' -y install connman
 
 rm -f /etc/resolv.conf
 
