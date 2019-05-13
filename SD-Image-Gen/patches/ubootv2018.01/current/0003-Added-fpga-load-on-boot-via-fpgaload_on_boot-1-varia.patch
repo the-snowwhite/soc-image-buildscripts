@@ -1,7 +1,7 @@
-From 5ba3d5f6e94705904d1acbe6133fda24e87ef81f Mon Sep 17 00:00:00 2001
+From 6bad92d0321011a3fd74bb9fc4158c9d0e20c7cb Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 13 Apr 2018 23:02:14 +0200
-Subject: [PATCH 3/5] Added fpga load on boot via fpgaload_on_boot=1 variable
+Subject: [PATCH 3/6] Added fpga load on boot via fpgaload_on_boot=1 variable
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -10,7 +10,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
-index 5c469a2..66e1065 100644
+index 5c469a23fa..66e10655aa 100644
 --- a/include/config_distro_bootcmd.h
 +++ b/include/config_distro_bootcmd.h
 @@ -336,7 +336,9 @@
@@ -25,7 +25,7 @@ index 5c469a2..66e1065 100644
  			"${scriptaddr} ${prefix}extlinux/extlinux.conf\0" \
  	\
 diff --git a/include/configs/socfpga_common.h b/include/configs/socfpga_common.h
-index 1f5dd9e..8f76934 100644
+index 1f5dd9e33a..8f769349e5 100644
 --- a/include/configs/socfpga_common.h
 +++ b/include/configs/socfpga_common.h
 @@ -334,9 +334,13 @@ unsigned int cm_get_qspi_controller_clk_hz(void);
@@ -44,5 +44,5 @@ index 1f5dd9e..8f76934 100644
  
  #endif	/* __CONFIG_SOCFPGA_COMMON_H__ */
 -- 
-2.7.4
+2.17.1
 

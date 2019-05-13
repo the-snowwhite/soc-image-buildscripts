@@ -1,7 +1,7 @@
-From 2904c7e813bbefc8a1b7fecb84c2d5cdbc3bf93b Mon Sep 17 00:00:00 2001
+From 7e4c1db204ea5dc9ace8a374b31eba921075d25a Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 23 May 2018 16:49:04 +0200
-Subject: [PATCH 5/5] Take fpga2sdram port 0,1 out of reset, for framebuffer
+Subject: [PATCH 5/6] Take fpga2sdram port 0,1 out of reset, for framebuffer
  access
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -10,7 +10,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
-index c1ca235..01aeef4 100644
+index c1ca235901..01aeef4a88 100644
 --- a/include/config_distro_bootcmd.h
 +++ b/include/config_distro_bootcmd.h
 @@ -339,8 +339,9 @@
@@ -26,5 +26,5 @@ index c1ca235..01aeef4 100644
  	\
  	"scan_dev_for_extlinux="                                          \
 -- 
-2.7.4
+2.17.1
 

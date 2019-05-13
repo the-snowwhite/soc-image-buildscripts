@@ -1,7 +1,7 @@
-From 3e82a272e3af3ab4e3dc2e06772983816b02bf5e Mon Sep 17 00:00:00 2001
+From 9505ba981648094ac6b28fe7085515be763e721b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 13 Apr 2018 14:06:40 +0200
-Subject: [PATCH 2/5] Add support for fw_printenv fw_setenv
+Subject: [PATCH 2/6] Add support for fw_printenv fw_setenv
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -12,7 +12,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  4 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/configs/socfpga_de0_nano_soc_defconfig b/configs/socfpga_de0_nano_soc_defconfig
-index a805894..dc6a931 100644
+index a805894361..dc6a931524 100644
 --- a/configs/socfpga_de0_nano_soc_defconfig
 +++ b/configs/socfpga_de0_nano_soc_defconfig
 @@ -69,3 +69,4 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0xa4a5
@@ -21,7 +21,7 @@ index a805894..dc6a931 100644
  CONFIG_USE_TINY_PRINTF=y
 +CONFIG_FILE=y
 diff --git a/configs/socfpga_de10_nano_defconfig b/configs/socfpga_de10_nano_defconfig
-index aa9fe7e..0998ba6 100644
+index aa9fe7e684..0998ba69a0 100644
 --- a/configs/socfpga_de10_nano_defconfig
 +++ b/configs/socfpga_de10_nano_defconfig
 @@ -63,3 +63,4 @@ CONFIG_USB_GADGET_PRODUCT_NUM=0xa4a5
@@ -30,7 +30,7 @@ index aa9fe7e..0998ba6 100644
  CONFIG_USE_TINY_PRINTF=y
 +CONFIG_FILE=y
 diff --git a/configs/socfpga_de1_soc_defconfig b/configs/socfpga_de1_soc_defconfig
-index bc7af51..19e3b7b 100644
+index bc7af51204..19e3b7be66 100644
 --- a/configs/socfpga_de1_soc_defconfig
 +++ b/configs/socfpga_de1_soc_defconfig
 @@ -57,3 +57,4 @@ CONFIG_USB_DWC2=y
@@ -39,7 +39,7 @@ index bc7af51..19e3b7b 100644
  # CONFIG_EFI_LOADER is not set
 +CONFIG_FILE=y
 diff --git a/include/configs/socfpga_common.h b/include/configs/socfpga_common.h
-index 66e7c4f..1f5dd9e 100644
+index 66e7c4fc8b..1f5dd9e33a 100644
 --- a/include/configs/socfpga_common.h
 +++ b/include/configs/socfpga_common.h
 @@ -235,7 +235,7 @@ unsigned int cm_get_qspi_controller_clk_hz(void);
@@ -52,5 +52,5 @@ index 66e7c4f..1f5dd9e 100644
  
  /* Environment for QSPI boot */
 -- 
-2.7.4
+2.17.1
 
