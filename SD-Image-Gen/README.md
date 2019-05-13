@@ -24,6 +24,10 @@ Current rootfs = qemu-debootstrap generated rootfs (Debian stretch 9.x)
 
 ---
 
+- (Detailed setup steps for machinekit use)[http://preview.machinekit.io/docs/getting-started/machinekit-de10-images/]
+
+---
+
 Howto build process:
 
 For the full functionality setup a local debian repository (reprepro) and point the variable:
