@@ -728,7 +728,7 @@ sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${ROOTFS_MNT}' '${shell_cm
 # parameters: 1: mount dev name, 2: user name
 gen_add_user_sh() {
 echo "------------------------------------------"
-echo "generating add_user.sh chroot config script"etup_configfiles
+echo "generating add_user.sh chroot config script"
 echo "------------------------------------------"
 export DEFGROUPS="sudo,kmem,adm,dialout,${2},video,plugdev,netdev"
 
@@ -888,11 +888,7 @@ sudo chmod +x ${1}/home/initial.sh
 add_mk_repo(){
 echo "ECHO: adding mk sources.list"
 sudo chroot --userspec=root:root ${1} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 43DDF224
-if [ "${3}" == "buster" ]; then
-    sudo sh -c 'echo "deb http://deb.machinekit.io/debian stretch main" > '${1}'/etc/apt/sources.list.d/'${2}'.list'
-else
-    sudo sh -c 'echo "deb http://deb.machinekit.io/debian '${3}' main" > '${1}'/etc/apt/sources.list.d/'${2}'.list'
-fi
+sudo sh -c 'echo "deb http://deb.machinekit.io/debian '${3}' main" > '${1}'/etc/apt/sources.list.d/'${2}'.list'
 sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 }
 
@@ -1002,30 +998,30 @@ sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install apt-transport-https'
 if [[ "${2}" == "machinekit" ]]; then
-    add_mk_repo ${1} ${2} ${3}
+    if [ "${4}" != "arm64" ]; then
+        add_mk_repo ${1} ${2} ${3}
+    fi
 fi
 
 if [ "${DESKTOP}" == "yes" ]; then
     echo "Scr_MSG: Installing lxqt"
     if [ "${3}" == "bionic" ] || [ "${3}" == "buster" ]; then
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
-#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
-#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt openbox lxmenu-data  lxqt-globalkeys  lxqt-panel lxqt-policykit lxqt'
-#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm-theme-breeze ark lxqt lxqt-panel'
-#        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/tasksel install lubuntu-qt-desktop'
-#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt openbox lxmenu-data pcmanfm-qt lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core openbox lxqt-sudo'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
     else
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install openbox lxmenu-data pcmanfm-qt lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo'
+         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt pcmanfm-qt5'
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install openbox lxmenu-data pcmanfm-qt lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo'
     #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y '
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-addons'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install  kwin-style-breeze'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze-icon-theme'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-addons'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install  kwin-style-breeze'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze breeze-cursor-theme breeze-icon-theme'
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
+#         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
     fi
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils mesa-utils-extra'
 #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install kwin-x11 kwin-style-breeze kwin-addons systemsettings'
@@ -1037,6 +1033,8 @@ if [ "${DESKTOP}" == "yes" ]; then
 #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
 #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt openbox xfwm4'
 #    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4 xfwm4-theme-breeze'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
 

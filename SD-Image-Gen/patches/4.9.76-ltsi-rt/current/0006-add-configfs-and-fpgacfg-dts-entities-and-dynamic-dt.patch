@@ -1,7 +1,7 @@
-From 7cc8a9c6441367bbfe4d367b6d5a5d5c2a1e2b25 Mon Sep 17 00:00:00 2001
+From bfcd4c160fbec1ab30f35757fe868268fa1fe0d7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
-Subject: [PATCH 06/33] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 06/34] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>

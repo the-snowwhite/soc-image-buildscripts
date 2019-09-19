@@ -1,21 +1,21 @@
-From 99cd5b49f21d0f2b79d54d6fdfd5e5ec2e542e24 Mon Sep 17 00:00:00 2001
+From ea682e9a715ee7962c92f0a0dd83e333809e12f4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 18 May 2018 20:35:35 +0200
-Subject: [PATCH 13/29] Add framebuffer-ii core driver based on Mister, and
+Subject: [PATCH 13/33] Add framebuffer-ii core driver based on Mister, and
  enable it
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/configs/socfpga_defconfig |   4 +-
- drivers/video/fbdev/Kconfig        |  48 +++--
+ drivers/video/fbdev/Kconfig        |  48 ++--
  drivers/video/fbdev/Makefile       |   1 +
- drivers/video/fbdev/altvipfb.c     | 420 ++++++++++++++++++-------------------
- drivers/video/fbdev/altvipfbii.c   | 260 +++++++++++++++++++++++
+ drivers/video/fbdev/altvipfb.c     | 420 ++++++++++++++---------------
+ drivers/video/fbdev/altvipfbii.c   | 260 ++++++++++++++++++
  5 files changed, 503 insertions(+), 230 deletions(-)
  create mode 100644 drivers/video/fbdev/altvipfbii.c
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index ad7ca9d..cb504b6 100644
+index ad7ca9d21361..cb504b62a019 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -118,7 +118,9 @@ CONFIG_MFD_STMPE=y
@@ -30,7 +30,7 @@ index ad7ca9d..cb504b6 100644
  CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
  CONFIG_USB=y
 diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
-index cf29ed5..d306017 100644
+index cf29ed5e40ca..d30601787b5d 100644
 --- a/drivers/video/fbdev/Kconfig
 +++ b/drivers/video/fbdev/Kconfig
 @@ -238,6 +238,16 @@ config FB_ALTERA_VIP
@@ -150,7 +150,7 @@ index cf29ed5..d306017 100644
  
  	  To compile this driver as a module, choose M here: the
 diff --git a/drivers/video/fbdev/Makefile b/drivers/video/fbdev/Makefile
-index bb8f9d0..5951a8f 100644
+index bb8f9d0ac6b3..5951a8f70640 100644
 --- a/drivers/video/fbdev/Makefile
 +++ b/drivers/video/fbdev/Makefile
 @@ -11,6 +11,7 @@ obj-$(CONFIG_FB_WMT_GE_ROPS)   += wmt_ge_rops.o
@@ -162,7 +162,7 @@ index bb8f9d0..5951a8f 100644
  obj-$(CONFIG_FB_ALTERA_VIP_FB2_PLAT) += altvipfb2_drv.o
  altvipfb2_drv-objs := altvipfb2-plat.o altvipfb2.o
 diff --git a/drivers/video/fbdev/altvipfb.c b/drivers/video/fbdev/altvipfb.c
-index b247858..4724a0e 100644
+index b247858ba43a..4724a0e975e5 100644
 --- a/drivers/video/fbdev/altvipfb.c
 +++ b/drivers/video/fbdev/altvipfb.c
 @@ -41,260 +41,260 @@
@@ -638,7 +638,7 @@ index b247858..4724a0e 100644
  
 diff --git a/drivers/video/fbdev/altvipfbii.c b/drivers/video/fbdev/altvipfbii.c
 new file mode 100644
-index 0000000..a80ae1a
+index 000000000000..a80ae1a714f7
 --- /dev/null
 +++ b/drivers/video/fbdev/altvipfbii.c
 @@ -0,0 +1,260 @@
@@ -903,5 +903,5 @@ index 0000000..a80ae1a
 +MODULE_AUTHOR("Chris Rauer <crauer@altera.com>");
 +MODULE_LICENSE("GPL v2");
 -- 
-2.7.4
+2.17.1
 

@@ -1,7 +1,7 @@
-From 6be9c2f317a20a112cd05a08d2fbcaa2ad66c900 Mon Sep 17 00:00:00 2001
+From cbd5bb6f53e5bf0853f714497180d8d2dbad9780 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 23:18:17 +0200
-Subject: [PATCH 27/33] Add kernel debug stuff
+Subject: [PATCH 27/34] Add kernel debug stuff
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

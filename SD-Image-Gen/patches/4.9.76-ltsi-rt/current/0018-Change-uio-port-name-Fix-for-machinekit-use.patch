@@ -1,7 +1,7 @@
-From 7c25073265887c4d237e9b17352e332e614362c6 Mon Sep 17 00:00:00 2001
+From 5435af001fd072900dbae3e438e7585dedb610d1 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 26 May 2018 21:36:55 +0200
-Subject: [PATCH 18/33] Change uio port name Fix: for machinekit use
+Subject: [PATCH 18/34] Change uio port name Fix: for machinekit use
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

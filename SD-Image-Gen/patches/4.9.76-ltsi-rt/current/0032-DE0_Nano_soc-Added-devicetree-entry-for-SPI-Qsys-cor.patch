@@ -1,7 +1,7 @@
-From 1c853e0937106e4c3bdfce33dc804f19fa2fdde4 Mon Sep 17 00:00:00 2001
+From f39bf190fb1630632587987f19b7a7feb25828f2 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 12 Jan 2019 19:36:51 +0100
-Subject: [PATCH 32/33] DE0_Nano_soc: Added devicetree entry for SPI Qsys core
+Subject: [PATCH 32/34] DE0_Nano_soc: Added devicetree entry for SPI Qsys core
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

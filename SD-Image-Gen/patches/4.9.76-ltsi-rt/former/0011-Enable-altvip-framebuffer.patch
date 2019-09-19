@@ -1,16 +1,16 @@
-From 65ebc7c99d07293baed4ff2e7a590a083756d566 Mon Sep 17 00:00:00 2001
+From 8d2003f8a906701e0f569d93e65fdfa666f32a06 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 30 Mar 2018 20:41:53 +0200
-Subject: [PATCH 11/29] Enable altvip framebuffer
+Subject: [PATCH 11/33] Enable altvip framebuffer
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
  arch/arm/Kconfig                   |   1 +
- arch/arm/configs/socfpga_defconfig | 111 +++++++++++++++++++++++++++++++++++++
+ arch/arm/configs/socfpga_defconfig | 111 +++++++++++++++++++++++++++++
  2 files changed, 112 insertions(+)
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 5715844..62f0881 100644
+index 5715844e83e3..62f0881d75e9 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
 @@ -1737,6 +1737,7 @@ source "mm/Kconfig"
@@ -22,7 +22,7 @@ index 5715844..62f0881 100644
  	default "9" if SA1111 || ARCH_EFM32
  	default "11"
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index bce72c2..ad7ca9d 100644
+index bce72c27b9d5..ad7ca9d21361 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -187,3 +187,114 @@ CONFIG_FUNCTION_TRACER=y
@@ -141,5 +141,5 @@ index bce72c2..ad7ca9d 100644
 +#CONFIG_ALTERA_PR_IP_CORE=y
 +#CONFIG_ALTERA_PR_IP_CORE_PLAT=y
 -- 
-2.7.4
+2.17.1
 

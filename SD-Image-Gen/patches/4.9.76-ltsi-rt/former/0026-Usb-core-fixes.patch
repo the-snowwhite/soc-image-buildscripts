@@ -1,17 +1,17 @@
-From 54920f739c5b63553631c7a8fe6f589310e563f8 Mon Sep 17 00:00:00 2001
+From 3f90dc965076274ea97a1af587e1fec1dc5be781 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 18:13:46 +0200
-Subject: [PATCH 26/29] Usb core fixes
+Subject: [PATCH 26/33] Usb core fixes
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- .../socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts |  2 ++
- drivers/usb/dwc2/core.h                            |  1 +
- drivers/usb/dwc2/platform.c                        | 24 +++++++++++++++++++++-
+ ...pga_cyclone5_de10_nano_uio_aud_fbii_hd.dts |  2 ++
+ drivers/usb/dwc2/core.h                       |  1 +
+ drivers/usb/dwc2/platform.c                   | 24 ++++++++++++++++++-
  3 files changed, 26 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
-index 723f2a3..317c9c5 100644
+index 723f2a38e136..317c9c5a97c3 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 @@ -265,5 +265,7 @@
@@ -23,7 +23,7 @@ index 723f2a3..317c9c5 100644
  	status = "okay";
  };
 diff --git a/drivers/usb/dwc2/core.h b/drivers/usb/dwc2/core.h
-index 5095263..98b35ad 100644
+index 5095263482e5..98b35ada5238 100644
 --- a/drivers/usb/dwc2/core.h
 +++ b/drivers/usb/dwc2/core.h
 @@ -873,6 +873,7 @@ struct dwc2_hsotg {
@@ -35,7 +35,7 @@ index 5095263..98b35ad 100644
  	unsigned int queuing_high_bandwidth:1;
  	unsigned int srp_success:1;
 diff --git a/drivers/usb/dwc2/platform.c b/drivers/usb/dwc2/platform.c
-index fe2fc57..2de69d5 100644
+index fe2fc57bbc90..2de69d5df962 100644
 --- a/drivers/usb/dwc2/platform.c
 +++ b/drivers/usb/dwc2/platform.c
 @@ -388,6 +388,23 @@ static int dwc2_lowlevel_hw_init(struct dwc2_hsotg *hsotg)
@@ -85,5 +85,5 @@ index fe2fc57..2de69d5 100644
  	dwc2_force_dr_mode(hsotg);
  
 -- 
-2.7.4
+2.17.1
 

@@ -1,18 +1,18 @@
-From 3d5c23c81ac5dbe6e25624a80b2d1ce2c3386a6b Mon Sep 17 00:00:00 2001
+From b7a59ad103030d02ce9970912e3a92a5ee73c682 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 1 Jun 2018 12:52:57 +0200
-Subject: [PATCH 22/29] Make DE1x Devicetree qsys core addresses consistant
+Subject: [PATCH 22/33] Make DE1x Devicetree qsys core addresses consistant
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- .../socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts |  6 +-
- .../boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 22 +++----
- .../dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts   | 26 ++++----
- arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts     | 70 +++++++++++-----------
+ ...pga_cyclone5_de10_nano_uio_aud_fbii_hd.dts |  6 +-
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 22 +++---
+ .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 26 +++----
+ .../arm/boot/dts/socfpga_cyclone5_de1_soc.dts | 70 +++++++++----------
  4 files changed, 58 insertions(+), 66 deletions(-)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
-index 65d1a56..4b8b813 100644
+index 65d1a56a8a23..4b8b81316cf6 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 @@ -133,7 +133,7 @@
@@ -43,7 +43,7 @@ index 65d1a56..4b8b813 100644
  		ilc@0x100030000 {
  			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
-index c05a7f7..cc62324 100644
+index c05a7f799d5b..cc62324122c7 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 @@ -85,8 +85,8 @@
@@ -111,7 +111,7 @@ index c05a7f7..cc62324 100644
  	};
  };
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
-index ce568a0..67bf19f 100644
+index ce568a0efbfd..67bf19fc5f08 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
 @@ -71,8 +71,8 @@
@@ -190,7 +190,7 @@ index ce568a0..67bf19f 100644
  	};
  };
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
-index 4925f44..11f0a9c 100644
+index 4925f44d0043..11f0a9cd94db 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de1_soc.dts
 @@ -137,56 +137,56 @@
@@ -311,5 +311,5 @@ index 4925f44..11f0a9c 100644
  	};
  };
 -- 
-2.7.4
+2.17.1
 

@@ -1,7 +1,7 @@
-From 31e08fcf6ab6b9407b2ef98d57f5b426aa0ff85f Mon Sep 17 00:00:00 2001
+From 60e801cefe6ffa57dbd43adf957294b63486b9a6 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 16 Oct 2018 12:46:21 +0200
-Subject: [PATCH 31/33] Add devicetree for DE1 Nano Touch screen Quartus
+Subject: [PATCH 31/34] Add devicetree for DE1 Nano Touch screen Quartus
  project
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>

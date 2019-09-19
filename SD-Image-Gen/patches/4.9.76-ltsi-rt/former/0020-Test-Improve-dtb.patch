@@ -1,15 +1,15 @@
-From 8b1d9dc8b9d1beab56a82b64fdea8f727103e3fd Mon Sep 17 00:00:00 2001
+From 9776ba79f2d0f4ee79aa07c32fcd4e7b076df6e0 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 31 May 2018 13:46:11 +0200
-Subject: [PATCH 20/29] Test Improve dtb
+Subject: [PATCH 20/33] Test Improve dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- .../socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 22 ++++++++++++++--------
+ ...pga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 22 ++++++++++++-------
  1 file changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
-index 1bf0892..65d1a56 100644
+index 1bf089216f35..65d1a56a8a23 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
 @@ -122,9 +122,8 @@
@@ -84,5 +84,5 @@ index 1bf0892..65d1a56 100644
  	};
  };
 -- 
-2.7.4
+2.17.1
 
