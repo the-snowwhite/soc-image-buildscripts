@@ -1,7 +1,7 @@
-From c4d51ebaf0fd72b6ec4bad6d54bbf2d205702d22 Mon Sep 17 00:00:00 2001
+From cf1e48c0170efc641bef3c5b9c1747892ea14e67 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 21 May 2018 13:19:43 +0200
-Subject: [PATCH 08/33] Enable bridges in dtb's
+Subject: [PATCH 08/34] Enable bridges in dtb's
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

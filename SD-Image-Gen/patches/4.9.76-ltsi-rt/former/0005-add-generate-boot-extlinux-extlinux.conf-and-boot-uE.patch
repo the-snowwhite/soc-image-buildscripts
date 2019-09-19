@@ -1,7 +1,7 @@
-From 356043e9c58cebf1ceeb40522da00ad08ddd2f08 Mon Sep 17 00:00:00 2001
+From f2eb467110902e85f4f8a7aa50946bdb38e463db Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
-Subject: [PATCH 05/29] add generate /boot/extlinux/extlinux.conf and
+Subject: [PATCH 05/33] add generate /boot/extlinux/extlinux.conf and
  /boot/uEnv.txt for uboot boot info
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -10,7 +10,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 21 insertions(+)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index d67c791..d6a4058 100755
+index d67c791ddc2d..d6a4058377f4 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
 @@ -203,6 +203,27 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
@@ -42,5 +42,5 @@ index d67c791..d6a4058 100755
  	mkdir -p "$tmpdir$debhookdir/$script.d"
  	cat <<EOF > "$tmpdir/DEBIAN/$script"
 -- 
-2.7.4
+2.17.1
 

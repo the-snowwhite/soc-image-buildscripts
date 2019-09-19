@@ -655,8 +655,12 @@ arm64_build() {
     if [ ! -z "${3}" ]; then
         echo "MSG: compiling ${1}"
         if [ "${3}" == "deb-pkg" ]; then
-            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 KBUILD_IMAGE=arch/arm64/boot/Image LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="2" deb-pkg
+            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 UIMAGE_LOADADDR=0x8000 LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="2" "${3}"
+#            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 KBUILD_IMAGE=arch/arm64/boot/Image LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="2" linux.bin deb-pkg
 #            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm64 KBUILD_DEBARCH=arm64 KBUILD_IMAGE=Image LOCALVERSION=-"socfpga64-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="2" deb-pkg
+            ${CROSS_COMPILE}objcopy -O binary -R .note -R .comment -S vmlinux linux.bin
+            gzip -9 linux.bin
+            mkimage -A ppc -O linux -T kernel -C gzip -a 0 -e 0 -n "Linux Kernel Image" -d linux.bin.gz uImage
         else
             make -j${NCORES} "${2}"
             echo "MSG: building ${1}"

@@ -1,7 +1,7 @@
-From 02badf3c0e1871d245637a1e17fe5f9fd61b0e90 Mon Sep 17 00:00:00 2001
+From baa74fced58fdd3d6a63631de7ccfaaed601b007 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 2 Jun 2018 22:56:31 +0200
-Subject: [PATCH 23/33] Add builtin audio codec driver for DE1/DE10 SoC
+Subject: [PATCH 23/34] Add builtin audio codec driver for DE1/DE10 SoC
  (wm8731) Add Audio and framebuffer Supporting device trees xga and hd
  versions
 

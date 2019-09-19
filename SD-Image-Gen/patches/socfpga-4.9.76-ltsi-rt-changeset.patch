@@ -1,7 +1,7 @@
-From 863f395485a705e13a7ba3c49b650f719d3be12a Mon Sep 17 00:00:00 2001
+From 62f10aabe4a919fe7267597dbf2353e13d18f555 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:14:18 +0100
-Subject: [PATCH 01/33] disable debug package gen
+Subject: [PATCH 01/34] disable debug package gen
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -25,10 +25,10 @@ index 5c8c02ffd864..31148aa2e935 100644
 2.17.1
 
 
-From 9d651948c4bad162eac64a6ecf5b4691dfb989cc Mon Sep 17 00:00:00 2001
+From b45008ae7daa7259ef3274dc69f9f51606d138d5 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 1 May 2018 16:02:19 +0200
-Subject: [PATCH 02/33] Remove gittag from kernel (file) name(s)
+Subject: [PATCH 02/34] Remove gittag from kernel (file) name(s)
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -48,10 +48,10 @@ index 31148aa2e935..d5758c68e455 100644
 2.17.1
 
 
-From 8b24dee1205097ffbd1443780a8fd8bc0fc12949 Mon Sep 17 00:00:00 2001
+From b6ceccf248c3361032773308411a9f0288f67f03 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:21:56 +0100
-Subject: [PATCH 03/33] add ext4 root fs support and autofs4 module
+Subject: [PATCH 03/34] add ext4 root fs support and autofs4 module
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -87,10 +87,10 @@ index d5758c68e455..5ac78d2ef09e 100644
 2.17.1
 
 
-From b81286a31d17e30d8a6af70da23b8c7787bc6170 Mon Sep 17 00:00:00 2001
+From 34aa73d586dc0e36d929d33587db8c06234ca8d7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
-Subject: [PATCH 04/33] add .dtd files to kernel-image .deb
+Subject: [PATCH 04/34] add .dtd files to kernel-image .deb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -125,10 +125,10 @@ index 3c575cd07888..d67c791ddc2d 100755
 2.17.1
 
 
-From f2eb467110902e85f4f8a7aa50946bdb38e463db Mon Sep 17 00:00:00 2001
+From 61299adae99f6609ee14532792d948c3f96c5398 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:33:44 +0100
-Subject: [PATCH 05/33] add generate /boot/extlinux/extlinux.conf and
+Subject: [PATCH 05/34] add generate /boot/extlinux/extlinux.conf and
  /boot/uEnv.txt for uboot boot info
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -172,10 +172,10 @@ index d67c791ddc2d..d6a4058377f4 100755
 2.17.1
 
 
-From 7cc8a9c6441367bbfe4d367b6d5a5d5c2a1e2b25 Mon Sep 17 00:00:00 2001
+From bfcd4c160fbec1ab30f35757fe868268fa1fe0d7 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 15:43:11 +0100
-Subject: [PATCH 06/33] add configfs and fpgacfg dts entities, and dynamic dts
+Subject: [PATCH 06/34] add configfs and fpgacfg dts entities, and dynamic dts
  overlay support
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -212,10 +212,10 @@ index 5ac78d2ef09e..44eb99105dcd 100644
 2.17.1
 
 
-From cb14e913b3af5a3f41fc5337c3d4ea8b44faf496 Mon Sep 17 00:00:00 2001
+From f488740f362242641ab2f3d54530be91e97f5a3b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 12:55:03 +0100
-Subject: [PATCH 07/33] rename kernel package names to *-socfpga-rt-ltsi
+Subject: [PATCH 07/34] rename kernel package names to *-socfpga-rt-ltsi
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -243,10 +243,10 @@ index d6a4058377f4..ee58811e94d0 100755
 2.17.1
 
 
-From c4d51ebaf0fd72b6ec4bad6d54bbf2d205702d22 Mon Sep 17 00:00:00 2001
+From cf1e48c0170efc641bef3c5b9c1747892ea14e67 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 21 May 2018 13:19:43 +0200
-Subject: [PATCH 08/33] Enable bridges in dtb's
+Subject: [PATCH 08/34] Enable bridges in dtb's
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -277,10 +277,10 @@ index 595eb4f1a761..3de276d42114 100644
 2.17.1
 
 
-From ce25054a5cd29a0439ec7b0c36ed9c56d60a14d6 Mon Sep 17 00:00:00 2001
+From ae0f42bf97c018f8db047cda2f63ce5021d83590 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 10 Mar 2018 13:13:12 +0100
-Subject: [PATCH 09/33] add spidev in dts so driver is loaded
+Subject: [PATCH 09/34] add spidev in dts so driver is loaded
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -314,10 +314,10 @@ index 3de276d42114..dce11432fcbd 100644
 2.17.1
 
 
-From f10355556e59c9f1b516e97135810d130aa87588 Mon Sep 17 00:00:00 2001
+From 561c2420eae1e7c84da0659e488698a4d7b40102 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 12 Mar 2018 23:41:23 +0100
-Subject: [PATCH 10/33] set ACL secutity
+Subject: [PATCH 10/34] set ACL secutity
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -357,10 +357,10 @@ index 44eb99105dcd..bce72c27b9d5 100644
 2.17.1
 
 
-From 8d2003f8a906701e0f569d93e65fdfa666f32a06 Mon Sep 17 00:00:00 2001
+From ba712944c711a51167d09550daa422f55d6ec791 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 30 Mar 2018 20:41:53 +0200
-Subject: [PATCH 11/33] Enable altvip framebuffer
+Subject: [PATCH 11/34] Enable altvip framebuffer
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -503,10 +503,10 @@ index bce72c27b9d5..ad7ca9d21361 100644
 2.17.1
 
 
-From c9317aa2f577862ee595cf4bdeb114e2f223863e Mon Sep 17 00:00:00 2001
+From 226e60d55dcacedad4ecb586b676e25c34a265b6 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 22:21:04 +0100
-Subject: [PATCH 12/33] Added DE-10 Nano with uio, with/without framebuffer
+Subject: [PATCH 12/34] Added DE-10 Nano with uio, with/without framebuffer
  1024x768 and 1920x1080(hd) dts dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -1098,10 +1098,10 @@ index 000000000000..bfb289855be1
 2.17.1
 
 
-From ea682e9a715ee7962c92f0a0dd83e333809e12f4 Mon Sep 17 00:00:00 2001
+From 8fb800c07ce332cbc23dabfede73d202469ce7c3 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 18 May 2018 20:35:35 +0200
-Subject: [PATCH 13/33] Add framebuffer-ii core driver based on Mister, and
+Subject: [PATCH 13/34] Add framebuffer-ii core driver based on Mister, and
  enable it
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -2006,10 +2006,10 @@ index 000000000000..a80ae1a714f7
 2.17.1
 
 
-From ca4835c1d3ff31515598b5d263ba60241aee7bea Mon Sep 17 00:00:00 2001
+From 36d9eca37f54cc9ff3390f66b729af9efde8424d Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 8 Apr 2018 22:39:54 +0200
-Subject: [PATCH 14/33] Add audio and midi drivers for holosynth and builtin
+Subject: [PATCH 14/34] Add audio and midi drivers for holosynth and builtin
  audio codec on de1 board
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -4307,10 +4307,10 @@ index 000000000000..1f4268c7387f
 2.17.1
 
 
-From 409f0b04555861a5af789a6435a58bf03573a46e Mon Sep 17 00:00:00 2001
+From 2b5025db0e84d2515adee97dd958e207fcc9d467 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 17 May 2018 10:58:21 +0200
-Subject: [PATCH 15/33] Add Hsynth audio driver with Phat(pcm5102) audio output
+Subject: [PATCH 15/34] Add Hsynth audio driver with Phat(pcm5102) audio output
  Add vipii fb,pidac/hsynth audio dtb for DE10 Nano HD HDMI
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -5269,10 +5269,10 @@ index 000000000000..2d56f0b83f5a
 2.17.1
 
 
-From b39f7a459d4782d0904487bf0d697c2e59c1aecd Mon Sep 17 00:00:00 2001
+From 27ac4bd83a2fa2b70d9b93c62c7dd3a233ce3124 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 4 May 2018 14:32:56 +0200
-Subject: [PATCH 16/33] add vipii framebuffer dtb for de1_soc
+Subject: [PATCH 16/34] add vipii framebuffer dtb for de1_soc
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -5588,10 +5588,10 @@ index 000000000000..225e46161c5c
 2.17.1
 
 
-From 35c8d2ff12a366f5979580810751004e93c13924 Mon Sep 17 00:00:00 2001
+From 905402f100a5032f5d74d490d83b1ffdf0f2973b Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 24 May 2018 12:18:18 +0200
-Subject: [PATCH 17/33] div codec mods
+Subject: [PATCH 17/34] div codec mods
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -5741,10 +5741,10 @@ index 2d56f0b83f5a..3011c2b42579 100644
 2.17.1
 
 
-From 7c25073265887c4d237e9b17352e332e614362c6 Mon Sep 17 00:00:00 2001
+From 5435af001fd072900dbae3e438e7585dedb610d1 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 26 May 2018 21:36:55 +0200
-Subject: [PATCH 18/33] Change uio port name Fix: for machinekit use
+Subject: [PATCH 18/34] Change uio port name Fix: for machinekit use
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -5782,10 +5782,10 @@ index bfb289855be1..f6ba2c68e527 100644
 2.17.1
 
 
-From 74c3cd1db05238daa22597ee604f34b2a91cfbac Mon Sep 17 00:00:00 2001
+From 4fe8274c53b7d36e678846dc312b9d34bbab370f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 30 May 2018 12:33:08 +0200
-Subject: [PATCH 19/33] Terasic dev boards: Make core addresses in qsys
+Subject: [PATCH 19/34] Terasic dev boards: Make core addresses in qsys
  devicetrees consistant
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -6072,10 +6072,10 @@ index 225e46161c5c..c6aaacc3496e 100644
 2.17.1
 
 
-From 9776ba79f2d0f4ee79aa07c32fcd4e7b076df6e0 Mon Sep 17 00:00:00 2001
+From ba3e8f867dc1e1ed3ba38e331408e7ed8297c768 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 31 May 2018 13:46:11 +0200
-Subject: [PATCH 20/33] Test Improve dtb
+Subject: [PATCH 20/34] Test Improve dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -6161,10 +6161,10 @@ index 1bf089216f35..65d1a56a8a23 100644
 2.17.1
 
 
-From ee48f50922a05404fa95eba93abe0c8594311123 Mon Sep 17 00:00:00 2001
+From b0a6c1f7113a798163f59d7c80dc11b78a9e2e2f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 31 May 2018 18:08:43 +0200
-Subject: [PATCH 21/33] Add missing .ops to synthpcm5102 codec
+Subject: [PATCH 21/34] Add missing .ops to synthpcm5102 codec
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -6284,10 +6284,10 @@ index 9791ae3c9608..414414670f15 100644
 2.17.1
 
 
-From b7a59ad103030d02ce9970912e3a92a5ee73c682 Mon Sep 17 00:00:00 2001
+From 5ee97c5e8761f963877ffffa806667fb0a0a364c Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 1 Jun 2018 12:52:57 +0200
-Subject: [PATCH 22/33] Make DE1x Devicetree qsys core addresses consistant
+Subject: [PATCH 22/34] Make DE1x Devicetree qsys core addresses consistant
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -6600,10 +6600,10 @@ index 4925f44d0043..11f0a9cd94db 100644
 2.17.1
 
 
-From 02badf3c0e1871d245637a1e17fe5f9fd61b0e90 Mon Sep 17 00:00:00 2001
+From baa74fced58fdd3d6a63631de7ccfaaed601b007 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 2 Jun 2018 22:56:31 +0200
-Subject: [PATCH 23/33] Add builtin audio codec driver for DE1/DE10 SoC
+Subject: [PATCH 23/34] Add builtin audio codec driver for DE1/DE10 SoC
  (wm8731) Add Audio and framebuffer Supporting device trees xga and hd
  versions
 
@@ -7353,10 +7353,10 @@ index 000000000000..e297ef4b0c0c
 2.17.1
 
 
-From 97226c1c1f665b00e88d98ea10c1becdc3fef3c3 Mon Sep 17 00:00:00 2001
+From 4e5cc799926de6a3d831636bdef351d150eedf79 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 8 Jun 2018 16:50:10 +0200
-Subject: [PATCH 24/33] Rename Hsynth stream names
+Subject: [PATCH 24/34] Rename Hsynth stream names
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7400,10 +7400,10 @@ index 414414670f15..bf40ad2dd911 100644
 2.17.1
 
 
-From b0fffbf455ee8c67488074cc5f6b318bfed11314 Mon Sep 17 00:00:00 2001
+From 2d1e0e988a8f586632e349617a0f23f27bfc1e1f Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 17:24:54 +0200
-Subject: [PATCH 25/33] Add irq to De10 Nano vipii fb
+Subject: [PATCH 25/34] Add irq to De10 Nano vipii fb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7438,10 +7438,10 @@ index 4b8b81316cf6..723f2a38e136 100644
 2.17.1
 
 
-From 3f90dc965076274ea97a1af587e1fec1dc5be781 Mon Sep 17 00:00:00 2001
+From 08d0af89547fcb04ab67897f28a8860f0d3d5269 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 18:13:46 +0200
-Subject: [PATCH 26/33] Usb core fixes
+Subject: [PATCH 26/34] Usb core fixes
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7528,10 +7528,10 @@ index fe2fc57bbc90..2de69d5df962 100644
 2.17.1
 
 
-From 6be9c2f317a20a112cd05a08d2fbcaa2ad66c900 Mon Sep 17 00:00:00 2001
+From cbd5bb6f53e5bf0853f714497180d8d2dbad9780 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 10 Jun 2018 23:18:17 +0200
-Subject: [PATCH 27/33] Add kernel debug stuff
+Subject: [PATCH 27/34] Add kernel debug stuff
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7556,10 +7556,10 @@ index 4917bafcd7ae..4ca99129e968 100644
 2.17.1
 
 
-From 2865d74a0981310f1ad2cda34b9943cdb0e60e8e Mon Sep 17 00:00:00 2001
+From 6b534d3abc39d271f09f6671844b8d489444dab8 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 11 Jun 2018 16:18:22 +0200
-Subject: [PATCH 28/33] Sounddriver mods
+Subject: [PATCH 28/34] Sounddriver mods
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -7884,10 +7884,10 @@ index 3011c2b42579..c99a5b485fee 100644
 2.17.1
 
 
-From 14ffd12bd41f1042156c1c701870808ea14d4865 Mon Sep 17 00:00:00 2001
+From 71f82cbf8eb5f5bf5a02ae9cf36aba90c52dce01 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 15 Jun 2018 02:48:57 +0200
-Subject: [PATCH 29/33] update DE10 devicetrees
+Subject: [PATCH 29/34] update DE10 devicetrees
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -8068,10 +8068,10 @@ index cc62324122c7..ac06b3c2f5cb 100644
 2.17.1
 
 
-From 358ace9b9f5cead2ceb5934d80e989fc85e71a4c Mon Sep 17 00:00:00 2001
+From 98b226d3f29a20a5faddcc5451dec58d5f09b5da Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 12 Oct 2018 20:51:17 +0200
-Subject: [PATCH 30/33] Add devicetree for DE10 Nano Touch screen Quartus
+Subject: [PATCH 30/34] Add devicetree for DE10 Nano Touch screen Quartus
  project
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -8374,10 +8374,10 @@ index 000000000000..d18c9bea582c
 2.17.1
 
 
-From 31e08fcf6ab6b9407b2ef98d57f5b426aa0ff85f Mon Sep 17 00:00:00 2001
+From 60e801cefe6ffa57dbd43adf957294b63486b9a6 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 16 Oct 2018 12:46:21 +0200
-Subject: [PATCH 31/33] Add devicetree for DE1 Nano Touch screen Quartus
+Subject: [PATCH 31/34] Add devicetree for DE1 Nano Touch screen Quartus
  project
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
@@ -8694,10 +8694,10 @@ index 000000000000..5d39b86b2caa
 2.17.1
 
 
-From 1c853e0937106e4c3bdfce33dc804f19fa2fdde4 Mon Sep 17 00:00:00 2001
+From f39bf190fb1630632587987f19b7a7feb25828f2 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 12 Jan 2019 19:36:51 +0100
-Subject: [PATCH 32/33] DE0_Nano_soc: Added devicetree entry for SPI Qsys core
+Subject: [PATCH 32/34] DE0_Nano_soc: Added devicetree entry for SPI Qsys core
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -8746,10 +8746,10 @@ index b280e6494193..b245fa4ad585 100644
 2.17.1
 
 
-From c92e4ab68b372ea21aad9408374a33e18019c9f7 Mon Sep 17 00:00:00 2001
+From 96706b265c861944d0ec0c76818f8398d9762fb4 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sat, 12 Jan 2019 20:48:14 +0100
-Subject: [PATCH 33/33] De0_Nano_Soc: Add hps spi0 device (on mux=0)
+Subject: [PATCH 33/34] De0_Nano_Soc: Add hps spi0 device (on mux=0)
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -8788,6 +8788,30 @@ index dce11432fcbd..ddbd5a180eaa 100644
  		};
  
  		spi1: spi@fff01000 {
+-- 
+2.17.1
+
+
+From 444acf81738c51e8ad36ee7966e9a6e87074b828 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Tue, 4 Jun 2019 15:47:25 +0200
+Subject: [PATCH 34/34] Add nfs4 secutity
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 14cf5aad9574..a70cf420297a 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -361,3 +361,5 @@ CONFIG_SND_SOC_FSL_ESAI=m
+ CONFIG_SND_SOC_IMX_AUDMUX=m
+ CONFIG_SND_SOC_I2C_AND_SPI=y
+ CONFIG_HZ_1000=y
++CONFIG_SUNRPC_GSS=y
++CONFIG_RPCSEC_GSS_KRB5=y
 -- 
 2.17.1
 

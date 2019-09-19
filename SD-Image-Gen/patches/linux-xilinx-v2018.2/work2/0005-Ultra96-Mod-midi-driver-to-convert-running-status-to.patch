@@ -1,0 +1,40 @@
+From d757ae16fbde67f624ece4ee9f3cc787cd2281fe Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 7 Jan 2019 17:35:18 +0100
+Subject: [PATCH 5/5] Ultra96: Mod midi driver to convert running status to non
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ sound/soc/socsynth/hsynth-midi.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/sound/soc/socsynth/hsynth-midi.c b/sound/soc/socsynth/hsynth-midi.c
+index 364a16b86ef2..28a58a362def 100644
+--- a/sound/soc/socsynth/hsynth-midi.c
++++ b/sound/soc/socsynth/hsynth-midi.c
+@@ -76,8 +76,20 @@ static int hmidi_card_remove(struct snd_soc_card *card)
+ }
+ 
+ static void snd_socmidi_transmit(unsigned char data){
+-
+-    iowrite8(data, midireg_mem);
++    int count;
++    unsigned char curr_status;
++    if (data >= 128) {
++        count = 0;
++        curr_status = data;
++    } else {
++        count = count + 1;
++    }
++    if (count >= 3 && (count & 1)){
++        iowrite8(curr_status, midireg_mem);
++        iowrite8(data, midireg_mem);
++    } else {
++        iowrite8(data, midireg_mem);
++    }
+ 
+ }
+ 
+-- 
+2.17.1
+

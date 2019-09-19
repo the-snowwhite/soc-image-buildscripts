@@ -1,15 +1,15 @@
-From db823480effbe0e871d4a5a9bcd56a8400dcc576 Mon Sep 17 00:00:00 2001
+From ee48f50922a05404fa95eba93abe0c8594311123 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 31 May 2018 18:08:43 +0200
-Subject: [PATCH 21/29] Add missing .ops to synthpcm5102 codec
+Subject: [PATCH 21/33] Add missing .ops to synthpcm5102 codec
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- sound/soc/codecs/hsynthpcm5102.c | 93 +++++++++++++++++++++++++++++++---------
+ sound/soc/codecs/hsynthpcm5102.c | 93 ++++++++++++++++++++++++--------
  1 file changed, 72 insertions(+), 21 deletions(-)
 
 diff --git a/sound/soc/codecs/hsynthpcm5102.c b/sound/soc/codecs/hsynthpcm5102.c
-index 9791ae3..4144146 100644
+index 9791ae3c9608..414414670f15 100644
 --- a/sound/soc/codecs/hsynthpcm5102.c
 +++ b/sound/soc/codecs/hsynthpcm5102.c
 @@ -27,32 +27,83 @@ static const struct snd_soc_dapm_route hsynthpcm5102_routes[] = {
@@ -118,5 +118,5 @@ index 9791ae3..4144146 100644
  };
  
 -- 
-2.7.4
+2.17.1
 

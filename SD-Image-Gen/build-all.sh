@@ -75,7 +75,7 @@ UBOOT_MAKE_CONFIG="all"
 UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"
 XIL_UBOOT_IMG_FILENAME="u-boot"
 #XIL_BOOT_FILES_LOC="/home/mib/Development/Docker/petalinux-docker"
-XIL_BOOT_FILES_LOC='/home/mib/Development/Holosynth_arm64_image_build/bak/BOOT'
+XIL_BOOT_FILES_LOC='/home/mib/Projects/2019v1/my-work' 
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
 
@@ -83,7 +83,7 @@ ALT_GIT_KERNEL_VERSION="4.9.76"
 ALT_GIT_KERNEL_REV="-ltsi-rt"
 XIL_GIT_KERNEL_VERSION="xilinx"
 #XIL_GIT_KERNEL_REV="-v2018.2"
-XIL_GIT_KERNEL_REV="-v2018.3"
+XIL_GIT_KERNEL_REV="-v2019.1"
 #XIL_GIT_KERNEL_REV="-v2017.3"
 #ALT_GIT_KERNEL_VERSION="4.15"
 
@@ -228,7 +228,7 @@ usage()
     echo "    -h --help (this printout)"
     echo "    --deps    Will install build deps"
     echo "    --uboot   Will clone, patch and build uboot (add =c to skip build)"
-    echo "    --build_git-kernel   Will clone, patch and build kernel from git (add =c to skip build)"
+    echo "    --build_git-kernel   Will clone, patch and build kernel from git (add =c to skip build) Use =distroname=boardname"
     echo "    --gitkernel2repo   Will add kernel .debs to local repo Use =distroname=distarch"
     echo "    --mk2repo   Will add machinekit .debs to local repo Use =distroname=distarch"
     echo "    --cadence2repo   Will add cadence .debs to local repo Use =distroname=distarch"
@@ -318,9 +318,10 @@ contains ${BOARDS[@]} ${1}
             else
                 KERNEL_PKG_VERSION="0.1"
             fi
-¤            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR} ${XIL_GIT_KERNEL_PATCH_FILE}
-#            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR}
-            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "work2" ${GIT_KERNEL_DIR}
+#            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR} ${XIL_GIT_KERNEL_PATCH_FILE}
+##            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR}
+#            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "work2" ${GIT_KERNEL_DIR}
+            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "xlnx_rebase_v4.14_2018.3" ${GIT_KERNEL_DIR}
             arm64_build "${XIL_GIT_KERNEL_BUILD_DIR}" ${XIL_KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/xil_git_kernel_deb_rt-log.txt
         else
             KERNEL_PKG_VERSION="1.0"
@@ -509,10 +510,11 @@ inst_repo_kernel() {
                     else
                         SD_KERNEL_TAG="*socfpga64-0.1"
                     fi
+                    sudo cp -r '/home/mib/Projects/2019v1/kernel_modules/lib/modules' ${1}/lib
                 else
                     SD_KERNEL_TAG="socfpga-rt-ltsi"
+                    inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
                 fi
-                inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
                 compress_rootfs ${CURRENT_DIR} ${1} "${6}_${2}" ${4}
                 unmount_binded ${1}
             else
@@ -571,62 +573,47 @@ assemble_full_sd_img() {
                 fi
                 SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
 
-                echo "step 1 create ${SD_IMG_FILE}"
+                echo "MSG: step 1 create ${SD_IMG_FILE}"
                 if [ "${3}" == "ultra96" ]; then
+                    echo "MSG: No dd uboot install"
+                    echo ""
+                    echo "Script_MSG: Arm64 detected"
+                    echo ""
+                    create_img "2" "${SD_IMG_FILE}" "${1}" "p2" "1"
+                    mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
+                    echo "Copying files to boot partition"
                     if [ "${4}" == "petalinux" ]; then
-                        create_img "2" "${SD_IMG_FILE}" "${1}" "p2" "1"
-                        mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
-                        echo "Copying files to boot partition"
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/BOOT.BIN ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/image.ub ${1}
-                        echo "Unmounting boot partition"
-                        unmount_binded ${1}
-                        unmount_loopdev
-                        echo "mounting rootfs partition"
-                        mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
-                        echo "Extracting to rootfs partition"
-                        sudo tar xfS ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/rootfs.tar.bz2 -C ${1} --use-compress-program lbzip2
-                        unmount_binded ${1}
-                        unmount_loopdev
-                        echo "No dd uboot install"
                     else
-                        create_img "2" "${SD_IMG_FILE}" "${1}" "p2" "2"
-                        mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
-                        echo "Copying files to boot partition"
                         sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
-                        echo "Unmounting boot partition"
-                        unmount_binded ${1}
-                        unmount_loopdev
-                        echo "mounting rootfs partition"
-                        mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
-                        echo "Extracting to rootfs partition"
+                    fi
+                    echo "MSG: Unmounting boot partition"
+                    unmount_binded ${1}
+                    unmount_loopdev
+                    echo "MSG: mounting rootfs partition"
+                    mount_sd_imagefile ${SD_IMG_FILE} ${1} p2
+                    echo "MSG: Extracting to rootfs partition"
+                    if [ "${4}" == "petalinux" ]; then
+                        sudo tar xfS ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/rootfs.tar.bz2 -C ${1} --use-compress-program lbzip2
+                    else
                         extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
-                        if [ "${4}" == "bionic" ] || [ "${4}" == "buster" ]; then
-                            echo ""
-                            echo "Script_MSG: Arm64 detected"
-                            echo ""
-                            bind_mounted ${1}
-                             sudo sync
-                             sudo rm -f ${1}/etc/resolv.conf
-                             sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
-                             sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
-                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
-                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
-                             set -x
-                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y lxmenu-data  lxqt-globalkeys  lxqt-panel lxqt'
-#                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev xserver-xorg-video-armsoc-exynos xserver-xorg-video-armsoc lua-inotify inotify-tools'
-#                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libdirectfb-1.7-7 libdirectfb-bin libdirectfb-extra xserver-xorg-video-fbdev lua-inotify inotify-tools'
-#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-fbdev xserver-xorg-video-armsoc'
-                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xserver-xorg-video-fbdev'
-#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils'
-#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install --reinstall kwin-x11 kwin-addons'
-#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --no-install-recommends install  --reinstall kwin-style-breeze'
-#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kde-style-breeze kde-style-breeze-qt4'
-#                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install --reinstall breeze-icon-theme'
-                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
-                             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/mv /etc/X11/xorg.conf /etc/X11/xorg.conf-armsoc-bak'
-
+                    fi
+                   bind_mounted ${1}
+                    sudo sync
+                    sudo rm -f ${1}/etc/resolv.conf
+                    sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
+                    sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
+                    set -x
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxmenu-data  lxqt-globalkeys  lxqt-panel lxqt'
+#                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libdirectfb-1.2-9 xserver-xorg-video-fbdev'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm sddm-theme-breeze'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/mv /etc/X11/xorg.conf /etc/X11/xorg.conf-armsoc-bak'
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
 Section "Files"
     ModulePath "/usr/local/lib/xorg/modules,/usr/lib/xorg/modules"
@@ -661,19 +648,32 @@ Section "Screen"
 EndSection
 
 EOF'
-                            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
-                            sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
-                        fi
-                        unmount_binded ${1}
-                        unmount_loopdev
-                        echo "No dd uboot install"
-                        set +x
+                    if [ ! "$(ls -A "./mali")" ]; then
+                        wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
+                        tar -xf mali-400-userspace.tar
                     fi
-                else
+                    cd mali
+                    cd rel-v2019.1
+                    tar -xf r8p0-01rel0.tar
+                    cd ${CURRENT_DIR}
+                    sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+                    sudo cp --preserve=links mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+                    sudo cp mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+#                        sudo rm ${1}/usr/lib/aarch64-linux-gnu/mali-egl/libwayland-egl.so
+#                    sudo cp '/home/mib/Projects/2019v1/xilinx-ultra96-reva-2019.1/build/tmp/sysroots-components/aarch64/xf86-video-armsoc/usr/lib/xorg/modules/drivers/armsoc_drv.so' \
+#                    ${1}/usr/lib/xorg/modules/drivers
+                    echo "MSG: Copy armsoc driver"
+                    sudo cp '/home/mib/Projects/2018v3/petalinux-rootfs/usr/lib/xorg/modules/drivers/armsoc_drv.so' ${1}/usr/lib/xorg/modules/drivers  
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
+                    sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
+                    unmount_binded ${1}
+                    unmount_loopdev
+                 else
                     create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
-                    echo "step 2 mount:"
+                    echo "MSG: step 2 mount:"
                     mount_sd_imagefile ${SD_IMG_FILE} ${1} ${media_rootfs_partition}
                     extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
                     set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
                     unmount_binded ${1}
                     unmount_loopdev

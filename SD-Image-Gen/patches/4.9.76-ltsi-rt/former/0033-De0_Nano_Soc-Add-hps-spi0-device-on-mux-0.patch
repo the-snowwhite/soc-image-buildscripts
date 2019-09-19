@@ -1,0 +1,45 @@
+From c92e4ab68b372ea21aad9408374a33e18019c9f7 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sat, 12 Jan 2019 20:48:14 +0100
+Subject: [PATCH 33/33] De0_Nano_Soc: Add hps spi0 device (on mux=0)
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga.dtsi | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index dce11432fcbd..ddbd5a180eaa 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -786,15 +786,24 @@
+ 			interrupts = <0 39 4>;
+ 		};
+ 
+-		spi0: spi@fff00000 {
++        spi0: spi@fff00000 {
+ 			compatible = "snps,dw-apb-ssi";
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <0xfff00000 0x1000>;
+ 			interrupts = <0 154 4>;
+-			num-cs = <4>;
++			num-chipselect = <4>;
++			tx-dma-channel = <&pdma 16>;
++			rx-dma-channel = <&pdma 17>;
+ 			clocks = <&spi_m_clk>;
+-			status = "disabled";
++			status = "okay";
++
++            spidev0: spidev@0 {
++                compatible = "rohm,dh2228fv";
++                reg = <0>;
++                spi-max-frequency = <100000000>;
++                enable-dma = <1>;
++            };
+ 		};
+ 
+ 		spi1: spi@fff01000 {
+-- 
+2.17.1
+

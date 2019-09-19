@@ -1,7 +1,7 @@
-From 30e18f8f202c4a63748c4304ae9fe47405094314 Mon Sep 17 00:00:00 2001
+From b81286a31d17e30d8a6af70da23b8c7787bc6170 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 7 Mar 2018 14:26:50 +0100
-Subject: [PATCH 04/29] add .dtd files to kernel-image .deb
+Subject: [PATCH 04/33] add .dtd files to kernel-image .deb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Michael Brown <producer@holotronic.dk>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 3c575cd0..d67c791 100755
+index 3c575cd07888..d67c791ddc2d 100755
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
 @@ -128,7 +128,7 @@ BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' $KCONFIG_CONFIG || true)"
@@ -33,5 +33,5 @@ index 3c575cd0..d67c791 100755
  
  if grep -q "^CONFIG_OF=y" $KCONFIG_CONFIG ; then
 -- 
-2.7.4
+2.17.1
 

@@ -1,7 +1,7 @@
-From 9776ba79f2d0f4ee79aa07c32fcd4e7b076df6e0 Mon Sep 17 00:00:00 2001
+From ba3e8f867dc1e1ed3ba38e331408e7ed8297c768 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Thu, 31 May 2018 13:46:11 +0200
-Subject: [PATCH 20/33] Test Improve dtb
+Subject: [PATCH 20/34] Test Improve dtb
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---

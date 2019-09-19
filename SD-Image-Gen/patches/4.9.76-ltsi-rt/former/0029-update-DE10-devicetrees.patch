@@ -1,16 +1,16 @@
-From c97339002c3fe2d32fe1d5622a742467960e4727 Mon Sep 17 00:00:00 2001
+From 14ffd12bd41f1042156c1c701870808ea14d4865 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 15 Jun 2018 02:48:57 +0200
-Subject: [PATCH 29/29] update DE10 devicetrees
+Subject: [PATCH 29/33] update DE10 devicetrees
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
 ---
- arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts   | 113 +++++++++++++++++----
- .../boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts |   4 +-
+ .../boot/dts/socfpga_cyclone5_de10_nano.dts   | 113 +++++++++++++++---
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts |   4 +-
  2 files changed, 97 insertions(+), 20 deletions(-)
 
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
-index 7645340..a767457 100644
+index 7645340f9787..a767457e4354 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
 @@ -1,18 +1,18 @@
@@ -157,7 +157,7 @@ index 7645340..a767457 100644
  	};
  };
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
-index cc62324..ac06b3c 100644
+index cc62324122c7..ac06b3c2f5cb 100644
 --- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 @@ -86,7 +86,7 @@
@@ -179,5 +179,5 @@ index cc62324..ac06b3c 100644
  			altr,interrupt-type = <0x2>;
  			altr,interrupt_type = <0x2>;
 -- 
-2.7.4
+2.17.1
 

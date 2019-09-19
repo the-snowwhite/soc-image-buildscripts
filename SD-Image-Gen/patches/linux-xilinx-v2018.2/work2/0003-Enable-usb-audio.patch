@@ -1,0 +1,30 @@
+From f09bb63ebd0a2a3c92ea9f380dfb8f20a72f6f67 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 10 Dec 2018 00:01:51 +0100
+Subject: [PATCH 3/5] Enable usb audio
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm64/configs/xilinx_zynqmp_defconfig | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/configs/xilinx_zynqmp_defconfig b/arch/arm64/configs/xilinx_zynqmp_defconfig
+index 9ce9ef73e51a..bb09dbafed5a 100644
+--- a/arch/arm64/configs/xilinx_zynqmp_defconfig
++++ b/arch/arm64/configs/xilinx_zynqmp_defconfig
+@@ -267,6 +267,12 @@ CONFIG_FB_XILINX=y
+ CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_SOUND=y
+ CONFIG_SND=y
++CONFIG_USB_AUDIO=y
++CONFIG_USB_GADGET=y
++CONFIG_SND_USB_AUDIO=y
++CONFIG_SND_SOC=y
++CONFIG_SND_SOC_I2C_AND_SPI=y
++CONFIG_SND_SOC_PCM5102A=y
+ # CONFIG_SND_DRIVERS is not set
+ # CONFIG_SND_PCI is not set
+ CONFIG_SND_SOC=y
+-- 
+2.17.1
+
