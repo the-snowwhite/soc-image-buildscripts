@@ -782,9 +782,6 @@ sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
 sudo rm -f ${1}/etc/resolv.conf
 sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
 
-#sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y install apt-transport-https
-
-#sudo sh -c 'echo "deb [arch=armhf] https://deb.mah.priv.at/ jessie socfpga" > '${1}'/etc/apt/sources.list.d/debmah.list'
 #sudo sh -c 'echo "deb [arch=armhf] http://${local_ws}.holotronic.lan/debian '${distro}' main" > '${1}'/etc/apt/sources.list.d/mibsocdeb.list'
 echo ""
 # echo "Script_MSG: Will now add key to ${local_ws}"
@@ -801,14 +798,6 @@ sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 # #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes --allow-unauthenticated upgrade
 sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y upgrade
-
-# echo ""
-# echo "# --------->       Removing qemu policy file          <--------------- ---------"
-# echo ""
-# if [ -f ${POLICY_FILE} ]; then
-#     echo "removing ${POLICY_FILE}"
-#     sudo rm -f ${POLICY_FILE}
-# fi
 
 echo ""
 echo "Script_MSG: Will now install kernel packages"
