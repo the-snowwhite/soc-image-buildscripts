@@ -38,7 +38,8 @@ HOME_DEB_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
 
 shell_cmd="/bin/bash"
 
-DEB_EXT_REPO_URL="http://deb.debian.org//debian/"
+#DEB_EXT_REPO_URL="http://deb.debian.org//debian/"
+DEB_EXT_REPO_URL="http://ftp.dk.debian.org/debian/"
 #UB_EXT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
 UB_EXT_REPO_URL="http://ports.ubuntu.com/ubuntu-ports/"
 #final_repo="http://ftp.dk.debian.org/debian/"
@@ -217,6 +218,7 @@ POLICY_FILE=${1}/usr/sbin/policy-rc.d
 
 EnableSystemdNetworkedLink='/etc/systemd/system/multi-user.target.wants/systemd-networkd.service'
 EnableSystemdResolvedLink='/etc/systemd/system/multi-user.target.wants/systemd-resolved.service'
+EnableResize2fsLink='/etc/systemd/system/multi-user.target.wants/resize2fs.service'
 
 
 #-----------------------------------------------------------------------------------
@@ -242,13 +244,13 @@ usage()
     echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
     echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience Use =distroname=username=distarch"
     echo "    --finalize-desktop-rootfs   Will create user and configure  rootfs with desktop for fully working out of the box experience Use =distroname=username=distarch"
-    echo "    --inst_repo_kernel   Will install kernel from local repo"
-    echo "    --inst_repo_kernel-desktop   Will install kernel from local repo in desktop version"
+    echo "    --inst_repo_kernel   Will install kernel from local repo Use =distroname=distarch=username"
+    echo "    --inst_repo_kernel-desktop   Will install kernel from local repo in desktop version Use =distroname=distarch=username"
+    echo "    --inst_hs_aud_stuff  Will install holosynth audio stuff in rootfs image"
     echo "    --bindmount_rootfsimg    Will mount rootfs image"
     echo "    --bindunmount_rootfsimg    Will unmount rootfs image"
-    echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file"
-    echo "    --assemble_desktop_sd_img   Will generate full populated fb sd imagefile and bmap file"
-    echo "    --inst_hs_aud_stuff  Will install holosynth audio stuff in rootfs image"
+    echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file Use =boardname=distroname=username"
+    echo "    --assemble_desktop_sd_img   Will generate full populated fb sd imagefile and bmap file Use =boardname=distroname=username"
     echo ""
 }
 
@@ -606,75 +608,52 @@ assemble_full_sd_img() {
                     sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
                     sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
-                    set -x
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxmenu-data  lxqt-globalkeys  lxqt-panel lxqt'
-#                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libdirectfb-1.2-9 xserver-xorg-video-fbdev'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm sddm-theme-breeze'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/mv /etc/X11/xorg.conf /etc/X11/xorg.conf-armsoc-bak'
-sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
-Section "Files"
-    ModulePath "/usr/local/lib/xorg/modules,/usr/lib/xorg/modules"
-EndSection
-
-Section "InputDevice"
-	Identifier	"System Mouse"
-	Driver		"mouse"
-	Option		"Device" "/dev/input/mouse0"
-EndSection
-
-Section "InputDevice"
-	Identifier	"System Keyboard"
-	Driver		"kbd"
-	Option		"Device" "/dev/input/event0"
-EndSection
-
-Section "Device"
-        Identifier      "ZynqMP"
-        Driver          "armsoc"
-        Option          "DRI2"                  "true"
-        Option          "DRI2_PAGE_FLIP"        "false"
-        Option          "DRI2_WAIT_VSYNC"       "true"
-        Option          "SWcursorLCD"           "false"
-        Option          "DEBUG"                 "false"
-EndSection
-
-Section "Screen"
-        Identifier      "DefaultScreen"
-        Device          "ZynqMP"
-        DefaultDepth    16
-EndSection
-
-EOF'
-                    if [ ! "$(ls -A "./mali")" ]; then
-                        wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
-                        tar -xf mali-400-userspace.tar
-                    fi
-                    cd mali
-                    cd rel-v2019.1
-                    tar -xf r8p0-01rel0.tar
-                    cd ${CURRENT_DIR}
-                    sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                    sudo cp --preserve=links mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                    sudo cp mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-#                        sudo rm ${1}/usr/lib/aarch64-linux-gnu/mali-egl/libwayland-egl.so
-#                    sudo cp '/home/mib/Projects/2019v1/xilinx-ultra96-reva-2019.1/build/tmp/sysroots-components/aarch64/xf86-video-armsoc/usr/lib/xorg/modules/drivers/armsoc_drv.so' \
-#                    ${1}/usr/lib/xorg/modules/drivers
-                    echo "MSG: Copy armsoc driver"
-                    sudo cp '/home/mib/Projects/2018v3/petalinux-rootfs/usr/lib/xorg/modules/drivers/armsoc_drv.so' ${1}/usr/lib/xorg/modules/drivers  
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
                     sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
+                    sudo cp -R ${PATCH_SCRIPT_DIR}/Auto-expand-on-boot/* ${1}
+                    sudo ln -s ${1}/lib/systemd/system/resize2fs.service ${1}/${EnableResize2fsLink}
+                    echo ""
+                    echo "# --------->       Removing qemu policy file          <--------------- ---------"
+                    echo ""
+
+                    if [ -f ${POLICY_FILE} ]; then
+                        echo "removing ${POLICY_FILE}"
+                        sudo rm -f ${POLICY_FILE}
+                    fi
                     unmount_binded ${1}
                     unmount_loopdev
-                 else
+                else
                     create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
                     echo "MSG: step 2 mount:"
                     mount_sd_imagefile ${SD_IMG_FILE} ${1} ${media_rootfs_partition}
                     extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
+                    bind_mounted ${1}
+                    sudo sync
+                    sudo rm -f ${1}/etc/resolv.conf
+                    sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
+                    sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
+                    sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
+                    sudo cp -R ${PATCH_SCRIPT_DIR}/Auto-expand-on-boot/* ${1}
+                    sudo ln -s ${1}/lib/systemd/system/resize2fs.service ${1}/${EnableResize2fsLink}
                     set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
+                    echo ""
+                    echo "# --------->       Removing qemu policy file          <--------------- ---------"
+                    echo ""
+
+                    if [ -f ${POLICY_FILE} ]; then
+                        echo "removing ${POLICY_FILE}"
+                        sudo rm -f ${POLICY_FILE}
+                    fi
                     unmount_binded ${1}
                     unmount_loopdev
                     install_uboot "${UBOOT_BUILD_DIR}" "${UBOOT_IMG_FILENAME}" "${SD_IMG_FILE}"
@@ -844,6 +823,20 @@ while [ "$1" != "" ]; do
             DESKTOP="yes"
             inst_repo_kernel ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" "${CURRENT_DIR}/finalized-with-kernel-and-desktop-${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ;;
+        --inst_hs_aud_stuff)
+            if [ "$(ls -A ${ROOTFS_MNT})" ]; then
+                echo "Script_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
+                unmount_binded ${ROOTFS_MNT}
+            fi
+            create_img "1" "${CURRENT_DIR}/${ROOTFS_IMG}"
+            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
+            bind_mounted ${ROOTFS_MNT}
+            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop"
+            mkdir -p ${CURRENT_DIR}/Qt_logs
+            inst_cadence ${ROOTFS_MNT} 2>&1| tee ${CURRENT_DIR}/Qt_logs/install_cadence-log.txt
+            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
+            unmount_binded ${ROOTFS_MNT}
+            ;;
         --bindmount_rootfsimg)
             mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
             bind_mounted ${ROOTFS_MNT}
@@ -857,23 +850,6 @@ while [ "$1" != "" ]; do
         --assemble_desktop_sd_img)
             DESKTOP="yes"
             assemble_full_sd_img ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" "${VALUE1}" "${VALUE2}" "${VALUE3}"
-            ;;
-        --inst_hs_aud_stuff)
-            if [ "$(ls -A ${ROOTFS_MNT})" ]; then
-                echo "Script_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
-                unmount_binded ${ROOTFS_MNT}
-            fi
-            create_img "1" "${CURRENT_DIR}/${ROOTFS_IMG}"
-            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
-            bind_mounted ${ROOTFS_MNT}
-            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop"
-#           cp "${CURRENT_DIR}/desktop-${ROOTFS_IMG}" "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}"
-#            mount_imagefile "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}" ${ROOTFS_MNT}
-#            bind_mounted ${ROOTFS_MNT}
-            mkdir -p ${CURRENT_DIR}/Qt_logs
-            inst_cadence ${ROOTFS_MNT} 2>&1| tee ${CURRENT_DIR}/Qt_logs/install_cadence-log.txt
-            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
-            unmount_binded ${ROOTFS_MNT}
             ;;
     *)
             echo "ERROR: unknown parameter \"$PARAM\""
