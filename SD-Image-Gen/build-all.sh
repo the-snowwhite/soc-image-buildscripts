@@ -76,7 +76,7 @@ UBOOT_MAKE_CONFIG="all"
 UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"
 XIL_UBOOT_IMG_FILENAME="u-boot"
 #XIL_BOOT_FILES_LOC="/home/mib/Development/Docker/petalinux-docker"
-XIL_BOOT_FILES_LOC='/home/mib/Projects/2019v1/my-work' 
+XIL_BOOT_FILES_LOC='/home/mib/Projects/sd-boot-files'
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
 
@@ -588,7 +588,7 @@ assemble_full_sd_img() {
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/BOOT.BIN ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/image.ub ${1}
                     else
-                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
                     fi
                     echo "MSG: Unmounting boot partition"
