@@ -963,10 +963,7 @@ sudo chroot --userspec=root:root ${1} /bin/mkdir -p /var/tmp
 sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /var/tmp
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
-#if [ "${3}" == "buster" ]; then
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install debconf gnupg2 sudo wget apt-utils kmod'
-#fi
-#if [ "${3}" == "bionic" ]; then
+sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install debconf gnupg2 sudo wget apt-utils kmod'
 
 #export DEBIAN_FRONTEND=noninteractive
 #apt-get install -y tzdata
@@ -976,7 +973,7 @@ sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}
     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tzdata'
     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -fs /usr/share/zoneinfo/Europe/Copenhagen /etc/localtime'
     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install kwrite gnupg2 avahi-discover traceroute cgroupfs-mount ntp'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install featherpad gnupg2 avahi-discover traceroute cgroupfs-mount ntp'
 #fi
 if [ "${3}" == "bionic" ]; then
     sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}.holotronic.lan/ubuntu/socfpgakernel.gpg.key
@@ -1022,16 +1019,16 @@ if [ "${DESKTOP}" == "yes" ]; then
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm'
     else
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core openbox lxqt-sudo'
+        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core lxqt-sudo'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt pcmanfm-qt5'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxmenu-data  lxqt-globalkeys lxqt-panel lxqt'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm sddm-theme-breeze'
+#        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm sddm-theme-breeze'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze breeze-cursor-theme breeze-icon-theme'
 #         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
 #         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
     fi
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils mesa-utils-extra'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi'
+    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils mesa-utils-extra xfonts-cyrillic'
+#    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install xfonts-base xfonts-cyrillic xfonts-100dpi xfonts-75dpi'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
@@ -1040,7 +1037,7 @@ if [ "${DESKTOP}" == "yes" ]; then
     if [[ "${4}" == "arm64" ]]; then
         if [ "${3}" == "bionic" ]; then
             sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install linux-firmware'
-        else 
+        else
             if [ "${3}" == "stretch" ]; then
                 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y -t '${3}'-backports install firmware-ti-connectivity'
             else
@@ -1170,8 +1167,9 @@ EOF'
         sudo cp --preserve=links mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
         sudo cp mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
         echo "MSG: Copy armsoc driver"
-        sudo cp '/home/mib/Projects/2019v1/xilinx-ultra96-reva-2019.1/build/tmp/sysroots-components/aarch64/xf86-video-armsoc/usr/lib/xorg/modules/drivers/armsoc_drv.so' ${1}/usr/lib/xorg/modules/drivers
-#        sudo cp '/home/mib/Projects/2018v3/petalinux-rootfs/usr/lib/xorg/modules/drivers/armsoc_drv.so' ${1}/usr/lib/xorg/modules/drivers  
+#        sudo cp '/home/mib/Projects/2019v1/xilinx-ultra96-reva-2019.1/build/tmp/sysroots-components/aarch64/xf86-video-armsoc/usr/lib/xorg/modules/drivers/armsoc_drv.so' ${1}/usr/lib/xorg/modules/drivers
+        sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
+#        sudo cp '/home/mib/Projects/2018v3/petalinux-rootfs/usr/lib/xorg/modules/drivers/armsoc_drv.so' ${1}/usr/lib/xorg/modules/drivers
 
     else
 
