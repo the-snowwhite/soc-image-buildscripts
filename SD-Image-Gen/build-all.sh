@@ -607,15 +607,8 @@ assemble_full_sd_img() {
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/BOOT.BIN ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/image.ub ${1}
                     else
-##                        if [ "${4}" == "bullseye" ]; then
-                            sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
-                            sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
-#                            sudo cp /home/mib/avnet-ultra96-rev1.dtb ${1}
-#                            sudo cp /home/mib/Image ${1}
-##                        else
-##                            sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
-##                            sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
-##                        fi
+                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
                     fi
                     echo "MSG: Unmounting boot partition"
                     unmount_binded ${1}
