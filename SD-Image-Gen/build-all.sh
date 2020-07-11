@@ -25,7 +25,7 @@
 BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "DExx" "ultra96")
 
 ## Valid distros:
-DISTROS=("stretch" "buster" "bionic" "petalinux")
+DISTROS=("stretch" "buster" "bullseye" "bionic" "petalinux")
 
 ## Valid archs:
 DISTARCHS=("armhf" "arm64")
@@ -82,10 +82,10 @@ RT_PATCH_REV="rt60"
 
 ALT_GIT_KERNEL_VERSION="4.9.76"
 ALT_GIT_KERNEL_REV="-ltsi-rt"
-XIL_GIT_KERNEL_VERSION="xilinx"
-#XIL_GIT_KERNEL_REV="-v2018.2"
-XIL_GIT_KERNEL_REV="-v2019.1"
-#XIL_GIT_KERNEL_REV="-v2017.3"
+#XIL_GIT_KERNEL_VERSION="xilinx"
+XIL_GIT_KERNEL_VERSION="zynqmp"
+#XIL_GIT_KERNEL_REV="-v2019.1"
+XIL_GIT_KERNEL_REV="-5.5-mib"
 #ALT_GIT_KERNEL_VERSION="4.15"
 
 #RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
@@ -353,10 +353,10 @@ gen_rootfs_image() {
     zero=0;
     contains ${DISTROS[@]} ${3}
     if [ "$?" -eq 0 ]; then
-        echo "Valid distroname = ${3} given"
+        echo "Script_MSG: Valid distroname = ${3} given"
         contains ${DISTARCHS[@]} ${4}
         if [ "$?" -eq 0 ]; then
-            echo "Valid distarch = ${4} given"
+            echo "Script_MSG: Valid distarch = ${4} given"
             create_img "1" ${2}
             mount_imagefile ${2} ${1}
             . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
@@ -366,12 +366,23 @@ gen_rootfs_image() {
                     run_desktop_qemu_debootstrap_bionic ${1} ${3} ${UB_EXT_REPO_URL} ${4}
                     echo "Script_MSG: run_desktop_qemu_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
                 else
-                    if [ "${3}" == "buster" ]; then
-                        run_desktop_qemu_debootstrap_buster ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                        echo "Script_MSG: run_desktop_qemu_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                    if [ "${3}" == "bullseye" ]; then
+                        echo "Script_MSG: will run run_desktop_qemu_debootstrap_bullseye"
+                        run_desktop_qemu_debootstrap_bullseye ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                        echo "Script_MSG: run_desktop_qemu_debootstrap_bullseye (${3}) (${4}) function return value was --> ${output}"
                     else
-                        run_desktop_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                        echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                        if [ "${3}" == "buster" ]; then
+                            run_desktop_qemu_debootstrap_buster ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                            echo "Script_MSG: run_desktop_qemu_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                        else
+                            if [ "${3}" == "stretch" ]; then
+                                run_desktop_qemu_debootstrap_stretch ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                                echo "Script_MSG: run_desktop_qemu_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                            else
+                                run_desktop_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                                echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                            fi
+                        fi
                     fi
                 fi
             else
@@ -508,11 +519,15 @@ inst_repo_kernel() {
                 echo "Script_MSG: will now install kernel"
                 if [ "${5}" == "arm64" ]; then
                     if [ "${4}" == "bionic" ] || [ "${4}" == "buster" ]; then
-                        SD_KERNEL_TAG="*socfpga64-2.1"
+                        SD_KERNEL_TAG="*socfpga64-4.14"
                     else
-                        SD_KERNEL_TAG="*socfpga64-0.1"
+                        SD_KERNEL_TAG="*socfpga64-5.5"
                     fi
-                    sudo cp -r '/home/mib/Projects/2019v1/kernel_modules/lib/modules' ${1}/lib
+                    if [ "${4}" == "bullseye" ]; then
+                        sudo cp -r '/home/mib/Projects/2020v1/kernel_modules/lib/modules' ${1}/lib
+                    else
+                        sudo cp -r '/home/mib/Projects/2019v1/kernel_modules/lib/modules' ${1}/lib
+                    fi
                 else
                     SD_KERNEL_TAG="socfpga-rt-ltsi"
                     inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
@@ -588,8 +603,15 @@ assemble_full_sd_img() {
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/BOOT.BIN ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/image.ub ${1}
                     else
-                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
-                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+##                        if [ "${4}" == "bullseye" ]; then
+                            sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
+                            sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+#                            sudo cp /home/mib/avnet-ultra96-rev1.dtb ${1}
+#                            sudo cp /home/mib/Image ${1}
+##                        else
+##                            sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
+##                            sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+##                        fi
                     fi
                     echo "MSG: Unmounting boot partition"
                     unmount_binded ${1}
@@ -614,7 +636,7 @@ assemble_full_sd_img() {
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
                     sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
-                    sudo cp -R ${PATCH_SCRIPT_DIR}/Auto-expand-on-boot/* ${1}
+                    sudo cp -R ${MAIN_SCRIPT_DIR}/Auto-expand-on-boot/* ${1}
                     sudo ln -s ${1}/lib/systemd/system/resize2fs.service ${1}/${EnableResize2fsLink}
                     echo ""
                     echo "# --------->       Removing qemu policy file          <--------------- ---------"
@@ -643,7 +665,7 @@ assemble_full_sd_img() {
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
                     sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
-                    sudo cp -R ${PATCH_SCRIPT_DIR}/Auto-expand-on-boot/* ${1}
+                    sudo cp -R ${MAIN_SCRIPT_DIR}/Auto-expand-on-boot/}/Auto-expand-on-boot/* ${1}
                     sudo ln -s ${1}/lib/systemd/system/resize2fs.service ${1}/${EnableResize2fsLink}
                     set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
                     echo ""

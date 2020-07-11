@@ -16,6 +16,12 @@ output=${?}
 }
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+run_desktop_qemu_debootstrap_bullseye() {
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}
+output=${?}
+}
+
+# ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 run_desktop_qemu_debootstrap_buster() {
 sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}
 output=${?}
@@ -29,14 +35,23 @@ output=${?}
 #,dhcpcd5,open-iscsi,
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+#leafpad,
 run_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}
 output=${?}
 }
 
 ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+#leafpad,libdirectfb-1.2-9,gksu
+run_desktop_qemu_debootstrap_stretch() {
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,acpid ${2} ${1} ${3}
+output=${?}
+}
+
+## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
+#leafpad,libdirectfb-1.2-9,gksu
 run_desktop_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,gksu,acpid ${2} ${1} ${3}
+sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}
 output=${?}
 }
 
@@ -839,7 +854,7 @@ rm -f /etc/resolv.conf
      echo ""
      echo "ECHO:--> Enabling Systemd Networkd"
      echo ""
-     ln -s /lib/systemd/system/systemd-networkd.service'${EnableSystemdNetworkedLink}'
+     ln -s /lib/systemd/system/systemd-networkd.service '${EnableSystemdNetworkedLink}'
  fi
 
 # enable systemd-resolved
@@ -1010,13 +1025,24 @@ fi
 if [ "${DESKTOP}" == "yes" ]; then
     echo "Scr_MSG: Installing lxqt"
 #    if [ "${3}" == "bionic" ] || [ "${3}" == "buster" ]; then
-    if [ "${3}" == "bionic" ]; then
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core openbox lxqt-sudo'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm'
+    if [ "${3}" == "bionic" ] || [ "${3}" == "bullseye" ]; then
+        if [ "${3}" == "bionic" ]; then
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core openbox lxqt-sudo'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm'
+        fi
+        if [ "${3}" == "bullseye" ]; then
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm sddm-theme-debian-elarun'
+#            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel task-desktop'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
+            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze breeze-cursor-theme breeze-icon-theme'
+        fi
     else
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
         sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core lxqt-sudo'
@@ -1123,7 +1149,7 @@ if [ "${DESKTOP}" == "yes" ]; then
     if [[ "${4}" == "arm64" ]]; then
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
 Section "Files"
-    ModulePath "/usr/local/lib/xorg/modules,/usr/lib/xorg/modules"
+    ModulePath "/usr/lib/xorg/modules"
 EndSection
 
 Section "InputDevice"
@@ -1155,22 +1181,46 @@ Section "Screen"
 EndSection
 
 EOF'
-        if [ ! "$(ls -A "./mali")" ]; then
-            wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
-            tar -xf mali-400-userspace.tar
+    if [ ! "$(ls -A "./mali")" ]; then
+        wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
+        tar -xf mali-400-userspace.tar
+    fi
+    cd mali
+    if [ "${3}" == "bullseye" ]; then
+        if [ ! "$(ls -A "./mali-userspace-binaries")" ]; then
+            git clone https://github.com/Xilinx/mali-userspace-binaries.git
         fi
-        cd mali
-        cd rel-v2019.1
-        tar -xf r8p0-01rel0.tar
+        cd mali-userspace-binaries
+        git checkout rel-v2020.1
         cd ${CURRENT_DIR}
-        sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-        sudo cp --preserve=links mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-        sudo cp mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+#        sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+        sudo cp -P mali/mali-userspace-binaries/r9p0-01rel0/arm-linux-gnueabihf/common/* ${1}/usr/lib/aarch64-linux-gnu
+        sudo cp mali/mali-userspace-binaries/r9p0-01rel0/arm-linux-gnueabihf/x11/libMali.so.9.0  ${1}/usr/lib/aarch64-linux-gnu/libMali.so.9.0
         echo "MSG: Copy armsoc driver"
-#        sudo cp '/home/mib/Projects/2019v1/xilinx-ultra96-reva-2019.1/build/tmp/sysroots-components/aarch64/xf86-video-armsoc/usr/lib/xorg/modules/drivers/armsoc_drv.so' ${1}/usr/lib/xorg/modules/drivers
-        sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
-#        sudo cp '/home/mib/Projects/2018v3/petalinux-rootfs/usr/lib/xorg/modules/drivers/armsoc_drv.so' ${1}/usr/lib/xorg/modules/drivers
-
+        sudo cp '/home/mib/Projects/2020v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
+    else
+        if [ "${3}" == "buster" ]; then
+            cd rel-v2019.1
+            tar -xf r8p0-01rel0.tar
+            cd ${CURRENT_DIR}
+            sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+            sudo cp -P mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+            sudo cp mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+            echo "MSG: Copy armsoc driver"
+            sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
+        else
+            if [[ "${3}" == "stretch" ]]; then
+                cd rel-v2018.3
+                tar -xf r8p0-01rel0.tar
+                cd ${CURRENT_DIR}
+                sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+                sudo cp -P mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+                sudo cp mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+                echo "MSG: Copy armsoc driver"
+                sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
+            fi
+        fi
+    fi
     else
 
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
@@ -1193,7 +1243,7 @@ EOF'
 fi
 
 sudo sh -c 'echo options uio_pdrv_genirq of_id="generic-uio,ui_pdrv" > '${1}'/etc/modprobe.d/uioreg.conf'
-sudo sh -c 'echo "KERNEL==\"uio0\",MODE=\"666\"" > '${1}'/etc/udev/rules.d/10-local.rules'
+sudo sh -c 'echo "KERNEL==\"uio*\",MODE=\"666\"" > '${1}'/etc/udev/rules.d/10-local.rules'
 
 echo ""
 echo "# --------->       Restoring resolv.conf link         <--------------- ---------"
