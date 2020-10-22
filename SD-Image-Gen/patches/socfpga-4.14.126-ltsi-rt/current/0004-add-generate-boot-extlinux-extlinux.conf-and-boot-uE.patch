@@ -1,0 +1,46 @@
+From dbcb85711dab641cb14bff795d71f46255bdc03b Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Tue, 13 Oct 2020 16:15:11 +0200
+Subject: [PATCH 04/12] add generate /boot/extlinux/extlinux.conf and
+ /boot/uEnv.txt for uboot boot info
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index b6d3675e8087..5750b334dcd3 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -194,6 +194,27 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
+ else
+ 	want_initrd=No
+ fi
++# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
++cat <<EOF > "$tmpdir/boot/uEnv.txt"
++kver=${version}
++initrd_installed=$want_initrd
++hostname=holosynthv
++EOF
++cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
++fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
++loadimage=run fpgaload; bridge enable; mw.b 0xffd05018 0xf0; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++mmcboot=setenv bootargs console=ttyS0,115200 root=${mmcroot} rootfstype=ext4 rw rootwait fbcon=rotate:2;bootz ${loadaddr} - ${fdt_addr}
++EOF
++
++# create extlinux.conf in /boot folder (for u-boot probing)
++mkdir -p "$tmpdir/boot/extlinux"
++cat <<EOF > "$tmpdir/boot/extlinux/extlinux.conf"
++label Linux ${version}
++    kernel /boot/vmlinuz-$version
++    append  console=ttyS0,115200 root=/dev/mmcblk0p3 rw rootfstype=ext4 rootwait
++    fdtdir /boot/dtb
++EOF
++
+ for script in postinst postrm preinst prerm ; do
+ 	mkdir -p "$tmpdir$debhookdir/$script.d"
+ 	cat <<EOF > "$tmpdir/DEBIAN/$script"
+-- 
+2.25.1
+

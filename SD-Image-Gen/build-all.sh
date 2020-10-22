@@ -34,7 +34,7 @@ DISTARCHS=("armhf" "arm64")
 USERS=("machinekit" "holosynth" "ubuntu" "vivado")
 
 #HOME_DEB_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
-HOME_DEB_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
+HOME_DEB_MIRR_REPO_URL=http://kdeneon-ws/debian
 
 shell_cmd="/bin/bash"
 
@@ -49,8 +49,10 @@ final_ub_repo=${UB_EXT_REPO_URL}
 local_deb_repo=${DEB_EXT_REPO_URL}
 local_ub_repo=${UB_EXT_REPO_URL}
 local_ws=kdeneon-ws
-local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
-local_ub_kernel_repo="http://${local_ws}.holotronic.lan/ubuntu/"
+#local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
+#local_ub_kernel_repo="http://${local_ws}.holotronic.lan/ubuntu/"
+local_kernel_repo="http://${local_ws}/debian/"
+local_ub_kernel_repo="http://${local_ws}/ubuntu/"
 
 
 ## 3 part Expandable image with swap in p2
@@ -80,7 +82,8 @@ XIL_BOOT_FILES_LOC='/home/mib/Projects/sd-boot-files'
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
 
-ALT_GIT_KERNEL_VERSION="4.9.76"
+#ALT_GIT_KERNEL_VERSION="4.9.76"
+ALT_GIT_KERNEL_VERSION="4.14.126"
 ALT_GIT_KERNEL_REV="-ltsi-rt"
 #XIL_GIT_KERNEL_VERSION="xilinx"
 XIL_GIT_KERNEL_VERSION="zynqmp"
@@ -114,7 +117,8 @@ WORK_DIR=$(pwd)
 
 #HOME_REPO_DIR="/var/www/repos/apt/debian"
 #HOME_REPO_DIR="/var/www/debian"
-HOME_REPO_DIR="/var/www/repos/apt"
+#HOME_REPO_DIR="/var/www/repos/apt"
+HOME_REPO_DIR="/opt/lampp/htdocs/repos/apt"
 
 MAIN_SCRIPT_DIR="$(cd $(dirname $0) && pwd)"
 SUB_SCRIPT_DIR=${MAIN_SCRIPT_DIR}/subscripts
