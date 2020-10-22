@@ -23,7 +23,7 @@ output=${?}
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 run_desktop_qemu_debootstrap_buster() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}
+sudo qemu-debootstrap --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}
 output=${?}
 }
 
@@ -135,12 +135,14 @@ sudo sh -c 'cat <<EOT > '${1}'/etc/apt/sources.list-final
 #------------------------------------------------------------------------------#
 
 ###### Debian Main Repos
-deb '${final_deb_repo}' '${2}' main contrib non-free
-deb-src '${final_deb_repo}' '${2}' main
+deb '${final_deb_repo}' '${2}'main contrib non-free
+deb-src '${final_deb_repo}' '${2}'main contrib non-free
 
 ###### Debian Update Repos
+deb '${final_deb_repo}' '${2}'-updates main contrib non-free
+deb-src '${final_deb_repo}' '${2}'-updates main contrib non-free
 deb http://security.debian.org/ '${2}'/updates main contrib non-free
-deb http://ftp.debian.org/debian '${2}'-backports main
+#deb http://ftp.debian.org/debian '${2}'-backports main contrib non-free
 
 EOT'
 fi
@@ -734,6 +736,7 @@ echo "Europe/Copenhagen" > /etc/timezone && \
     dpkg-reconfigure -f noninteractive tzdata && \
     sed -i -e '"'"'s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/'"'"' /etc/locale.gen && \
     sed -i -e '"'"'s/# da_DK.UTF-8 UTF-8/da_DK.UTF-8 UTF-8/'"'"' /etc/locale.gen && \
+    sed -i -e '"'"'s/# en_DK.UTF-8 UTF-8/en_DK.UTF-8 UTF-8/'"'"' /etc/locale.gen && \
     echo '"'"'LANG="en_US.UTF-8"'"'"'>/etc/default/locale && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
@@ -991,9 +994,9 @@ sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}
     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install featherpad gnupg2 avahi-discover traceroute cgroupfs-mount ntp'
 #fi
 if [ "${3}" == "bionic" ]; then
-    sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}.holotronic.lan/ubuntu/socfpgakernel.gpg.key
+    sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}/ubuntu/socfpgakernel.gpg.key
 else
-    sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}.holotronic.lan/debian/socfpgakernel.gpg.key
+    sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}/debian/socfpgakernel.gpg.key
 fi
 
 sudo chroot --userspec=root:root ${1} /usr/bin/apt-key add socfpgakernel.gpg.key
