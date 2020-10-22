@@ -25,7 +25,7 @@
 BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "DExx" "ultra96")
 
 ## Valid distros:
-DISTROS=("stretch" "buster" "bionic" "petalinux")
+DISTROS=("stretch" "buster" "bullseye" "bionic" "petalinux")
 
 ## Valid archs:
 DISTARCHS=("armhf" "arm64")
@@ -34,11 +34,12 @@ DISTARCHS=("armhf" "arm64")
 USERS=("machinekit" "holosynth" "ubuntu" "vivado")
 
 #HOME_DEB_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
-HOME_DEB_MIRR_REPO_URL=http://debian9-ws2.holotronic.lan/debian
+HOME_DEB_MIRR_REPO_URL=http://kdeneon-ws/debian
 
 shell_cmd="/bin/bash"
 
-DEB_EXT_REPO_URL="http://deb.debian.org//debian/"
+#DEB_EXT_REPO_URL="http://deb.debian.org//debian/"
+DEB_EXT_REPO_URL="http://ftp.dk.debian.org/debian/"
 #UB_EXT_REPO_URL=http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports
 UB_EXT_REPO_URL="http://ports.ubuntu.com/ubuntu-ports/"
 #final_repo="http://ftp.dk.debian.org/debian/"
@@ -48,8 +49,10 @@ final_ub_repo=${UB_EXT_REPO_URL}
 local_deb_repo=${DEB_EXT_REPO_URL}
 local_ub_repo=${UB_EXT_REPO_URL}
 local_ws=kdeneon-ws
-local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
-local_ub_kernel_repo="http://${local_ws}.holotronic.lan/ubuntu/"
+#local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
+#local_ub_kernel_repo="http://${local_ws}.holotronic.lan/ubuntu/"
+local_kernel_repo="http://${local_ws}/debian/"
+local_ub_kernel_repo="http://${local_ws}/ubuntu/"
 
 
 ## 3 part Expandable image with swap in p2
@@ -75,16 +78,17 @@ UBOOT_MAKE_CONFIG="all"
 UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"
 XIL_UBOOT_IMG_FILENAME="u-boot"
 #XIL_BOOT_FILES_LOC="/home/mib/Development/Docker/petalinux-docker"
-XIL_BOOT_FILES_LOC='/home/mib/Projects/2019v1/my-work' 
+XIL_BOOT_FILES_LOC='/home/mib/Projects/sd-boot-files'
 RT_KERNEL_VERSION="4.9.68"
 RT_PATCH_REV="rt60"
 
-ALT_GIT_KERNEL_VERSION="4.9.76"
+#ALT_GIT_KERNEL_VERSION="4.9.76"
+ALT_GIT_KERNEL_VERSION="4.14.126"
 ALT_GIT_KERNEL_REV="-ltsi-rt"
-XIL_GIT_KERNEL_VERSION="xilinx"
-#XIL_GIT_KERNEL_REV="-v2018.2"
-XIL_GIT_KERNEL_REV="-v2019.1"
-#XIL_GIT_KERNEL_REV="-v2017.3"
+#XIL_GIT_KERNEL_VERSION="xilinx"
+XIL_GIT_KERNEL_VERSION="zynqmp"
+#XIL_GIT_KERNEL_REV="-v2019.1"
+XIL_GIT_KERNEL_REV="-5.5-mib"
 #ALT_GIT_KERNEL_VERSION="4.15"
 
 #RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
@@ -113,7 +117,8 @@ WORK_DIR=$(pwd)
 
 #HOME_REPO_DIR="/var/www/repos/apt/debian"
 #HOME_REPO_DIR="/var/www/debian"
-HOME_REPO_DIR="/var/www/repos/apt"
+#HOME_REPO_DIR="/var/www/repos/apt"
+HOME_REPO_DIR="/opt/lampp/htdocs/repos/apt"
 
 MAIN_SCRIPT_DIR="$(cd $(dirname $0) && pwd)"
 SUB_SCRIPT_DIR=${MAIN_SCRIPT_DIR}/subscripts
@@ -217,6 +222,7 @@ POLICY_FILE=${1}/usr/sbin/policy-rc.d
 
 EnableSystemdNetworkedLink='/etc/systemd/system/multi-user.target.wants/systemd-networkd.service'
 EnableSystemdResolvedLink='/etc/systemd/system/multi-user.target.wants/systemd-resolved.service'
+EnableResize2fsLink='/etc/systemd/system/multi-user.target.wants/resize2fs.service'
 
 
 #-----------------------------------------------------------------------------------
@@ -242,13 +248,13 @@ usage()
     echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
     echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience Use =distroname=username=distarch"
     echo "    --finalize-desktop-rootfs   Will create user and configure  rootfs with desktop for fully working out of the box experience Use =distroname=username=distarch"
-    echo "    --inst_repo_kernel   Will install kernel from local repo"
-    echo "    --inst_repo_kernel-desktop   Will install kernel from local repo in desktop version"
+    echo "    --inst_repo_kernel   Will install kernel from local repo Use =distroname=distarch=username"
+    echo "    --inst_repo_kernel-desktop   Will install kernel from local repo in desktop version Use =distroname=distarch=username"
+    echo "    --inst_hs_aud_stuff  Will install holosynth audio stuff in rootfs image"
     echo "    --bindmount_rootfsimg    Will mount rootfs image"
     echo "    --bindunmount_rootfsimg    Will unmount rootfs image"
-    echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file"
-    echo "    --assemble_desktop_sd_img   Will generate full populated fb sd imagefile and bmap file"
-    echo "    --inst_hs_aud_stuff  Will install holosynth audio stuff in rootfs image"
+    echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file Use =boardname=distroname=username"
+    echo "    --assemble_desktop_sd_img   Will generate full populated fb sd imagefile and bmap file Use =boardname=distroname=username"
     echo ""
 }
 
@@ -351,10 +357,10 @@ gen_rootfs_image() {
     zero=0;
     contains ${DISTROS[@]} ${3}
     if [ "$?" -eq 0 ]; then
-        echo "Valid distroname = ${3} given"
+        echo "Script_MSG: Valid distroname = ${3} given"
         contains ${DISTARCHS[@]} ${4}
         if [ "$?" -eq 0 ]; then
-            echo "Valid distarch = ${4} given"
+            echo "Script_MSG: Valid distarch = ${4} given"
             create_img "1" ${2}
             mount_imagefile ${2} ${1}
             . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
@@ -364,12 +370,23 @@ gen_rootfs_image() {
                     run_desktop_qemu_debootstrap_bionic ${1} ${3} ${UB_EXT_REPO_URL} ${4}
                     echo "Script_MSG: run_desktop_qemu_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
                 else
-                    if [ "${3}" == "buster" ]; then
-                        run_desktop_qemu_debootstrap_buster ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                        echo "Script_MSG: run_desktop_qemu_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                    if [ "${3}" == "bullseye" ]; then
+                        echo "Script_MSG: will run run_desktop_qemu_debootstrap_bullseye"
+                        run_desktop_qemu_debootstrap_bullseye ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                        echo "Script_MSG: run_desktop_qemu_debootstrap_bullseye (${3}) (${4}) function return value was --> ${output}"
                     else
-                        run_desktop_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                        echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                        if [ "${3}" == "buster" ]; then
+                            run_desktop_qemu_debootstrap_buster ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                            echo "Script_MSG: run_desktop_qemu_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                        else
+                            if [ "${3}" == "stretch" ]; then
+                                run_desktop_qemu_debootstrap_stretch ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                                echo "Script_MSG: run_desktop_qemu_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                            else
+                                run_desktop_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                                echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                            fi
+                        fi
                     fi
                 fi
             else
@@ -506,11 +523,15 @@ inst_repo_kernel() {
                 echo "Script_MSG: will now install kernel"
                 if [ "${5}" == "arm64" ]; then
                     if [ "${4}" == "bionic" ] || [ "${4}" == "buster" ]; then
-                        SD_KERNEL_TAG="*socfpga64-2.1"
+                        SD_KERNEL_TAG="*socfpga64-4.14"
                     else
-                        SD_KERNEL_TAG="*socfpga64-0.1"
+                        SD_KERNEL_TAG="*socfpga64-5.5"
                     fi
-                    sudo cp -r '/home/mib/Projects/2019v1/kernel_modules/lib/modules' ${1}/lib
+                    if [ "${4}" == "bullseye" ]; then
+                        sudo cp -r '/home/mib/Projects/2020v1/kernel_modules/lib/modules' ${1}/lib
+                    else
+                        sudo cp -r '/home/mib/Projects/2019v1/kernel_modules/lib/modules' ${1}/lib
+                    fi
                 else
                     SD_KERNEL_TAG="socfpga-rt-ltsi"
                     inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
@@ -586,8 +607,15 @@ assemble_full_sd_img() {
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/BOOT.BIN ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/image.ub ${1}
                     else
-                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN ${1}
-                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+##                        if [ "${4}" == "bullseye" ]; then
+                            sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
+                            sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+#                            sudo cp /home/mib/avnet-ultra96-rev1.dtb ${1}
+#                            sudo cp /home/mib/Image ${1}
+##                        else
+##                            sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
+##                            sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+##                        fi
                     fi
                     echo "MSG: Unmounting boot partition"
                     unmount_binded ${1}
@@ -606,75 +634,52 @@ assemble_full_sd_img() {
                     sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
                     sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
-                    set -x
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxmenu-data  lxqt-globalkeys  lxqt-panel lxqt'
-#                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libdirectfb-1.2-9 xserver-xorg-video-fbdev'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm sddm-theme-breeze'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/mv /etc/X11/xorg.conf /etc/X11/xorg.conf-armsoc-bak'
-sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
-Section "Files"
-    ModulePath "/usr/local/lib/xorg/modules,/usr/lib/xorg/modules"
-EndSection
-
-Section "InputDevice"
-	Identifier	"System Mouse"
-	Driver		"mouse"
-	Option		"Device" "/dev/input/mouse0"
-EndSection
-
-Section "InputDevice"
-	Identifier	"System Keyboard"
-	Driver		"kbd"
-	Option		"Device" "/dev/input/event0"
-EndSection
-
-Section "Device"
-        Identifier      "ZynqMP"
-        Driver          "armsoc"
-        Option          "DRI2"                  "true"
-        Option          "DRI2_PAGE_FLIP"        "false"
-        Option          "DRI2_WAIT_VSYNC"       "true"
-        Option          "SWcursorLCD"           "false"
-        Option          "DEBUG"                 "false"
-EndSection
-
-Section "Screen"
-        Identifier      "DefaultScreen"
-        Device          "ZynqMP"
-        DefaultDepth    16
-EndSection
-
-EOF'
-                    if [ ! "$(ls -A "./mali")" ]; then
-                        wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
-                        tar -xf mali-400-userspace.tar
-                    fi
-                    cd mali
-                    cd rel-v2019.1
-                    tar -xf r8p0-01rel0.tar
-                    cd ${CURRENT_DIR}
-                    sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                    sudo cp --preserve=links mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                    sudo cp mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-#                        sudo rm ${1}/usr/lib/aarch64-linux-gnu/mali-egl/libwayland-egl.so
-#                    sudo cp '/home/mib/Projects/2019v1/xilinx-ultra96-reva-2019.1/build/tmp/sysroots-components/aarch64/xf86-video-armsoc/usr/lib/xorg/modules/drivers/armsoc_drv.so' \
-#                    ${1}/usr/lib/xorg/modules/drivers
-                    echo "MSG: Copy armsoc driver"
-                    sudo cp '/home/mib/Projects/2018v3/petalinux-rootfs/usr/lib/xorg/modules/drivers/armsoc_drv.so' ${1}/usr/lib/xorg/modules/drivers  
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
                     sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
+                    sudo cp -R ${MAIN_SCRIPT_DIR}/Auto-expand-on-boot/* ${1}
+                    sudo ln -s ${1}/lib/systemd/system/resize2fs.service ${1}/${EnableResize2fsLink}
+                    echo ""
+                    echo "# --------->       Removing qemu policy file          <--------------- ---------"
+                    echo ""
+
+                    if [ -f ${POLICY_FILE} ]; then
+                        echo "removing ${POLICY_FILE}"
+                        sudo rm -f ${POLICY_FILE}
+                    fi
                     unmount_binded ${1}
                     unmount_loopdev
-                 else
+                else
                     create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
                     echo "MSG: step 2 mount:"
                     mount_sd_imagefile ${SD_IMG_FILE} ${1} ${media_rootfs_partition}
                     extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
+                    bind_mounted ${1}
+                    sudo sync
+                    sudo rm -f ${1}/etc/resolv.conf
+                    sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
+                    sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
+                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
+                    sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
+                    sudo cp -R ${MAIN_SCRIPT_DIR}/Auto-expand-on-boot/}/Auto-expand-on-boot/* ${1}
+                    sudo ln -s ${1}/lib/systemd/system/resize2fs.service ${1}/${EnableResize2fsLink}
                     set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
+                    echo ""
+                    echo "# --------->       Removing qemu policy file          <--------------- ---------"
+                    echo ""
+
+                    if [ -f ${POLICY_FILE} ]; then
+                        echo "removing ${POLICY_FILE}"
+                        sudo rm -f ${POLICY_FILE}
+                    fi
                     unmount_binded ${1}
                     unmount_loopdev
                     install_uboot "${UBOOT_BUILD_DIR}" "${UBOOT_IMG_FILENAME}" "${SD_IMG_FILE}"
@@ -844,6 +849,20 @@ while [ "$1" != "" ]; do
             DESKTOP="yes"
             inst_repo_kernel ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" "${CURRENT_DIR}/finalized-with-kernel-and-desktop-${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ;;
+        --inst_hs_aud_stuff)
+            if [ "$(ls -A ${ROOTFS_MNT})" ]; then
+                echo "Script_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
+                unmount_binded ${ROOTFS_MNT}
+            fi
+            create_img "1" "${CURRENT_DIR}/${ROOTFS_IMG}"
+            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
+            bind_mounted ${ROOTFS_MNT}
+            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop"
+            mkdir -p ${CURRENT_DIR}/Qt_logs
+            inst_cadence ${ROOTFS_MNT} 2>&1| tee ${CURRENT_DIR}/Qt_logs/install_cadence-log.txt
+            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
+            unmount_binded ${ROOTFS_MNT}
+            ;;
         --bindmount_rootfsimg)
             mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
             bind_mounted ${ROOTFS_MNT}
@@ -857,23 +876,6 @@ while [ "$1" != "" ]; do
         --assemble_desktop_sd_img)
             DESKTOP="yes"
             assemble_full_sd_img ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" "${VALUE1}" "${VALUE2}" "${VALUE3}"
-            ;;
-        --inst_hs_aud_stuff)
-            if [ "$(ls -A ${ROOTFS_MNT})" ]; then
-                echo "Script_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
-                unmount_binded ${ROOTFS_MNT}
-            fi
-            create_img "1" "${CURRENT_DIR}/${ROOTFS_IMG}"
-            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
-            bind_mounted ${ROOTFS_MNT}
-            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop"
-#           cp "${CURRENT_DIR}/desktop-${ROOTFS_IMG}" "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}"
-#            mount_imagefile "${CURRENT_DIR}/fin-qt-dep-${ROOTFS_IMG}" ${ROOTFS_MNT}
-#            bind_mounted ${ROOTFS_MNT}
-            mkdir -p ${CURRENT_DIR}/Qt_logs
-            inst_cadence ${ROOTFS_MNT} 2>&1| tee ${CURRENT_DIR}/Qt_logs/install_cadence-log.txt
-            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
-            unmount_binded ${ROOTFS_MNT}
             ;;
     *)
             echo "ERROR: unknown parameter \"$PARAM\""

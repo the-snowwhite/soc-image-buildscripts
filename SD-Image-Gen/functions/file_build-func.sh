@@ -677,7 +677,7 @@ arm64_build() {
 ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
 add2repo(){
 #sudo systemctl stop apache2
-set -x
+#set -x
     contains ${DISTROS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid distroname = ${1} given"
@@ -782,10 +782,6 @@ sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
 sudo rm -f ${1}/etc/resolv.conf
 sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
 
-#sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y install apt-transport-https
-
-#sudo sh -c 'echo "deb [arch=armhf] https://deb.mah.priv.at/ jessie socfpga" > '${1}'/etc/apt/sources.list.d/debmah.list'
-#sudo sh -c 'echo "deb [arch=armhf] http://${local_ws}.holotronic.lan/debian '${distro}' main" > '${1}'/etc/apt/sources.list.d/mibsocdeb.list'
 echo ""
 # echo "Script_MSG: Will now add key to ${local_ws}"
 # echo ""
@@ -793,22 +789,9 @@ sudo chroot --userspec=root:root ${1} /bin/mkdir -p /var/tmp
 sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /var/tmp
 sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 #
-# sudo chroot --userspec=root:root ${1} sudo sh -c 'wget -O - http://'${local_ws}'.holotronic.lan/debian/socfpgakernel.gpg.key|apt-key add -'
-#sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update --allow-unauthenticated
 sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
 
-# #sudo chroot --userspec=root:root ${1} /usr/bin/apt-key adv --keyserver keyserver.ubuntu.com --recv 4FD9D713
-# #sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
-#sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y --assume-yes --allow-unauthenticated upgrade
 sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y upgrade
-
-# echo ""
-# echo "# --------->       Removing qemu policy file          <--------------- ---------"
-# echo ""
-# if [ -f ${POLICY_FILE} ]; then
-#     echo "removing ${POLICY_FILE}"
-#     sudo rm -f ${POLICY_FILE}
-# fi
 
 echo ""
 echo "Script_MSG: Will now install kernel packages"

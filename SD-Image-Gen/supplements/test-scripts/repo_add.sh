@@ -4,7 +4,8 @@ echo "#--------------------------- Script start --------------------------------
 echo "#--->                                                                     <---#"
 echo "#--------------------------- Script start ------------------------------------#"
 
-cd /var/www/repos/apt/debian 
+#cd /var/www/repos/apt/debian 
+cd /opt/lampp/htdocs/repos/apt 
 
 #JESSIE_LIST=`eval sudo reprepro -C main -A armhf --list-format="${package}\n" list jessie`
 echo ""
