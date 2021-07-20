@@ -4,54 +4,89 @@
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 ## E: Couldn't find these debs: libdirectfb-1.7-7 libssh2-1 cgroupfs-mount gnupg2 ntp avahi-discover traceroute ifupdown2,cgmanager
 run_qemu_debootstrap_bionic() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,git,curl,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}
+arguments="--arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,git,curl,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}"
+
+if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
+  sudo debootstrap $arguments
+else
+  sudo qemu-debootstrap --foreign $arguments
+fi  
 output=${?}
 }
 
 # lightdm,lxqt
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 run_desktop_qemu_debootstrap_bionic() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,libnss-mdns,strace,u-boot-tools,initramfs-tools,dirmngr,wget,git,curl,xorg,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}
+arguments="--arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,libnss-mdns,strace,u-boot-tools,initramfs-tools,dirmngr,wget,git,curl,xorg,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}"
+
+if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
+  sudo debootstrap $arguments
+else
+  sudo qemu-debootstrap --foreign $arguments
+fi  
 output=${?}
 }
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 run_desktop_qemu_debootstrap_bullseye() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}
+arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,autofs,libpam-systemd,systemd-sysv,fuse,cgroup-tools,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}"
+
+if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
+  sudo debootstrap $arguments
+else
+  sudo qemu-debootstrap --foreign $arguments
+fi
 output=${?}
 }
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 run_desktop_qemu_debootstrap_buster() {
-sudo qemu-debootstrap --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}
+arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}"
+
+if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
+  sudo debootstrap $arguments
+else
+  sudo qemu-debootstrap --foreign $arguments
+fi
 output=${?}
 }
-
-# # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
-# run_qemu_debootstrap_buster_lxqt() {
-# sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofsfuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid,lxqt-core,lxqt,task-lxqt-desktop ${2} ${1} ${3}
-# output=${?}
-# }
-#,dhcpcd5,open-iscsi,
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 #leafpad,
 run_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}
+arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}"
+
+if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
+  sudo debootstrap $arguments
+else
+  sudo qemu-debootstrap --foreign $arguments
+fi
 output=${?}
 }
 
 ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 #leafpad,libdirectfb-1.2-9,gksu
 run_desktop_qemu_debootstrap_stretch() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,acpid ${2} ${1} ${3}
+arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,acpid ${2} ${1} ${3}"
+
+if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
+  sudo debootstrap $arguments
+else
+  sudo qemu-debootstrap --foreign $arguments
+fi
 output=${?}
 }
 
 ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 #leafpad,libdirectfb-1.2-9,gksu
 run_desktop_qemu_debootstrap() {
-sudo qemu-debootstrap --foreign --arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}
+arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}"
+
+if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
+  sudo debootstrap $arguments
+else
+  sudo qemu-debootstrap --foreign $arguments
+fi
 output=${?}
 }
 
