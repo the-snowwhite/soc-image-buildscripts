@@ -34,7 +34,8 @@ DISTARCHS=("armhf" "arm64")
 USERS=("machinekit" "holosynth" "ubuntu" "vivado")
 
 #HOME_DEB_MIRR_REPO_URL=http://kubuntu16-srv.holotronic.lan/debian
-HOME_DEB_MIRR_REPO_URL=http://kdeneon-ws/debian
+#HOME_DEB_MIRR_REPO_URL=http://kdeneon-ws/debian
+HOME_DEB_MIRR_REPO_URL=http://bullseye-ws2/debian
 
 shell_cmd="/bin/bash"
 
@@ -48,7 +49,8 @@ final_ub_repo=${UB_EXT_REPO_URL}
 #local_deb_repo=${HOME_DEB_MIRR_REPO_URL}
 local_deb_repo=${DEB_EXT_REPO_URL}
 local_ub_repo=${UB_EXT_REPO_URL}
-local_ws=kdeneon-ws
+#local_ws=kdeneon-ws
+local_ws=bullseye-ws2
 #local_kernel_repo="http://${local_ws}.holotronic.lan/debian/"
 #local_ub_kernel_repo="http://${local_ws}.holotronic.lan/ubuntu/"
 local_kernel_repo="http://${local_ws}/debian/"
@@ -119,7 +121,8 @@ WORK_DIR=$(pwd)
 #HOME_REPO_DIR="/var/www/repos/apt/debian"
 #HOME_REPO_DIR="/var/www/debian"
 #HOME_REPO_DIR="/var/www/repos/apt"
-HOME_REPO_DIR="/opt/lampp/htdocs/repos/apt"
+#HOME_REPO_DIR="/opt/lampp/htdocs/repos/apt"
+HOME_REPO_DIR="/var/www/html/repos/apt"
 
 MAIN_SCRIPT_DIR="$(cd $(dirname $0) && pwd)"
 SUB_SCRIPT_DIR=${MAIN_SCRIPT_DIR}/subscripts
@@ -245,10 +248,10 @@ usage()
     echo "    --hikey2repo   Will add Hikey kernel .debs to local repo Use =distroname=distarch"
     echo "    --dexed2repo   Will add Dexed and plugin .debs to local repo Use =distroname=distarch"
     echo "    --xf86-video-armsoc2repo   Will add xf86-video-armsoc .debs to local repo Use =distroname=distarch"
-    echo "    --gen-base-qemu-rootfs   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
-    echo "    --gen-base-qemu-rootfs-desktop   Will create single root partition image and generate base qemu rootfs Use =distroname=distarch"
-    echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience Use =distroname=username=distarch"
-    echo "    --finalize-desktop-rootfs   Will create user and configure  rootfs with desktop for fully working out of the box experience Use =distroname=username=distarch"
+    echo "    --gen-base-rootfs   Will create single root partition image and generate base rootfs Use =distroname=distarch"
+    echo "    --gen-base-rootfs-desktop   Will create single root partition image and generate base rootfs Use =distroname=distarch"
+    echo "    --finalize-rootfs   Will create user and configure  rootfs for fully working out of the box experience Use =distroname=distarch=username"
+    echo "    --finalize-desktop-rootfs   Will create user and configure  rootfs with desktop for fully working out of the box experience Use =distroname=distarch=username"
     echo "    --inst_repo_kernel   Will install kernel from local repo Use =distroname=distarch=username"
     echo "    --inst_repo_kernel-desktop   Will install kernel from local repo in desktop version Use =distroname=distarch=username"
     echo "    --inst_hs_aud_stuff  Will install holosynth audio stuff in rootfs image"
@@ -276,7 +279,7 @@ install_deps() {
 #         echo "Script_MSG: ${CC_DIR}"
 #         echo ""
 #     fi
-    install_crossbuild_armhf
+    
     install_crossbuild_arm64
     install_uboot_dep
     install_kernel_dep
@@ -368,31 +371,31 @@ gen_rootfs_image() {
             echo ""
             if [ "${DESKTOP}" == "yes" ]; then
                 if [ "${3}" == "bionic" ]; then
-                    run_desktop_qemu_debootstrap_bionic ${1} ${3} ${UB_EXT_REPO_URL} ${4}
-                    echo "Script_MSG: run_desktop_qemu_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
+                    run_desktop_debootstrap_bionic ${1} ${3} ${UB_EXT_REPO_URL} ${4}
+                    echo "Script_MSG: run_desktop_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
                 else
                     if [ "${3}" == "bullseye" ]; then
-                        echo "Script_MSG: will run run_desktop_qemu_debootstrap_bullseye"
-                        run_desktop_qemu_debootstrap_bullseye ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                        echo "Script_MSG: run_desktop_qemu_debootstrap_bullseye (${3}) (${4}) function return value was --> ${output}"
+                        echo "Script_MSG: will run run_desktop_debootstrap_bullseye"
+                        run_desktop_debootstrap_bullseye ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                        echo "Script_MSG: run_desktop_debootstrap_bullseye (${3}) (${4}) function return value was --> ${output}"
                     else
                         if [ "${3}" == "buster" ]; then
-                            run_desktop_qemu_debootstrap_buster ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                            echo "Script_MSG: run_desktop_qemu_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                            run_desktop_debootstrap_buster ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                            echo "Script_MSG: run_desktop_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
                         else
                             if [ "${3}" == "stretch" ]; then
-                                run_desktop_qemu_debootstrap_stretch ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                                echo "Script_MSG: run_desktop_qemu_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                                run_desktop_debootstrap_stretch ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                                echo "Script_MSG: run_desktop_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
                             else
-                                run_desktop_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                                echo "Script_MSG: run_desktop_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                                run_desktop_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                                echo "Script_MSG: run_desktop_debootstrap (${3}) (${4}) function return value was --> ${output}"
                             fi
                         fi
                     fi
                 fi
             else
-                run_qemu_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                echo "Script_MSG: run_qemu_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                run_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
+                echo "Script_MSG: run_debootstrap (${3}) (${4}) function return value was --> ${output}"
             fi
             echo ""
             if [[ $output -gt $zero ]]; then
@@ -401,16 +404,16 @@ gen_rootfs_image() {
                 exit 1
             else
                 if [ "${DESKTOP}" == "yes" ]; then
-                    compress_rootfs ${CURRENT_DIR} ${1} "qemu_${4}_debootstrap-only-desktop" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "${4}_debootstrap-only-desktop" ${3}
                     # parameters: 1: work dir, 2: mount dev name, 3: comp prefix, 4 distro name
                 else
-                    compress_rootfs ${CURRENT_DIR} ${1} "qemu_${4}_debootstrap-only" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "${4}_debootstrap-only" ${3}
                     # parameters: 1: work dir, 2: mount dev name, 3: comp prefix, 4 distro name
                 fi
-                echo "Script_MSG: finished qemu_${4}_debootstrap-only with success ... !"
+                echo "Script_MSG: finished ${4}_debootstrap-only with success ... !"
                 unmount_binded ${1}
-                cp ${2} "${2}-base-qemu"
-                echo "Script_MSG: copied ${2} to --> ${2}-base-qemu as a backup"
+                cp ${2} "${2}-base"
+                echo "Script_MSG: copied ${2} to --> ${2}-base as a backup"
             fi
         else
             echo "--gen_rootfs_image= bad argument --> ${4}"
@@ -428,18 +431,18 @@ gen_rootfs_image() {
     fi
 }
 
-## parameters: 1: mount dev name, 2: image name, 3: distro name, 4 user name, 5: distro arch
+## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch, 5: user name
 finalize_rootfs_image() {
 #    set -x
     contains ${DISTROS[@]} ${3}
     if [ "$?" -eq 0 ]; then
         echo "Valid distroname = ${3} given"
-        contains ${USERS[@]} ${4}
+        contains ${USERS[@]} ${5}
         if [ "$?" -eq 0 ]; then
-            echo "Valid user name = ${4} given"
-            contains ${DISTARCHS[@]} ${5}
+            echo "Valid user name = ${5} given"
+            contains ${DISTARCHS[@]} ${4}
             if [ "$?" -eq 0 ]; then
-                echo "Valid distarch = ${5} given"
+                echo "Valid distarch = ${4} given"
                 if [ "$(ls -A ${1})" ]; then
                     echo "Script_MSG: !! Found ${1} mounted .. will unmount now"
                     unmount_binded ${1}
@@ -449,20 +452,20 @@ finalize_rootfs_image() {
                 bind_mounted ${1}
                 . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
                 if [ "${DESKTOP}" == "yes" ]; then
-                    extract_rootfs ${CURRENT_DIR} ${1} "qemu_${5}_debootstrap-only-desktop" ${3}
+                    extract_rootfs ${CURRENT_DIR} ${1} "${4}_debootstrap-only-desktop" ${3}
                 else
-                    extract_rootfs ${CURRENT_DIR} ${1} "qemu_${5}_debootstrap-only" ${3}
+                    extract_rootfs ${CURRENT_DIR} ${1} "${4}_debootstrap-only" ${3}
                 fi
-                echo "Script_MSG: will now run final setup_configfiles with user name: ${4}"
-                setup_configfiles ${1} ${4} ${3} ${5}
+                echo "Script_MSG: will now run final setup_configfiles with user name: ${5}"
+                setup_configfiles ${1} ${5} ${3} ${4}
                 echo "Script_MSG: configfiles setup finished"
-                initial_rootfs_user_setup_sh ${1} ${4} ${3} ${5}
-                finalize ${1} ${4} ${3} ${5}
+                initial_rootfs_user_setup_sh ${1} ${5} ${3} ${4}
+                finalize ${1} ${5} ${3} ${4}
                 sudo sync
                 if [ "${DESKTOP}" == "yes" ]; then
-                    compress_rootfs ${CURRENT_DIR} ${1} "${4}_finalized-fully-configured-desktop" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "${5}_finalized-fully-configured-desktop" ${3}
                 else
-                    compress_rootfs ${CURRENT_DIR} ${1} "${4}_finalized-fully-configured" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "${5}_finalized-fully-configured" ${3}
                 fi
  #               set +e
                 sudo sync
@@ -470,13 +473,13 @@ finalize_rootfs_image() {
                 cp ${2} "${2}-fully-configured"
                 sudo sync
             else
-                echo "--finalize_rootfs_image= bad argument --> ${5}"
+                echo "--finalize_rootfs_image= bad argument --> ${4}"
                 echo "Use =distroname=username=distarch"
                 echo "Valid distarchs are:"
                 echo " ${DISTARCHS[@]}"
             fi
         else
-            echo "--finalize_rootfs_image= bad argument --> ${4}"
+            echo "--finalize_rootfs_image= bad argument --> ${5}"
             echo "missing username"
             echo "Use =distroname=username=distarch"
             echo "Valid distrosnames are:"
@@ -534,7 +537,8 @@ inst_repo_kernel() {
                         sudo cp -r '/home/mib/Projects/2019v1/kernel_modules/lib/modules' ${1}/lib
                     fi
                 else
-                    SD_KERNEL_TAG="socfpga-rt-ltsi"
+#                    SD_KERNEL_TAG="socfpga-rt-ltsi"
+                    SD_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}-socfpga"
                     inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
                 fi
                 compress_rootfs ${CURRENT_DIR} ${1} "${6}_${2}" ${4}
@@ -670,14 +674,13 @@ assemble_full_sd_img() {
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
                     sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
-                    sudo cp -R ${MAIN_SCRIPT_DIR}/Auto-expand-on-boot/}/Auto-expand-on-boot/* ${1}
+                    sudo cp -R ${MAIN_SCRIPT_DIR}/Auto-expand-on-boot/* ${1}
                     sudo ln -s ${1}/lib/systemd/system/resize2fs.service ${1}/${EnableResize2fsLink}
                     set_fw_uboot_env_mnt ${LOOP_DEV} ${1}
-                    echo ""
-                    echo "# --------->       Removing qemu policy file          <--------------- ---------"
-                    echo ""
-
                     if [ -f ${POLICY_FILE} ]; then
+                        echo ""
+                        echo "# --------->       Removing qemu policy file          <--------------- ---------"
+                        echo ""
                         echo "removing ${POLICY_FILE}"
                         sudo rm -f ${POLICY_FILE}
                     fi
@@ -752,6 +755,7 @@ while [ "$1" != "" ]; do
             fi
             ;;
         --gitkernel2repo)
+            set -x
             contains ${DISTARCHS[@]} ${VALUE2}
             if [ "$?" -eq 0 ]; then
                 echo "Valid distarch = ${VALUE2} given"
@@ -825,25 +829,25 @@ while [ "$1" != "" ]; do
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
             add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/armsoc_debs" "${VALUE2}" "xserver-xorg-video-armsoc"
             ;;
-        --gen-base-qemu-rootfs)
+        --gen-base-rootfs)
             ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
-            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-qemu-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
+            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-base_rootfs-log.txt
             ;;
-        --gen-base-qemu-rootfs-desktop)
+        --gen-base-rootfs-desktop)
             DESKTOP="yes"
             ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
-            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-qemu-${VALUE2}-desktop_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-qemu-base_rootfs-log.txt
+            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-${VALUE2}-desktop_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-base_rootfs-log.txt
             ;;
        --finalize-rootfs)
             finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/qemu-${VALUE3}-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
-            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4 user name, 5: distro arch
+            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch, 5: user name
             ;;
         --finalize-desktop-rootfs)
             DESKTOP="yes"
             finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/qemu-${VALUE3}-desktop-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
-            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4 user name, 5: distro arch
+            ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch, 5: user name
             ;;
-        --inst_repo_kernel)
+        --inst_repo_kernel)sudo losetup -d
             inst_repo_kernel ${ROOTFS_MNT} "finalized-fully-configured-with-kernel" "${CURRENT_DIR}/finalized-with-kernel-${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ;;
         --inst_repo_kernel-desktop)

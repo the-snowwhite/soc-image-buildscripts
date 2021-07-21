@@ -40,7 +40,8 @@ install_crossbuild_armhf() {
     sudo apt -y install
     sudo dpkg --add-architecture armhf
     sudo apt -y install --no-install-recommends build-essential crossbuild-essential-armhf
-    sudo apt -y install --reinstall lib32stdc++6 gcc-arm-linux-gnueabihf
+#    sudo apt -y install --reinstall lib32stdc++6 gcc-arm-linux-gnueabihf
+    sudo apt -y install --reinstall lib32stdc++6-x32-cross gcc-arm-linux-gnueabihf
 }
 
 install_crossbuild_arm64() {
@@ -585,7 +586,7 @@ git_fetch() {
     if [ ! -z "${5}" ]; then
         echo "MSG: cleaning repo"
         cd ${1}/${5}
-        git remote add linux ${KERNEL_URL}
+#        git remote add linux ${KERNEL_URL}
         git clean -d -f -x
         git fetch origin
 #        git reset --hard origin/${4}
@@ -626,7 +627,7 @@ armhf_build() {
     if [ ! -z "${3}" ]; then
         echo "MSG: compiling ${1}"
         if [ "${3}" == "deb-pkg" ]; then
-            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" KDEB_PKGVERSION="1" deb-pkg
+            make -j${NCORES} "${2}" NAME="Michael Brown" EMAIL="producer@holotronic.dk" ARCH=arm KBUILD_DEBARCH=armhf LOCALVERSION=-"socfpga-${KERNEL_PKG_VERSION}" deb-pkg
         else
             make -j${NCORES} "${2}"
             echo "MSG: building ${1}"
@@ -783,8 +784,6 @@ sudo rm -f ${1}/etc/resolv.conf
 sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
 
 echo ""
-# echo "Script_MSG: Will now add key to ${local_ws}"
-# echo ""
 sudo chroot --userspec=root:root ${1} /bin/mkdir -p /var/tmp
 sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /var/tmp
 sudo chroot --userspec=root:root ${1} /usr/bin/${apt_cmd} -y update
@@ -952,8 +951,8 @@ elif [ "${1}" = "2" ] || [ "${1}" = "3" ]; then
     echo "SubScript_MSG: creating file systems"
     echo ""
 
+    sudo sh -c "LC_ALL=C mkfs -t vfat -n BOOT ${LOOP_DEV}p1"
     if [ "${1}" = "2" ]; then
-        sudo sh -c "LC_ALL=C mkfs -t vfat -n BOOT ${LOOP_DEV}p1"
         mkfs_partition="${LOOP_DEV}p2"
         sudo sh -c "LC_ALL=C ${mkfs} ${mkfs_options} ${mkfs_partition} ${mkfs_label}"
     elif [ "${1}" = "3" ]; then
