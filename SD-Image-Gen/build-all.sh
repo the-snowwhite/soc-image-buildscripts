@@ -87,7 +87,8 @@ RT_PATCH_REV="rt60"
 
 #ALT_GIT_KERNEL_VERSION="4.14.126"
 #ALT_GIT_KERNEL_REV="-ltsi-rt"
-ALT_GIT_KERNEL_VERSION="5.4.114"
+ALT_GIT_KERNEL_NUM="5.4.114"
+ALT_GIT_KERNEL_VERSION="5.4"
 ALT_GIT_KERNEL_REV="-lts"
 #XIL_GIT_KERNEL_VERSION="xilinx"
 XIL_GIT_KERNEL_VERSION="zynqmp"
@@ -537,8 +538,7 @@ inst_repo_kernel() {
                         sudo cp -r '/home/mib/Projects/2019v1/kernel_modules/lib/modules' ${1}/lib
                     fi
                 else
-#                    SD_KERNEL_TAG="socfpga-rt-ltsi"
-                    SD_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}-socfpga"
+                    SD_KERNEL_TAG="${ALT_GIT_KERNEL_NUM}-socfpga"
                     inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
                 fi
                 compress_rootfs ${CURRENT_DIR} ${1} "${6}_${2}" ${4}
