@@ -173,7 +173,7 @@ create_image() {
 }
 
 generate_rootfs_into_image() {
-	sh -c "${SUB_SCRIPT_DIR}/gen_rootfs-qemu_2.5.sh ${CURRENT_DIR} ${ROOTFS_IMG} ${distro} ${ROOTFS_MNT}" | tee ${CURRENT_DIR}/gen_rootfs-qemu_2.5-log.txt
+	sh -c "${SUB_SCRIPT_DIR}/gen_rootfs_2.5.sh ${CURRENT_DIR} ${ROOTFS_IMG} ${distro} ${ROOTFS_MNT}" | tee ${CURRENT_DIR}/gen_rootfs_2.5-log.txt
 }
 
 #-----------------------------------------------------------------------------------

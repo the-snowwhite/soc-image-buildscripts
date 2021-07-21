@@ -3,7 +3,7 @@
 # lightdm,lxqt
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 ## E: Couldn't find these debs: libdirectfb-1.7-7 libssh2-1 cgroupfs-mount gnupg2 ntp avahi-discover traceroute ifupdown2,cgmanager
-run_qemu_debootstrap_bionic() {
+run_debootstrap_bionic() {
 arguments="--arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,leafpad,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,git,curl,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}"
 
 if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
@@ -16,7 +16,7 @@ output=${?}
 
 # lightdm,lxqt
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
-run_desktop_qemu_debootstrap_bionic() {
+run_desktop_debootstrap_bionic() {
 arguments="--arch=${4} --variant=buildd --include=sudo,locales,nano,adduser,apt-utils,rsyslog,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,libnss-mdns,strace,u-boot-tools,initramfs-tools,dirmngr,wget,git,curl,xorg,autofs,libpam-systemd,systemd-sysv,fuse,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,x11-xserver-utils,acpid ${2} ${1} ${3}"
 
 if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
@@ -28,7 +28,7 @@ output=${?}
 }
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
-run_desktop_qemu_debootstrap_bullseye() {
+run_desktop_debootstrap_bullseye() {
 arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,autofs,libpam-systemd,systemd-sysv,fuse,cgroup-tools,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}"
 
 if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
@@ -40,7 +40,7 @@ output=${?}
 }
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
-run_desktop_qemu_debootstrap_buster() {
+run_desktop_debootstrap_buster() {
 arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kwrite,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}"
 
 if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
@@ -53,7 +53,7 @@ output=${?}
 
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 #leafpad,
-run_qemu_debootstrap() {
+run_debootstrap() {
 arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,xserver-xorg-video-dummy,libpam-systemd,systemd-sysv ${2} ${1} ${3}"
 
 if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
@@ -66,7 +66,7 @@ output=${?}
 
 ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 #leafpad,libdirectfb-1.2-9,gksu
-run_desktop_qemu_debootstrap_stretch() {
+run_desktop_debootstrap_stretch() {
 arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.2-9,x11-xserver-utils,acpid ${2} ${1} ${3}"
 
 if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
@@ -79,7 +79,7 @@ output=${?}
 
 ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
 #leafpad,libdirectfb-1.2-9,gksu
-run_desktop_qemu_debootstrap() {
+run_desktop_debootstrap() {
 arguments="--arch=${4} --variant=buildd  --keyring /usr/share/keyrings/debian-archive-keyring.gpg --include=sudo,locales,nano,vim,adduser,apt-utils,rsyslog,libssh2-1,openssh-client,openssh-server,openssl,kmod,dbus,dbus-x11,upower,udev,net-tools,lsof,less,accountsservice,iputils-ping,python,python3,ifupdown,iproute2,avahi-daemon,uuid-runtime,avahi-discover,libnss-mdns,traceroute,strace,u-boot-tools,initramfs-tools,gnupg2,dirmngr,wget,xorg,cgroupfs-mount,ntp,autofs,libpam-systemd,systemd-sysv,fuse,cgmanager,policykit-1,gtk2-engines-pixbuf,fontconfig,fontconfig-config,console-setup,fbset,libdirectfb-1.7-7,x11-xserver-utils,acpid ${2} ${1} ${3}"
 
 if [[ `eval lscpu | grep Architecture` == *"aarch64"* ]]; then
@@ -534,11 +534,7 @@ sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:r
 sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata'
 sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install featherpad gnupg2 avahi-discover traceroute cgroupfs-mount ntp'
 
-if [ "${3}" == "bionic" ]; then
-    sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}/ubuntu/socfpgakernel.gpg.key
-else
-    sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}/debian/socfpgakernel.gpg.key
-fi
+sudo chroot --userspec=root:root ${1} /usr/bin/wget http://${local_ws}/debian/socfpgakernel.gpg.key
 
 sudo chroot --userspec=root:root ${1} /usr/bin/apt-key add socfpgakernel.gpg.key
 sudo chroot --userspec=root:root ${1} /bin/rm socfpgakernel.gpg.key
