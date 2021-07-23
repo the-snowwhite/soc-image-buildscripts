@@ -1,4 +1,4 @@
-From 6147115a58dc327d8e07f4840c41cd1dda4801e4 Mon Sep 17 00:00:00 2001
+From d4e70f1076dd60597b1a2e4da6eb9ca6158ef595 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:00:07 +0200
 Subject: [PATCH 04/10] add .dtb files to kernel-image .deb

@@ -1,13 +1,13 @@
-From be919063afadf73612a51ed59812167f8f3b41a9 Mon Sep 17 00:00:00 2001
+From 66f0d45314479ae44866397ce63283dab85c8cbd Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:12:26 +0200
-Subject: [PATCH 8/9] Enable altvip framebuffer
+Subject: [PATCH 08/10] Enable altvip_fb2 framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  arch/arm/Kconfig                   |   1 +
- arch/arm/configs/socfpga_defconfig | 109 +++++++++++++++++++++++++++++
- 2 files changed, 110 insertions(+)
+ arch/arm/configs/socfpga_defconfig | 114 ++++++++++++++++++++++++++++-
+ 2 files changed, 113 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
 index 9aa88715f196..cc22f79083a3 100644
@@ -22,10 +22,35 @@ index 9aa88715f196..cc22f79083a3 100644
  	default "9" if SA1111 || ARCH_EFM32
  	default "11"
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 897eee544d8d..9330175e1547 100644
+index 897eee544d8d..d07d46550767 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
-@@ -190,3 +190,112 @@ CONFIG_FUNCTION_TRACER=y
+@@ -124,7 +124,14 @@ CONFIG_MFD_STMPE=y
+ CONFIG_REGULATOR=y
+ CONFIG_REGULATOR_FIXED_VOLTAGE=y
+ CONFIG_FB=y
+-CONFIG_FB_ALTERA_VIP_FB2_PLAT=m
++CONFIG_FB_CMDLINE=y
++CONFIG_FB_NOTIFY=y
++CONFIG_FB_CFB_FILLRECT=y
++CONFIG_FB_CFB_COPYAREA=y
++CONFIG_FB_CFB_IMAGEBLIT=y
++CONFIG_FB_ALTERA_VIP=y
++CONFIG_FB_ALTERA_VIP_FB2=y
++CONFIG_FB_ALTERA_VIP_FB2_PLAT=y
+ CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
+ CONFIG_USB=y
+@@ -182,7 +189,7 @@ CONFIG_NFSD_V4=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_PRINTK_TIME=y
+-CONFIG_DEBUG_INFO=y
++CONFIG_DEBUG_INFO=n
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_SCHED_DEBUG is not set
+@@ -190,3 +197,106 @@ CONFIG_FUNCTION_TRACER=y
  CONFIG_DEBUG_USER=y
  CONFIG_ISCSI_TCP=m
  CONFIG_ISCSI_TARGET=m
@@ -115,12 +140,6 @@ index 897eee544d8d..9330175e1547 100644
 +CONFIG_V4L_PLATFORM_DRIVERS=y
 +CONFIG_SOC_CAMERA=y
 +CONFIG_SOC_CAMERA_PLATFORM=y
-+CONFIG_FB_CMDLINE=y
-+CONFIG_FB_NOTIFY=y
-+CONFIG_FB_CFB_FILLRECT=y
-+CONFIG_FB_CFB_COPYAREA=y
-+CONFIG_FB_CFB_IMAGEBLIT=y
-+CONFIG_FB_ALTERA_VIP=y
 +CONFIG_DUMMY_CONSOLE=y
 +CONFIG_FRAMEBUFFER_CONSOLE=y
 +CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y

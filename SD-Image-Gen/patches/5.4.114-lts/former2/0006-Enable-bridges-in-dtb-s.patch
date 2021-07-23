@@ -1,4 +1,4 @@
-From c16e72696608e2f4e84ed00c5359688013880302 Mon Sep 17 00:00:00 2001
+From 1078522f203f0bca9d2be2e77ff9af0fb6045ff6 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:08:12 +0200
 Subject: [PATCH 06/10] Enable bridges in dtb's

@@ -1,418 +1,17 @@
-From fd0b52c95378209d7d325adc45711895e5ef9636 Mon Sep 17 00:00:00 2001
-From: Holotronic <producer@holotronic.dk>
-Date: Wed, 21 Jul 2021 21:49:22 +0200
-Subject: [PATCH 1/9] Remove gittag from kernel (file) name(s)
-
-Signed-off-by: Holotronic <producer@holotronic.dk>
----
- arch/arm/configs/socfpga_defconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 800bc78bcc50..a03de34a4611 100644
---- a/arch/arm/configs/socfpga_defconfig
-+++ b/arch/arm/configs/socfpga_defconfig
-@@ -1,3 +1,4 @@
-+CONFIG_LOCALVERSION_AUTO=n
- CONFIG_SYSVIPC=y
- CONFIG_HIGH_RES_TIMERS=y
- CONFIG_IKCONFIG=y
--- 
-2.30.2
-
-
-From d306a12d0b72bf7a9e868aa933fe2e3df54b0fd5 Mon Sep 17 00:00:00 2001
-From: Holotronic <producer@holotronic.dk>
-Date: Wed, 21 Jul 2021 21:52:06 +0200
-Subject: [PATCH 2/9] add uio driver module support
-
-Signed-off-by: Holotronic <producer@holotronic.dk>
----
- arch/arm/configs/socfpga_defconfig | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index a03de34a4611..161240b7096a 100644
---- a/arch/arm/configs/socfpga_defconfig
-+++ b/arch/arm/configs/socfpga_defconfig
-@@ -1,4 +1,8 @@
- CONFIG_LOCALVERSION_AUTO=n
-+CONFIG_UIO=m
-+CONFIG_UIO_PDRV=m
-+CONFIG_UIO_PDRV_GENIRQ=m
-+CONFIG_CONFIGFS_FS=y
- CONFIG_SYSVIPC=y
- CONFIG_HIGH_RES_TIMERS=y
- CONFIG_IKCONFIG=y
--- 
-2.30.2
-
-
-From 7fff3efc14a3a80b4e4e6bf4e3e7bdf46275618d Mon Sep 17 00:00:00 2001
-From: Holotronic <producer@holotronic.dk>
-Date: Wed, 21 Jul 2021 21:56:45 +0200
-Subject: [PATCH 3/9] add ext4 root fs support and autofs4 module set ACL
- secutity
-
-Signed-off-by: Holotronic <producer@holotronic.dk>
----
- arch/arm/configs/socfpga_defconfig | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 161240b7096a..897eee544d8d 100644
---- a/arch/arm/configs/socfpga_defconfig
-+++ b/arch/arm/configs/socfpga_defconfig
-@@ -26,7 +26,8 @@ CONFIG_NEON=y
- CONFIG_OPROFILE=y
- CONFIG_MODULES=y
- CONFIG_MODULE_UNLOAD=y
--# CONFIG_BLK_DEV_BSG is not set
-+#CONFIG_LBDAF=y
-+CONFIG_BLK_DEV_BSG is not set
- # CONFIG_IOSCHED_DEADLINE is not set
- # CONFIG_IOSCHED_CFQ is not set
- CONFIG_NET=y
-@@ -158,11 +159,18 @@ CONFIG_EXT2_FS=y
- CONFIG_EXT2_FS_XATTR=y
- CONFIG_EXT2_FS_POSIX_ACL=y
- CONFIG_EXT3_FS=y
--CONFIG_AUTOFS4_FS=y
-+CONFIG_EXT4_FS=y
-+CONFIG_AUTOFS4_FS=m
-+CONFIG_EXT4_FS_POSIX_ACL=y
-+CONFIG_EXT4_FS_SECURITY=y
-+CONFIG_EXT4_FS_XATTR=y
- CONFIG_VFAT_FS=y
- CONFIG_NTFS_FS=y
- CONFIG_NTFS_RW=y
- CONFIG_TMPFS=y
-+CONFIG_TMPFS_POSIX_ACL=y
-+CONFIG_TMPFS_SECURITY=y
-+CONFIG_TMPFS_XATTR=y
- CONFIG_JFFS2_FS=y
- CONFIG_NFS_FS=y
- CONFIG_NFS_V3_ACL=y
-@@ -180,3 +188,5 @@ CONFIG_DETECT_HUNG_TASK=y
- # CONFIG_SCHED_DEBUG is not set
- CONFIG_FUNCTION_TRACER=y
- CONFIG_DEBUG_USER=y
-+CONFIG_ISCSI_TCP=m
-+CONFIG_ISCSI_TARGET=m
--- 
-2.30.2
-
-
-From abf3a6a8125b94d3b5e976ca60c8460f9168026b Mon Sep 17 00:00:00 2001
-From: Holotronic <producer@holotronic.dk>
-Date: Wed, 21 Jul 2021 22:00:07 +0200
-Subject: [PATCH 4/9] add .dtb files to kernel-image .deb
-
-Signed-off-by: Holotronic <producer@holotronic.dk>
----
- scripts/package/builddeb | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index c4c580f547ef..38c981a9d1de 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -80,6 +80,7 @@ BUILD_DEBUG=$(if_enabled_echo CONFIG_DEBUG_INFO Yes)
- rm -rf "$tmpdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" $objtree/debian/files
- mkdir -m 755 -p "$tmpdir/DEBIAN"
- mkdir -p "$tmpdir/lib" "$tmpdir/boot"
-+mkdir -p "$tmpdir/lib" "$tmpdir/boot/dtb"
- mkdir -p "$kernel_headers_dir/lib/modules/$version/"
- 
- # Build and install the kernel
-@@ -94,6 +95,7 @@ else
- 	cp $KCONFIG_CONFIG "$tmpdir/boot/config-$version"
- fi
- cp "$($MAKE -s -f $srctree/Makefile image_name)" "$tmpdir/$installed_image_path"
-+cp arch/$ARCH/boot/dts/*.dtb "$tmpdir/boot/dtb"
- 
- if is_enabled CONFIG_OF_EARLY_FLATTREE; then
- 	# Only some architectures with OF support have this target
--- 
-2.30.2
-
-
-From e4a487eeda033ea614a50929a33f13b358021f21 Mon Sep 17 00:00:00 2001
-From: Holotronic <producer@holotronic.dk>
-Date: Wed, 21 Jul 2021 22:03:58 +0200
-Subject: [PATCH 5/9] add generate /boot/extlinux/extlinux.conf and
- /boot/uEnv.txt for uboot boot info
-
-Signed-off-by: Holotronic <producer@holotronic.dk>
----
- scripts/package/builddeb | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 38c981a9d1de..56fbcb494061 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -141,6 +141,27 @@ if [ "$ARCH" != "um" ]; then
- 	mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$host_arch/
- fi
- 
-+# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
-+cat <<EOF > "$tmpdir/boot/uEnv.txt"
-+kver=${version}
-+initrd_installed=$want_initrd
-+hostname=holosynthv
-+EOF
-+cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
-+fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
-+loadimage=run fpgaload; bridge enable; mw.b 0xffd05018 0xf0; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
-+mmcboot=setenv bootargs console=ttyS0,115200 root=${mmcroot} rootfstype=ext4 rw rootwait;bootz ${loadaddr} - ${fdt_addr}
-+EOF
-+
-+# create extlinux.conf in /boot folder (for u-boot probing)
-+mkdir -p "$tmpdir/boot/extlinux"
-+cat <<EOF > "$tmpdir/boot/extlinux/extlinux.conf"
-+label Linux ${version}
-+    kernel /boot/vmlinuz-$version
-+    append  console=ttyS0,115200 root=/dev/mmcblk0p3 rw rootfstype=ext4 rootwait
-+    fdtdir /boot/dtb
-+EOF
-+
- # Install the maintainer scripts
- # Note: hook scripts under /etc/kernel are also executed by official Debian
- # kernel packages, as well as kernel packages built using make-kpkg.
--- 
-2.30.2
-
-
-From 8a706976b750c0c1335615f617b004080a8d5839 Mon Sep 17 00:00:00 2001
-From: Holotronic <producer@holotronic.dk>
-Date: Wed, 21 Jul 2021 22:08:12 +0200
-Subject: [PATCH 6/9] Enable bridges in dtb's
-
-Signed-off-by: Holotronic <producer@holotronic.dk>
----
- arch/arm/boot/dts/socfpga.dtsi | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
-index e40422077438..2e3591881422 100644
---- a/arch/arm/boot/dts/socfpga.dtsi
-+++ b/arch/arm/boot/dts/socfpga.dtsi
-@@ -531,6 +531,7 @@
- 			reg = <0xff400000 0x100000>;
- 			resets = <&rst LWHPS2FPGA_RESET>;
- 			clocks = <&l4_main_clk>;
-+			bridge-enable = <1>;
- 		};
- 
- 		fpga_bridge1: fpga_bridge@ff500000 {
-@@ -538,6 +539,7 @@
- 			reg = <0xff500000 0x10000>;
- 			resets = <&rst HPS2FPGA_RESET>;
- 			clocks = <&l4_main_clk>;
-+			bridge-enable = <1>;
- 		};
- 
- 		fpgamgr0: fpgamgr@ff706000 {
--- 
-2.30.2
-
-
-From 5d87bacaa04b11c4dd3adcdf62e468af58955194 Mon Sep 17 00:00:00 2001
-From: Holotronic <producer@holotronic.dk>
-Date: Wed, 21 Jul 2021 22:09:58 +0200
-Subject: [PATCH 7/9] add spidev in dts so driver is loaded
-
-Signed-off-by: Holotronic <producer@holotronic.dk>
----
- arch/arm/boot/dts/socfpga.dtsi | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
-index 2e3591881422..1aa4a78d79b4 100644
---- a/arch/arm/boot/dts/socfpga.dtsi
-+++ b/arch/arm/boot/dts/socfpga.dtsi
-@@ -825,9 +825,18 @@
- 			reg = <0xfff01000 0x1000>;
- 			interrupts = <0 155 4>;
- 			num-cs = <4>;
-+			tx-dma-channel = <&pdma 20>;
-+			rx-dma-channel = <&pdma 21>;
- 			clocks = <&spi_m_clk>;
- 			resets = <&rst SPIM1_RESET>;
--			status = "disabled";
-+			status = "okay";
-+
-+			spidev1: spidev@0 {
-+				compatible = "rohm,dh2228fv";
-+				reg = <0>;
-+				spi-max-frequency = <100000000>;
-+				enable-dma = <1>;
-+			};
- 		};
- 
- 		sysmgr: sysmgr@ffd08000 {
--- 
-2.30.2
-
-
-From be919063afadf73612a51ed59812167f8f3b41a9 Mon Sep 17 00:00:00 2001
-From: Holotronic <producer@holotronic.dk>
-Date: Wed, 21 Jul 2021 22:12:26 +0200
-Subject: [PATCH 8/9] Enable altvip framebuffer
-
-Signed-off-by: Holotronic <producer@holotronic.dk>
----
- arch/arm/Kconfig                   |   1 +
- arch/arm/configs/socfpga_defconfig | 109 +++++++++++++++++++++++++++++
- 2 files changed, 110 insertions(+)
-
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 9aa88715f196..cc22f79083a3 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -1606,6 +1606,7 @@ config ARM_MODULE_PLTS
- 
- config FORCE_MAX_ZONEORDER
- 	int "Maximum zone order"
-+	default "13" if ARCH_SOCFPGA
- 	default "12" if SOC_AM33XX
- 	default "9" if SA1111 || ARCH_EFM32
- 	default "11"
-diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 897eee544d8d..9330175e1547 100644
---- a/arch/arm/configs/socfpga_defconfig
-+++ b/arch/arm/configs/socfpga_defconfig
-@@ -190,3 +190,112 @@ CONFIG_FUNCTION_TRACER=y
- CONFIG_DEBUG_USER=y
- CONFIG_ISCSI_TCP=m
- CONFIG_ISCSI_TARGET=m
-+CONFIG_FIX_EARLYCON_MEM=y
-+CONFIG_ARM_HEAVY_MB=y
-+CONFIG_ARCH_SUPPORTS_BIG_ENDIAN=y
-+CONFIG_DMA_SHARED_BUFFER=y
-+CONFIG_FORCE_MAX_ZONEORDER=13
-+CONFIG_CMA=y
-+CONFIG_DMA_CMA=y
-+CONFIG_MEMORY_ISOLATION=y
-+CONFIG_CMA_DEBUG=y
-+CONFIG_CMA_DEBUGFS=y
-+CONFIG_CMA_AREAS=7
-+CONFIG_GENERIC_EARLY_IOREMAP=y
-+CONFIG_FRAME_VECTOR=y
-+CONFIG_CMA_SIZE_MBYTES=512
-+CONFIG_CMA_SIZE_SEL_MBYTES=y
-+CONFIG_CMA_ALIGNMENT=8
-+CONFIG_VT_HW_CONSOLE_BINDING=y
-+CONFIG_MEDIA_SUPPORT=y
-+CONFIG_MEDIA_SUPPORT=y
-+CONFIG_MEDIA_CAMERA_SUPPORT=y
-+CONFIG_MEDIA_CONTROLLER=y
-+CONFIG_MEDIA_CONTROLLER_DVB=y
-+CONFIG_VIDEO_DEV=y
-+CONFIG_VIDEO_V4L2_SUBDEV_API=y
-+CONFIG_VIDEO_V4L2=y
-+CONFIG_VIDEOBUF_GEN=y
-+CONFIG_VIDEOBUF2_CORE=y
-+CONFIG_VIDEOBUF2_MEMOPS=y
-+CONFIG_VIDEOBUF2_VMALLOC=y
-+CONFIG_MEDIA_USB_SUPPORT=y
-+CONFIG_MEDIA_USB_SUPPORT=y
-+CONFIG_USB_VIDEO_CLASS=y
-+CONFIG_USB_VIDEO_CLASS_INPUT_EVDEV=y
-+CONFIG_USB_GSPCA=y
-+CONFIG_USB_M5602=y
-+CONFIG_USB_STV06XX=y
-+CONFIG_USB_GL860=y
-+CONFIG_USB_GSPCA_BENQ=y
-+CONFIG_USB_GSPCA_CONEX=y
-+CONFIG_USB_GSPCA_CPIA1=y
-+CONFIG_USB_GSPCA_DTCS033=y
-+CONFIG_USB_GSPCA_ETOMS=y
-+CONFIG_USB_GSPCA_FINEPIX=y
-+CONFIG_USB_GSPCA_JEILINJ=y
-+CONFIG_USB_GSPCA_JL2005BCD=y
-+CONFIG_USB_GSPCA_KINECT=y
-+CONFIG_USB_GSPCA_KONICA=y
-+CONFIG_USB_GSPCA_MARS=y
-+CONFIG_USB_GSPCA_MR97310A=y
-+CONFIG_USB_GSPCA_NW80X=y
-+CONFIG_USB_GSPCA_OV519=y
-+CONFIG_USB_GSPCA_OV534=y
-+CONFIG_USB_GSPCA_OV534_9=y
-+CONFIG_USB_GSPCA_PAC207=y
-+CONFIG_USB_GSPCA_PAC7302=y
-+CONFIG_USB_GSPCA_PAC7311=y
-+CONFIG_USB_GSPCA_SE401=y
-+CONFIG_USB_GSPCA_SN9C2028=y
-+CONFIG_USB_GSPCA_SN9C20X=y
-+CONFIG_USB_GSPCA_SONIXB=y
-+CONFIG_USB_GSPCA_SONIXJ=y
-+CONFIG_USB_GSPCA_SPCA500=y
-+CONFIG_USB_GSPCA_SPCA501=y
-+CONFIG_USB_GSPCA_SPCA505=y
-+CONFIG_USB_GSPCA_SPCA506=y
-+CONFIG_USB_GSPCA_SPCA508=y
-+CONFIG_USB_GSPCA_SPCA561=y
-+CONFIG_USB_GSPCA_SPCA1528=y
-+CONFIG_USB_GSPCA_SQ905=y
-+CONFIG_USB_GSPCA_SQ905C=y
-+CONFIG_USB_GSPCA_SQ930X=y
-+CONFIG_USB_GSPCA_STK014=y
-+CONFIG_USB_GSPCA_STK1135=y
-+CONFIG_USB_GSPCA_STV0680=y
-+CONFIG_USB_GSPCA_SUNPLUS=y
-+CONFIG_USB_GSPCA_T613=y
-+CONFIG_USB_GSPCA_TOPRO=y
-+CONFIG_USB_GSPCA_TOUPTEK=y
-+CONFIG_USB_GSPCA_TV8532=y
-+CONFIG_USB_GSPCA_VC032X=y
-+CONFIG_USB_GSPCA_VICAM=y
-+CONFIG_USB_GSPCA_XIRLINK_CIT=y
-+CONFIG_USB_GSPCA_ZC3XX=y
-+CONFIG_V4L_PLATFORM_DRIVERS=y
-+CONFIG_SOC_CAMERA=y
-+CONFIG_SOC_CAMERA_PLATFORM=y
-+CONFIG_FB_CMDLINE=y
-+CONFIG_FB_NOTIFY=y
-+CONFIG_FB_CFB_FILLRECT=y
-+CONFIG_FB_CFB_COPYAREA=y
-+CONFIG_FB_CFB_IMAGEBLIT=y
-+CONFIG_FB_ALTERA_VIP=y
-+CONFIG_DUMMY_CONSOLE=y
-+CONFIG_FRAMEBUFFER_CONSOLE=y
-+CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
-+CONFIG_FRAMEBUFFER_CONSOLE_ROTATION=y
-+CONFIG_LOGO=y
-+CONFIG_LOGO_LINUX_MONO=y
-+CONFIG_LOGO_LINUX_VGA16=y
-+CONFIG_LOGO_LINUX_CLUT224=y
-+CONFIG_MEDIA_SUBDRV_AUTOSELECT=y
-+CONFIG_LIBCRC32C=y
-+CONFIG_INPUT_EVDEV=y
-+CONFIG_INPUT_UINPUT=y
-+CONFIG_INPUT_TOUCHSCREEN=y
-+CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
-+CONFIG_HID=y
-+CONFIG_USB_HID=y
-+CONFIG_HID_MULTITOUCH=y
--- 
-2.30.2
-
-
-From c5ee39199c80ed558ad6dfb6e96bb97a791ddce4 Mon Sep 17 00:00:00 2001
+From e58fd4c6d225c7d30af3927f4c2dc05aab75abfd Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:18:25 +0200
-Subject: [PATCH 9/9] Added DE-10 Nano basic and with uio, with SD/HD
- framebuffer
+Subject: [PATCH 10/10] Added DE-10 Nano basic dtb and with uio, hsynthaudio
+ and with SD/HD framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                    |   3 +
- .../boot/dts/socfpga_cyclone5_de10_nano.dts   | 189 +++++++++++++++
- .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 229 ++++++++++++++++++
- .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 229 ++++++++++++++++++
- 4 files changed, 650 insertions(+)
+ .../boot/dts/socfpga_cyclone5_de10_nano.dts   | 189 ++++++++++++++
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 224 +++++++++++++++++
+ .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 233 ++++++++++++++++++
+ arch/arm/configs/socfpga_defconfig            |   2 +-
+ 5 files changed, 650 insertions(+), 1 deletion(-)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
@@ -628,10 +227,10 @@ index 000000000000..a767457e4354
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 new file mode 100644
-index 000000000000..7dadfd569ce0
+index 000000000000..9fa90e0e7a01
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
-@@ -0,0 +1,229 @@
+@@ -0,0 +1,224 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -705,9 +304,10 @@ index 000000000000..7dadfd569ce0
 +			<0x00000001 0x00003000 0xff203000 0x00000010>,
 +			<0x00000001 0x00004000 0xff204000 0x00000010>,
 +			<0x00000001 0x00005000 0xff205000 0x00000010>,
-+			<0x00000001 0x00030000 0xff230000 0x00000100>,
-+			<0x00000001 0x00031000 0xff231000 0x00000080>,
-+			<0x00000001 0x00040000 0xff240000 0x00010000>;
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00000010>,
++			<0x00000001 0x00060000 0xff260000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -763,18 +363,16 @@ index 000000000000..7dadfd569ce0
 +			gpio-controller;
 +		};
 +
-+		vip@0x100031000 {
-+			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-9.1";
-+			reg = <0x00000001 0x00031000 0x00000080>;
-+			max-width = <1024>;
-+			max-height = <768>;
-+			bits-per-color = <0x8>;
-+			colors-per-beat = <0x4>;
-+			beats-per-pixel = <0x1>;
-+			mem-word-width = <0x80>;
++		dp_0_frame_buf: vip@100031000 {
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1024>;
++			altr,max-height = <768>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <128>;
 +		};
 +
-+		holosynth_sysex0@0x100040000 {
++		holosynth_sysex@0x100040000 {
 +			compatible = "generic-uio,ui_pdrv";
 +			reg = <0x00000001 0x00040000 0x00010000>;
 +			interrupt-parent = <&intc>;
@@ -783,21 +381,17 @@ index 000000000000..7dadfd569ce0
 +			data_width = <32>;
 +		};
 +
-+		holosynth_midi0@0x100040000 {
-+			compatible = "generic-uio,ui_pdrv";
-+			reg = <0x00000001 0x00050000 0x00000008>;
-+			interrupt-parent = <&intc>;
-+			interrupts = <0 44 5>;
-+			address_width = <14>;
-+			data_width = <32>;
++		holosynth_midi@0x100050000 {
++			compatible = "holotr,socsynth-midi";
++			reg = <0x00000001 0x00050000 0x00000010>;
++			address_width = <3>;
++			data_width = <8>;
 +		};
 +
-+		holosynth_audio0@0x100060000 {
++		holosynth_audio@0x100060000 {
 +			compatible = "generic-uio,ui_pdrv";
-+			reg = <0x00000001 0x00060000 0x00000008>;
-+			interrupt-parent = <&intc>;
-+			interrupts = <0 46 7>;
-+			address_width = <3>;
++			reg = <0x00000001 0x00060000 0x00010000>;
++			address_width = <14>;
 +			data_width = <32>;
 +		};
 +	};
@@ -863,10 +457,10 @@ index 000000000000..7dadfd569ce0
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
 new file mode 100644
-index 000000000000..784ebd65fbd1
+index 000000000000..81678e2f90a6
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
-@@ -0,0 +1,229 @@
+@@ -0,0 +1,233 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -940,9 +534,10 @@ index 000000000000..784ebd65fbd1
 +			<0x00000001 0x00003000 0xff203000 0x00000010>,
 +			<0x00000001 0x00004000 0xff204000 0x00000010>,
 +			<0x00000001 0x00005000 0xff205000 0x00000010>,
-+            <0x00000000 0x00010000 0xc0010000 0x00010000>,
-+            <0x00000001 0x00031000 0xff231000 0x00000080>,
-+			<0x00000001 0x00040000 0xff240000 0x00010000>;
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00000010>,
++			<0x00000001 0x00060000 0xff260000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -997,19 +592,26 @@ index 000000000000..784ebd65fbd1
 +			#gpio-cells = <0x2>;
 +			gpio-controller;
 +		};
-+
++/*
++		dp_0_frame_buf: vip@100031000 {
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1920>;
++			altr,max-height = <1080>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <128>;
++		};
++*/
 +		vip@0x100031000 {
-+			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-9.1";
-+			reg = <0x00000001 0x00031000 0x00000080>;
-+			max-width = <1920>;
-+			max-height = <1080>;
-+			bits-per-color = <0x8>;
-+			colors-per-beat = <0x4>;
-+			beats-per-pixel = <0x1>;
-+			mem-word-width = <0x80>;
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1920>;
++			altr,max-height = <1080>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <0x80>;
 +		};
 +
-+		holosynth_sysex0@0x100040000 {
++		holosynth_sysex@0x100040000 {
 +			compatible = "generic-uio,ui_pdrv";
 +			reg = <0x00000001 0x00040000 0x00010000>;
 +			interrupt-parent = <&intc>;
@@ -1018,21 +620,17 @@ index 000000000000..784ebd65fbd1
 +			data_width = <32>;
 +		};
 +
-+		holosynth_midi0@0x100040000 {
-+			compatible = "generic-uio,ui_pdrv";
-+			reg = <0x00000001 0x00050000 0x00000008>;
-+			interrupt-parent = <&intc>;
-+			interrupts = <0 44 5>;
-+			address_width = <14>;
-+			data_width = <32>;
++		holosynth_midi@0x100050000 {
++			compatible = "holotr,socsynth-midi";
++			reg = <0x00000001 0x00050000 0x00000010>;
++			address_width = <3>;
++			data_width = <8>;
 +		};
 +
-+		holosynth_audio0@0x100060000 {
++		holosynth_audio@0x100060000 {
 +			compatible = "generic-uio,ui_pdrv";
-+			reg = <0x00000001 0x00060000 0x00000008>;
-+			interrupt-parent = <&intc>;
-+			interrupts = <0 46 7>;
-+			address_width = <3>;
++			reg = <0x00000001 0x00060000 0x00010000>;
++			address_width = <14>;
 +			data_width = <32>;
 +		};
 +	};
@@ -1096,6 +694,19 @@ index 000000000000..784ebd65fbd1
 +&usb1 {
 +	status = "okay";
 +};
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 4f38eb7cac55..4d0019124584 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -130,7 +130,7 @@ CONFIG_FB_CFB_FILLRECT=y
+ CONFIG_FB_CFB_COPYAREA=y
+ CONFIG_FB_CFB_IMAGEBLIT=y
+ CONFIG_FB_ALTERA_VIP=y
+-CONFIG_FB_ALTERA_VIP_II=y
++CONFIG_FB_ALTERA_VIP_FB2=y
+ CONFIG_FB_ALTERA_VIP_FB2_PLAT=y
+ CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
 -- 
 2.30.2
 

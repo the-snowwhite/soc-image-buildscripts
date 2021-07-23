@@ -1,9 +1,10 @@
-From b32f7e3bfad9bdb67e73862bcdc7174511a5dc1f Mon Sep 17 00:00:00 2001
+From 5f2b6f046a9fe049ba4ba2d9d3d93a13dd818c0e Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Sun, 11 Mar 2018 20:02:36 +0100
-Subject: [PATCH 1/6] add support for part command
+Subject: [PATCH 1/7] add support for part command
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
+Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  configs/socfpga_de0_nano_soc_defconfig | 1 +
  configs/socfpga_de10_nano_defconfig    | 1 +
@@ -47,15 +48,16 @@ index 97a6c5e5df..bc7af51204 100644
  CONFIG_DM_GPIO=y
  CONFIG_DWAPB_GPIO=y
 -- 
-2.17.1
+2.30.2
 
 
-From 9505ba981648094ac6b28fe7085515be763e721b Mon Sep 17 00:00:00 2001
+From f4fc240085c3b4397f15b46233fe85536879530d Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 13 Apr 2018 14:06:40 +0200
-Subject: [PATCH 2/6] Add support for fw_printenv fw_setenv
+Subject: [PATCH 2/7] Add support for fw_printenv fw_setenv
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
+Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  configs/socfpga_de0_nano_soc_defconfig | 1 +
  configs/socfpga_de10_nano_defconfig    | 1 +
@@ -104,15 +106,16 @@ index 66e7c4fc8b..1f5dd9e33a 100644
  
  /* Environment for QSPI boot */
 -- 
-2.17.1
+2.30.2
 
 
-From 6bad92d0321011a3fd74bb9fc4158c9d0e20c7cb Mon Sep 17 00:00:00 2001
+From 6059d667764298b1a5c4abc365a01892da539146 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Fri, 13 Apr 2018 23:02:14 +0200
-Subject: [PATCH 3/6] Added fpga load on boot via fpgaload_on_boot=1 variable
+Subject: [PATCH 3/7] Added fpga load on boot via fpgaload_on_boot=1 variable
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
+Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  include/config_distro_bootcmd.h  | 4 +++-
  include/configs/socfpga_common.h | 6 +++++-
@@ -153,15 +156,16 @@ index 1f5dd9e33a..8f769349e5 100644
  
  #endif	/* __CONFIG_SOCFPGA_COMMON_H__ */
 -- 
-2.17.1
+2.30.2
 
 
-From 34d4e130a9565949425782b153680f42dc253d9c Mon Sep 17 00:00:00 2001
+From caa124c3c813fdd75ce1f636a7dd3bb9480902d0 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Tue, 1 May 2018 15:37:43 +0200
-Subject: [PATCH 4/6] Enable cpu DMA(0-3), fix for audio drivers
+Subject: [PATCH 4/7] Enable cpu DMA(0-3), fix for audio drivers
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
+Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  include/config_distro_bootcmd.h | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
@@ -181,22 +185,23 @@ index 66e10655aa..c1ca235901 100644
  			"${scriptaddr} ${prefix}extlinux/extlinux.conf\0" \
  	\
 -- 
-2.17.1
+2.30.2
 
 
-From 7e4c1db204ea5dc9ace8a374b31eba921075d25a Mon Sep 17 00:00:00 2001
+From 7c616c36f16969848d08ed1ea607666e828f00a2 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Wed, 23 May 2018 16:49:04 +0200
-Subject: [PATCH 5/6] Take fpga2sdram port 0,1 out of reset, for framebuffer
+Subject: [PATCH 5/7] Take fpga2sdram port 0,1 out of reset, for framebuffer
  access
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
+Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  include/config_distro_bootcmd.h | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
-index c1ca235901..01aeef4a88 100644
+index c1ca235901..37e312a46b 100644
 --- a/include/config_distro_bootcmd.h
 +++ b/include/config_distro_bootcmd.h
 @@ -339,8 +339,9 @@
@@ -206,22 +211,23 @@ index c1ca235901..01aeef4a88 100644
 -        "mw.b 0xffd05018 0xf0; fi;"       \
 -		"sysboot ${devtype} ${devnum}:${distro_bootpart} any "    \
 +        "mw.b 0xffd05018 0xf0;"       \
-+        "mw.w 0xffc25080 0x0303; fi;"       \
++        "mw.w 0xffc25080 0x3fff; fi;"       \
 +        "sysboot ${devtype} ${devnum}:${distro_bootpart} any "    \
  			"${scriptaddr} ${prefix}extlinux/extlinux.conf\0" \
  	\
  	"scan_dev_for_extlinux="                                          \
 -- 
-2.17.1
+2.30.2
 
 
-From 330571a30a35079bf3b5f1c71453888de243eac3 Mon Sep 17 00:00:00 2001
+From edc2509c51e273d01d751b0898f24fc18a748f72 Mon Sep 17 00:00:00 2001
 From: Michael Brown <producer@holotronic.dk>
 Date: Mon, 13 May 2019 18:33:04 +0200
-Subject: [PATCH 6/6] MK DExx: change default devicetree to generic
+Subject: [PATCH 6/7] MK DExx: change default devicetree to generic
  fpga-configureless bootable
 
 Signed-off-by: Michael Brown <producer@holotronic.dk>
+Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  configs/socfpga_de0_nano_soc_defconfig | 3 ++-
  configs/socfpga_de10_nano_defconfig    | 3 ++-
@@ -271,5 +277,32 @@ index 19e3b7be66..ee31f05885 100644
  # CONFIG_DISPLAY_BOARDINFO is not set
  CONFIG_SPL=y
 -- 
-2.17.1
+2.30.2
+
+
+From 958a6ebd0049a8fcebcc48bb36cf4330acf0e228 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Fri, 23 Jul 2021 21:01:35 +0200
+Subject: [PATCH 7/7] fix: multiple definition of yylloc;
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ scripts/dtc/dtc-parser.tab.c_shipped | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/dtc/dtc-parser.tab.c_shipped b/scripts/dtc/dtc-parser.tab.c_shipped
+index aea514fa69..e70924a8ce 100644
+--- a/scripts/dtc/dtc-parser.tab.c_shipped
++++ b/scripts/dtc/dtc-parser.tab.c_shipped
+@@ -1202,7 +1202,7 @@ int yychar;
+ /* The semantic value of the lookahead symbol.  */
+ YYSTYPE yylval;
+ /* Location data for the lookahead symbol.  */
+-YYLTYPE yylloc
++extern YYLTYPE yylloc
+ # if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+   = { 1, 1, 1, 1 }
+ # endif
+-- 
+2.30.2
 

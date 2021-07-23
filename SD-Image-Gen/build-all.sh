@@ -20,6 +20,7 @@
 #------------------------------------------------------------------------------------------------------
 # Variables Custom settings
 #------------------------------------------------------------------------------------------------------
+export DEBIAN_FRONTEND=noninteractive
 
 ## Valid boards:
 BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "DExx" "ultra96")
@@ -70,8 +71,8 @@ mkfs_options=""
 
 
 ## Select u-boot version:
-#UBOOT_VERSION="v2018.01"
-UBOOT_VERSION="v2021.01"
+UBOOT_VERSION="v2018.01"
+#UBOOT_VERSION="v2021.01"
 
 #XIL_UBOOT_VERSION="v2018.07"
 #XIL_UBOOT_VERSION="v2018.07-rc3"
@@ -87,8 +88,8 @@ RT_PATCH_REV="rt60"
 
 #ALT_GIT_KERNEL_VERSION="4.14.126"
 #ALT_GIT_KERNEL_REV="-ltsi-rt"
-ALT_GIT_KERNEL_NUM="5.4.114"
-ALT_GIT_KERNEL_VERSION="5.4"
+#ALT_GIT_KERNEL_NUM="5.4"
+ALT_GIT_KERNEL_VERSION="5.4.114"
 ALT_GIT_KERNEL_REV="-lts"
 #XIL_GIT_KERNEL_VERSION="xilinx"
 XIL_GIT_KERNEL_VERSION="zynqmp"
@@ -141,7 +142,7 @@ CURRENT_DATE=`date -I`
 REL_DATE=${CURRENT_DATE}
 #REL_DATE=2016-03-07
 
-DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev"
+#DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev,tty"
 
 ## ----------------------------  Toolchain   -----------------------------##
 CROSS_GNU_ARCH="arm-linux-gnueabihf"
@@ -238,8 +239,8 @@ usage()
     echo ""
     echo "    -h --help (this printout)"
     echo "    --deps    Will install build deps"
-    echo "    --uboot   Will clone, patch and build uboot (add =c to skip build)"
-    echo "    --build_git-kernel   Will clone, patch and build kernel from git (add =c to skip build) Use =distroname=boardname"
+    echo "    --uboot   Will clone, patch and build uboot Use  =boardname (add =c to skip build)"
+    echo "    --build_git-kernel   Will clone, patch and build kernel from git Use =distroname=boardname (add =c to skip build)"
     echo "    --gitkernel2repo   Will add kernel .debs to local repo Use =distroname=distarch"
     echo "    --mk2repo   Will add machinekit .debs to local repo Use =distroname=distarch"
     echo "    --cadence2repo   Will add cadence .debs to local repo Use =distroname=distarch"
@@ -296,13 +297,11 @@ build_uboot() {
         echo "Valid boardname = ${1} given"
         if [ "${1}" == "ultra96" ]; then
             XIL_UBOOT_PATCH_FILE="u-boot-${XIL_UBOOT_VERSION}-ultra96-changeset.patch"
-#            git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
             git_fetch ${UBOOT_PARENT_DIR} ${XIL_UBOOT_GIT_URL} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_PATCH_FILE}
             UBOOT_BOARD_CONFIG="xilinx_zynqmp_zcu100_revC_defconfig"
             arm64_build  "$UBOOT_PARENT_DIR/${XIL_UBOOT_VERSION}" "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}" "envtools"
         else
             # patches:
-    #        UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-${1}-changeset.patch"
             UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-de0-de10_nano-de1_soc-changeset.patch"
             git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
             UBOOT_BOARD_CONFIG="socfpga_${1}_defconfig"
@@ -312,7 +311,7 @@ build_uboot() {
         git_fetch ${UBOOT_PARENT_DIR} ${UBOOT_GIT_URL} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_VERSION} ${UBOOT_PATCH_FILE}
     else
         echo "--build_uboot= bad argument --> ${1}"
-        echo "Use either =c to fetch and patch only or =boardname"
+        echo "Use (=c to skip build) =boardname"
         echo "Valid boardnames are:"
         echo " ${BOARDS[@]}"
     fi
@@ -538,7 +537,7 @@ inst_repo_kernel() {
                         sudo cp -r '/home/mib/Projects/2019v1/kernel_modules/lib/modules' ${1}/lib
                     fi
                 else
-                    SD_KERNEL_TAG="${ALT_GIT_KERNEL_NUM}-socfpga"
+                    SD_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}-socfpga"
                     inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
                 fi
                 compress_rootfs ${CURRENT_DIR} ${1} "${6}_${2}" ${4}
@@ -612,15 +611,8 @@ assemble_full_sd_img() {
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/BOOT.BIN ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/image.ub ${1}
                     else
-##                        if [ "${4}" == "bullseye" ]; then
                             sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
                             sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
-#                            sudo cp /home/mib/avnet-ultra96-rev1.dtb ${1}
-#                            sudo cp /home/mib/Image ${1}
-##                        else
-##                            sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
-##                            sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
-##                        fi
                     fi
                     echo "MSG: Unmounting boot partition"
                     unmount_binded ${1}
@@ -638,10 +630,10 @@ assemble_full_sd_img() {
                     sudo rm -f ${1}/etc/resolv.conf
                     sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
                     sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
                     sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
@@ -667,10 +659,10 @@ assemble_full_sd_img() {
                     sudo rm -f ${1}/etc/resolv.conf
                     sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
                     sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
-                    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
                     sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
@@ -688,6 +680,9 @@ assemble_full_sd_img() {
                     unmount_loopdev
                     install_uboot "${UBOOT_BUILD_DIR}" "${UBOOT_IMG_FILENAME}" "${SD_IMG_FILE}"
                 fi
+                echo ""
+                echo "# --------->       Running final steps:               <--------------- ---------"
+                echo ""
                 make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
             else
                 echo "--assemble_full_sd_img= bad argument --> ${5}"
@@ -755,7 +750,7 @@ while [ "$1" != "" ]; do
             fi
             ;;
         --gitkernel2repo)
-            set -x
+#            set -x
             contains ${DISTARCHS[@]} ${VALUE2}
             if [ "$?" -eq 0 ]; then
                 echo "Valid distarch = ${VALUE2} given"

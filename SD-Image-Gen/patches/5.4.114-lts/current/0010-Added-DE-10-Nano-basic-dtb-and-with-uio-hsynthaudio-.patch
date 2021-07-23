@@ -1,16 +1,16 @@
-From c5ee39199c80ed558ad6dfb6e96bb97a791ddce4 Mon Sep 17 00:00:00 2001
+From fe1b400af4290a9c9ab3c67afc221e56be5dcc11 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:18:25 +0200
-Subject: [PATCH 9/9] Added DE-10 Nano basic and with uio, with SD/HD
- framebuffer
+Subject: [PATCH 10/10] Added DE-10 Nano basic dtb and with uio, hsynthaudio
+ and with SD/HD framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                    |   3 +
  .../boot/dts/socfpga_cyclone5_de10_nano.dts   | 189 +++++++++++++++
- .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 229 ++++++++++++++++++
- .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 229 ++++++++++++++++++
- 4 files changed, 650 insertions(+)
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 224 ++++++++++++++++++
+ .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 224 ++++++++++++++++++
+ 4 files changed, 640 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
@@ -226,10 +226,10 @@ index 000000000000..a767457e4354
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 new file mode 100644
-index 000000000000..7dadfd569ce0
+index 000000000000..9fa90e0e7a01
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
-@@ -0,0 +1,229 @@
+@@ -0,0 +1,224 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -303,9 +303,10 @@ index 000000000000..7dadfd569ce0
 +			<0x00000001 0x00003000 0xff203000 0x00000010>,
 +			<0x00000001 0x00004000 0xff204000 0x00000010>,
 +			<0x00000001 0x00005000 0xff205000 0x00000010>,
-+			<0x00000001 0x00030000 0xff230000 0x00000100>,
-+			<0x00000001 0x00031000 0xff231000 0x00000080>,
-+			<0x00000001 0x00040000 0xff240000 0x00010000>;
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00000010>,
++			<0x00000001 0x00060000 0xff260000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -361,18 +362,16 @@ index 000000000000..7dadfd569ce0
 +			gpio-controller;
 +		};
 +
-+		vip@0x100031000 {
-+			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-9.1";
-+			reg = <0x00000001 0x00031000 0x00000080>;
-+			max-width = <1024>;
-+			max-height = <768>;
-+			bits-per-color = <0x8>;
-+			colors-per-beat = <0x4>;
-+			beats-per-pixel = <0x1>;
-+			mem-word-width = <0x80>;
++		dp_0_frame_buf: vip@100031000 {
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1024>;
++			altr,max-height = <768>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <128>;
 +		};
 +
-+		holosynth_sysex0@0x100040000 {
++		holosynth_sysex@0x100040000 {
 +			compatible = "generic-uio,ui_pdrv";
 +			reg = <0x00000001 0x00040000 0x00010000>;
 +			interrupt-parent = <&intc>;
@@ -381,21 +380,17 @@ index 000000000000..7dadfd569ce0
 +			data_width = <32>;
 +		};
 +
-+		holosynth_midi0@0x100040000 {
-+			compatible = "generic-uio,ui_pdrv";
-+			reg = <0x00000001 0x00050000 0x00000008>;
-+			interrupt-parent = <&intc>;
-+			interrupts = <0 44 5>;
-+			address_width = <14>;
-+			data_width = <32>;
++		holosynth_midi@0x100050000 {
++			compatible = "holotr,socsynth-midi";
++			reg = <0x00000001 0x00050000 0x00000010>;
++			address_width = <3>;
++			data_width = <8>;
 +		};
 +
-+		holosynth_audio0@0x100060000 {
++		holosynth_audio@0x100060000 {
 +			compatible = "generic-uio,ui_pdrv";
-+			reg = <0x00000001 0x00060000 0x00000008>;
-+			interrupt-parent = <&intc>;
-+			interrupts = <0 46 7>;
-+			address_width = <3>;
++			reg = <0x00000001 0x00060000 0x00010000>;
++			address_width = <14>;
 +			data_width = <32>;
 +		};
 +	};
@@ -461,10 +456,10 @@ index 000000000000..7dadfd569ce0
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
 new file mode 100644
-index 000000000000..784ebd65fbd1
+index 000000000000..bc21c7e28747
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
-@@ -0,0 +1,229 @@
+@@ -0,0 +1,224 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -538,9 +533,10 @@ index 000000000000..784ebd65fbd1
 +			<0x00000001 0x00003000 0xff203000 0x00000010>,
 +			<0x00000001 0x00004000 0xff204000 0x00000010>,
 +			<0x00000001 0x00005000 0xff205000 0x00000010>,
-+            <0x00000000 0x00010000 0xc0010000 0x00010000>,
-+            <0x00000001 0x00031000 0xff231000 0x00000080>,
-+			<0x00000001 0x00040000 0xff240000 0x00010000>;
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00000010>,
++			<0x00000001 0x00060000 0xff260000 0x00010000>;
 +
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
@@ -597,17 +593,15 @@ index 000000000000..784ebd65fbd1
 +		};
 +
 +		vip@0x100031000 {
-+			compatible = "altr,vip-frame-reader-1.0", "ALTR,vip-frame-reader-9.1";
-+			reg = <0x00000001 0x00031000 0x00000080>;
-+			max-width = <1920>;
-+			max-height = <1080>;
-+			bits-per-color = <0x8>;
-+			colors-per-beat = <0x4>;
-+			beats-per-pixel = <0x1>;
-+			mem-word-width = <0x80>;
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1920>;
++			altr,max-height = <1080>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <0x80>;
 +		};
 +
-+		holosynth_sysex0@0x100040000 {
++		holosynth_sysex@0x100040000 {
 +			compatible = "generic-uio,ui_pdrv";
 +			reg = <0x00000001 0x00040000 0x00010000>;
 +			interrupt-parent = <&intc>;
@@ -616,21 +610,17 @@ index 000000000000..784ebd65fbd1
 +			data_width = <32>;
 +		};
 +
-+		holosynth_midi0@0x100040000 {
-+			compatible = "generic-uio,ui_pdrv";
-+			reg = <0x00000001 0x00050000 0x00000008>;
-+			interrupt-parent = <&intc>;
-+			interrupts = <0 44 5>;
-+			address_width = <14>;
-+			data_width = <32>;
++		holosynth_midi@0x100050000 {
++			compatible = "holotr,socsynth-midi";
++			reg = <0x00000001 0x00050000 0x00000010>;
++			address_width = <3>;
++			data_width = <8>;
 +		};
 +
-+		holosynth_audio0@0x100060000 {
++		holosynth_audio@0x100060000 {
 +			compatible = "generic-uio,ui_pdrv";
-+			reg = <0x00000001 0x00060000 0x00000008>;
-+			interrupt-parent = <&intc>;
-+			interrupts = <0 46 7>;
-+			address_width = <3>;
++			reg = <0x00000001 0x00060000 0x00010000>;
++			address_width = <14>;
 +			data_width = <32>;
 +		};
 +	};

@@ -1,0 +1,1729 @@
+From 10ff8762fbfce83683840b2d26f703ce62112012 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Wed, 21 Jul 2021 21:49:22 +0200
+Subject: [PATCH 01/10] Remove gittag from kernel (file) name(s)
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 800bc78bcc50..a03de34a4611 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -1,3 +1,4 @@
++CONFIG_LOCALVERSION_AUTO=n
+ CONFIG_SYSVIPC=y
+ CONFIG_HIGH_RES_TIMERS=y
+ CONFIG_IKCONFIG=y
+-- 
+2.30.2
+
+
+From b232504807fb13bb616d6465f95628765569bef0 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Wed, 21 Jul 2021 21:52:06 +0200
+Subject: [PATCH 02/10] add uio driver module support
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index a03de34a4611..161240b7096a 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -1,4 +1,8 @@
+ CONFIG_LOCALVERSION_AUTO=n
++CONFIG_UIO=m
++CONFIG_UIO_PDRV=m
++CONFIG_UIO_PDRV_GENIRQ=m
++CONFIG_CONFIGFS_FS=y
+ CONFIG_SYSVIPC=y
+ CONFIG_HIGH_RES_TIMERS=y
+ CONFIG_IKCONFIG=y
+-- 
+2.30.2
+
+
+From 7f41c000dffd952138439233a95aca0c71a7a400 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Wed, 21 Jul 2021 21:56:45 +0200
+Subject: [PATCH 03/10] add ext4 root fs support and autofs4 module set ACL
+ secutity
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 161240b7096a..897eee544d8d 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -26,7 +26,8 @@ CONFIG_NEON=y
+ CONFIG_OPROFILE=y
+ CONFIG_MODULES=y
+ CONFIG_MODULE_UNLOAD=y
+-# CONFIG_BLK_DEV_BSG is not set
++#CONFIG_LBDAF=y
++CONFIG_BLK_DEV_BSG is not set
+ # CONFIG_IOSCHED_DEADLINE is not set
+ # CONFIG_IOSCHED_CFQ is not set
+ CONFIG_NET=y
+@@ -158,11 +159,18 @@ CONFIG_EXT2_FS=y
+ CONFIG_EXT2_FS_XATTR=y
+ CONFIG_EXT2_FS_POSIX_ACL=y
+ CONFIG_EXT3_FS=y
+-CONFIG_AUTOFS4_FS=y
++CONFIG_EXT4_FS=y
++CONFIG_AUTOFS4_FS=m
++CONFIG_EXT4_FS_POSIX_ACL=y
++CONFIG_EXT4_FS_SECURITY=y
++CONFIG_EXT4_FS_XATTR=y
+ CONFIG_VFAT_FS=y
+ CONFIG_NTFS_FS=y
+ CONFIG_NTFS_RW=y
+ CONFIG_TMPFS=y
++CONFIG_TMPFS_POSIX_ACL=y
++CONFIG_TMPFS_SECURITY=y
++CONFIG_TMPFS_XATTR=y
+ CONFIG_JFFS2_FS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V3_ACL=y
+@@ -180,3 +188,5 @@ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_SCHED_DEBUG is not set
+ CONFIG_FUNCTION_TRACER=y
+ CONFIG_DEBUG_USER=y
++CONFIG_ISCSI_TCP=m
++CONFIG_ISCSI_TARGET=m
+-- 
+2.30.2
+
+
+From 6147115a58dc327d8e07f4840c41cd1dda4801e4 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Wed, 21 Jul 2021 22:00:07 +0200
+Subject: [PATCH 04/10] add .dtb files to kernel-image .deb
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index c4c580f547ef..38c981a9d1de 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -80,6 +80,7 @@ BUILD_DEBUG=$(if_enabled_echo CONFIG_DEBUG_INFO Yes)
+ rm -rf "$tmpdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" $objtree/debian/files
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p "$tmpdir/lib" "$tmpdir/boot"
++mkdir -p "$tmpdir/lib" "$tmpdir/boot/dtb"
+ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+ 
+ # Build and install the kernel
+@@ -94,6 +95,7 @@ else
+ 	cp $KCONFIG_CONFIG "$tmpdir/boot/config-$version"
+ fi
+ cp "$($MAKE -s -f $srctree/Makefile image_name)" "$tmpdir/$installed_image_path"
++cp arch/$ARCH/boot/dts/*.dtb "$tmpdir/boot/dtb"
+ 
+ if is_enabled CONFIG_OF_EARLY_FLATTREE; then
+ 	# Only some architectures with OF support have this target
+-- 
+2.30.2
+
+
+From 648f20c902f46025d4c2b7dac58c57c53f09fb79 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Wed, 21 Jul 2021 22:03:58 +0200
+Subject: [PATCH 05/10] add generate /boot/extlinux/extlinux.conf and
+ /boot/uEnv.txt for uboot boot info
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 38c981a9d1de..56fbcb494061 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -141,6 +141,27 @@ if [ "$ARCH" != "um" ]; then
+ 	mv $libc_headers_dir/usr/include/asm $libc_headers_dir/usr/include/$host_arch/
+ fi
+ 
++# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
++cat <<EOF > "$tmpdir/boot/uEnv.txt"
++kver=${version}
++initrd_installed=$want_initrd
++hostname=holosynthv
++EOF
++cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
++fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
++loadimage=run fpgaload; bridge enable; mw.b 0xffd05018 0xf0; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++mmcboot=setenv bootargs console=ttyS0,115200 root=${mmcroot} rootfstype=ext4 rw rootwait;bootz ${loadaddr} - ${fdt_addr}
++EOF
++
++# create extlinux.conf in /boot folder (for u-boot probing)
++mkdir -p "$tmpdir/boot/extlinux"
++cat <<EOF > "$tmpdir/boot/extlinux/extlinux.conf"
++label Linux ${version}
++    kernel /boot/vmlinuz-$version
++    append  console=ttyS0,115200 root=/dev/mmcblk0p3 rw rootfstype=ext4 rootwait
++    fdtdir /boot/dtb
++EOF
++
+ # Install the maintainer scripts
+ # Note: hook scripts under /etc/kernel are also executed by official Debian
+ # kernel packages, as well as kernel packages built using make-kpkg.
+-- 
+2.30.2
+
+
+From c16e72696608e2f4e84ed00c5359688013880302 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Wed, 21 Jul 2021 22:08:12 +0200
+Subject: [PATCH 06/10] Enable bridges in dtb's
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index e40422077438..2e3591881422 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -531,6 +531,7 @@
+ 			reg = <0xff400000 0x100000>;
+ 			resets = <&rst LWHPS2FPGA_RESET>;
+ 			clocks = <&l4_main_clk>;
++			bridge-enable = <1>;
+ 		};
+ 
+ 		fpga_bridge1: fpga_bridge@ff500000 {
+@@ -538,6 +539,7 @@
+ 			reg = <0xff500000 0x10000>;
+ 			resets = <&rst HPS2FPGA_RESET>;
+ 			clocks = <&l4_main_clk>;
++			bridge-enable = <1>;
+ 		};
+ 
+ 		fpgamgr0: fpgamgr@ff706000 {
+-- 
+2.30.2
+
+
+From d1f72f45d6df8ec426d13a5fece8063225a38846 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Wed, 21 Jul 2021 22:09:58 +0200
+Subject: [PATCH 07/10] add spidev in dts so driver is loaded
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga.dtsi | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/socfpga.dtsi b/arch/arm/boot/dts/socfpga.dtsi
+index 2e3591881422..1aa4a78d79b4 100644
+--- a/arch/arm/boot/dts/socfpga.dtsi
++++ b/arch/arm/boot/dts/socfpga.dtsi
+@@ -825,9 +825,18 @@
+ 			reg = <0xfff01000 0x1000>;
+ 			interrupts = <0 155 4>;
+ 			num-cs = <4>;
++			tx-dma-channel = <&pdma 20>;
++			rx-dma-channel = <&pdma 21>;
+ 			clocks = <&spi_m_clk>;
+ 			resets = <&rst SPIM1_RESET>;
+-			status = "disabled";
++			status = "okay";
++
++			spidev1: spidev@0 {
++				compatible = "rohm,dh2228fv";
++				reg = <0>;
++				spi-max-frequency = <100000000>;
++				enable-dma = <1>;
++			};
+ 		};
+ 
+ 		sysmgr: sysmgr@ffd08000 {
+-- 
+2.30.2
+
+
+From 11d3597ac1e2ee352a328efe48d43f7650e6a867 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Wed, 21 Jul 2021 22:12:26 +0200
+Subject: [PATCH 08/10] Enable altvip_fb2_II framebuffer based on Mister
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/Kconfig                   |   1 +
+ arch/arm/configs/socfpga_defconfig | 114 ++++++++++++-
+ drivers/video/fbdev/Kconfig        |  10 ++
+ drivers/video/fbdev/Makefile       |   1 +
+ drivers/video/fbdev/altvipfbii.c   | 260 +++++++++++++++++++++++++++++
+ 5 files changed, 384 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/video/fbdev/altvipfbii.c
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 9aa88715f196..cc22f79083a3 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -1606,6 +1606,7 @@ config ARM_MODULE_PLTS
+ 
+ config FORCE_MAX_ZONEORDER
+ 	int "Maximum zone order"
++	default "13" if ARCH_SOCFPGA
+ 	default "12" if SOC_AM33XX
+ 	default "9" if SA1111 || ARCH_EFM32
+ 	default "11"
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 897eee544d8d..0d0b7617f50b 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -124,7 +124,14 @@ CONFIG_MFD_STMPE=y
+ CONFIG_REGULATOR=y
+ CONFIG_REGULATOR_FIXED_VOLTAGE=y
+ CONFIG_FB=y
+-CONFIG_FB_ALTERA_VIP_FB2_PLAT=m
++CONFIG_FB_CMDLINE=y
++CONFIG_FB_NOTIFY=y
++CONFIG_FB_CFB_FILLRECT=y
++CONFIG_FB_CFB_COPYAREA=y
++CONFIG_FB_CFB_IMAGEBLIT=y
++CONFIG_FB_ALTERA_VIP=y
++CONFIG_FB_ALTERA_VIP_II=y
++CONFIG_FB_ALTERA_VIP_FB2_PLAT=y
+ CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
+ CONFIG_USB=y
+@@ -182,7 +189,7 @@ CONFIG_NFSD_V4=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_PRINTK_TIME=y
+-CONFIG_DEBUG_INFO=y
++CONFIG_DEBUG_INFO=n
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_SCHED_DEBUG is not set
+@@ -190,3 +197,106 @@ CONFIG_FUNCTION_TRACER=y
+ CONFIG_DEBUG_USER=y
+ CONFIG_ISCSI_TCP=m
+ CONFIG_ISCSI_TARGET=m
++CONFIG_FIX_EARLYCON_MEM=y
++CONFIG_ARM_HEAVY_MB=y
++CONFIG_ARCH_SUPPORTS_BIG_ENDIAN=y
++CONFIG_DMA_SHARED_BUFFER=y
++CONFIG_FORCE_MAX_ZONEORDER=13
++CONFIG_CMA=y
++CONFIG_DMA_CMA=y
++CONFIG_MEMORY_ISOLATION=y
++CONFIG_CMA_DEBUG=y
++CONFIG_CMA_DEBUGFS=y
++CONFIG_CMA_AREAS=7
++CONFIG_GENERIC_EARLY_IOREMAP=y
++CONFIG_FRAME_VECTOR=y
++CONFIG_CMA_SIZE_MBYTES=512
++CONFIG_CMA_SIZE_SEL_MBYTES=y
++CONFIG_CMA_ALIGNMENT=8
++CONFIG_VT_HW_CONSOLE_BINDING=y
++CONFIG_MEDIA_SUPPORT=y
++CONFIG_MEDIA_SUPPORT=y
++CONFIG_MEDIA_CAMERA_SUPPORT=y
++CONFIG_MEDIA_CONTROLLER=y
++CONFIG_MEDIA_CONTROLLER_DVB=y
++CONFIG_VIDEO_DEV=y
++CONFIG_VIDEO_V4L2_SUBDEV_API=y
++CONFIG_VIDEO_V4L2=y
++CONFIG_VIDEOBUF_GEN=y
++CONFIG_VIDEOBUF2_CORE=y
++CONFIG_VIDEOBUF2_MEMOPS=y
++CONFIG_VIDEOBUF2_VMALLOC=y
++CONFIG_MEDIA_USB_SUPPORT=y
++CONFIG_MEDIA_USB_SUPPORT=y
++CONFIG_USB_VIDEO_CLASS=y
++CONFIG_USB_VIDEO_CLASS_INPUT_EVDEV=y
++CONFIG_USB_GSPCA=y
++CONFIG_USB_M5602=y
++CONFIG_USB_STV06XX=y
++CONFIG_USB_GL860=y
++CONFIG_USB_GSPCA_BENQ=y
++CONFIG_USB_GSPCA_CONEX=y
++CONFIG_USB_GSPCA_CPIA1=y
++CONFIG_USB_GSPCA_DTCS033=y
++CONFIG_USB_GSPCA_ETOMS=y
++CONFIG_USB_GSPCA_FINEPIX=y
++CONFIG_USB_GSPCA_JEILINJ=y
++CONFIG_USB_GSPCA_JL2005BCD=y
++CONFIG_USB_GSPCA_KINECT=y
++CONFIG_USB_GSPCA_KONICA=y
++CONFIG_USB_GSPCA_MARS=y
++CONFIG_USB_GSPCA_MR97310A=y
++CONFIG_USB_GSPCA_NW80X=y
++CONFIG_USB_GSPCA_OV519=y
++CONFIG_USB_GSPCA_OV534=y
++CONFIG_USB_GSPCA_OV534_9=y
++CONFIG_USB_GSPCA_PAC207=y
++CONFIG_USB_GSPCA_PAC7302=y
++CONFIG_USB_GSPCA_PAC7311=y
++CONFIG_USB_GSPCA_SE401=y
++CONFIG_USB_GSPCA_SN9C2028=y
++CONFIG_USB_GSPCA_SN9C20X=y
++CONFIG_USB_GSPCA_SONIXB=y
++CONFIG_USB_GSPCA_SONIXJ=y
++CONFIG_USB_GSPCA_SPCA500=y
++CONFIG_USB_GSPCA_SPCA501=y
++CONFIG_USB_GSPCA_SPCA505=y
++CONFIG_USB_GSPCA_SPCA506=y
++CONFIG_USB_GSPCA_SPCA508=y
++CONFIG_USB_GSPCA_SPCA561=y
++CONFIG_USB_GSPCA_SPCA1528=y
++CONFIG_USB_GSPCA_SQ905=y
++CONFIG_USB_GSPCA_SQ905C=y
++CONFIG_USB_GSPCA_SQ930X=y
++CONFIG_USB_GSPCA_STK014=y
++CONFIG_USB_GSPCA_STK1135=y
++CONFIG_USB_GSPCA_STV0680=y
++CONFIG_USB_GSPCA_SUNPLUS=y
++CONFIG_USB_GSPCA_T613=y
++CONFIG_USB_GSPCA_TOPRO=y
++CONFIG_USB_GSPCA_TOUPTEK=y
++CONFIG_USB_GSPCA_TV8532=y
++CONFIG_USB_GSPCA_VC032X=y
++CONFIG_USB_GSPCA_VICAM=y
++CONFIG_USB_GSPCA_XIRLINK_CIT=y
++CONFIG_USB_GSPCA_ZC3XX=y
++CONFIG_V4L_PLATFORM_DRIVERS=y
++CONFIG_SOC_CAMERA=y
++CONFIG_SOC_CAMERA_PLATFORM=y
++CONFIG_DUMMY_CONSOLE=y
++CONFIG_FRAMEBUFFER_CONSOLE=y
++CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
++CONFIG_FRAMEBUFFER_CONSOLE_ROTATION=y
++CONFIG_LOGO=y
++CONFIG_LOGO_LINUX_MONO=y
++CONFIG_LOGO_LINUX_VGA16=y
++CONFIG_LOGO_LINUX_CLUT224=y
++CONFIG_MEDIA_SUBDRV_AUTOSELECT=y
++CONFIG_LIBCRC32C=y
++CONFIG_INPUT_EVDEV=y
++CONFIG_INPUT_UINPUT=y
++CONFIG_INPUT_TOUCHSCREEN=y
++CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
++CONFIG_HID=y
++CONFIG_USB_HID=y
++CONFIG_HID_MULTITOUCH=y
+diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
+index 1aab0a6cceb9..00492fbd668d 100644
+--- a/drivers/video/fbdev/Kconfig
++++ b/drivers/video/fbdev/Kconfig
+@@ -218,6 +218,16 @@ config FB_TILEBLITTING
+ 
+ comment "Frame buffer hardware drivers"
+ 	depends on FB
++ 
++config FB_ALTERA_VIP_II
++	tristate "Altera VIP II Framebuffer support"
++	depends on FB
++	select FB_CFB_FILLRECT
++	select FB_CFB_COPYAREA
++	select FB_CFB_IMAGEBLIT
++	help
++	  This driver supports the Altera Video and Image Processing(VIP)
++	  Framebuffer II
+ 
+ config FB_ALTERA_VIP_FB2
+     tristate "Altera VIP Frame Buffer II framebuffer support"
+diff --git a/drivers/video/fbdev/Makefile b/drivers/video/fbdev/Makefile
+index 73fa249a8e43..957c33e75c9c 100644
+--- a/drivers/video/fbdev/Makefile
++++ b/drivers/video/fbdev/Makefile
+@@ -11,6 +11,7 @@ obj-$(CONFIG_FB_MACMODES)      += macmodes.o
+ obj-$(CONFIG_FB_WMT_GE_ROPS)   += wmt_ge_rops.o
+ 
+ # Hardware specific drivers go first
++obj-$(CONFIG_FB_ALTERA_VIP_II)	  += altvipfbii.o
+ obj-$(CONFIG_FB_ALTERA_VIP_FB2) += altvipfb2.o
+ obj-$(CONFIG_FB_ALTERA_VIP_FB2_PLAT) += altvipfb2_drv.o
+ altvipfb2_drv-objs := altvipfb2-plat.o altvipfb2.o
+diff --git a/drivers/video/fbdev/altvipfbii.c b/drivers/video/fbdev/altvipfbii.c
+new file mode 100644
+index 000000000000..a80ae1a714f7
+--- /dev/null
++++ b/drivers/video/fbdev/altvipfbii.c
+@@ -0,0 +1,260 @@
++/*
++ *  altvipfb.c -- Altera Video and Image Processing(VIP) Frame Reader driver
++ *
++ *  This is based on a driver made by Thomas Chou <thomas@wytron.com.tw> and
++ *  Walter Goossens <waltergoossens@home.nl> This driver supports the Altera VIP
++ *  Frame Reader component.  More info on the hardware can be found in
++ *  the Altera Video and Image Processing Suite User Guide at this address
++ *  http://www.altera.com/literature/ug/ug_vip.pdf.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ */
++
++#include <linux/dma-mapping.h>
++#include <linux/fb.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++
++#define PALETTE_SIZE	256
++#define DRIVER_NAME	"altvipfbii"
++
++/* control registers */
++#define ALTVIPFB_CONTROL		0
++#define ALTVIPFB_FRAMEINFO		20
++#define ALTVIPFB_FRAMEADDR		24
++
++struct altvipfb_type;
++
++struct altvipfb_dev {
++    struct platform_device *pdev;
++    struct fb_info info;
++    struct resource *reg_res;
++    void __iomem *base;
++    u32 pseudo_palette[PALETTE_SIZE];
++};
++
++static int altvipfb_setcolreg(unsigned regno, unsigned red, unsigned green,
++                              unsigned blue, unsigned transp, struct fb_info *info)
++{
++    /*
++     *  Set a single color register. The values supplied have a 32 bit
++     *  magnitude.
++     *  Return != 0 for invalid regno.
++     */
++
++    if (regno > 255)
++        return 1;
++
++    red >>= 8;
++    green >>= 8;
++    blue >>= 8;
++
++    if (regno < 255) {
++        ((u32 *)info->pseudo_palette)[regno] =
++        ((red & 255) << 16) | ((green & 255) << 8) | (blue & 255);
++    }
++
++    return 0;
++}
++
++static struct fb_ops altvipfb_ops = {
++    .owner = THIS_MODULE,
++    .fb_fillrect = cfb_fillrect,
++    .fb_copyarea = cfb_copyarea,
++    .fb_imageblit = cfb_imageblit,
++    .fb_setcolreg = altvipfb_setcolreg,
++};
++
++static void altvipfb_start_hw(struct altvipfb_dev *fbdev)
++{
++    writel(1, fbdev->base + ALTVIPFB_CONTROL);
++    writel((fbdev->info.var.xres & 0xFFF) | ((fbdev->info.var.yres & 0xFFF) << 13), fbdev->base + ALTVIPFB_FRAMEINFO);
++    writel(fbdev->info.fix.smem_start, fbdev->base + ALTVIPFB_FRAMEADDR);
++}
++
++static void altvipfb_disable_hw(struct altvipfb_dev *fbdev)
++{
++    /* set the control register to 0 to stop streaming */
++    writel(0, fbdev->base + ALTVIPFB_CONTROL);
++}
++
++static int altvipfb_setup_fb_info(struct altvipfb_dev *fbdev)
++{
++    struct fb_info *info = &fbdev->info;
++    struct device_node *np = fbdev->pdev->dev.of_node;
++
++    int ret;
++
++    //     u32 width = readl(fbdev->base + 0x80);
++    //     u32 height = readl(fbdev->base + 0x88);
++    //     info->var.xres = (((width>>12)&0xf)*1000) + (((width>>8)&0xf)*100) + (((width>>4)&0xf)*10) + (width&0xf);
++    //     info->var.yres = (((height>>12)&0xf)*1000) + (((height>>8)&0xf)*100) + (((height>>4)&0xf)*10) + (height&0xf);
++
++    ret = of_property_read_u32(np, "max-width", &fbdev->info.var.xres);
++    if (ret) {
++        dev_err(&fbdev->pdev->dev,
++                "Missing required parameter 'max-width'");
++        return ret;
++    }
++
++    ret = of_property_read_u32(np, "max-height", &fbdev->info.var.yres);
++    if (ret) {
++        dev_err(&fbdev->pdev->dev,
++                "Missing required parameter 'max-height'");
++        return ret;
++    }
++
++    strcpy(info->fix.id, DRIVER_NAME);
++    info->fix.type = FB_TYPE_PACKED_PIXELS;
++    info->fix.visual = FB_VISUAL_TRUECOLOR;
++    info->fix.accel = FB_ACCEL_NONE;
++
++    info->fbops = &altvipfb_ops;
++    info->var.activate = FB_ACTIVATE_NOW;
++    info->var.height = -1;
++    info->var.width = -1;
++    info->var.vmode = FB_VMODE_NONINTERLACED;
++
++    info->var.xres_virtual = info->var.xres,
++    info->var.yres_virtual = info->var.yres;
++    info->var.bits_per_pixel = 32;
++
++    dev_info(&fbdev->pdev->dev, "FB width = %u, FB height = %u\n", info->var.xres, info->var.yres);
++
++    /* settings for 32bit pixels */
++    info->var.red.offset = 16;
++    info->var.red.length = 8;
++    info->var.red.msb_right = 0;
++    info->var.green.offset = 8;
++    info->var.green.length = 8;
++    info->var.green.msb_right = 0;
++    info->var.blue.offset = 0;
++    info->var.blue.length = 8;
++    info->var.blue.msb_right = 0;
++
++    info->fix.line_length = (info->var.xres *
++    (info->var.bits_per_pixel >> 3));
++    info->fix.smem_len = info->fix.line_length * info->var.yres;
++
++    info->pseudo_palette = fbdev->pseudo_palette;
++    info->flags = FBINFO_FLAG_DEFAULT;
++
++    return 0;
++}
++
++static int altvipfb_probe(struct platform_device *pdev)
++{
++    int retval;
++    void *fbmem_virt;
++    struct altvipfb_dev *fbdev;
++
++    fbdev = devm_kzalloc(&pdev->dev, sizeof(*fbdev), GFP_KERNEL);
++    if (!fbdev)
++        return -ENOMEM;
++
++    fbdev->pdev = pdev;
++    fbdev->reg_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++    if (!fbdev->reg_res)
++        return -ENODEV;
++
++    //     fbdev->base = devm_ioremap_resource(&pdev->dev, fbdev->reg_res);
++    //     if (IS_ERR(fbdev->base)) {
++    //         dev_err(&pdev->dev, "devm_ioremap_resource failed\n");
++    //         return PTR_ERR(fbdev->base);
++    //     }
++
++    retval = altvipfb_setup_fb_info(fbdev);
++
++    fbmem_virt = dma_alloc_coherent(NULL,
++                                    fbdev->info.fix.smem_len,
++                                    (void *)&(fbdev->info.fix.smem_start),
++                                    GFP_KERNEL);
++    if (!fbmem_virt) {
++        dev_err(&pdev->dev,
++                "altvipfb: unable to allocate %d Bytes fb memory\n",
++                fbdev->info.fix.smem_len);
++        return retval;
++    }
++
++    fbdev->info.screen_base = fbmem_virt;
++
++    retval = fb_alloc_cmap(&fbdev->info.cmap, PALETTE_SIZE, 0);
++    if (retval < 0)
++        goto err_dma_free;
++
++    platform_set_drvdata(pdev, fbdev);
++
++    fbdev->base = devm_ioremap_resource(&pdev->dev, fbdev->reg_res);
++    if (IS_ERR(fbdev->base)) {
++        dev_err(&pdev->dev, "devm_ioremap_resource failed\n");
++        retval = PTR_ERR(fbdev->base);
++        goto err_dealloc_cmap;
++    }
++
++    altvipfb_start_hw(fbdev);
++
++    retval = register_framebuffer(&fbdev->info);
++    if (retval < 0)
++        goto err_dealloc_cmap;
++
++    dev_info(&pdev->dev, "fb%d: %s frame buffer device at 0x%x+0x%x\n",
++             fbdev->info.node, fbdev->info.fix.id,
++             (unsigned)fbdev->info.fix.smem_start,
++             fbdev->info.fix.smem_len);
++
++    return 0;
++
++    err_dealloc_cmap:
++    fb_dealloc_cmap(&fbdev->info.cmap);
++    err_dma_free:
++    dma_free_coherent(NULL, fbdev->info.fix.smem_len, fbmem_virt,
++                      fbdev->info.fix.smem_start);
++    return retval;
++}
++
++static int altvipfb_remove(struct platform_device *dev)
++{
++    struct altvipfb_dev *fbdev = platform_get_drvdata(dev);
++
++    if (fbdev) {
++        unregister_framebuffer(&fbdev->info);
++        fb_dealloc_cmap(&fbdev->info.cmap);
++        dma_free_coherent(NULL, fbdev->info.fix.smem_len,
++                          fbdev->info.screen_base,
++                          fbdev->info.fix.smem_start);
++        altvipfb_disable_hw(fbdev);
++    }
++    return 0;
++}
++
++
++static struct of_device_id altvipfb_match[] = {
++    { .compatible = "altr,vip-frame-buffer-ii-2.0" },
++    {},
++};
++MODULE_DEVICE_TABLE(of, altvipfb_match);
++
++static struct platform_driver altvipfb_driver = {
++    .probe = altvipfb_probe,
++    .remove = altvipfb_remove,
++    .driver = {
++        .owner = THIS_MODULE,
++        .name = DRIVER_NAME,
++        .of_match_table = altvipfb_match,
++    },
++};
++module_platform_driver(altvipfb_driver);
++
++MODULE_DESCRIPTION("Altera VIP Frame Reader framebuffer driver");
++MODULE_AUTHOR("Chris Rauer <crauer@altera.com>");
++MODULE_LICENSE("GPL v2");
+-- 
+2.30.2
+
+
+From 17bfb18ee96278d260e2babc103f2d3b6da15ef3 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Thu, 22 Jul 2021 10:52:56 +0200
+Subject: [PATCH 09/10] add hsynth midi driver
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig |   2 +
+ sound/soc/Kconfig                  |   1 +
+ sound/soc/Makefile                 |   1 +
+ sound/soc/socsynth/Kconfig         |   2 +
+ sound/soc/socsynth/Makefile        |   2 +
+ sound/soc/socsynth/hsynth-midi.c   | 215 +++++++++++++++++++++++++++++
+ 6 files changed, 223 insertions(+)
+ create mode 100644 sound/soc/socsynth/Kconfig
+ create mode 100644 sound/soc/socsynth/Makefile
+ create mode 100644 sound/soc/socsynth/hsynth-midi.c
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 0d0b7617f50b..4f38eb7cac55 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -300,3 +300,5 @@ CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
+ CONFIG_HID=y
+ CONFIG_USB_HID=y
+ CONFIG_HID_MULTITOUCH=y
++CONFIG_SND_SOC_HSYNTH_MIDI=m
++CONFIG_SND_SEQUENCER=y
+diff --git a/sound/soc/Kconfig b/sound/soc/Kconfig
+index bdc305cece6e..4c512beefd6b 100644
+--- a/sound/soc/Kconfig
++++ b/sound/soc/Kconfig
+@@ -63,6 +63,7 @@ source "sound/soc/rockchip/Kconfig"
+ source "sound/soc/samsung/Kconfig"
+ source "sound/soc/sh/Kconfig"
+ source "sound/soc/sirf/Kconfig"
++source "sound/soc/socsynth/Kconfig"
+ source "sound/soc/sof/Kconfig"
+ source "sound/soc/spear/Kconfig"
+ source "sound/soc/sprd/Kconfig"
+diff --git a/sound/soc/Makefile b/sound/soc/Makefile
+index 861a21b79484..8f007bae32a1 100644
+--- a/sound/soc/Makefile
++++ b/sound/soc/Makefile
+@@ -46,6 +46,7 @@ obj-$(CONFIG_SND_SOC)	+= rockchip/
+ obj-$(CONFIG_SND_SOC)	+= samsung/
+ obj-$(CONFIG_SND_SOC)	+= sh/
+ obj-$(CONFIG_SND_SOC)	+= sirf/
++obj-$(CONFIG_SND_SOC)	+= socsynth/
+ obj-$(CONFIG_SND_SOC)	+= sof/
+ obj-$(CONFIG_SND_SOC)	+= spear/
+ obj-$(CONFIG_SND_SOC)	+= sprd/
+diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
+new file mode 100644
+index 000000000000..457edbfaa620
+--- /dev/null
++++ b/sound/soc/socsynth/Kconfig
+@@ -0,0 +1,2 @@
++config SND_SOC_HSYNTH_MIDI
++       tristate "Holosynth MIDI support"
+diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
+new file mode 100644
+index 000000000000..126f34202ac8
+--- /dev/null
++++ b/sound/soc/socsynth/Makefile
+@@ -0,0 +1,2 @@
++snd-soc-hsynth-midi-objs := hsynth-midi.o
++obj-$(CONFIG_SND_SOC_HSYNTH_MIDI) += snd-soc-hsynth-midi.o
+diff --git a/sound/soc/socsynth/hsynth-midi.c b/sound/soc/socsynth/hsynth-midi.c
+new file mode 100644
+index 000000000000..564e6c51fab4
+--- /dev/null
++++ b/sound/soc/socsynth/hsynth-midi.c
+@@ -0,0 +1,215 @@
++/*
++* hsynth-soc -- SoC audio ( midi for Altera SoC boards
++* Author: Michael Brown the-snowwhite <producer@holotronic.dk>
++*
++* Based on de1-soc-wm8731 by
++*  B. Steinsbo <bsteinsbo@gmail.com>
++*
++* Licensed under the GPL-2.
++*/
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/clk.h>
++#include <linux/platform_device.h>
++#include <linux/of.h>
++#include <linux/uaccess.h>
++#include <linux/ioport.h>
++#include <linux/io.h>
++
++#include <sound/core.h>
++#include <sound/seq_kernel.h>
++#include <sound/rawmidi.h>
++#include <sound/initval.h>
++#include <sound/soc.h>
++
++#define SYNTHSOCSOUND_LOG_PREFIX "synthsound: "
++
++#define midi_ins 0
++#define midi_outs 1
++
++#define MIDIREG_BASE 0xa0000000
++#define MIDIREG_SIZE PAGE_SIZE
++#define MIDIREG_OFFSET 0x00000
++
++#define printe(...) pr_err(SYNTHSOCSOUND_LOG_PREFIX __VA_ARGS__)
++
++static int snd_socmidi_open(struct snd_rawmidi_substream *substream);
++static int snd_socmidi_close(struct snd_rawmidi_substream *substream);
++static int hmidi_card_probe(struct snd_soc_card *card);
++static int hmidi_card_remove(struct snd_soc_card *card);
++static void snd_socmidi_transmit(unsigned char data);
++static void snd_socmidi_output_trigger(struct snd_rawmidi_substream *substream, int);
++static int hsound_midi_init(struct snd_card *card);
++
++void *midireg_mem;
++
++static int snd_socmidi_open(struct snd_rawmidi_substream *substream)
++{
++    return 0;
++}
++
++static int snd_socmidi_close(struct snd_rawmidi_substream *substream)
++{
++    return 0;
++}
++
++static int hmidi_card_probe(struct snd_soc_card *card)
++{
++    int err;
++
++    err = hsound_midi_init(card->snd_card);
++
++    if (err < 0) {
++        return err;
++    }
++
++    return 0;
++}
++
++static int hmidi_card_remove(struct snd_soc_card *card)
++{
++    return 0;
++}
++
++static void snd_socmidi_transmit(unsigned char data){
++
++    int count;
++    unsigned char curr_status;
++    if (data >= 0x80 && data < 0xF8) {
++        count = 0;
++        curr_status = data;
++    } else {
++        count = count + 1;
++    }
++    if (count >= 3 && (count & 1) && (curr_status < 0xF0)){
++        iowrite8(curr_status, midireg_mem);
++        iowrite8(data, midireg_mem);
++    } else {
++        iowrite8(data, midireg_mem);
++    }
++
++}
++
++static void snd_socmidi_output_trigger(struct snd_rawmidi_substream *substream, int up) {
++
++    if (!up)
++        return;
++
++    while (1) {
++        unsigned char data;
++        if (snd_rawmidi_transmit(substream, &data, 1) != 1)
++            break; /* no more data */
++        snd_socmidi_transmit(data);
++    }
++}
++
++static struct snd_rawmidi *g_rmidi;
++
++static struct snd_rawmidi_ops snd_socmidi_output_ops = {
++    .open = snd_socmidi_open,
++    .close = snd_socmidi_close,
++    .trigger = snd_socmidi_output_trigger,
++};
++
++static void pisnd_get_port_info(struct snd_rawmidi *rmidi, int number, struct snd_seq_port_info *seq_port_info)
++{
++    seq_port_info->type =
++        SNDRV_SEQ_PORT_TYPE_MIDI_GENERIC |
++        SNDRV_SEQ_PORT_TYPE_HARDWARE |
++        SNDRV_SEQ_PORT_TYPE_PORT;
++    seq_port_info->midi_voices = 0;
++}
++
++static struct snd_rawmidi_global_ops hsnd_global_ops = {.get_port_info = pisnd_get_port_info, };
++
++static int hsound_midi_init(struct snd_card *card)
++{
++    int err;
++struct resource *res;
++
++    err = snd_rawmidi_new(card, "SocMIDI", 0, midi_outs, midi_ins, &g_rmidi);
++
++    if (err < 0) {
++        printe("snd_rawmidi_new failed: %d\n", err);
++        return err;
++    }
++
++    strcpy(g_rmidi->name, "Holosynth MIDI ");
++
++    g_rmidi->info_flags = SNDRV_RAWMIDI_INFO_OUTPUT;
++
++    g_rmidi->ops = &hsnd_global_ops;
++
++    g_rmidi->private_data = (void *)0;
++
++    snd_rawmidi_set_ops(g_rmidi, SNDRV_RAWMIDI_STREAM_OUTPUT, &snd_socmidi_output_ops);
++
++    res = request_mem_region((MIDIREG_BASE + MIDIREG_OFFSET), MIDIREG_SIZE, "MIDIREG");
++    if (res == NULL) {
++        return -EBUSY;
++    }
++
++    midireg_mem = ioremap((MIDIREG_BASE + MIDIREG_OFFSET), MIDIREG_SIZE);
++    if (midireg_mem == NULL) {
++        release_mem_region(MIDIREG_BASE, MIDIREG_SIZE);
++        return -EFAULT;
++    }
++
++    return 0;
++}
++
++static struct snd_soc_card snd_soc_hsynth_soc = {
++    .name = "HSYNTH-MIDI",
++    .owner = THIS_MODULE,
++    .probe        = hmidi_card_probe,
++    .remove       = hmidi_card_remove,
++
++};
++
++static int hsynth_soc_audio_probe(struct platform_device *pdev)
++{
++    struct snd_soc_card *card = &snd_soc_hsynth_soc;
++    int ret;
++
++    card->dev = &pdev->dev;
++
++    ret = snd_soc_register_card(card);
++    if (ret) {
++        dev_err(&pdev->dev, "snd_soc_register_card() failed\n");
++    }
++
++    return ret;
++}
++
++static int soc_audio_remove(struct platform_device *pdev)
++{
++    struct snd_soc_card *card = platform_get_drvdata(pdev);
++
++     snd_soc_unregister_card(card);
++
++    return 0;
++}
++
++static const struct of_device_id soc_hsynth_dt_ids[] = {
++    { .compatible = "holotr,socsynth-midi", },
++    { }
++};
++MODULE_DEVICE_TABLE(of, soc_hsynth_dt_ids);
++
++static struct platform_driver soc_audio_driver = {
++    .driver = {
++        .name	= "soc-synth-midi",
++        .owner	= THIS_MODULE,
++        .of_match_table = of_match_ptr(soc_hsynth_dt_ids),
++    },
++    .probe	= hsynth_soc_audio_probe,
++    .remove	= soc_audio_remove,
++};
++
++module_platform_driver(soc_audio_driver);
++
++/* Module information */
++MODULE_AUTHOR("Michael Brown (the-snowwhite) <producer@holotronic.dk>");
++MODULE_DESCRIPTION("ALSA SoC HSYNTH-MIDI");
++MODULE_LICENSE("GPL");
+-- 
+2.30.2
+
+
+From efb54e749ae7e86434c44a08e380b09e04da55df Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Wed, 21 Jul 2021 22:18:25 +0200
+Subject: [PATCH 10/10] Added DE-10 Nano basic dtb and with uio, hsynthaudio
+ and with SD/HD framebuffer
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/Makefile                    |   3 +
+ .../boot/dts/socfpga_cyclone5_de10_nano.dts   | 189 ++++++++++++++
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 224 +++++++++++++++++
+ .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 233 ++++++++++++++++++
+ arch/arm/configs/socfpga_defconfig            |   2 +-
+ 5 files changed, 650 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
+ create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
+ create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index b21b3a64641a..30d186e973be 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -958,6 +958,9 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
+ 	socfpga_cyclone5_mcvevk.dtb \
+ 	socfpga_cyclone5_socdk.dtb \
+ 	socfpga_cyclone5_de0_nano_soc.dtb \
++	socfpga_cyclone5_de10_nano_uio_fb.dtb \
++	socfpga_cyclone5_de10_nano_uio_fb_hd.dtb \
++	socfpga_cyclone5_de10_nano.dtb \
+ 	socfpga_cyclone5_sockit.dtb \
+ 	socfpga_cyclone5_socrates.dtb \
+ 	socfpga_cyclone5_sodia.dtb \
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
+new file mode 100644
+index 000000000000..a767457e4354
+--- /dev/null
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
+@@ -0,0 +1,189 @@
++/*
++* Copyright Intel Corporation (C) 2017. All rights reserved.
++*
++* This program is free software; you can redistribute it and/or modify
++* it under the terms and conditions of the GNU General Public License,
++* version 2, as published by the Free Software Foundation.
++*
++* This program is distributed in the hope it will be useful, but WITHOUT
++* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++* more details.
++*
++* You should have received a copy of the GNU General Public License along with
++* this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
++
++#include "socfpga_cyclone5.dtsi"
++
++/ {
++	model = "Terasic DE10-Nano";
++	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
++
++	chosen {
++		bootargs = "earlyprintk";
++		stdout-path = "serial0:115200n8";
++	};
++
++	memory {
++		name = "memory";
++		device_type = "memory";
++		reg = <0x0 0x40000000>; /* 1GB */
++	};
++
++	aliases {
++		ethernet0 = &gmac1;
++	};
++
++	regulator_3_3v: 3-3-v-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++	};
++
++	leds {
++		compatible = "gpio-leds";
++		hps0 {
++			label = "hps_led0";
++			gpios = <&portb 24 0>;
++			linux,default-trigger = "heartbeat";
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys";
++		hps0 {
++			label = "hps_key0";
++			gpios = <&portb 25 0>;
++			linux,code = <63>;
++			debounce-interval = <50>;
++		};
++	};
++
++	bridge@0xc0000000 {
++		compatible = "altr,bridge-15.1", "simple-bus";
++		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
++		#address-cells = <0x2>;
++		#size-cells = <0x1>;
++		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
++			<0x00000001 0x00030000 0xff230000 0x00000100>;
++
++		sysid@0x100001000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00001000 0x00000008>;
++			id = <0xacd51302>;
++			timestamp = <0x5929e204>;
++		};
++
++		serial@0x100002000 {
++			compatible = "altr,juart-15.1", "altr,juart-1.0";
++			reg = <0x00000001 0x00002000 0x00000008>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 40 0>;
++			clocks = <0x2>;
++		};
++
++		gpio@0x100003000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00003000 0x00000010>;
++			altr,gpio-bank-width = <0x8>;
++			resetvalue = <0xff>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};
++
++		gpio@0x100004000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00004000 0x00000010>;
++			altr,gpio-bank-width = <0x4>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 41 1>;
++			altr,interrupt-type = <0x3>;
++			altr,interrupt_type = <0x3>;
++			edge_type = <0x2>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};
++
++		gpio@0x100005000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00005000 0x00000010>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 42 2>;
++			altr,gpio-bank-width = <0x2>;
++			altr,interrupt-type = <0x2>;
++			altr,interrupt_type = <0x2>;
++			edge_type = <0x1>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};
++	};
++};
++
++&gmac1 {
++	status = "okay";
++	phy-mode = "rgmii";
++
++	txd0-skew-ps = <0>; /* -420ps */
++	txd1-skew-ps = <0>; /* -420ps */
++	txd2-skew-ps = <0>; /* -420ps */
++	txd3-skew-ps = <0>; /* -420ps */
++	rxd0-skew-ps = <420>; /* 0ps */
++	rxd1-skew-ps = <420>; /* 0ps */
++	rxd2-skew-ps = <420>; /* 0ps */
++	rxd3-skew-ps = <420>; /* 0ps */
++	txen-skew-ps = <0>; /* -420ps */
++	txc-skew-ps = <1860>; /* 960ps */
++	rxdv-skew-ps = <420>; /* 0ps */
++	rxc-skew-ps = <1680>; /* 780ps */
++
++	max-frame-size = <3800>;
++};
++
++&gpio0 {
++	status = "okay";
++};
++
++&gpio1 {
++	status = "okay";
++};
++
++&gpio2 {
++	status = "okay";
++};
++
++&i2c0 {
++	status = "okay";
++	speed-mode = <0>;
++
++	adxl345: adxl345@0 {
++		compatible = "adi,adxl34x";
++		reg = <0x53>;
++
++		interrupt-parent = <&intc>;
++		interrupts = <3 2>;
++	};
++};
++
++&mmc0 {
++	vmmc-supply = <&regulator_3_3v>;
++	vqmmc-supply = <&regulator_3_3v>;
++	status = "okay";
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&usb1 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
+new file mode 100644
+index 000000000000..9fa90e0e7a01
+--- /dev/null
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
+@@ -0,0 +1,224 @@
++/*
++* Copyright Intel Corporation (C) 2017. All rights reserved.
++*
++* This program is free software; you can redistribute it and/or modify
++* it under the terms and conditions of the GNU General Public License,
++* version 2, as published by the Free Software Foundation.
++*
++* This program is distributed in the hope it will be useful, but WITHOUT
++* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++* more details.
++*
++* You should have received a copy of the GNU General Public License along with
++* this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
++
++#include "socfpga_cyclone5.dtsi"
++
++/ {
++	model = "Terasic DE10-Nano";
++	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
++
++	chosen {
++		bootargs = "earlyprintk";
++		stdout-path = "serial0:115200n8";
++	};
++
++	memory {
++		name = "memory";
++		device_type = "memory";
++		reg = <0x0 0x40000000>; /* 1GB */
++	};
++
++	aliases {
++		ethernet0 = &gmac1;
++	};
++
++	regulator_3_3v: 3-3-v-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++	};
++
++	leds {
++		compatible = "gpio-leds";
++		hps0 {
++			label = "hps_led0";
++			gpios = <&portb 24 0>;
++			linux,default-trigger = "heartbeat";
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys";
++		hps0 {
++			label = "hps_key0";
++			gpios = <&portb 25 0>;
++			linux,code = <63>;
++			debounce-interval = <50>;
++		};
++	};
++
++	bridge@0xc0000000 {
++		compatible = "altr,bridge-15.1", "simple-bus";
++		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
++		#address-cells = <0x2>;
++		#size-cells = <0x1>;
++		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00000010>,
++			<0x00000001 0x00060000 0xff260000 0x00010000>;
++
++		sysid@0x100001000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00001000 0x00000008>;
++			id = <0xacd51302>;
++			timestamp = <0x5929e204>;
++		};
++
++		serial@0x100002000 {
++			compatible = "altr,juart-15.1", "altr,juart-1.0";
++			reg = <0x00000001 0x00002000 0x00000008>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 40 0>;
++			clocks = <0x2>;
++		};
++
++		gpio@0x100003000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00003000 0x00000010>;
++			altr,gpio-bank-width = <0x8>;
++			resetvalue = <0xff>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};
++
++		gpio@0x100004000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00004000 0x00000010>;
++			altr,gpio-bank-width = <0x4>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 41 1>;
++			altr,interrupt-type = <0x3>;
++			altr,interrupt_type = <0x3>;
++			edge_type = <0x2>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};
++
++		gpio@0x100005000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00005000 0x00000010>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 42 2>;
++			altr,gpio-bank-width = <0x2>;
++			altr,interrupt-type = <0x2>;
++			altr,interrupt_type = <0x2>;
++			edge_type = <0x1>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};
++
++		dp_0_frame_buf: vip@100031000 {
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1024>;
++			altr,max-height = <768>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <128>;
++		};
++
++		holosynth_sysex@0x100040000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 43 4>;
++			address_width = <14>;
++			data_width = <32>;
++		};
++
++		holosynth_midi@0x100050000 {
++			compatible = "holotr,socsynth-midi";
++			reg = <0x00000001 0x00050000 0x00000010>;
++			address_width = <3>;
++			data_width = <8>;
++		};
++
++		holosynth_audio@0x100060000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00060000 0x00010000>;
++			address_width = <14>;
++			data_width = <32>;
++		};
++	};
++};
++
++&gmac1 {
++	status = "okay";
++	phy-mode = "rgmii";
++
++	txd0-skew-ps = <0>; /* -420ps */
++	txd1-skew-ps = <0>; /* -420ps */
++	txd2-skew-ps = <0>; /* -420ps */
++	txd3-skew-ps = <0>; /* -420ps */
++	rxd0-skew-ps = <420>; /* 0ps */
++	rxd1-skew-ps = <420>; /* 0ps */
++	rxd2-skew-ps = <420>; /* 0ps */
++	rxd3-skew-ps = <420>; /* 0ps */
++	txen-skew-ps = <0>; /* -420ps */
++	txc-skew-ps = <1860>; /* 960ps */
++	rxdv-skew-ps = <420>; /* 0ps */
++	rxc-skew-ps = <1680>; /* 780ps */
++
++	max-frame-size = <3800>;
++};
++
++&gpio0 {
++	status = "okay";
++};
++
++&gpio1 {
++	status = "okay";
++};
++
++&gpio2 {
++	status = "okay";
++};
++
++&i2c0 {
++	status = "okay";
++	speed-mode = <0>;
++
++	adxl345: adxl345@0 {
++		compatible = "adi,adxl34x";
++		reg = <0x53>;
++
++		interrupt-parent = <&intc>;
++		interrupts = <3 2>;
++	};
++};
++
++&mmc0 {
++	vmmc-supply = <&regulator_3_3v>;
++	vqmmc-supply = <&regulator_3_3v>;
++	status = "okay";
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&usb1 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
+new file mode 100644
+index 000000000000..81678e2f90a6
+--- /dev/null
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
+@@ -0,0 +1,233 @@
++/*
++* Copyright Intel Corporation (C) 2017. All rights reserved.
++*
++* This program is free software; you can redistribute it and/or modify
++* it under the terms and conditions of the GNU General Public License,
++* version 2, as published by the Free Software Foundation.
++*
++* This program is distributed in the hope it will be useful, but WITHOUT
++* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++* more details.
++*
++* You should have received a copy of the GNU General Public License along with
++* this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
++
++#include "socfpga_cyclone5.dtsi"
++
++/ {
++	model = "Terasic DE10-Nano";
++	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
++
++	chosen {
++		bootargs = "earlyprintk";
++		stdout-path = "serial0:115200n8";
++	};
++
++	memory {
++		name = "memory";
++		device_type = "memory";
++		reg = <0x0 0x40000000>; /* 1GB */
++	};
++
++	aliases {
++		ethernet0 = &gmac1;
++	};
++
++	regulator_3_3v: 3-3-v-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++	};
++
++	leds {
++		compatible = "gpio-leds";
++		hps0 {
++			label = "hps_led0";
++			gpios = <&portb 24 0>;
++			linux,default-trigger = "heartbeat";
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys";
++		hps0 {
++			label = "hps_key0";
++			gpios = <&portb 25 0>;
++			linux,code = <63>;
++			debounce-interval = <50>;
++		};
++	};
++
++	bridge@0xc0000000 {
++		compatible = "altr,bridge-15.1", "simple-bus";
++		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
++		#address-cells = <0x2>;
++		#size-cells = <0x1>;
++		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00000010>,
++			<0x00000001 0x00060000 0xff260000 0x00010000>;
++
++		sysid@0x100001000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00001000 0x00000008>;
++			id = <0xacd51302>;
++			timestamp = <0x5929e204>;
++		};
++
++		serial@0x100002000 {
++			compatible = "altr,juart-15.1", "altr,juart-1.0";
++			reg = <0x00000001 0x00002000 0x00000008>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 40 4>;
++			clocks = <0x2>;
++		};
++
++		gpio@0x100003000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00003000 0x00000010>;
++			altr,gpio-bank-width = <0x8>;
++			resetvalue = <0xff>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};
++
++		gpio@0x100004000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00004000 0x00000010>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 41 1>;
++			altr,gpio-bank-width = <0x4>;
++			altr,interrupt-type = <0x3>;
++			altr,interrupt_type = <0x3>;
++			edge_type = <0x2>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};
++
++		gpio@0x100005000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00005000 0x00000010>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 42 1>;
++			altr,gpio-bank-width = <0x2>;
++			altr,interrupt-type = <0x2>;
++			altr,interrupt_type = <0x2>;
++			edge_type = <0x1>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};
++/*
++		dp_0_frame_buf: vip@100031000 {
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1920>;
++			altr,max-height = <1080>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <128>;
++		};
++*/
++		vip@0x100031000 {
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1920>;
++			altr,max-height = <1080>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <0x80>;
++		};
++
++		holosynth_sysex@0x100040000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 43 4>;
++			address_width = <14>;
++			data_width = <32>;
++		};
++
++		holosynth_midi@0x100050000 {
++			compatible = "holotr,socsynth-midi";
++			reg = <0x00000001 0x00050000 0x00000010>;
++			address_width = <3>;
++			data_width = <8>;
++		};
++
++		holosynth_audio@0x100060000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00060000 0x00010000>;
++			address_width = <14>;
++			data_width = <32>;
++		};
++	};
++};
++
++&gmac1 {
++	status = "okay";
++	phy-mode = "rgmii";
++
++	txd0-skew-ps = <0>; /* -420ps */
++	txd1-skew-ps = <0>; /* -420ps */
++	txd2-skew-ps = <0>; /* -420ps */
++	txd3-skew-ps = <0>; /* -420ps */
++	rxd0-skew-ps = <420>; /* 0ps */
++	rxd1-skew-ps = <420>; /* 0ps */
++	rxd2-skew-ps = <420>; /* 0ps */
++	rxd3-skew-ps = <420>; /* 0ps */
++	txen-skew-ps = <0>; /* -420ps */
++	txc-skew-ps = <1860>; /* 960ps */
++	rxdv-skew-ps = <420>; /* 0ps */
++	rxc-skew-ps = <1680>; /* 780ps */
++
++	max-frame-size = <3800>;
++};
++
++&gpio0 {
++	status = "okay";
++};
++
++&gpio1 {
++	status = "okay";
++};
++
++&gpio2 {
++	status = "okay";
++};
++
++&i2c0 {
++	status = "okay";
++	speed-mode = <0>;
++
++	adxl345: adxl345@0 {
++		compatible = "adi,adxl34x";
++		reg = <0x53>;
++
++		interrupt-parent = <&intc>;
++		interrupts = <3 2>;
++	};
++};
++
++&mmc0 {
++	vmmc-supply = <&regulator_3_3v>;
++	vqmmc-supply = <&regulator_3_3v>;
++	status = "okay";
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&usb1 {
++	status = "okay";
++};
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 4f38eb7cac55..4d0019124584 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -130,7 +130,7 @@ CONFIG_FB_CFB_FILLRECT=y
+ CONFIG_FB_CFB_COPYAREA=y
+ CONFIG_FB_CFB_IMAGEBLIT=y
+ CONFIG_FB_ALTERA_VIP=y
+-CONFIG_FB_ALTERA_VIP_II=y
++CONFIG_FB_ALTERA_VIP_FB2=y
+ CONFIG_FB_ALTERA_VIP_FB2_PLAT=y
+ CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y
+-- 
+2.30.2
+
