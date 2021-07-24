@@ -596,9 +596,9 @@ unmount_binded(){
 # parameters: 1: work dir, 2: mount dev name, 3: comp prefix, 4 distro name
 compress_rootfs(){
     if [ "${4}" == "bionic" ]; then
-        COMPNAME=ubuntu-${4}-socfpga_${3}
+        COMPNAME=ubuntu-${4}-${3}
     else
-        COMPNAME=debian-${4}-socfpga_${3}
+        COMPNAME=debian-${4}-${3}
     fi
     echo "#---------------------------------------------------------------------------#"
     echo "#Script_MSG:                                                                   #"
@@ -606,7 +606,6 @@ compress_rootfs(){
     echo " ${1}/${COMPNAME}_rootfs.tar.bz2"
     echo "----------------------------------------------------------------------------#"
     cd ${2}
-#	sudo tar -cSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys --exclude=tmp . --use-compress-program lbzip2
     sudo tar -cSf ${1}/${COMPNAME}_rootfs.tar.bz2 --exclude=proc --exclude=mnt --exclude=lost+found --exclude=dev --exclude=sys . --use-compress-program lbzip2
     cd ${1}
     echo "#                                                                           #"
@@ -620,9 +619,9 @@ compress_rootfs(){
 extract_rootfs(){
 if [ ! -z "${3}" ]; then
     if [ "${4}" == "bionic" ]; then
-        COMPNAME=ubuntu-${4}-socfpga_${3}
+        COMPNAME=ubuntu-${4}-${3}
     else
-        COMPNAME=debian-${4}-socfpga_${3}
+        COMPNAME=debian-${4}-${3}
     fi
     echo "Script_MSG: Extracting ${1}/${COMPNAME}_rootfs.tar.bz2"
     echo "Script_MSG: Into imagefile"
@@ -673,17 +672,17 @@ sudo sync
 make_bmap_image() {
     echo ""
     echo "NOTE:  Now making bmap image"
-    echo ""
     cd ${1}
     bmaptool create -o ${2}.bmap ${2}
+    echo "Done ...."
     echo ""
     echo "NOTE:  Now making compressed image file (lbzip2)"
-    echo ""
     tar -cSf ${2}.tar.bz2 ${2} --use-compress-program lbzip2
+    echo "Done ...."
     echo ""
     echo "NOTE:  Now making md5sum of compressed image file"
-    echo ""
     md5sum ${2}.tar.bz2 > ${2}.tar.bz2.md5
+    echo "Done ...."
     echo ""
     echo "NOTE:  Bmap image created"
     echo ""

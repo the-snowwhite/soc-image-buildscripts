@@ -473,15 +473,17 @@ gen_local_sources_list ${1} ${3}
 sudo cp ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
 
 if [ "${2}" == "machinekit" ]; then
-    HOST_NAME="mksocfpga-nano-soc"
+    if [ "${4}" == "arm64" ]; then
+        HOST_NAME="mksocfpga-xil"
+    else
+        HOST_NAME="mksocfpga"
+    fi
 elif [ "${2}" == "holosynth" ]; then
     if [ "${4}" == "arm64" ]; then
-        HOST_NAME="holosynthv-u96"
+        HOST_NAME="holosynthv-xil"
     else
         HOST_NAME="holosynthv"
     fi
-elif [ "${2}" == "ubuntu" ]; then
-    HOST_NAME="ultra96"
 fi
 
 gen_hosts ${1} ${HOST_NAME}

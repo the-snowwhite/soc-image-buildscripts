@@ -23,7 +23,7 @@
 export DEBIAN_FRONTEND=noninteractive
 
 ## Valid boards:
-BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "DExx" "ultra96")
+BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "DExx" "mpsoc")
 
 ## Valid distros:
 DISTROS=("stretch" "buster" "bullseye" "bionic" "petalinux")
@@ -60,10 +60,14 @@ local_ub_kernel_repo="http://${local_ws}/ubuntu/"
 
 ## 3 part Expandable image with swap in p2
 ROOTFS_TYPE=ext4
-ROOTFS_LABEL="rootfs"
 mkfs="mkfs.${ROOTFS_TYPE}"
 media_swap_partition=p2
 media_rootfs_partition=p3
+ROOTFS_MNT="/tmp/myimage"
+
+ROOTFS_LABEL="rootfs"
+ROOTFS_IMG_END_TAG="${ROOTFS_LABEL}.img"
+QT_ROOTFS_IMG_END_TAG="qt_${ROOTFS_LABEL}.img"
 
 ext4_options="-O ^metadata_csum,^64bit"
 #mkfs_options="${ext4_options}"
@@ -133,10 +137,6 @@ PATCH_SCRIPT_DIR=${MAIN_SCRIPT_DIR}/patches
 DTS_DIR=${MAIN_SCRIPT_DIR}/../dts
 
 CURRENT_DIR=`pwd`
-ROOTFS_MNT="/tmp/myimage"
-
-ROOTFS_IMG="${ROOTFS_LABEL}.img"
-QT_ROOTFS_IMG="qt_${ROOTFS_LABEL}.img"
 
 CURRENT_DATE=`date -I`
 REL_DATE=${CURRENT_DATE}
@@ -295,11 +295,11 @@ build_uboot() {
     contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
-        if [ "${1}" == "ultra96" ]; then
-            XIL_UBOOT_PATCH_FILE="u-boot-${XIL_UBOOT_VERSION}-ultra96-changeset.patch"
-            git_fetch ${UBOOT_PARENT_DIR} ${XIL_UBOOT_GIT_URL} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_VERSION} ${XIL_UBOOT_PATCH_FILE}
-            UBOOT_BOARD_CONFIG="xilinx_zynqmp_zcu100_revC_defconfig"
-            arm64_build  "$UBOOT_PARENT_DIR/${XIL_UBOOT_VERSION}" "${UBOOT_BOARD_CONFIG}" "${UBOOT_MAKE_CONFIG}" "envtools"
+        if [ "${1}" == "mpsoc" ]; then
+            echo ""
+            echo "! Please use holosynth petalinux bsp to generate boot files"
+            echo ""
+            exit
         else
             # patches:
             UBOOT_PATCH_FILE="u-boot-${UBOOT_VERSION}-de0-de10_nano-de1_soc-changeset.patch"
@@ -322,17 +322,11 @@ build_git_kernel() {
 contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
-        if [ "${1}" == "ultra96" ]; then
-            if [ "${2}" == "bionic" ]; then
-                KERNEL_PKG_VERSION="2.1"
-            else
-                KERNEL_PKG_VERSION="0.1"
-            fi
-#            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR} ${XIL_GIT_KERNEL_PATCH_FILE}
-##            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "${XIL_GIT_KERNEL_TAG}" ${GIT_KERNEL_DIR}
-#            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "work2" ${GIT_KERNEL_DIR}
-            git_fetch ${XIL_GIT_KERNEL_PARENT_DIR} ${XIL_GIT_KERNEL_URL} ${XIL_GIT_KERNEL_TAG} "xlnx_rebase_v4.14_2018.3" ${GIT_KERNEL_DIR}
-            arm64_build "${XIL_GIT_KERNEL_BUILD_DIR}" ${XIL_KERNEL_CONF} "deb-pkg" |& tee ${CURRENT_DIR}/Logs/xil_git_kernel_deb_rt-log.txt
+        if [ "${1}" == "mpsoc" ]; then
+            echo ""
+            echo "! Please use holosynth petalinux bsp to generate boot files"
+            echo ""
+            exit
         else
             KERNEL_PKG_VERSION="1.0"
             git_fetch ${ALT_GIT_KERNEL_PARENT_DIR} ${ALT_GIT_KERNEL_URL} ${ALT_GIT_KERNEL_TAG} "origin/${ALT_GIT_KERNEL_BRANCH}" ${GIT_KERNEL_DIR} ${ALT_GIT_KERNEL_PATCH_FILE}
@@ -356,46 +350,46 @@ contains ${BOARDS[@]} ${1}
     fi
 }
 
-## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
+## parameters: 1: mount dev name, 2: distro name, 3: distro arch
 gen_rootfs_image() {
     zero=0;
-    contains ${DISTROS[@]} ${3}
+    contains ${DISTROS[@]} ${2}
     if [ "$?" -eq 0 ]; then
-        echo "Script_MSG: Valid distroname = ${3} given"
-        contains ${DISTARCHS[@]} ${4}
+        echo "Script_MSG: Valid distroname = ${2} given"
+        contains ${DISTARCHS[@]} ${3}
         if [ "$?" -eq 0 ]; then
-            echo "Script_MSG: Valid distarch = ${4} given"
-            create_img "1" ${2}
-            mount_imagefile ${2} ${1}
+            echo "Script_MSG: Valid distarch = ${3} given"
+            create_img "1" rootfs.img
+            mount_imagefile rootfs.img ${1}
             . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
             echo ""
             if [ "${DESKTOP}" == "yes" ]; then
-                if [ "${3}" == "bionic" ]; then
-                    run_desktop_debootstrap_bionic ${1} ${3} ${UB_EXT_REPO_URL} ${4}
-                    echo "Script_MSG: run_desktop_debootstrap_bionic (${3}) (${4}) function return value was --> ${output}"
+                if [ "${2}" == "bionic" ]; then
+                    run_desktop_debootstrap_bionic ${1} ${2} ${UB_EXT_REPO_URL} ${3}
+                    echo "Script_MSG: run_desktop_debootstrap_bionic (${2}) (${3}) function return value was --> ${output}"
                 else
-                    if [ "${3}" == "bullseye" ]; then
+                    if [ "${2}" == "bullseye" ]; then
                         echo "Script_MSG: will run run_desktop_debootstrap_bullseye"
-                        run_desktop_debootstrap_bullseye ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                        echo "Script_MSG: run_desktop_debootstrap_bullseye (${3}) (${4}) function return value was --> ${output}"
+                        run_desktop_debootstrap_bullseye ${1} ${2} ${DEB_EXT_REPO_URL} ${3}
+                        echo "Script_MSG: run_desktop_debootstrap_bullseye (${2}) (${3}) function return value was --> ${output}"
                     else
-                        if [ "${3}" == "buster" ]; then
-                            run_desktop_debootstrap_buster ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                            echo "Script_MSG: run_desktop_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                        if [ "${2}" == "buster" ]; then
+                            run_desktop_debootstrap_buster ${1} ${2} ${DEB_EXT_REPO_URL} ${3}
+                            echo "Script_MSG: run_desktop_debootstrap_buster (${2}) (${3}) function return value was --> ${output}"
                         else
-                            if [ "${3}" == "stretch" ]; then
-                                run_desktop_debootstrap_stretch ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                                echo "Script_MSG: run_desktop_debootstrap_buster (${3}) (${4}) function return value was --> ${output}"
+                            if [ "${2}" == "stretch" ]; then
+                                run_desktop_debootstrap_stretch ${1} ${2} ${DEB_EXT_REPO_URL} ${3}
+                                echo "Script_MSG: run_desktop_debootstrap_buster (${2}) (${3}) function return value was --> ${output}"
                             else
-                                run_desktop_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                                echo "Script_MSG: run_desktop_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                                run_desktop_debootstrap ${1} ${2} ${DEB_EXT_REPO_URL} ${3}
+                                echo "Script_MSG: run_desktop_debootstrap (${2}) (${3}) function return value was --> ${output}"
                             fi
                         fi
                     fi
                 fi
             else
-                run_debootstrap ${1} ${3} ${DEB_EXT_REPO_URL} ${4}
-                echo "Script_MSG: run_debootstrap (${3}) (${4}) function return value was --> ${output}"
+                run_debootstrap ${1} ${2} ${DEB_EXT_REPO_URL} ${3}
+                echo "Script_MSG: run_debootstrap (${2}) (${3}) function return value was --> ${output}"
             fi
             echo ""
             if [[ $output -gt $zero ]]; then
@@ -404,25 +398,28 @@ gen_rootfs_image() {
                 exit 1
             else
                 if [ "${DESKTOP}" == "yes" ]; then
-                    compress_rootfs ${CURRENT_DIR} ${1} "${4}_debootstrap-only-desktop" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "${3}_base-desktop" ${2}
                     # parameters: 1: work dir, 2: mount dev name, 3: comp prefix, 4 distro name
+                    unmount_binded ${1}
+                    sudo mv rootfs.img "${2}-${3}_base-desktop.img"
+                    echo "Script_MSG: renamed rootfs.img to --> ${2}-${3}_base-desktop.img"
                 else
-                    compress_rootfs ${CURRENT_DIR} ${1} "${4}_debootstrap-only" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "${3}_base" ${2}
                     # parameters: 1: work dir, 2: mount dev name, 3: comp prefix, 4 distro name
+                    unmount_binded ${1}
+                    sudo mv rootfs.img "${CURRENT_DIR}/${2}_${3}-base.img"
+                    echo "Script_MSG: renamed rootfs.img to --> ${CURRENT_DIR}/${2}_${3}-base.img"
                 fi
-                echo "Script_MSG: finished ${4}_debootstrap-only with success ... !"
-                unmount_binded ${1}
-                cp ${2} "${2}-base"
-                echo "Script_MSG: copied ${2} to --> ${2}-base as a backup"
+                echo "Script_MSG: finished debootstrap-only_${2}-${3} with success ... !"
             fi
         else
-            echo "--gen_rootfs_image= bad argument --> ${4}"
+            echo "--gen_rootfs_image= bad argument --> ${3}"
             echo "Use =distroname=distarch"
             echo "Valid distarchs are:"
             echo " ${DISTARCHS[@]}"
         fi
     else
-        echo "--gen_rootfs_image= bad argument --> ${3}"
+        echo "--gen_rootfs_image= bad argument --> ${2}"
         echo "Use =distroname=distarch"
         echo "Valid distrosnames are:"
         echo " ${DISTROS[@]}"
@@ -431,55 +428,58 @@ gen_rootfs_image() {
     fi
 }
 
-## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch, 5: user name
+## parameters: 1: mount dev name, 2: distro name, 3: distro arch, 4: user name
 finalize_rootfs_image() {
 #    set -x
-    contains ${DISTROS[@]} ${3}
+    contains ${DISTROS[@]} ${2}
     if [ "$?" -eq 0 ]; then
-        echo "Valid distroname = ${3} given"
-        contains ${USERS[@]} ${5}
+        echo "Valid distroname = ${2} given"
+        contains ${USERS[@]} ${4}
         if [ "$?" -eq 0 ]; then
-            echo "Valid user name = ${5} given"
-            contains ${DISTARCHS[@]} ${4}
+            echo "Valid user name = ${4} given"
+            contains ${DISTARCHS[@]} ${3}
             if [ "$?" -eq 0 ]; then
-                echo "Valid distarch = ${4} given"
+                echo "Valid distarch = ${3} given"
                 if [ "$(ls -A ${1})" ]; then
                     echo "Script_MSG: !! Found ${1} mounted .. will unmount now"
                     unmount_binded ${1}
                 fi
-                create_img "1" ${2}
-                mount_imagefile "${2}" ${1}
+                create_img "1" rootfs.img
+                mount_imagefile rootfs.img ${1}
                 bind_mounted ${1}
                 . ${FUNC_SCRIPT_DIR}/rootfs-func.sh
                 if [ "${DESKTOP}" == "yes" ]; then
-                    extract_rootfs ${CURRENT_DIR} ${1} "${4}_debootstrap-only-desktop" ${3}
+                    extract_rootfs ${CURRENT_DIR} ${1} "${3}_base-desktop" ${2}
                 else
-                    extract_rootfs ${CURRENT_DIR} ${1} "${4}_debootstrap-only" ${3}
+                    extract_rootfs ${CURRENT_DIR} ${1} "${3}_base" ${2}
                 fi
-                echo "Script_MSG: will now run final setup_configfiles with user name: ${5}"
-                setup_configfiles ${1} ${5} ${3} ${4}
+                echo "Script_MSG: will now run final setup_configfiles with user name: ${4}"
+                setup_configfiles ${1} ${4} ${2} ${3}
                 echo "Script_MSG: configfiles setup finished"
-                initial_rootfs_user_setup_sh ${1} ${5} ${3} ${4}
-                finalize ${1} ${5} ${3} ${4}
+                initial_rootfs_user_setup_sh ${1} ${4} ${2} ${3}
+                finalize ${1} ${4} ${2} ${3}
                 sudo sync
                 if [ "${DESKTOP}" == "yes" ]; then
-                    compress_rootfs ${CURRENT_DIR} ${1} "${5}_finalized-fully-configured-desktop" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "${3}_${4}_finalized-desktop" ${2}
                 else
-                    compress_rootfs ${CURRENT_DIR} ${1} "${5}_finalized-fully-configured" ${3}
+                    compress_rootfs ${CURRENT_DIR} ${1} "${3}_${4}_finalized" ${2}
                 fi
  #               set +e
                 sudo sync
                 unmount_binded ${1}
-                cp ${2} "${2}-fully-configured"
+                sudo mv rootfs.img "${CURRENT_DIR}/${2}_${3}_${4}_finalized.img"
                 sudo sync
+                echo "Script_MSG: renamed rootfs.img to --> ${CURRENT_DIR}/${2}_${3}_${4}_finalized.img"
+                echo ""
+                echo "Script_MSG: finished finalize_rootfs_image_${2}-${3}-${4} with success ... !"
             else
-                echo "--finalize_rootfs_image= bad argument --> ${4}"
+                echo "--finalize_rootfs_image= bad argument --> ${3}"
                 echo "Use =distroname=username=distarch"
                 echo "Valid distarchs are:"
                 echo " ${DISTARCHS[@]}"
             fi
         else
-            echo "--finalize_rootfs_image= bad argument --> ${5}"
+            echo "--finalize_rootfs_image= bad argument --> ${4}"
             echo "missing username"
             echo "Use =distroname=username=distarch"
             echo "Valid distrosnames are:"
@@ -490,7 +490,7 @@ finalize_rootfs_image() {
             echo " ${DISTARCHS[@]}"
         fi
     else
-        echo "--finalize_rootfs_image= bad argument --> ${3}"
+        echo "--finalize_rootfs_image= bad argument --> ${2}"
         echo "Use =distroname=username=distarch"
         echo "Valid distrosnames are:"
         echo " ${DISTROS[@]}"
@@ -501,37 +501,37 @@ finalize_rootfs_image() {
     fi
 }
 
-## parameters: 1: mount dev name, 2: kernel image tag, 3: rootfs image path, 4: distroname, 5: distro arch, 6: user name
+## parameters: 1: mount dev name, 2: distroname, 3: distro arch, 4: user name
 inst_repo_kernel() {
-    contains ${DISTROS[@]} ${4}
+    contains ${DISTROS[@]} ${2}
     if [ "$?" -eq 0 ]; then
-        echo "Valid distroname = ${4} given"
-        contains ${DISTARCHS[@]} ${5}
+        echo "Valid distroname = ${2} given"
+        contains ${DISTARCHS[@]} ${3}
         if [ "$?" -eq 0 ]; then
-            echo "Valid distarch = ${5} given"
-            contains ${USERS[@]} ${6}
+            echo "Valid distarch = ${3} given"
+            contains ${USERS[@]} ${4}
             if [ "$?" -eq 0 ]; then
-                echo "Valid user name = ${6} given"
+                echo "Valid user name = ${4} given"
                 if [ "$(ls -A ${1})" ]; then
                     echo "Script_MSG: !! Found ${1} mounted .. will unmount now"
                     unmount_binded ${1}
                 fi
-                create_img "1" ${3}
-                mount_imagefile "${3}" ${1}
+                create_img "1" rootfs.img
+                mount_imagefile rootfs.img ${1}
                 bind_mounted ${1}
                 if [ "${DESKTOP}" == "yes" ]; then
-                    extract_rootfs ${CURRENT_DIR} ${1} "${6}_finalized-fully-configured-desktop" ${4}
+                    extract_rootfs ${CURRENT_DIR} ${1} "${3}_${4}_finalized-desktop" ${2}
                 else
-                    extract_rootfs ${CURRENT_DIR} ${1} "${6}_finalized-fully-configured" ${4}
+                    extract_rootfs ${CURRENT_DIR} ${1} "${3}_${4}_finalized" ${2}
                 fi
                 echo "Script_MSG: will now install kernel"
-                if [ "${5}" == "arm64" ]; then
-                    if [ "${4}" == "bionic" ] || [ "${4}" == "buster" ]; then
+                if [ "${3}" == "arm64" ]; then
+                    if [ "${2}" == "bionic" ] || [ "${2}" == "buster" ]; then
                         SD_KERNEL_TAG="*socfpga64-4.14"
                     else
                         SD_KERNEL_TAG="*socfpga64-5.5"
                     fi
-                    if [ "${4}" == "bullseye" ]; then
+                    if [ "${2}" == "bullseye" ]; then
                         sudo cp -r '/home/mib/Projects/2020v1/kernel_modules/lib/modules' ${1}/lib
                     else
                         sudo cp -r '/home/mib/Projects/2019v1/kernel_modules/lib/modules' ${1}/lib
@@ -540,10 +540,19 @@ inst_repo_kernel() {
                     SD_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}-socfpga"
                     inst_kernel_from_local_repo ${1} ${SD_KERNEL_TAG}
                 fi
-                compress_rootfs ${CURRENT_DIR} ${1} "${6}_${2}" ${4}
-                unmount_binded ${1}
+                if [ "${DESKTOP}" == "yes" ]; then
+                    compress_rootfs ${CURRENT_DIR} ${1} "${3}_${4}_finalized-desktop_with-kernel" ${2}
+                    unmount_binded ${1}
+                    sudo mv rootfs.img "${2}_${3}_${4}_finalized-desktop_with-kernel.img"
+                else
+                    compress_rootfs ${CURRENT_DIR} ${1} "${3}_${4}_finalized_with-kernel" ${2}
+                    unmount_binded ${1}
+                    sudo mv rootfs.img "${2}_${3}_${4}_finalized_with-kernel.img"
+                fi
+                sudo sync
+                echo "Script_MSG: finished inst_repo_kernel_${2}-${3}-${4} with success ... !"
             else
-                echo "--inst_repo_kernel= bad argument --> ${6}"
+                echo "--inst_repo_kernel= bad argument --> ${4}"
                 echo "wrong user name"
                 echo "Use =distroname=distarch=username"
                 echo "Valid user names are:"
@@ -553,7 +562,7 @@ inst_repo_kernel() {
                 echo " ${DISTROS[@]}"
             fi
         else
-            echo "--inst_repo_kernel= bad argument --> ${5}"
+            echo "--inst_repo_kernel= bad argument --> ${3}"
             echo "Use =distroname=distarch=username"
             echo "Valid user names are:"
             echo " ${USERS[@]}"
@@ -563,7 +572,7 @@ inst_repo_kernel() {
             echo " ${DISTROS[@]}"
         fi
     else
-        echo "--inst_repo_kernel= bad argument --> ${4}"
+        echo "--inst_repo_kernel= bad argument --> ${2}"
         echo "Use =distroname=distarch=username"
         echo "Valid user names are:"
         echo " ${USERS[@]}"
@@ -585,21 +594,21 @@ assemble_full_sd_img() {
             contains ${USERS[@]} ${5}
             if [ "$?" -eq 0 ]; then
                 echo "Valid user name = ${5} given"
-                if [ "${3}" == "ultra96" ]; then
+                if [ "${3}" == "mpsoc" ]; then
                     SD_KERNEL_VERSION=${XIL_GIT_KERNEL_TAG}
                 else
                     SD_KERNEL_VERSION=${ALT_GIT_KERNEL_TAG}
                 fi
-                SD_FILE_PRELUDE="socfpga_${4}_${5}_${SD_KERNEL_VERSION}-${3}"
+                SD_FILE_PRELUDE="${4}_${5}_${SD_KERNEL_VERSION}-${3}"
                 if [ "${DESKTOP}" == "yes" ]; then
-                    SD_IMG_NAME="${SD_FILE_PRELUDE}_desktop_sd_${REL_DATE}.img"
+                    SD_IMG_NAME="${SD_FILE_PRELUDE}_desktop_sd_${REL_DATE}"
                 else
-                    SD_IMG_NAME="${SD_FILE_PRELUDE}_console_sd_${REL_DATE}.img"
+                    SD_IMG_NAME="${SD_FILE_PRELUDE}_console_sd_${REL_DATE}"
                 fi
-                SD_IMG_FILE="${CURRENT_DIR}/${SD_IMG_NAME}"
+                SD_IMG_FILE="${CURRENT_DIR}/socfpga_${SD_IMG_NAME}.img"
 
                 echo "MSG: step 1 create ${SD_IMG_FILE}"
-                if [ "${3}" == "ultra96" ]; then
+                if [ "${3}" == "mpsoc" ]; then
                     echo "MSG: No dd uboot install"
                     echo ""
                     echo "Script_MSG: Arm64 detected"
@@ -611,8 +620,8 @@ assemble_full_sd_img() {
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/BOOT.BIN ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/image.ub ${1}
                     else
-                            sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
-                            sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
+                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
                     fi
                     echo "MSG: Unmounting boot partition"
                     unmount_binded ${1}
@@ -623,9 +632,13 @@ assemble_full_sd_img() {
                     if [ "${4}" == "petalinux" ]; then
                         sudo tar xfS ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/rootfs.tar.bz2 -C ${1} --use-compress-program lbzip2
                     else
-                        extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
+                        if [ "${DESKTOP}" == "yes" ]; then
+                            extract_rootfs ${CURRENT_DIR} ${1} "${4}_arm64_${5}_finalized-desktop_with-kernel" ${4}
+                        else
+                            extract_rootfs ${CURRENT_DIR} ${1} "${4}_arm64_${5}_finalized_with-kernel" ${4}
+                        fi
                     fi
-                   bind_mounted ${1}
+                    bind_mounted ${1}
                     sudo sync
                     sudo rm -f ${1}/etc/resolv.conf
                     sudo cp /etc/resolv.conf ${1}/etc/resolv.conf
@@ -634,6 +647,7 @@ assemble_full_sd_img() {
                     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
                     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
                     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install --reinstall libc6-dev'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
                     sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
@@ -653,7 +667,11 @@ assemble_full_sd_img() {
                     create_img "3" "${SD_IMG_FILE}" "${1}" "${media_rootfs_partition}"
                     echo "MSG: step 2 mount:"
                     mount_sd_imagefile ${SD_IMG_FILE} ${1} ${media_rootfs_partition}
-                    extract_rootfs ${CURRENT_DIR} ${1} "${5}_${2}" ${4}
+                    if [ "${DESKTOP}" == "yes" ]; then
+                        extract_rootfs ${CURRENT_DIR} ${1} "armhf_${5}_finalized-desktop_with-kernel" ${4}
+                    else
+                        extract_rootfs ${CURRENT_DIR} ${1} "armhf_${5}_finalized_with-kernel" ${4}
+                    fi
                     bind_mounted ${1}
                     sudo sync
                     sudo rm -f ${1}/etc/resolv.conf
@@ -663,6 +681,7 @@ assemble_full_sd_img() {
                     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
                     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y upgrade'
                     sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install dialog'
+                    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install --reinstall libc6-dev'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/rm -f /etc/resolv.conf'
                     sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -s /run/systemd/resolve/resolv.conf  /etc/resolv.conf'
                     sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
@@ -683,7 +702,12 @@ assemble_full_sd_img() {
                 echo ""
                 echo "# --------->       Running final steps:               <--------------- ---------"
                 echo ""
-                make_bmap_image ${CURRENT_DIR} ${SD_IMG_NAME}
+                make_bmap_image ${CURRENT_DIR} "socfpga_${SD_IMG_NAME}.img"
+                echo "Script_MSG: finished assemble_full_sd_img_${3}-${4}-${5} with success ... !"
+                echo ""
+                echo "# --------->         SD Imaging Completed             <--------------- ---------"
+                echo ""
+                echo "Script_MSG: Image is now completely built and ready for distribution ... !"
             else
                 echo "--assemble_full_sd_img= bad argument --> ${5}"
                 echo "Use =boardname=distroname=username"
@@ -826,56 +850,58 @@ while [ "$1" != "" ]; do
             ;;
         --gen-base-rootfs)
             ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
-            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-base_rootfs-log.txt
+            gen_rootfs_image ${ROOTFS_MNT} "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-base_rootfs-log.txt
             ;;
         --gen-base-rootfs-desktop)
             DESKTOP="yes"
             ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch
-            gen_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/base-${VALUE2}-desktop_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-base_rootfs-log.txt
+            gen_rootfs_image ${ROOTFS_MNT} "${VALUE1}" "${VALUE2}" | tee ${CURRENT_DIR}/Logs/gen-base_rootfs-log.txt
             ;;
        --finalize-rootfs)
-            finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/qemu-${VALUE3}-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            finalize_rootfs_image ${ROOTFS_MNT} "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
             ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch, 5: user name
             ;;
         --finalize-desktop-rootfs)
             DESKTOP="yes"
-            finalize_rootfs_image ${ROOTFS_MNT} "${CURRENT_DIR}/qemu-${VALUE3}-desktop-${VALUE2}_${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
+            finalize_rootfs_image ${ROOTFS_MNT} "${VALUE1}" "${VALUE2}" "${VALUE3}" | tee ${CURRENT_DIR}/Logs/finalize_rootfs-log.txt
             ## parameters: 1: mount dev name, 2: image name, 3: distro name, 4: distro arch, 5: user name
             ;;
         --inst_repo_kernel)sudo losetup -d
-            inst_repo_kernel ${ROOTFS_MNT} "finalized-fully-configured-with-kernel" "${CURRENT_DIR}/finalized-with-kernel-${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}"
+            inst_repo_kernel ${ROOTFS_MNT} "${VALUE1}" "${VALUE2}" "${VALUE3}"
+            ## parameters: 1: mount dev name, 2: bzipname end, 3: rootfs image path, 4: distroname, 5: distro arch, 6: user name
             ;;
         --inst_repo_kernel-desktop)
             DESKTOP="yes"
-            inst_repo_kernel ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" "${CURRENT_DIR}/finalized-with-kernel-and-desktop-${ROOTFS_IMG}" "${VALUE1}" "${VALUE2}" "${VALUE3}"
-            ;;
+            inst_repo_kernel ${ROOTFS_MNT} "${VALUE1}" "${VALUE2}" "${VALUE3}"
+            ## parameters: 1: mount dev name, 2: bzipname end, 3: rootfs image path, 4: distroname, 5: distro arch, 6: user name
+           ;;
         --inst_hs_aud_stuff)
             if [ "$(ls -A ${ROOTFS_MNT})" ]; then
                 echo "Script_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
                 unmount_binded ${ROOTFS_MNT}
             fi
-            create_img "1" "${CURRENT_DIR}/${ROOTFS_IMG}"
-            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
+            create_img "1" rootfs.img
+            mount_imagefile rootfs.img ${ROOTFS_MNT}
             bind_mounted ${ROOTFS_MNT}
-            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop"
+            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-with-kernel-and-desktop"
             mkdir -p ${CURRENT_DIR}/Qt_logs
             inst_cadence ${ROOTFS_MNT} 2>&1| tee ${CURRENT_DIR}/Qt_logs/install_cadence-log.txt
-            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-fully-configured-with-kernel-and-desktop-and-qt-deps"
+            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-with-kernel-and-desktop-and-qt-deps"
             unmount_binded ${ROOTFS_MNT}
             ;;
         --bindmount_rootfsimg)
-            mount_imagefile "${CURRENT_DIR}/${ROOTFS_IMG}" ${ROOTFS_MNT}
+            mount_imagefile rootfs.img ${ROOTFS_MNT}
             bind_mounted ${ROOTFS_MNT}
             ;;
         --bindunmount_rootfsimg)
             unmount_binded ${ROOTFS_MNT}
             ;;
         --assemble_sd_img)
-            assemble_full_sd_img ${ROOTFS_MNT} "finalized-fully-configured-with-kernel" "${VALUE1}" "${VALUE2}" "${VALUE3}"
+            assemble_full_sd_img ${ROOTFS_MNT} "finalized-with-kernel" "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ;;
         --assemble_desktop_sd_img)
             DESKTOP="yes"
-            assemble_full_sd_img ${ROOTFS_MNT} "finalized-fully-configured-with-kernel-and-desktop" "${VALUE1}" "${VALUE2}" "${VALUE3}"
+            assemble_full_sd_img ${ROOTFS_MNT} "finalized-with-kernel-and-desktop" "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ;;
     *)
             echo "ERROR: unknown parameter \"$PARAM\""
