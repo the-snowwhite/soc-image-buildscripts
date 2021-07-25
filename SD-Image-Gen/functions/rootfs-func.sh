@@ -715,26 +715,15 @@ Section "Screen"
 EndSection
 
 EOF'
-    if [ ! "$(ls -A "./mali")" ]; then
-        wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
-        tar -xf mali-400-userspace.tar
-    fi
-    cd mali
-    if [ "${3}" == "bullseye" ]; then
-        if [ ! "$(ls -A "./mali-userspace-binaries")" ]; then
-            git clone https://github.com/Xilinx/mali-userspace-binaries.git
-        fi
-        cd mali-userspace-binaries
-        git checkout rel-v2020.1
-        cd ${CURRENT_DIR}
-#        sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-        sudo cp -P mali/mali-userspace-binaries/r9p0-01rel0/arm-linux-gnueabihf/common/* ${1}/usr/lib/aarch64-linux-gnu
-        sudo cp mali/mali-userspace-binaries/r9p0-01rel0/arm-linux-gnueabihf/x11/libMali.so.9.0  ${1}/usr/lib/aarch64-linux-gnu/libMali.so.9.0
-        echo "MSG: Copy armsoc driver"
-        sudo cp '/home/mib/Projects/2020v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
-    else
-        if [ "${3}" == "buster" ]; then
-            cd rel-v2019.1
+        if [ "${3}" == "bullseye" ]; then
+            wget https://github.com/the-snowwhite/HolosynthV/raw/2020.2.2/VivadoProjects/Myirtech/fz3/lib_drv.tar.gz -O lib_drv.tar.gz
+            sudo tar -xzf lib_drv.tar.gz -C ${1}
+        elif [ "${3}" == "buster" ]; then
+            if [ ! "$(ls -A "./mali")" ]; then
+                wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
+                tar -xf mali-400-userspace.tar
+            fi
+            cd mali/rel-v2019.1
             tar -xf r8p0-01rel0.tar
             cd ${CURRENT_DIR}
             sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
@@ -742,19 +731,20 @@ EOF'
             sudo cp mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
             echo "MSG: Copy armsoc driver"
             sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
-        else
-            if [[ "${3}" == "stretch" ]]; then
-                cd rel-v2018.3
-                tar -xf r8p0-01rel0.tar
-                cd ${CURRENT_DIR}
-                sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                sudo cp -P mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                sudo cp mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                echo "MSG: Copy armsoc driver"
-                sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
+        elif [[ "${3}" == "stretch" ]]; then
+            if [ ! "$(ls -A "./mali")" ]; then
+                wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
+                tar -xf mali-400-userspace.tar
             fi
+            cd mali/rel-v2018.3
+            tar -xf r8p0-01rel0.tar
+            cd ${CURRENT_DIR}
+            sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+            sudo cp -P mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+            sudo cp mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+            echo "MSG: Copy armsoc driver"
+            sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
         fi
-    fi
     else
 
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
