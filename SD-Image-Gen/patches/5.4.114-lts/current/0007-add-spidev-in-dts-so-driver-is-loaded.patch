@@ -1,7 +1,7 @@
-From d1f72f45d6df8ec426d13a5fece8063225a38846 Mon Sep 17 00:00:00 2001
+From 6d2b7b1dabc84a9f4d29ebc310aa90ac4f948a0f Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:09:58 +0200
-Subject: [PATCH 07/10] add spidev in dts so driver is loaded
+Subject: [PATCH 07/11] add spidev in dts so driver is loaded
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---

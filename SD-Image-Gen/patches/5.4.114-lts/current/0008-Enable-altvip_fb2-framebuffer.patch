@@ -1,7 +1,7 @@
-From 66f0d45314479ae44866397ce63283dab85c8cbd Mon Sep 17 00:00:00 2001
+From 514f365c38d34307bddc582d8159c48306f20cbe Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:12:26 +0200
-Subject: [PATCH 08/10] Enable altvip_fb2 framebuffer
+Subject: [PATCH 08/11] Enable altvip_fb2 framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
