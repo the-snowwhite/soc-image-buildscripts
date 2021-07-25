@@ -716,7 +716,7 @@ EndSection
 
 EOF'
         if [ "${3}" == "bullseye" ]; then
-            wget https://github.com/the-snowwhite/HolosynthV/raw/2020.2.2/VivadoProjects/Myirtech/fz3/lib_drv.tar.gz -O lib_drv.tar.gz
+            wget ${HolosynthV_URL}/VivadoProjects/Myirtech/fz3/lib_drv.tar.gz -O lib_drv.tar.gz
             sudo tar -xzf lib_drv.tar.gz -C ${1}
         elif [ "${3}" == "buster" ]; then
             if [ ! "$(ls -A "./mali")" ]; then

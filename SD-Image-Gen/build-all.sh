@@ -23,7 +23,9 @@
 export DEBIAN_FRONTEND=noninteractive
 
 ## Valid boards:
-BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "DExx" "mpsoc")
+BOARDS=("de0_nano_soc" "de10_nano" "de1_soc" "ultra96v1" "fz3" "ultramyir" "k26-stkit")
+
+BOARD_CLASS=("cvsoc" "mpsoc")
 
 ## Valid distros:
 DISTROS=("stretch" "buster" "bullseye" "bionic" "petalinux")
@@ -56,7 +58,7 @@ local_ws=bullseye-ws2
 #local_ub_kernel_repo="http://${local_ws}.holotronic.lan/ubuntu/"
 local_kernel_repo="http://${local_ws}/debian/"
 local_ub_kernel_repo="http://${local_ws}/ubuntu/"
-
+HolosynthV_URL="https://github.com/the-snowwhite/HolosynthV/raw/2020.2.2"
 
 ## 3 part Expandable image with swap in p2
 ROOTFS_TYPE=ext4
@@ -98,7 +100,7 @@ ALT_GIT_KERNEL_REV="-lts"
 #XIL_GIT_KERNEL_VERSION="xilinx"
 XIL_GIT_KERNEL_VERSION="zynqmp"
 #XIL_GIT_KERNEL_REV="-v2019.1"
-XIL_GIT_KERNEL_REV="-5.5-mib"
+XIL_GIT_KERNEL_REV="-5.4"
 
 #RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
 #RT_PATCH_REV="ltsi-rt23"
@@ -291,11 +293,12 @@ install_deps() {
     echo "MSG: deps installed"
 }
 
-build_uboot() {
+## parameters: 1: board name
+uild_uboot() {
     contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
-        if [ "${1}" == "mpsoc" ]; then
+        if [ "${1}" == "ultra96v1" ] || [ "${1}" == "fz3" ] || [ "${1}" == "ultramyir" ] || [ "${1}" == "k26-stkit" ]; then
             echo ""
             echo "! Please use holosynth petalinux bsp to generate boot files"
             echo ""
@@ -322,7 +325,7 @@ build_git_kernel() {
 contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
-        if [ "${1}" == "mpsoc" ]; then
+        if [ "${1}" == "ultra96v1" ] || [ "${1}" == "fz3" ] || [ "${1}" == "ultramyir" ] || [ "${1}" == "k26-stkit" ]; then
             echo ""
             echo "! Please use holosynth petalinux bsp to generate boot files"
             echo ""
@@ -461,15 +464,18 @@ finalize_rootfs_image() {
                 sudo sync
                 if [ "${DESKTOP}" == "yes" ]; then
                     compress_rootfs ${CURRENT_DIR} ${1} "${3}_${4}_finalized-desktop" ${2}
+                    sudo sync
+                    unmount_binded ${1}
+                    sudo mv rootfs.img "${CURRENT_DIR}/${2}_${3}_${4}_finalized-desktop.img"
+                    echo "Script_MSG: renamed rootfs.img to --> ${CURRENT_DIR}/${2}_${3}_${4}_finalized.img"
                 else
                     compress_rootfs ${CURRENT_DIR} ${1} "${3}_${4}_finalized" ${2}
+                    sudo sync
+                    unmount_binded ${1}
+                    sudo mv rootfs.img "${CURRENT_DIR}/${2}_${3}_${4}_finalized.img"
+                    echo "Script_MSG: renamed rootfs.img to --> ${CURRENT_DIR}/${2}_${3}_${4}_finalized.img"
                 fi
- #               set +e
                 sudo sync
-                unmount_binded ${1}
-                sudo mv rootfs.img "${CURRENT_DIR}/${2}_${3}_${4}_finalized.img"
-                sudo sync
-                echo "Script_MSG: renamed rootfs.img to --> ${CURRENT_DIR}/${2}_${3}_${4}_finalized.img"
                 echo ""
                 echo "Script_MSG: finished finalize_rootfs_image_${2}-${3}-${4} with success ... !"
             else
@@ -594,7 +600,7 @@ assemble_full_sd_img() {
             contains ${USERS[@]} ${5}
             if [ "$?" -eq 0 ]; then
                 echo "Valid user name = ${5} given"
-                if [ "${3}" == "mpsoc" ]; then
+                if [ "${3}" == "ultra96v1" ] || [ "${3}" == "fz3" ] || [ "${3}" == "ultramyir" ] || [ "${3}" == "k26-stkit" ]; then
                     SD_KERNEL_VERSION=${XIL_GIT_KERNEL_TAG}
                 else
                     SD_KERNEL_VERSION=${ALT_GIT_KERNEL_TAG}
@@ -608,10 +614,8 @@ assemble_full_sd_img() {
                 SD_IMG_FILE="${CURRENT_DIR}/socfpga_${SD_IMG_NAME}.img"
 
                 echo "MSG: step 1 create ${SD_IMG_FILE}"
-                if [ "${3}" == "mpsoc" ]; then
-                    echo "MSG: No dd uboot install"
-                    echo ""
-                    echo "Script_MSG: Arm64 detected"
+                if [ "${3}" == "ultra96v1" ] || [ "${3}" == "fz3" ] || [ "${3}" == "ultramyir" ] || [ "${3}" == "k26-stkit" ]; then
+                    echo "Script_MSG: Arm64 mpsoc detected"
                     echo ""
                     create_img "2" "${SD_IMG_FILE}" "${1}" "p2" "1"
                     mount_sd_imagefile ${SD_IMG_FILE} ${1} p1
@@ -620,8 +624,18 @@ assemble_full_sd_img() {
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/BOOT.BIN ${1}
                         sudo cp ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/image.ub ${1}
                     else
-                        sudo cp ${XIL_BOOT_FILES_LOC}/BOOT.BIN* ${1}
-                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
+                        if [ "${3}" == "ultra96v1" ]; then
+                            wget ${HolosynthV_URL}/VivadoProjects/Avnet/ultra96v1-holosynthv-2020.2.2.tar.bz2 -O board.tar.bz2                            
+                        elif [ "${3}" == "fz3" ]; then
+                            wget ${HolosynthV_URL}/VivadoProjects/Myirtech/fz3/fz3-holosynthv-2020.2.tar.bz2 -O board.tar.bz2
+                        elif [ "${3}" == "ultramyir" ]; then
+                            wget ${HolosynthV_URL}/VivadoProjects/Myirtech/ultramyir/ultramyir-holosynthv-2020.2.2.tar.bz2 -O board.tar.bz2
+                        elif [ "${3}" == "k26-stkit" ]; then
+                            wget ${HolosynthV_URL}/VivadoProjects/Xilinx/k26-stkit/k26-stkit-holosynthv-2020.2.2.tar.bz2 -O board.tar.bz2
+                        fi
+                        tar xfS board.tar.bz2 "${3}-holosynthv-2020.2.2"/pre-built/linux/images --use-compress-program lbzip2 --strip-components 3
+                        sudo cp images/* ${1}
+#                        sudo cp ${XIL_BOOT_FILES_LOC}/image.ub ${1}
                     fi
                     echo "MSG: Unmounting boot partition"
                     unmount_binded ${1}
@@ -633,9 +647,11 @@ assemble_full_sd_img() {
                         sudo tar xfS ${XIL_BOOT_FILES_LOC}/peta_built/images/linux/rootfs.tar.bz2 -C ${1} --use-compress-program lbzip2
                     else
                         if [ "${DESKTOP}" == "yes" ]; then
-                            extract_rootfs ${CURRENT_DIR} ${1} "${4}_arm64_${5}_finalized-desktop_with-kernel" ${4}
+#                            extract_rootfs ${CURRENT_DIR} ${1} "arm64_${5}_finalized-desktop_with-kernel" ${4}
+                            extract_rootfs ${CURRENT_DIR} ${1} "arm64_${5}_finalized-desktop" ${4}
                         else
-                            extract_rootfs ${CURRENT_DIR} ${1} "${4}_arm64_${5}_finalized_with-kernel" ${4}
+#                            extract_rootfs ${CURRENT_DIR} ${1} "arm64_${5}_finalized_with-kernel" ${4}
+                            extract_rootfs ${CURRENT_DIR} ${1} "arm64_${5}_finalized" ${4}
                         fi
                     fi
                     bind_mounted ${1}
