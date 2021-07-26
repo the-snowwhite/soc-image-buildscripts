@@ -1,7 +1,7 @@
-From 514f365c38d34307bddc582d8159c48306f20cbe Mon Sep 17 00:00:00 2001
+From bb9d0aab15303097989370a2d63b3bbf3a308f73 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:12:26 +0200
-Subject: [PATCH 08/11] Enable altvip_fb2 framebuffer
+Subject: [PATCH 09/12] Enable altvip_fb2 framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
@@ -10,10 +10,10 @@ Signed-off-by: Holotronic <producer@holotronic.dk>
  2 files changed, 113 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 9aa88715f196..cc22f79083a3 100644
+index af8bbf08f14e..694c3c6fa0ef 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
-@@ -1606,6 +1606,7 @@ config ARM_MODULE_PLTS
+@@ -1608,6 +1608,7 @@ config ARM_MODULE_PLTS
  
  config FORCE_MAX_ZONEORDER
  	int "Maximum zone order"

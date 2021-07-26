@@ -1,7 +1,7 @@
-From f75cc5a81e243490f9e3022d462f17736f03f254 Mon Sep 17 00:00:00 2001
+From d6d61d9a19e931ff8f8d4dcba28e04a1562fdd2f Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:49:22 +0200
-Subject: [PATCH 01/11] Remove gittag from kernel (file) name(s)
+Subject: [PATCH 02/12] Remove gittag from kernel (file) name(s)
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---

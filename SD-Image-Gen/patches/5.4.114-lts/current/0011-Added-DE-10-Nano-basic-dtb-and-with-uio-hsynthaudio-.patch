@@ -1,7 +1,7 @@
-From e93956b4ad8e8ffe3118bd5e410d707054b66be9 Mon Sep 17 00:00:00 2001
+From f1dc7c7fce3f5f61b555b00b481c5532cf133f76 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:18:25 +0200
-Subject: [PATCH 10/11] Added DE-10 Nano basic dtb and with uio, hsynthaudio
+Subject: [PATCH 11/12] Added DE-10 Nano basic dtb and with uio, hsynthaudio
  and with SD/HD framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>

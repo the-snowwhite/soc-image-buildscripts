@@ -1,7 +1,7 @@
-From dbd6eb84829d4fe978da23c33e21d7463015464f Mon Sep 17 00:00:00 2001
+From be186a516b07ac7d75eaf8440749bd28b2a33b34 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Mon, 26 Jul 2021 00:30:35 +0200
-Subject: [PATCH 11/11] Enable ALSA sound
+Subject: [PATCH 12/12] Enable ALSA sound
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
