@@ -1,4 +1,4 @@
-From bb9d0aab15303097989370a2d63b3bbf3a308f73 Mon Sep 17 00:00:00 2001
+From 64c5475f2b9d00ea7f88d0804464f572ddc0b22e Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:12:26 +0200
 Subject: [PATCH 09/12] Enable altvip_fb2 framebuffer
@@ -158,5 +158,5 @@ index 897eee544d8d..d07d46550767 100644
 +CONFIG_USB_HID=y
 +CONFIG_HID_MULTITOUCH=y
 -- 
-2.30.2
+2.25.1
 

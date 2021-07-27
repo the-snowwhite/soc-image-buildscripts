@@ -1,4 +1,4 @@
-From 74331e4e36cb6cd442e64e5faa511946bd00ed53 Mon Sep 17 00:00:00 2001
+From c0b266bebefc4783c9094ae38fabe545e0fdac6e Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Mon, 26 Jul 2021 15:27:38 +0200
 Subject: [PATCH 01/12] Apply realtime patch (patch-5.4.129-rt61.patch.xz)
@@ -28345,10 +28345,10 @@ index 2e7d2b3f2907..797ee2ff15f7 100644
  		ret = handle_exit(vcpu, run, ret);
  	}
 -- 
-2.30.2
+2.25.1
 
 
-From d6d61d9a19e931ff8f8d4dcba28e04a1562fdd2f Mon Sep 17 00:00:00 2001
+From 65cc7fc9fa3875e8fd8120b02a39b213fd55ff57 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:49:22 +0200
 Subject: [PATCH 02/12] Remove gittag from kernel (file) name(s)
@@ -28368,10 +28368,10 @@ index 800bc78bcc50..a03de34a4611 100644
  CONFIG_HIGH_RES_TIMERS=y
  CONFIG_IKCONFIG=y
 -- 
-2.30.2
+2.25.1
 
 
-From b0f54c4f5906ae9b40bc7f7332c1fbb447e1087a Mon Sep 17 00:00:00 2001
+From 40374d9b01b8887a1ced804080439a782b94dfaf Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:52:06 +0200
 Subject: [PATCH 03/12] add uio driver module support
@@ -28395,10 +28395,10 @@ index a03de34a4611..161240b7096a 100644
  CONFIG_HIGH_RES_TIMERS=y
  CONFIG_IKCONFIG=y
 -- 
-2.30.2
+2.25.1
 
 
-From 6abe2d30a00f6b471dc5e29882ecb28bf167e699 Mon Sep 17 00:00:00 2001
+From d37833bb4c9bfc9ca2171420359d2ebfb159967f Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:56:45 +0200
 Subject: [PATCH 04/12] add ext4 root fs support and autofs4 module set ACL
@@ -28450,10 +28450,10 @@ index 161240b7096a..897eee544d8d 100644
 +CONFIG_ISCSI_TCP=m
 +CONFIG_ISCSI_TARGET=m
 -- 
-2.30.2
+2.25.1
 
 
-From ecc81b3f4ce2e4fe3fe23341189976d88d0a4308 Mon Sep 17 00:00:00 2001
+From 60b66ba28676b6756132b7bd50188a885e3079a0 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:00:07 +0200
 Subject: [PATCH 05/12] add .dtb files to kernel-image .deb
@@ -28484,10 +28484,10 @@ index c4c580f547ef..38c981a9d1de 100755
  if is_enabled CONFIG_OF_EARLY_FLATTREE; then
  	# Only some architectures with OF support have this target
 -- 
-2.30.2
+2.25.1
 
 
-From 7f0ea901b532d6435bc107950dc643a0de597246 Mon Sep 17 00:00:00 2001
+From 0140eae81b457b8c6fca155d491fcfe81676dee9 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:03:58 +0200
 Subject: [PATCH 06/12] add generate /boot/extlinux/extlinux.conf and
@@ -28531,10 +28531,10 @@ index 38c981a9d1de..56fbcb494061 100755
  # Note: hook scripts under /etc/kernel are also executed by official Debian
  # kernel packages, as well as kernel packages built using make-kpkg.
 -- 
-2.30.2
+2.25.1
 
 
-From 0ec4963d6575f68c644038748f522e396475560f Mon Sep 17 00:00:00 2001
+From e0bed20659f8df8815cb374d5cb653e04501912a Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:08:12 +0200
 Subject: [PATCH 07/12] Enable bridges in dtb's
@@ -28565,10 +28565,10 @@ index e40422077438..2e3591881422 100644
  
  		fpgamgr0: fpgamgr@ff706000 {
 -- 
-2.30.2
+2.25.1
 
 
-From e582d96fc4cdaa22365dc99a9091f89003d2f159 Mon Sep 17 00:00:00 2001
+From 844d684f6125c72b9f879ab2d940418ac47bf0ba Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:09:58 +0200
 Subject: [PATCH 08/12] add spidev in dts so driver is loaded
@@ -28603,10 +28603,10 @@ index 2e3591881422..1aa4a78d79b4 100644
  
  		sysmgr: sysmgr@ffd08000 {
 -- 
-2.30.2
+2.25.1
 
 
-From bb9d0aab15303097989370a2d63b3bbf3a308f73 Mon Sep 17 00:00:00 2001
+From 64c5475f2b9d00ea7f88d0804464f572ddc0b22e Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:12:26 +0200
 Subject: [PATCH 09/12] Enable altvip_fb2 framebuffer
@@ -28766,10 +28766,10 @@ index 897eee544d8d..d07d46550767 100644
 +CONFIG_USB_HID=y
 +CONFIG_HID_MULTITOUCH=y
 -- 
-2.30.2
+2.25.1
 
 
-From b3ed289e855255dd528e1b96b0cc0221dfec7957 Mon Sep 17 00:00:00 2001
+From 73340c43a420d87d1d2722d84bc776daf8d57f68 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Thu, 22 Jul 2021 10:52:56 +0200
 Subject: [PATCH 10/12] add hsynth midi driver
@@ -28781,8 +28781,8 @@ Signed-off-by: Holotronic <producer@holotronic.dk>
  sound/soc/Makefile                 |   1 +
  sound/soc/socsynth/Kconfig         |   2 +
  sound/soc/socsynth/Makefile        |   2 +
- sound/soc/socsynth/hsynth-midi.c   | 215 +++++++++++++++++++++++++++++
- 6 files changed, 223 insertions(+)
+ sound/soc/socsynth/hsynth-midi.c   | 235 +++++++++++++++++++++++++++++
+ 6 files changed, 243 insertions(+)
  create mode 100644 sound/soc/socsynth/Kconfig
  create mode 100644 sound/soc/socsynth/Makefile
  create mode 100644 sound/soc/socsynth/hsynth-midi.c
@@ -28839,10 +28839,10 @@ index 000000000000..126f34202ac8
 +obj-$(CONFIG_SND_SOC_HSYNTH_MIDI) += snd-soc-hsynth-midi.o
 diff --git a/sound/soc/socsynth/hsynth-midi.c b/sound/soc/socsynth/hsynth-midi.c
 new file mode 100644
-index 000000000000..564e6c51fab4
+index 000000000000..34823ba80dde
 --- /dev/null
 +++ b/sound/soc/socsynth/hsynth-midi.c
-@@ -0,0 +1,215 @@
+@@ -0,0 +1,235 @@
 +/*
 +* hsynth-soc -- SoC audio ( midi for Altera SoC boards
 +* Author: Michael Brown the-snowwhite <producer@holotronic.dk>
@@ -28858,6 +28858,7 @@ index 000000000000..564e6c51fab4
 +#include <linux/clk.h>
 +#include <linux/platform_device.h>
 +#include <linux/of.h>
++#include <linux/of_address.h>
 +#include <linux/uaccess.h>
 +#include <linux/ioport.h>
 +#include <linux/io.h>
@@ -28873,9 +28874,7 @@ index 000000000000..564e6c51fab4
 +#define midi_ins 0
 +#define midi_outs 1
 +
-+#define MIDIREG_BASE 0xa0000000
 +#define MIDIREG_SIZE PAGE_SIZE
-+#define MIDIREG_OFFSET 0x00000
 +
 +#define printe(...) pr_err(SYNTHSOCSOUND_LOG_PREFIX __VA_ARGS__)
 +
@@ -28886,6 +28885,9 @@ index 000000000000..564e6c51fab4
 +static void snd_socmidi_transmit(unsigned char data);
 +static void snd_socmidi_output_trigger(struct snd_rawmidi_substream *substream, int);
 +static int hsound_midi_init(struct snd_card *card);
++static int hsynth_soc_audio_probe(struct platform_device *pdev);
++static int soc_audio_remove(struct platform_device *pdev);
++
 +
 +void *midireg_mem;
 +
@@ -28971,7 +28973,6 @@ index 000000000000..564e6c51fab4
 +static int hsound_midi_init(struct snd_card *card)
 +{
 +    int err;
-+struct resource *res;
 +
 +    err = snd_rawmidi_new(card, "SocMIDI", 0, midi_outs, midi_ins, &g_rmidi);
 +
@@ -28990,17 +28991,6 @@ index 000000000000..564e6c51fab4
 +
 +    snd_rawmidi_set_ops(g_rmidi, SNDRV_RAWMIDI_STREAM_OUTPUT, &snd_socmidi_output_ops);
 +
-+    res = request_mem_region((MIDIREG_BASE + MIDIREG_OFFSET), MIDIREG_SIZE, "MIDIREG");
-+    if (res == NULL) {
-+        return -EBUSY;
-+    }
-+
-+    midireg_mem = ioremap((MIDIREG_BASE + MIDIREG_OFFSET), MIDIREG_SIZE);
-+    if (midireg_mem == NULL) {
-+        release_mem_region(MIDIREG_BASE, MIDIREG_SIZE);
-+        return -EFAULT;
-+    }
-+
 +    return 0;
 +}
 +
@@ -29015,7 +29005,37 @@ index 000000000000..564e6c51fab4
 +static int hsynth_soc_audio_probe(struct platform_device *pdev)
 +{
 +    struct snd_soc_card *card = &snd_soc_hsynth_soc;
++    struct resource res;
 +    int ret;
++    void __iomem *base;
++
++    /* Get the addresses */
++    if (of_address_to_resource(pdev->dev.of_node, 0, &res)) {
++        dev_err(&pdev->dev, "Missing reg property\n");
++        return -ENODEV;
++    }
++    midireg_mem = ioremap(res.start, resource_size(&res));
++    if (!midireg_mem) {
++        dev_err(&pdev->dev, "Could not map registers\n");
++        return -ENODEV;
++    }
++/*
++    res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++    if (!res)
++        return -ENODEV;
++
++    res = request_mem_region(&pdev->dev, MIDIREG_SIZE, "MIDIREG");
++    if (res == NULL) {
++        return -EBUSY;
++    }
++
++    midireg_mem = ioremap(&pdev->dev, MIDIREG_SIZE);
++    if (midireg_mem == NULL) {
++        release_mem_region(&pdev->dev, MIDIREG_SIZE);
++        return -EFAULT;
++    }
++*/
++    dev_info(&pdev->dev, "Hsynth midi device at 0x%x\n", (unsigned int) midireg_mem);
 +
 +    card->dev = &pdev->dev;
 +
@@ -29059,10 +29079,10 @@ index 000000000000..564e6c51fab4
 +MODULE_DESCRIPTION("ALSA SoC HSYNTH-MIDI");
 +MODULE_LICENSE("GPL");
 -- 
-2.30.2
+2.25.1
 
 
-From f1dc7c7fce3f5f61b555b00b481c5532cf133f76 Mon Sep 17 00:00:00 2001
+From b930631b5e2825c1c0a0d4c48165572d71a71f3a Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:18:25 +0200
 Subject: [PATCH 11/12] Added DE-10 Nano basic dtb and with uio, hsynthaudio
@@ -29749,10 +29769,10 @@ index 000000000000..bc21c7e28747
 +	status = "okay";
 +};
 -- 
-2.30.2
+2.25.1
 
 
-From be186a516b07ac7d75eaf8440749bd28b2a33b34 Mon Sep 17 00:00:00 2001
+From d533e27d47ea4f209c8dc6a991244efcb9aeb88b Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Mon, 26 Jul 2021 00:30:35 +0200
 Subject: [PATCH 12/12] Enable ALSA sound
@@ -29821,5 +29841,5 @@ index 4d0019124584..395efbc41501 100644
 +CONFIG_SND_SOC_SSM2602_I2C=m
 +CONFIG_SND_SOC_WM8731=m
 -- 
-2.30.2
+2.25.1
 

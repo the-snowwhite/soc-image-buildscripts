@@ -1,4 +1,4 @@
-From e582d96fc4cdaa22365dc99a9091f89003d2f159 Mon Sep 17 00:00:00 2001
+From 844d684f6125c72b9f879ab2d940418ac47bf0ba Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:09:58 +0200
 Subject: [PATCH 08/12] add spidev in dts so driver is loaded
@@ -33,5 +33,5 @@ index 2e3591881422..1aa4a78d79b4 100644
  
  		sysmgr: sysmgr@ffd08000 {
 -- 
-2.30.2
+2.25.1
 

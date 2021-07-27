@@ -1,4 +1,4 @@
-From be186a516b07ac7d75eaf8440749bd28b2a33b34 Mon Sep 17 00:00:00 2001
+From d533e27d47ea4f209c8dc6a991244efcb9aeb88b Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Mon, 26 Jul 2021 00:30:35 +0200
 Subject: [PATCH 12/12] Enable ALSA sound
@@ -67,5 +67,5 @@ index 4d0019124584..395efbc41501 100644
 +CONFIG_SND_SOC_SSM2602_I2C=m
 +CONFIG_SND_SOC_WM8731=m
 -- 
-2.30.2
+2.25.1
 

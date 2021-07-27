@@ -1,4 +1,4 @@
-From ecc81b3f4ce2e4fe3fe23341189976d88d0a4308 Mon Sep 17 00:00:00 2001
+From 60b66ba28676b6756132b7bd50188a885e3079a0 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:00:07 +0200
 Subject: [PATCH 05/12] add .dtb files to kernel-image .deb
@@ -29,5 +29,5 @@ index c4c580f547ef..38c981a9d1de 100755
  if is_enabled CONFIG_OF_EARLY_FLATTREE; then
  	# Only some architectures with OF support have this target
 -- 
-2.30.2
+2.25.1
 
