@@ -687,25 +687,3 @@ make_bmap_image() {
     echo "NOTE:  Bmap image created"
     echo ""
 }
-
-## parameters: 1: dev mount name
-inst_cadence(){
-echo ""
-echo "Script_MSG: Installing Cadence"
-echo ""
-
-sudo cp -f ${1}/etc/apt/sources.list-local ${1}/etc/apt/sources.list
-
-sudo rm -f ${1}/etc/resolv.conf
-sudo cp -f /etc/resolv.conf ${1}/etc/resolv.conf
-
-sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' update'
-
-sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libqwt-qt5-6 libqwt-qt5-dev'
-
-sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install cadence-data cadence-tools cadence claudia catia'
-
-sudo cp -f ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
-sudo chroot --userspec=root:root ${1} /bin/rm -f /etc/resolv.conf
-sudo chroot --userspec=root:root ${1} /bin/ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
-}

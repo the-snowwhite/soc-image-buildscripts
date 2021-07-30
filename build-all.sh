@@ -69,7 +69,6 @@ ROOTFS_MNT="/tmp/myimage"
 
 ROOTFS_LABEL="rootfs"
 ROOTFS_IMG_END_TAG="${ROOTFS_LABEL}.img"
-QT_ROOTFS_IMG_END_TAG="qt_${ROOTFS_LABEL}.img"
 
 ext4_options="-O ^metadata_csum,^64bit"
 #mkfs_options="${ext4_options}"
@@ -80,10 +79,7 @@ mkfs_options=""
 UBOOT_VERSION="v2018.01"
 #UBOOT_VERSION="v2021.01"
 
-#XIL_UBOOT_VERSION="v2018.07"
-#XIL_UBOOT_VERSION="v2018.07-rc3"
 XIL_UBOOT_VERSION="xilinx-v2018.2"
-#UBOOT_MAKE_CONFIG="u-boot-with-spl.sfp"
 UBOOT_MAKE_CONFIG="all"
 UBOOT_IMG_FILENAME="u-boot-with-spl.sfp"
 XIL_UBOOT_IMG_FILENAME="u-boot"
@@ -104,22 +100,10 @@ XIL_GIT_KERNEL_VERSION="zynqmp"
 #XIL_GIT_KERNEL_REV="-v2019.1"
 XIL_GIT_KERNEL_REV="-5.4"
 
-#RT_PATCH_REV="ltsi-rt23-socfpga-initrd"
-#RT_PATCH_REV="ltsi-rt23"
 ALT_KERNEL_CONF="socfpga_defconfig"
 XIL_KERNEL_CONF="xilinx_zynqmp_defconfig"
 ALT_GIT_KERNEL_TAG="${ALT_GIT_KERNEL_VERSION}${ALT_GIT_KERNEL_REV}"
 XIL_GIT_KERNEL_TAG="${XIL_GIT_KERNEL_VERSION}${XIL_GIT_KERNEL_REV}"
-
-QT_VER=5.7.1
-QTDIR="/home/mib/qt-src/qt-everywhere-opensource-src-${QT_VER}"
-#QT_VER=5.10.1
-#QTDIR="/home/mib/qt-src/qt-everywhere-src-${QT_VER}"
-
-QT_1="/tmp/qt_${QT_VER}-img"
-QT_PREFIX="/usr/local/lib/qt-${QT_VER}-altera-soc"
-
-QWTDIR="/home/mib/Developer/ext-repos/qwt/qwt"
 
 #------------------------------------------------------------------------------------------------------
 # Variables Prerequsites
@@ -128,9 +112,6 @@ apt_cmd="apt-get"
 #------------------------------------------------------------------------------------------------------
 WORK_DIR=$(pwd)
 
-#HOME_REPO_DIR="/var/www/repos/apt/debian"
-#HOME_REPO_DIR="/var/www/debian"
-#HOME_REPO_DIR="/var/www/repos/apt"
 #HOME_REPO_DIR="/opt/lampp/htdocs/repos/apt"
 HOME_REPO_DIR="/var/www/html/repos/apt"
 
@@ -146,22 +127,11 @@ CURRENT_DATE=`date -I`
 REL_DATE=${CURRENT_DATE}
 #REL_DATE=2016-03-07
 
-#DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev,tty"
+#DEFGROUPS="sudo,kmem,adm,dialout,holosynth,video,plugdev,netdev,audio,tty"
 
 ## ----------------------------  Toolchain   -----------------------------##
 CROSS_GNU_ARCH="arm-linux-gnueabihf"
 CROSS_GNU_ARCH_64="aarch64-linux-gnu"
-
-QT_CFLAGS="-march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard"
-
-#QT_CC_FOLDER_NAME="gcc-linaro-${CROSS_GNU_ARCH}-4.9-2014.09_linux"
-#QT_CC_FOLDER_NAME=PCH63_CC_FOLDER_NAME
-#QT_CC_FOLDER_NAME=PCH52_CC_FOLDER_NAME
-
-#QT_CC_DIR="${TOOLCHAIN_DIR}/${QT_CC_FOLDER_NAME}"
-#QT_CC_FILE="${QT_CC_FOLDER_NAME}.tar.xz"
-#QT_CC="${QT_CC_DIR}/bin/${CROSS_GNU_ARCH}-"
-QT_CC="/usr/bin/${CROSS_GNU_ARCH}-"
 
 ## ------------------------------  Kernel  -------------------------------##
 
@@ -209,17 +179,11 @@ HOLOSYNTH_QUAR_PROJ_FOLDER='/home/mib/Developer/the-snowwhite_git/HolosynthV/Qua
 
 #-----  select global toolchain  ------#
 
-#CC_FOLDER_NAME=${PCH63_CC_FOLDER_NAME}
-#CC_URL=${PCH63_CC_URL}
-
 #------------------------------------------------------------------------------------------------------
 # Variables Postrequsites
 #------------------------------------------------------------------------------------------------------
 
 #------------  Toolchain  -------------#
-#CC_DIR="${TOOLCHAIN_DIR}/${CC_FOLDER_NAME}"
-#CC_FILE="${CC_FOLDER_NAME}.tar.xz"
-#CC="${CC_DIR}/bin/${CROSS_GNU_ARCH}-"
 CC="${CROSS_GNU_ARCH}-"
 CC_64="${CROSS_GNU_ARCH_64}-"
 
@@ -248,12 +212,6 @@ usage()
     echo "    --build_git-kernel   Will clone, patch and build kernel from git Use =distroname=boardname (add =c to skip build)"
     echo "    --gitkernel2repo   Will add kernel .debs to local repo Use =distroname=distarch"
     echo "    --mk2repo   Will add machinekit .debs to local repo Use =distroname=distarch"
-    echo "    --cadence2repo   Will add cadence .debs to local repo Use =distroname=distarch"
-    echo "    --carla2repo   Will add carla .debs to local repo Use =distroname=distarch"
-    echo "    --lv22repo   Will add lv2plugin .debs to local repo Use =distroname=distarch"
-    echo "    --jackd22repo   Will add Jackd2 .debs to local repo Use =distroname=distarch"
-    echo "    --hikey2repo   Will add Hikey kernel .debs to local repo Use =distroname=distarch"
-    echo "    --dexed2repo   Will add Dexed and plugin .debs to local repo Use =distroname=distarch"
     echo "    --xf86-video-armsoc2repo   Will add xf86-video-armsoc .debs to local repo Use =distroname=distarch"
     echo "    --gen-base-rootfs   Will create single root partition image and generate base rootfs Use =distroname=distarch"
     echo "    --gen-base-rootfs-desktop   Will create single root partition image and generate base rootfs Use =distroname=distarch"
@@ -261,7 +219,6 @@ usage()
     echo "    --finalize-desktop-rootfs   Will create user and configure  rootfs with desktop for fully working out of the box experience Use =distroname=distarch=username"
     echo "    --inst_repo_kernel   Will install kernel from local repo Use =distroname=distarch=username"
     echo "    --inst_repo_kernel-desktop   Will install kernel from local repo in desktop version Use =distroname=distarch=username"
-    echo "    --inst_hs_aud_stuff  Will install holosynth audio stuff in rootfs image"
     echo "    --bindmount_rootfsimg    Will mount rootfs image"
     echo "    --bindunmount_rootfsimg    Will unmount rootfs image"
     echo "    --assemble_sd_img   Will generate full populated sd imagefile and bmap file Use =boardname=distroname=username"
@@ -297,7 +254,7 @@ install_deps() {
 }
 
 ## parameters: 1: board name
-uild_uboot() {
+build_uboot() {
     contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
@@ -815,54 +772,6 @@ while [ "$1" != "" ]; do
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
             add2repo "${VALUE1}" "/home/mib/Development/Docker" "${VALUE2}" "machinekit"
             ;;
-        --cadence2repo)
-            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
-            if [ "${VALUE1}" == "bionic" ]; then
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Cadence" "${VALUE2}" "cadence|claudia|catia|catarina"
-            else
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Cadence" "${VALUE2}" "cadence|claudia|catia|catarina"
-            fi
-            ;;
-        --carla2repo)
-            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
-            if [ "${VALUE1}" == "bionic" ]; then
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Carla" "${VALUE2}" "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler-static|carla"
-            else
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Carla" "${VALUE2}" "fttw3|libjpeg|liblo|libpng|mxml|zlib|pixman|ntk|libogg|libvorbis|flac|sndfile|fluidsynth|gig|linuxsampler-static|carla"
-            fi
-             ;;
-        --lv22repo)
-            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
-            if [ "${VALUE1}" == "bionic" ]; then
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Lv2-plugins" "${VALUE2}" "vs2sdk|sqlite3-static|linuxsampler-lv2|linuxsampler-dssi|linuxsampler-vst|hexter|premake"
-            else
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Lv2-plugins" "${VALUE2}" "vs2sdk|sqlite3-static|linuxsampler-lv2|linuxsampler-dssi|linuxsampler-vst"
-            fi
-             ;;
-        --jackd22repo)
-            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
-            if [ "${VALUE1}" == "bionic" ]; then
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Jackd2" "${VALUE2}" "libopus-custom-static|jackd2|ardour"
-            else
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Jackd2" "${VALUE2}" ""
-            fi
-             ;;
-        --hikey2repo)
-            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
-            if [ "${VALUE1}" == "stretch" ]; then
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Stretch/Hikey" "${VALUE2}" "hikey"
-            else
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Jackd2" "${VALUE2}" ""
-            fi
-             ;;
-        --dexed2repo)
-            ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
-            if [ "${VALUE1}" == "bionic" ]; then
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Bionic/Dexed" "${VALUE2}" "kxstudio3"
-            else
-                add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/Buster/Dexed" "${VALUE2}" ""
-            fi
-             ;;
        --xf86-video-armsoc2repo)
             ## parameters: 1: distro name, 2: dir, 3: dist arch, 4: file filter
             add2repo "${VALUE1}" "/home/mib/Development/Deb-Pkg/armsoc_debs" "${VALUE2}" "xserver-xorg-video-armsoc"
@@ -894,20 +803,6 @@ while [ "$1" != "" ]; do
             inst_repo_kernel ${ROOTFS_MNT} "${VALUE1}" "${VALUE2}" "${VALUE3}"
             ## parameters: 1: mount dev name, 2: bzipname end, 3: rootfs image path, 4: distroname, 5: distro arch, 6: user name
            ;;
-        --inst_hs_aud_stuff)
-            if [ "$(ls -A ${ROOTFS_MNT})" ]; then
-                echo "Script_MSG: !! Found ${ROOTFS_MNT} mounted .. will unmount now"
-                unmount_binded ${ROOTFS_MNT}
-            fi
-            create_img "1" rootfs.img
-            mount_imagefile rootfs.img ${ROOTFS_MNT}
-            bind_mounted ${ROOTFS_MNT}
-            extract_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-with-kernel-and-desktop"
-            mkdir -p ${CURRENT_DIR}/Qt_logs
-            inst_cadence ${ROOTFS_MNT} 2>&1| tee ${CURRENT_DIR}/Qt_logs/install_cadence-log.txt
-            compress_rootfs ${CURRENT_DIR} ${ROOTFS_MNT} "${USER_NAME}_finalized-with-kernel-and-desktop-and-qt-deps"
-            unmount_binded ${ROOTFS_MNT}
-            ;;
         --bindmount_rootfsimg)
             mount_imagefile rootfs.img ${ROOTFS_MNT}
             bind_mounted ${ROOTFS_MNT}
@@ -932,5 +827,4 @@ while [ "$1" != "" ]; do
 done
 
 # echo "Script was run from ${CURRENT_DIR}"
-# echo "Toolchain_dir =  ${TOOLCHAIN_DIR}"
 # echo ""
