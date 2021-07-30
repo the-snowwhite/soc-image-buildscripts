@@ -1,4 +1,5 @@
 #!/bin/bash
+export DEBIAN_FRONTEND=noninteractive
 
 # lightdm,lxqt
 # ## parameters: 1: mount dev name, 2: distro name, 3: repo url, 4: distro arch
@@ -299,7 +300,7 @@ gen_add_user_sh() {
 echo "------------------------------------------"
 echo "generating add_user.sh chroot config script"
 echo "------------------------------------------"
-export DEFGROUPS="sudo,kmem,adm,dialout,${2},video,plugdev,netdev"
+export DEFGROUPS="sudo,kmem,adm,dialout,${2},video,plugdev,netdev,audio,tty"
 
 sudo sh -c 'cat <<EOF > '${1}'/home/add_user.sh
 #!/bin/bash
@@ -353,14 +354,10 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 EOT
 
-
 exit
 EOF'
 
 sudo chmod +x ${1}/home/add_user.sh
-
-#sudo sh -c 'LANG=C.UTF-8  chroot --userspec=root:root '${1}' /usr/sbin/locale-gen en_GB.UTF-8 en_US.UTF-8 da_DK.UTF-8 en_DK.UTF-8'
-
 }
 
 # parameters: 1: mount dev name, 2: distro arch
@@ -476,15 +473,17 @@ gen_local_sources_list ${1} ${3}
 sudo cp ${1}/etc/apt/sources.list-final ${1}/etc/apt/sources.list
 
 if [ "${2}" == "machinekit" ]; then
-    HOST_NAME="mksocfpga-nano-soc"
+    if [ "${4}" == "arm64" ]; then
+        HOST_NAME="mksocfpga-xil"
+    else
+        HOST_NAME="mksocfpga"
+    fi
 elif [ "${2}" == "holosynth" ]; then
     if [ "${4}" == "arm64" ]; then
-        HOST_NAME="holosynthv-u96"
+        HOST_NAME="holosynthv-xil"
     else
         HOST_NAME="holosynthv"
     fi
-elif [ "${2}" == "ubuntu" ]; then
-    HOST_NAME="ultra96"
 fi
 
 gen_hosts ${1} ${HOST_NAME}
@@ -525,9 +524,9 @@ sudo chroot --userspec=root:root ${1} /bin/mkdir -p /tmp
 sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /tmp
 sudo chroot --userspec=root:root ${1} /bin/mkdir -p /var/tmp
 sudo chroot --userspec=root:root ${1} /bin/chmod 1777 /var/tmp
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install debconf gnupg2 sudo wget apt-utils kmod'
+sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
+sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install debconf gnupg2 sudo wget apt-utils kmod'
 
 sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tzdata'
 sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /bin/ln -fs /usr/share/zoneinfo/Europe/Copenhagen /etc/localtime'
@@ -546,16 +545,16 @@ echo "Script_MSG: gen_add_user_sh finished ... will now run in chroot"
 sudo sh -c 'LANG=C.UTF-8 chroot '${1}' '${shell_cmd}' -c /home/add_user.sh'
 
 if [ "${3}" == "buster" ]; then
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install iputils-ping xorg libpam-systemd systemd-sysv'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install iputils-ping xorg libpam-systemd systemd-sysv'
 fi
 echo ""
 echo "Scr_MSG: fix no sudo user ping:"
 echo ""
 sudo chmod u+s ${1}/bin/ping ${1}/bin/ping6
 echo "Script_MSG: installing apt-transport-https"
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
-sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install apt-transport-https'
+sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
+sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install apt-transport-https'
 if [[ "${2}" == "machinekit" ]]; then
     if [ "${4}" != "arm64" ]; then
         add_mk_repo ${1} ${2} ${3}
@@ -566,43 +565,43 @@ if [ "${DESKTOP}" == "yes" ]; then
     echo "Scr_MSG: Installing lxqt"
     if [ "${3}" == "bionic" ] || [ "${3}" == "bullseye" ]; then
         if [ "${3}" == "bionic" ]; then
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core openbox lxqt-sudo'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core openbox lxqt-sudo'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm'
         fi
         if [ "${3}" == "bullseye" ]; then
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install sddm sddm-theme-debian-elarun'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lightdm'
 #            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel task-desktop'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze breeze-cursor-theme breeze-icon-theme'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install tasksel'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install task-lxqt-desktop'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze breeze-cursor-theme breeze-icon-theme'
         fi
     else
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core lxqt-sudo'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt pcmanfm-qt5'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxmenu-data  lxqt-globalkeys lxqt-panel lxqt'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze breeze-cursor-theme breeze-icon-theme'
+        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install software-properties-common'
+        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt-core lxqt-sudo'
+        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxqt pcmanfm-qt5'
+        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install lxmenu-data  lxqt-globalkeys lxqt-panel lxqt'
+        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install breeze breeze-cursor-theme breeze-icon-theme'
     fi
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils mesa-utils-extra xfonts-cyrillic'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
-    sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install mesa-utils mesa-utils-extra xfonts-cyrillic'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y autoremove'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
+    sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y --assume-yes upgrade'
 
     if [[ "${4}" == "arm64" ]]; then
         if [ "${3}" == "bionic" ]; then
-            sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install linux-firmware'
+            sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install linux-firmware'
         else
             if [ "${3}" == "stretch" ]; then
-                sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y -t '${3}'-backports install firmware-ti-connectivity'
+                sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y -t '${3}'-backports install firmware-ti-connectivity'
             else
-                sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install firmware-ti-connectivity'
+                sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install firmware-ti-connectivity'
             fi
         fi
         sudo cp ${WORK_DIR}/../bt/TIInit_11.8.32.bts ${1}/lib/firmware/ti-connectivity/
@@ -611,7 +610,7 @@ if [ "${DESKTOP}" == "yes" ]; then
         echo "Scr_MSG: Installing Cadence deps"
 #        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_9.5.1~kxstudio3_all.deb'
 #        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/dpkg -i kxstudio-repos_9.5.1~kxstudio3_all.deb'
-        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libglibmm-2.4-1v5'
+        sudo sh -c 'DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y install libglibmm-2.4-1v5'
 #        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
 #        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/dpkg -i kxstudio-repos-gcc5_9.5.1~kxstudio3_all.deb'
 #        sudo sh -c 'LANG=C.UTF-8 chroot --userspec=root:root '${1}' /usr/bin/'${apt_cmd}' -y update'
@@ -716,26 +715,15 @@ Section "Screen"
 EndSection
 
 EOF'
-    if [ ! "$(ls -A "./mali")" ]; then
-        wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
-        tar -xf mali-400-userspace.tar
-    fi
-    cd mali
-    if [ "${3}" == "bullseye" ]; then
-        if [ ! "$(ls -A "./mali-userspace-binaries")" ]; then
-            git clone https://github.com/Xilinx/mali-userspace-binaries.git
-        fi
-        cd mali-userspace-binaries
-        git checkout rel-v2020.1
-        cd ${CURRENT_DIR}
-#        sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-        sudo cp -P mali/mali-userspace-binaries/r9p0-01rel0/arm-linux-gnueabihf/common/* ${1}/usr/lib/aarch64-linux-gnu
-        sudo cp mali/mali-userspace-binaries/r9p0-01rel0/arm-linux-gnueabihf/x11/libMali.so.9.0  ${1}/usr/lib/aarch64-linux-gnu/libMali.so.9.0
-        echo "MSG: Copy armsoc driver"
-        sudo cp '/home/mib/Projects/2020v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
-    else
-        if [ "${3}" == "buster" ]; then
-            cd rel-v2019.1
+        if [ "${3}" == "bullseye" ]; then
+            wget ${HolosynthV_URL}/VivadoProjects/Myirtech/fz3/lib_drv.tar.gz -O lib_drv.tar.gz
+            sudo tar -xzf lib_drv.tar.gz -C ${1}
+        elif [ "${3}" == "buster" ]; then
+            if [ ! "$(ls -A "./mali")" ]; then
+                wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
+                tar -xf mali-400-userspace.tar
+            fi
+            cd mali/rel-v2019.1
             tar -xf r8p0-01rel0.tar
             cd ${CURRENT_DIR}
             sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
@@ -743,19 +731,20 @@ EOF'
             sudo cp mali/rel-v2019.1/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
             echo "MSG: Copy armsoc driver"
             sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
-        else
-            if [[ "${3}" == "stretch" ]]; then
-                cd rel-v2018.3
-                tar -xf r8p0-01rel0.tar
-                cd ${CURRENT_DIR}
-                sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                sudo cp -P mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                sudo cp mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
-                echo "MSG: Copy armsoc driver"
-                sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
+        elif [[ "${3}" == "stretch" ]]; then
+            if [ ! "$(ls -A "./mali")" ]; then
+                wget https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
+                tar -xf mali-400-userspace.tar
             fi
+            cd mali/rel-v2018.3
+            tar -xf r8p0-01rel0.tar
+            cd ${CURRENT_DIR}
+            sudo mkdir -p ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+            sudo cp -P mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/common/* ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+            sudo cp mali/rel-v2018.3/r8p0-01rel0/aarch64-linux-gnu/x11/libMali.so.8.0 ${1}/usr/lib/aarch64-linux-gnu/mali-egl
+            echo "MSG: Copy armsoc driver"
+            sudo cp '/home/mib/Projects/2019v1/my-work/armsoc_drv.so'  ${1}/usr/lib/xorg/modules/drivers
         fi
-    fi
     else
 
 sudo sh -c 'cat <<EOF > '${1}'/etc/X11/xorg.conf
@@ -772,6 +761,12 @@ Section "ServerLayout"
     Option "SuspendTime" "0"
     Option "OffTime" "0"
 EndSection
+
+EOF'
+
+sudo sh -c 'cat <<EOF > '${1}'/etc/X11/Xwrapper.config
+allowed_users=anybody
+needs_root_rights=yes
 
 EOF'
     fi

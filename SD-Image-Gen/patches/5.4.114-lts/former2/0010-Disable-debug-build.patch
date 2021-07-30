@@ -1,0 +1,26 @@
+From e606b1fd2d28bca38275e095ca631b76f6447562 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Thu, 22 Jul 2021 13:58:59 +0200
+Subject: [PATCH 10/11] Disable debug build
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 9366f08f0bef..5cf06f7d4387 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -184,7 +184,7 @@ CONFIG_NFSD_V4=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_PRINTK_TIME=y
+-CONFIG_DEBUG_INFO=y
++CONFIG_DEBUG_INFO=n
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_SCHED_DEBUG is not set
+-- 
+2.30.2
+
