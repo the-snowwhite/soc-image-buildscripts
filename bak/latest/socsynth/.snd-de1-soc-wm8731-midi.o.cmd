@@ -1,1 +1,0 @@
-cmd_sound/soc/socsynth/snd-de1-soc-wm8731-midi.o := /home/mib/bin/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-ld -EL    -r -o sound/soc/socsynth/snd-de1-soc-wm8731-midi.o sound/soc/socsynth/de1-soc-wm8731-midi.o 
