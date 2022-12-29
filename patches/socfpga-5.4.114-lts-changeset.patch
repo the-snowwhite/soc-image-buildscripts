@@ -1,9 +1,10 @@
-From c0b266bebefc4783c9094ae38fabe545e0fdac6e Mon Sep 17 00:00:00 2001
+From 6721f4fb412aef63c01f6f7d8fff4f2392fcdd50 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Mon, 26 Jul 2021 15:27:38 +0200
-Subject: [PATCH 01/12] Apply realtime patch (patch-5.4.129-rt61.patch.xz)
+Subject: [PATCH 01/13] Apply realtime patch (patch-5.4.129-rt61.patch.xz)
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  .../Expedited-Grace-Periods.html              |    8 +-
  .../RCU/Design/Requirements/Requirements.html |   24 +-
@@ -28345,15 +28346,16 @@ index 2e7d2b3f2907..797ee2ff15f7 100644
  		ret = handle_exit(vcpu, run, ret);
  	}
 -- 
-2.25.1
+2.34.1
 
 
-From 65cc7fc9fa3875e8fd8120b02a39b213fd55ff57 Mon Sep 17 00:00:00 2001
+From e991807f813e631fc400216f0fb9874a2db122ed Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:49:22 +0200
-Subject: [PATCH 02/12] Remove gittag from kernel (file) name(s)
+Subject: [PATCH 02/13] Remove gittag from kernel (file) name(s)
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/configs/socfpga_defconfig | 1 +
  1 file changed, 1 insertion(+)
@@ -28368,15 +28370,16 @@ index 800bc78bcc50..a03de34a4611 100644
  CONFIG_HIGH_RES_TIMERS=y
  CONFIG_IKCONFIG=y
 -- 
-2.25.1
+2.34.1
 
 
-From 40374d9b01b8887a1ced804080439a782b94dfaf Mon Sep 17 00:00:00 2001
+From 5b5891af9d762068b74ed955d8d1ce71617c7cc3 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:52:06 +0200
-Subject: [PATCH 03/12] add uio driver module support
+Subject: [PATCH 03/13] add uio driver module support
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/configs/socfpga_defconfig | 4 ++++
  1 file changed, 4 insertions(+)
@@ -28395,16 +28398,17 @@ index a03de34a4611..161240b7096a 100644
  CONFIG_HIGH_RES_TIMERS=y
  CONFIG_IKCONFIG=y
 -- 
-2.25.1
+2.34.1
 
 
-From d37833bb4c9bfc9ca2171420359d2ebfb159967f Mon Sep 17 00:00:00 2001
+From e5ecfd051aa38d5c1eed0bdbe0554aca33baeb6a Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:56:45 +0200
-Subject: [PATCH 04/12] add ext4 root fs support and autofs4 module set ACL
+Subject: [PATCH 04/13] add ext4 root fs support and autofs4 module set ACL
  secutity
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/configs/socfpga_defconfig | 14 ++++++++++++--
  1 file changed, 12 insertions(+), 2 deletions(-)
@@ -28450,15 +28454,16 @@ index 161240b7096a..897eee544d8d 100644
 +CONFIG_ISCSI_TCP=m
 +CONFIG_ISCSI_TARGET=m
 -- 
-2.25.1
+2.34.1
 
 
-From 60b66ba28676b6756132b7bd50188a885e3079a0 Mon Sep 17 00:00:00 2001
+From 4e293f461d7dd80856db2aecf5927b7b681831fd Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:00:07 +0200
-Subject: [PATCH 05/12] add .dtb files to kernel-image .deb
+Subject: [PATCH 05/13] add .dtb files to kernel-image .deb
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  scripts/package/builddeb | 2 ++
  1 file changed, 2 insertions(+)
@@ -28484,16 +28489,17 @@ index c4c580f547ef..38c981a9d1de 100755
  if is_enabled CONFIG_OF_EARLY_FLATTREE; then
  	# Only some architectures with OF support have this target
 -- 
-2.25.1
+2.34.1
 
 
-From 0140eae81b457b8c6fca155d491fcfe81676dee9 Mon Sep 17 00:00:00 2001
+From ee10db91d64bd4efd0201250e9e84e86b19439c1 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:03:58 +0200
-Subject: [PATCH 06/12] add generate /boot/extlinux/extlinux.conf and
+Subject: [PATCH 06/13] add generate /boot/extlinux/extlinux.conf and
  /boot/uEnv.txt for uboot boot info
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  scripts/package/builddeb | 21 +++++++++++++++++++++
  1 file changed, 21 insertions(+)
@@ -28531,15 +28537,16 @@ index 38c981a9d1de..56fbcb494061 100755
  # Note: hook scripts under /etc/kernel are also executed by official Debian
  # kernel packages, as well as kernel packages built using make-kpkg.
 -- 
-2.25.1
+2.34.1
 
 
-From e0bed20659f8df8815cb374d5cb653e04501912a Mon Sep 17 00:00:00 2001
+From e29f4fb64e53b5e26e642fefba0e5ab855d9dc4b Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:08:12 +0200
-Subject: [PATCH 07/12] Enable bridges in dtb's
+Subject: [PATCH 07/13] Enable bridges in dtb's
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/boot/dts/socfpga.dtsi | 2 ++
  1 file changed, 2 insertions(+)
@@ -28565,15 +28572,16 @@ index e40422077438..2e3591881422 100644
  
  		fpgamgr0: fpgamgr@ff706000 {
 -- 
-2.25.1
+2.34.1
 
 
-From 844d684f6125c72b9f879ab2d940418ac47bf0ba Mon Sep 17 00:00:00 2001
+From 2c4a59cf9158e5c7ef2b853c5d2f4c25ea760529 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:09:58 +0200
-Subject: [PATCH 08/12] add spidev in dts so driver is loaded
+Subject: [PATCH 08/13] add spidev in dts so driver is loaded
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/boot/dts/socfpga.dtsi | 11 ++++++++++-
  1 file changed, 10 insertions(+), 1 deletion(-)
@@ -28603,15 +28611,16 @@ index 2e3591881422..1aa4a78d79b4 100644
  
  		sysmgr: sysmgr@ffd08000 {
 -- 
-2.25.1
+2.34.1
 
 
-From 64c5475f2b9d00ea7f88d0804464f572ddc0b22e Mon Sep 17 00:00:00 2001
+From cdfa1a55f55adc8cccad661f4f6ca29bd3cd367d Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:12:26 +0200
-Subject: [PATCH 09/12] Enable altvip_fb2 framebuffer
+Subject: [PATCH 09/13] Enable altvip_fb2 framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/Kconfig                   |   1 +
  arch/arm/configs/socfpga_defconfig | 114 ++++++++++++++++++++++++++++-
@@ -28766,15 +28775,16 @@ index 897eee544d8d..d07d46550767 100644
 +CONFIG_USB_HID=y
 +CONFIG_HID_MULTITOUCH=y
 -- 
-2.25.1
+2.34.1
 
 
-From 73340c43a420d87d1d2722d84bc776daf8d57f68 Mon Sep 17 00:00:00 2001
+From bed06ef12d69dfb48c11af7516a45ef6e7727e1d Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Thu, 22 Jul 2021 10:52:56 +0200
-Subject: [PATCH 10/12] add hsynth midi driver
+Subject: [PATCH 10/13] add hsynth midi driver
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/configs/socfpga_defconfig |   2 +
  sound/soc/Kconfig                  |   1 +
@@ -29079,16 +29089,17 @@ index 000000000000..34823ba80dde
 +MODULE_DESCRIPTION("ALSA SoC HSYNTH-MIDI");
 +MODULE_LICENSE("GPL");
 -- 
-2.25.1
+2.34.1
 
 
-From b930631b5e2825c1c0a0d4c48165572d71a71f3a Mon Sep 17 00:00:00 2001
+From 7a3f8c6398f1d02a326244e64d557a242976fe43 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:18:25 +0200
-Subject: [PATCH 11/12] Added DE-10 Nano basic dtb and with uio, hsynthaudio
+Subject: [PATCH 11/13] Added DE-10 Nano basic dtb and with uio, hsynthaudio
  and with SD/HD framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/boot/dts/Makefile                    |   3 +
  .../boot/dts/socfpga_cyclone5_de10_nano.dts   | 189 +++++++++++++++
@@ -29769,15 +29780,16 @@ index 000000000000..bc21c7e28747
 +	status = "okay";
 +};
 -- 
-2.25.1
+2.34.1
 
 
-From d533e27d47ea4f209c8dc6a991244efcb9aeb88b Mon Sep 17 00:00:00 2001
+From e2a4b38d7cbd7c38e00b80a26237a195d75ac67e Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Mon, 26 Jul 2021 00:30:35 +0200
-Subject: [PATCH 12/12] Enable ALSA sound
+Subject: [PATCH 12/13] Enable ALSA sound
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/configs/socfpga_defconfig | 49 ++++++++++++++++++++++++++++++
  1 file changed, 49 insertions(+)
@@ -29841,5 +29853,32 @@ index 4d0019124584..395efbc41501 100644
 +CONFIG_SND_SOC_SSM2602_I2C=m
 +CONFIG_SND_SOC_WM8731=m
 -- 
-2.25.1
+2.34.1
+
+
+From b8cdd3ef1065810647e2b602da8e3bd1e2cc6033 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Thu, 29 Dec 2022 19:27:19 +0100
+Subject: [PATCH 13/13] fix gcc11 soft float issue
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+index 1fc32b611f8a..da4af730d3ce 100644
+--- a/arch/arm/Makefile
++++ b/arch/arm/Makefile
+@@ -16,6 +16,8 @@ LDFLAGS_vmlinux	+= --be8
+ KBUILD_LDFLAGS_MODULE	+= --be8
+ endif
+ 
++KBUILD_CFLAGS	+= -msoft-float
++
+ ifeq ($(CONFIG_ARM_MODULE_PLTS),y)
+ KBUILD_LDS_MODULE	+= $(srctree)/arch/arm/kernel/module.lds
+ endif
+-- 
+2.34.1
 
