@@ -1,10 +1,11 @@
-From b930631b5e2825c1c0a0d4c48165572d71a71f3a Mon Sep 17 00:00:00 2001
+From 7a3f8c6398f1d02a326244e64d557a242976fe43 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:18:25 +0200
-Subject: [PATCH 11/12] Added DE-10 Nano basic dtb and with uio, hsynthaudio
+Subject: [PATCH 11/13] Added DE-10 Nano basic dtb and with uio, hsynthaudio
  and with SD/HD framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/boot/dts/Makefile                    |   3 +
  .../boot/dts/socfpga_cyclone5_de10_nano.dts   | 189 +++++++++++++++
@@ -685,5 +686,5 @@ index 000000000000..bc21c7e28747
 +	status = "okay";
 +};
 -- 
-2.25.1
+2.34.1
 

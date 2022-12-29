@@ -1,4 +1,4 @@
-From 1ea220f69739e0430e1e4552d54156718ee2a71c Mon Sep 17 00:00:00 2001
+From 11d3597ac1e2ee352a328efe48d43f7650e6a867 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:12:26 +0200
 Subject: [PATCH 08/10] Enable altvip_fb2_II framebuffer based on Mister

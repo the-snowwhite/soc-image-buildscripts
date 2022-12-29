@@ -1,7 +1,7 @@
-From 648f20c902f46025d4c2b7dac58c57c53f09fb79 Mon Sep 17 00:00:00 2001
+From 0140eae81b457b8c6fca155d491fcfe81676dee9 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:03:58 +0200
-Subject: [PATCH 05/10] add generate /boot/extlinux/extlinux.conf and
+Subject: [PATCH 06/12] add generate /boot/extlinux/extlinux.conf and
  /boot/uEnv.txt for uboot boot info
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
@@ -42,5 +42,5 @@ index 38c981a9d1de..56fbcb494061 100755
  # Note: hook scripts under /etc/kernel are also executed by official Debian
  # kernel packages, as well as kernel packages built using make-kpkg.
 -- 
-2.30.2
+2.25.1
 

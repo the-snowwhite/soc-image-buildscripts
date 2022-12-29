@@ -1,16 +1,16 @@
-From 0581543096349a504aa2351ac4f84a15acc5fc67 Mon Sep 17 00:00:00 2001
+From b930631b5e2825c1c0a0d4c48165572d71a71f3a Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:18:25 +0200
-Subject: [PATCH 11/11] Added DE-10 Nano basic dtb and with uio, hsynthaudio
+Subject: [PATCH 11/12] Added DE-10 Nano basic dtb and with uio, hsynthaudio
  and with SD/HD framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
  arch/arm/boot/dts/Makefile                    |   3 +
  .../boot/dts/socfpga_cyclone5_de10_nano.dts   | 189 +++++++++++++++
- .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 226 ++++++++++++++++++
- .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 226 ++++++++++++++++++
- 4 files changed, 644 insertions(+)
+ .../dts/socfpga_cyclone5_de10_nano_uio_fb.dts | 224 ++++++++++++++++++
+ .../socfpga_cyclone5_de10_nano_uio_fb_hd.dts  | 224 ++++++++++++++++++
+ 4 files changed, 640 insertions(+)
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
  create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
@@ -226,10 +226,10 @@ index 000000000000..a767457e4354
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
 new file mode 100644
-index 000000000000..aae2ef6efbe7
+index 000000000000..9fa90e0e7a01
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb.dts
-@@ -0,0 +1,226 @@
+@@ -0,0 +1,224 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -303,7 +303,7 @@ index 000000000000..aae2ef6efbe7
 +			<0x00000001 0x00003000 0xff203000 0x00000010>,
 +			<0x00000001 0x00004000 0xff204000 0x00000010>,
 +			<0x00000001 0x00005000 0xff205000 0x00000010>,
-+/*			<0x00000001 0x00031000 0xff231000 0x00000080>,*/
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
 +			<0x00000001 0x00040000 0xff240000 0x00010000>,
 +			<0x00000001 0x00050000 0xff250000 0x00000010>,
 +			<0x00000001 0x00060000 0xff260000 0x00010000>;
@@ -361,18 +361,16 @@ index 000000000000..aae2ef6efbe7
 +			#gpio-cells = <0x2>;
 +			gpio-controller;
 +		};
-+/*
-+		vip@0x100031000 {
-+			compatible = "altr,vip-frame-buffer-ii-2.0";
-+			reg = <0x00000001 0x00031000 0x00000080>;
-+			max-width = <1024>;
-+			max-height = <768>;
-+			bits-per-color = <0x8>;
-+			colors-per-beat = <0x4>;
-+			beats-per-pixel = <0x1>;
-+			mem-word-width = <0x80>;
++
++		dp_0_frame_buf: vip@100031000 {
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1024>;
++			altr,max-height = <768>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <128>;
 +		};
-+*/
++
 +		holosynth_sysex@0x100040000 {
 +			compatible = "generic-uio,ui_pdrv";
 +			reg = <0x00000001 0x00040000 0x00010000>;
@@ -458,10 +456,10 @@ index 000000000000..aae2ef6efbe7
 +};
 diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
 new file mode 100644
-index 000000000000..13d92a91177b
+index 000000000000..bc21c7e28747
 --- /dev/null
 +++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_fb_hd.dts
-@@ -0,0 +1,226 @@
+@@ -0,0 +1,224 @@
 +/*
 +* Copyright Intel Corporation (C) 2017. All rights reserved.
 +*
@@ -535,11 +533,11 @@ index 000000000000..13d92a91177b
 +			<0x00000001 0x00003000 0xff203000 0x00000010>,
 +			<0x00000001 0x00004000 0xff204000 0x00000010>,
 +			<0x00000001 0x00005000 0xff205000 0x00000010>,
-+			<0x00000001 0x00031000 0xff231000 0x00000080>,
-+			<0x00000001 0x00040000 0xff240000 0x00010000>;
-+/*			<0x00000001 0x00050000 0xff250000 0x00000010>,
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00000010>,
 +			<0x00000001 0x00060000 0xff260000 0x00010000>;
-+*/
++
 +		sysid@0x100001000 {
 +			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
 +			reg = <0x00000001 0x00001000 0x00000008>;
@@ -595,14 +593,12 @@ index 000000000000..13d92a91177b
 +		};
 +
 +		vip@0x100031000 {
-+			compatible = "altr,vip-frame-buffer-ii-2.0";
-+			reg = <0x00000001 0x00031000 0x00000080>;
-+			max-width = <1920>;
-+			max-height = <1080>;
-+			bits-per-color = <0x8>;
-+			colors-per-beat = <0x4>;
-+			beats-per-pixel = <0x1>;
-+			mem-word-width = <0x80>;
++			compatible = "altr,vip-frame-buffer-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			altr,max-width = <1920>;
++			altr,max-height = <1080>;
++			altr,bits-per-symbol = <8>;
++			altr,mem-port-width = <0x80>;
 +		};
 +
 +		holosynth_sysex@0x100040000 {
@@ -613,7 +609,7 @@ index 000000000000..13d92a91177b
 +			address_width = <14>;
 +			data_width = <32>;
 +		};
-+/*
++
 +		holosynth_midi@0x100050000 {
 +			compatible = "holotr,socsynth-midi";
 +			reg = <0x00000001 0x00050000 0x00000010>;
@@ -626,7 +622,7 @@ index 000000000000..13d92a91177b
 +			reg = <0x00000001 0x00060000 0x00010000>;
 +			address_width = <14>;
 +			data_width = <32>;
-+		};*/
++		};
 +	};
 +};
 +
@@ -689,5 +685,5 @@ index 000000000000..13d92a91177b
 +	status = "okay";
 +};
 -- 
-2.30.2
+2.25.1
 

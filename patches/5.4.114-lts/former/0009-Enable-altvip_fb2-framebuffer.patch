@@ -1,10 +1,9 @@
-From cdfa1a55f55adc8cccad661f4f6ca29bd3cd367d Mon Sep 17 00:00:00 2001
+From 64c5475f2b9d00ea7f88d0804464f572ddc0b22e Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:12:26 +0200
-Subject: [PATCH 09/13] Enable altvip_fb2 framebuffer
+Subject: [PATCH 09/12] Enable altvip_fb2 framebuffer
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
-Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/Kconfig                   |   1 +
  arch/arm/configs/socfpga_defconfig | 114 ++++++++++++++++++++++++++++-
@@ -159,5 +158,5 @@ index 897eee544d8d..d07d46550767 100644
 +CONFIG_USB_HID=y
 +CONFIG_HID_MULTITOUCH=y
 -- 
-2.34.1
+2.25.1
 

@@ -1,9 +1,10 @@
-From 40374d9b01b8887a1ced804080439a782b94dfaf Mon Sep 17 00:00:00 2001
+From 5b5891af9d762068b74ed955d8d1ce71617c7cc3 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:52:06 +0200
-Subject: [PATCH 03/12] add uio driver module support
+Subject: [PATCH 03/13] add uio driver module support
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/configs/socfpga_defconfig | 4 ++++
  1 file changed, 4 insertions(+)
@@ -22,5 +23,5 @@ index a03de34a4611..161240b7096a 100644
  CONFIG_HIGH_RES_TIMERS=y
  CONFIG_IKCONFIG=y
 -- 
-2.25.1
+2.34.1
 

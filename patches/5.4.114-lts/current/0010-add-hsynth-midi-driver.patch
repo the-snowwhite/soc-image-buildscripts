@@ -1,9 +1,10 @@
-From 73340c43a420d87d1d2722d84bc776daf8d57f68 Mon Sep 17 00:00:00 2001
+From bed06ef12d69dfb48c11af7516a45ef6e7727e1d Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Thu, 22 Jul 2021 10:52:56 +0200
-Subject: [PATCH 10/12] add hsynth midi driver
+Subject: [PATCH 10/13] add hsynth midi driver
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/configs/socfpga_defconfig |   2 +
  sound/soc/Kconfig                  |   1 +
@@ -308,5 +309,5 @@ index 000000000000..34823ba80dde
 +MODULE_DESCRIPTION("ALSA SoC HSYNTH-MIDI");
 +MODULE_LICENSE("GPL");
 -- 
-2.25.1
+2.34.1
 

@@ -1,10 +1,9 @@
-From e2a4b38d7cbd7c38e00b80a26237a195d75ac67e Mon Sep 17 00:00:00 2001
+From d533e27d47ea4f209c8dc6a991244efcb9aeb88b Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Mon, 26 Jul 2021 00:30:35 +0200
-Subject: [PATCH 12/13] Enable ALSA sound
+Subject: [PATCH 12/12] Enable ALSA sound
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
-Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/configs/socfpga_defconfig | 49 ++++++++++++++++++++++++++++++
  1 file changed, 49 insertions(+)
@@ -68,5 +67,5 @@ index 4d0019124584..395efbc41501 100644
 +CONFIG_SND_SOC_SSM2602_I2C=m
 +CONFIG_SND_SOC_WM8731=m
 -- 
-2.34.1
+2.25.1
 

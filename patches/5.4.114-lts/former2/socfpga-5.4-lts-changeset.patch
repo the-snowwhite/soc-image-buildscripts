@@ -1,4 +1,4 @@
-From 96c68a859e53fdd0375db00c195529b672898709 Mon Sep 17 00:00:00 2001
+From 10ff8762fbfce83683840b2d26f703ce62112012 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:49:22 +0200
 Subject: [PATCH 01/10] Remove gittag from kernel (file) name(s)
@@ -21,7 +21,7 @@ index 800bc78bcc50..a03de34a4611 100644
 2.30.2
 
 
-From 40e744f62916fd1ea07ccb8943dd52006d18283b Mon Sep 17 00:00:00 2001
+From b232504807fb13bb616d6465f95628765569bef0 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:52:06 +0200
 Subject: [PATCH 02/10] add uio driver module support
@@ -48,7 +48,7 @@ index a03de34a4611..161240b7096a 100644
 2.30.2
 
 
-From 2b145ace99549ab8c07dcfcb90b6325a06147347 Mon Sep 17 00:00:00 2001
+From 7f41c000dffd952138439233a95aca0c71a7a400 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:56:45 +0200
 Subject: [PATCH 03/10] add ext4 root fs support and autofs4 module set ACL
@@ -103,7 +103,7 @@ index 161240b7096a..897eee544d8d 100644
 2.30.2
 
 
-From d4e70f1076dd60597b1a2e4da6eb9ca6158ef595 Mon Sep 17 00:00:00 2001
+From 6147115a58dc327d8e07f4840c41cd1dda4801e4 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:00:07 +0200
 Subject: [PATCH 04/10] add .dtb files to kernel-image .deb
@@ -137,7 +137,7 @@ index c4c580f547ef..38c981a9d1de 100755
 2.30.2
 
 
-From 609b049b98f67ad15c6c3c907726e5ea7786b82e Mon Sep 17 00:00:00 2001
+From 648f20c902f46025d4c2b7dac58c57c53f09fb79 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:03:58 +0200
 Subject: [PATCH 05/10] add generate /boot/extlinux/extlinux.conf and
@@ -184,7 +184,7 @@ index 38c981a9d1de..56fbcb494061 100755
 2.30.2
 
 
-From 1078522f203f0bca9d2be2e77ff9af0fb6045ff6 Mon Sep 17 00:00:00 2001
+From c16e72696608e2f4e84ed00c5359688013880302 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:08:12 +0200
 Subject: [PATCH 06/10] Enable bridges in dtb's
@@ -218,7 +218,7 @@ index e40422077438..2e3591881422 100644
 2.30.2
 
 
-From c86418ad30e390ee5381102500a0f7f0c6b7e763 Mon Sep 17 00:00:00 2001
+From d1f72f45d6df8ec426d13a5fece8063225a38846 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:09:58 +0200
 Subject: [PATCH 07/10] add spidev in dts so driver is loaded
@@ -256,7 +256,7 @@ index 2e3591881422..1aa4a78d79b4 100644
 2.30.2
 
 
-From 1ea220f69739e0430e1e4552d54156718ee2a71c Mon Sep 17 00:00:00 2001
+From 11d3597ac1e2ee352a328efe48d43f7650e6a867 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:12:26 +0200
 Subject: [PATCH 08/10] Enable altvip_fb2_II framebuffer based on Mister
@@ -722,7 +722,7 @@ index 000000000000..a80ae1a714f7
 2.30.2
 
 
-From 3887d187e39ffbc49b710349e0b0d072e9e77aa6 Mon Sep 17 00:00:00 2001
+From 17bfb18ee96278d260e2babc103f2d3b6da15ef3 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Thu, 22 Jul 2021 10:52:56 +0200
 Subject: [PATCH 09/10] add hsynth midi driver
@@ -1015,7 +1015,7 @@ index 000000000000..564e6c51fab4
 2.30.2
 
 
-From e58fd4c6d225c7d30af3927f4c2dc05aab75abfd Mon Sep 17 00:00:00 2001
+From efb54e749ae7e86434c44a08e380b09e04da55df Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:18:25 +0200
 Subject: [PATCH 10/10] Added DE-10 Nano basic dtb and with uio, hsynthaudio

@@ -1,9 +1,10 @@
-From 60b66ba28676b6756132b7bd50188a885e3079a0 Mon Sep 17 00:00:00 2001
+From 4e293f461d7dd80856db2aecf5927b7b681831fd Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:00:07 +0200
-Subject: [PATCH 05/12] add .dtb files to kernel-image .deb
+Subject: [PATCH 05/13] add .dtb files to kernel-image .deb
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  scripts/package/builddeb | 2 ++
  1 file changed, 2 insertions(+)
@@ -29,5 +30,5 @@ index c4c580f547ef..38c981a9d1de 100755
  if is_enabled CONFIG_OF_EARLY_FLATTREE; then
  	# Only some architectures with OF support have this target
 -- 
-2.25.1
+2.34.1
 

@@ -1,9 +1,10 @@
-From e0bed20659f8df8815cb374d5cb653e04501912a Mon Sep 17 00:00:00 2001
+From e29f4fb64e53b5e26e642fefba0e5ab855d9dc4b Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 22:08:12 +0200
-Subject: [PATCH 07/12] Enable bridges in dtb's
+Subject: [PATCH 07/13] Enable bridges in dtb's
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  arch/arm/boot/dts/socfpga.dtsi | 2 ++
  1 file changed, 2 insertions(+)
@@ -29,5 +30,5 @@ index e40422077438..2e3591881422 100644
  
  		fpgamgr0: fpgamgr@ff706000 {
 -- 
-2.25.1
+2.34.1
 

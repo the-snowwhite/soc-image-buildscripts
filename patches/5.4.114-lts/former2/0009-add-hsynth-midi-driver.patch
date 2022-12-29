@@ -1,4 +1,4 @@
-From 3887d187e39ffbc49b710349e0b0d072e9e77aa6 Mon Sep 17 00:00:00 2001
+From 17bfb18ee96278d260e2babc103f2d3b6da15ef3 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Thu, 22 Jul 2021 10:52:56 +0200
 Subject: [PATCH 09/10] add hsynth midi driver

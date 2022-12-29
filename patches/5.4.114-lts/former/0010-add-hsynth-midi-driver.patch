@@ -1,7 +1,7 @@
-From 17bfb18ee96278d260e2babc103f2d3b6da15ef3 Mon Sep 17 00:00:00 2001
+From 73340c43a420d87d1d2722d84bc776daf8d57f68 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Thu, 22 Jul 2021 10:52:56 +0200
-Subject: [PATCH 09/10] add hsynth midi driver
+Subject: [PATCH 10/12] add hsynth midi driver
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
@@ -10,14 +10,14 @@ Signed-off-by: Holotronic <producer@holotronic.dk>
  sound/soc/Makefile                 |   1 +
  sound/soc/socsynth/Kconfig         |   2 +
  sound/soc/socsynth/Makefile        |   2 +
- sound/soc/socsynth/hsynth-midi.c   | 215 +++++++++++++++++++++++++++++
- 6 files changed, 223 insertions(+)
+ sound/soc/socsynth/hsynth-midi.c   | 235 +++++++++++++++++++++++++++++
+ 6 files changed, 243 insertions(+)
  create mode 100644 sound/soc/socsynth/Kconfig
  create mode 100644 sound/soc/socsynth/Makefile
  create mode 100644 sound/soc/socsynth/hsynth-midi.c
 
 diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
-index 0d0b7617f50b..4f38eb7cac55 100644
+index d07d46550767..4d0019124584 100644
 --- a/arch/arm/configs/socfpga_defconfig
 +++ b/arch/arm/configs/socfpga_defconfig
 @@ -300,3 +300,5 @@ CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
@@ -68,10 +68,10 @@ index 000000000000..126f34202ac8
 +obj-$(CONFIG_SND_SOC_HSYNTH_MIDI) += snd-soc-hsynth-midi.o
 diff --git a/sound/soc/socsynth/hsynth-midi.c b/sound/soc/socsynth/hsynth-midi.c
 new file mode 100644
-index 000000000000..564e6c51fab4
+index 000000000000..34823ba80dde
 --- /dev/null
 +++ b/sound/soc/socsynth/hsynth-midi.c
-@@ -0,0 +1,215 @@
+@@ -0,0 +1,235 @@
 +/*
 +* hsynth-soc -- SoC audio ( midi for Altera SoC boards
 +* Author: Michael Brown the-snowwhite <producer@holotronic.dk>
@@ -87,6 +87,7 @@ index 000000000000..564e6c51fab4
 +#include <linux/clk.h>
 +#include <linux/platform_device.h>
 +#include <linux/of.h>
++#include <linux/of_address.h>
 +#include <linux/uaccess.h>
 +#include <linux/ioport.h>
 +#include <linux/io.h>
@@ -102,9 +103,7 @@ index 000000000000..564e6c51fab4
 +#define midi_ins 0
 +#define midi_outs 1
 +
-+#define MIDIREG_BASE 0xa0000000
 +#define MIDIREG_SIZE PAGE_SIZE
-+#define MIDIREG_OFFSET 0x00000
 +
 +#define printe(...) pr_err(SYNTHSOCSOUND_LOG_PREFIX __VA_ARGS__)
 +
@@ -115,6 +114,9 @@ index 000000000000..564e6c51fab4
 +static void snd_socmidi_transmit(unsigned char data);
 +static void snd_socmidi_output_trigger(struct snd_rawmidi_substream *substream, int);
 +static int hsound_midi_init(struct snd_card *card);
++static int hsynth_soc_audio_probe(struct platform_device *pdev);
++static int soc_audio_remove(struct platform_device *pdev);
++
 +
 +void *midireg_mem;
 +
@@ -200,7 +202,6 @@ index 000000000000..564e6c51fab4
 +static int hsound_midi_init(struct snd_card *card)
 +{
 +    int err;
-+struct resource *res;
 +
 +    err = snd_rawmidi_new(card, "SocMIDI", 0, midi_outs, midi_ins, &g_rmidi);
 +
@@ -219,17 +220,6 @@ index 000000000000..564e6c51fab4
 +
 +    snd_rawmidi_set_ops(g_rmidi, SNDRV_RAWMIDI_STREAM_OUTPUT, &snd_socmidi_output_ops);
 +
-+    res = request_mem_region((MIDIREG_BASE + MIDIREG_OFFSET), MIDIREG_SIZE, "MIDIREG");
-+    if (res == NULL) {
-+        return -EBUSY;
-+    }
-+
-+    midireg_mem = ioremap((MIDIREG_BASE + MIDIREG_OFFSET), MIDIREG_SIZE);
-+    if (midireg_mem == NULL) {
-+        release_mem_region(MIDIREG_BASE, MIDIREG_SIZE);
-+        return -EFAULT;
-+    }
-+
 +    return 0;
 +}
 +
@@ -244,7 +234,37 @@ index 000000000000..564e6c51fab4
 +static int hsynth_soc_audio_probe(struct platform_device *pdev)
 +{
 +    struct snd_soc_card *card = &snd_soc_hsynth_soc;
++    struct resource res;
 +    int ret;
++    void __iomem *base;
++
++    /* Get the addresses */
++    if (of_address_to_resource(pdev->dev.of_node, 0, &res)) {
++        dev_err(&pdev->dev, "Missing reg property\n");
++        return -ENODEV;
++    }
++    midireg_mem = ioremap(res.start, resource_size(&res));
++    if (!midireg_mem) {
++        dev_err(&pdev->dev, "Could not map registers\n");
++        return -ENODEV;
++    }
++/*
++    res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++    if (!res)
++        return -ENODEV;
++
++    res = request_mem_region(&pdev->dev, MIDIREG_SIZE, "MIDIREG");
++    if (res == NULL) {
++        return -EBUSY;
++    }
++
++    midireg_mem = ioremap(&pdev->dev, MIDIREG_SIZE);
++    if (midireg_mem == NULL) {
++        release_mem_region(&pdev->dev, MIDIREG_SIZE);
++        return -EFAULT;
++    }
++*/
++    dev_info(&pdev->dev, "Hsynth midi device at 0x%x\n", (unsigned int) midireg_mem);
 +
 +    card->dev = &pdev->dev;
 +
@@ -288,5 +308,5 @@ index 000000000000..564e6c51fab4
 +MODULE_DESCRIPTION("ALSA SoC HSYNTH-MIDI");
 +MODULE_LICENSE("GPL");
 -- 
-2.30.2
+2.25.1
 

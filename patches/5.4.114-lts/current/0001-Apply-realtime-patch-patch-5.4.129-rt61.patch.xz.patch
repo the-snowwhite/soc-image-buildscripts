@@ -1,9 +1,10 @@
-From c0b266bebefc4783c9094ae38fabe545e0fdac6e Mon Sep 17 00:00:00 2001
+From 6721f4fb412aef63c01f6f7d8fff4f2392fcdd50 Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Mon, 26 Jul 2021 15:27:38 +0200
-Subject: [PATCH 01/12] Apply realtime patch (patch-5.4.129-rt61.patch.xz)
+Subject: [PATCH 01/13] Apply realtime patch (patch-5.4.129-rt61.patch.xz)
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
 ---
  .../Expedited-Grace-Periods.html              |    8 +-
  .../RCU/Design/Requirements/Requirements.html |   24 +-
@@ -28345,5 +28346,5 @@ index 2e7d2b3f2907..797ee2ff15f7 100644
  		ret = handle_exit(vcpu, run, ret);
  	}
 -- 
-2.25.1
+2.34.1
 

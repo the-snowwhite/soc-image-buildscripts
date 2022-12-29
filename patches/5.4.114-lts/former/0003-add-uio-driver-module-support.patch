@@ -1,7 +1,7 @@
-From b232504807fb13bb616d6465f95628765569bef0 Mon Sep 17 00:00:00 2001
+From 40374d9b01b8887a1ced804080439a782b94dfaf Mon Sep 17 00:00:00 2001
 From: Holotronic <producer@holotronic.dk>
 Date: Wed, 21 Jul 2021 21:52:06 +0200
-Subject: [PATCH 02/10] add uio driver module support
+Subject: [PATCH 03/12] add uio driver module support
 
 Signed-off-by: Holotronic <producer@holotronic.dk>
 ---
@@ -22,5 +22,5 @@ index a03de34a4611..161240b7096a 100644
  CONFIG_HIGH_RES_TIMERS=y
  CONFIG_IKCONFIG=y
 -- 
-2.30.2
+2.25.1
 
