@@ -1,0 +1,29 @@
+From beac1f5867970dabdb15aecc6fb9d0750669bab8 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Tue, 13 Oct 2020 16:21:04 +0200
+Subject: [PATCH 06/12] rename kernel package names to *-socfpga-rt-ltsi
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 5750b334dcd3..8adc90587bef 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -95,8 +95,9 @@ tmpdir="$objtree/debian/tmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
+ dbg_dir="$objtree/debian/dbgtmp"
+-packagename=linux-image-$version
+-kernel_headers_packagename=linux-headers-$version
++packagename=linux-image-socfpga-rt-ltsi
++fwpackagename=linux-firmware-image-socfpga-rt-ltsi
++kernel_headers_packagename=linux-headers-socfpga-rt-ltsi
+ libc_headers_packagename=linux-libc-dev
+ dbg_packagename=$packagename-dbg
+ debarch=
+-- 
+2.25.1
+

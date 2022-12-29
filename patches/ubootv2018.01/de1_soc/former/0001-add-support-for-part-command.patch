@@ -1,0 +1,25 @@
+From e6d94008285c8dbde201d2eabb6e808ee1a42006 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 11 Mar 2018 20:02:36 +0100
+Subject: [PATCH 1/2] add support for part command
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ configs/socfpga_de1_soc_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/socfpga_de1_soc_defconfig b/configs/socfpga_de1_soc_defconfig
+index 97a6c5e..bc7af51 100644
+--- a/configs/socfpga_de1_soc_defconfig
++++ b/configs/socfpga_de1_soc_defconfig
+@@ -39,6 +39,7 @@ CONFIG_CMD_FS_GENERIC=y
+ CONFIG_MTDIDS_DEFAULT="nor0=ff705000.spi.0"
+ CONFIG_ENV_IS_IN_MMC=y
+ CONFIG_SPL_DM=y
++CONFIG_CMD_PART=y
+ CONFIG_FPGA_SOCFPGA=y
+ CONFIG_DM_GPIO=y
+ CONFIG_DWAPB_GPIO=y
+-- 
+2.7.4
+

@@ -1,0 +1,37 @@
+From 2d1e0e988a8f586632e349617a0f23f27bfc1e1f Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 10 Jun 2018 17:24:54 +0200
+Subject: [PATCH 25/34] Add irq to De10 Nano vipii fb
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ .../boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+index 4b8b81316cf6..723f2a38e136 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+@@ -169,8 +169,8 @@
+ 			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
+ 			reg = <0x00000001 0x00030000 0x00000100>;
+ 			interrupt-parent = <&intc>;
+-			interrupts = <0 0 4 0 2 1 0 1 1 0 3 4 0 4 4>;
+-			interrupt-names = "jtag_uart", "button_pio", "dipsw_pio", "uioreg_io_0", "socmidi_0";
++			interrupts = <0 0 4 0 2 1 0 1 1 0 3 4 0 4 4 0 5 4>;
++			interrupt-names = "jtag_uart", "button_pio", "dipsw_pio", "uioreg_io_0", "socmidi_0", "alt_vip_cl_vfb_0";
+ 			interrupt-controller;
+ 			#interrupt-cells = <0x1>;
+ 			altr,sw-fifo-depth = <0x20>;
+@@ -179,6 +179,8 @@
+ 		vip@0x100031000 {
+ 			compatible = "altr,vip-frame-buffer-ii-2.0";
+ 			reg = <0x00000001 0x00031000 0x00000080>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 45 4>;
+ 			max-width = <1920>;
+ 			max-height = <1080>;
+ 			bits-per-color = <0x8>;
+-- 
+2.17.1
+

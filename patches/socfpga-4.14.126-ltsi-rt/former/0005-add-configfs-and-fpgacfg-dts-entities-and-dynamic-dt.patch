@@ -1,0 +1,28 @@
+From 41b81d5436f91c2053cff9cd8d92726ac3ddd15b Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Tue, 13 Oct 2020 16:19:13 +0200
+Subject: [PATCH 05/11] add configfs and fpgacfg dts entities, and dynamic dts
+ overlay support
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 3dfd0b066db5..81b159bb1f2c 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -62,6 +62,9 @@ CONFIG_MTD_SPI_NOR=y
+ CONFIG_SPI_CADENCE_QUADSPI=y
+ CONFIG_OF_OVERLAY=y
+ CONFIG_OF_CONFIGFS=y
++CONFIG_UIO=m
++CONFIG_UIO_PDRV_GENIRQ=m
++CONFIG_CONFIGFS_FS=y
+ CONFIG_BLK_DEV_LOOP=y
+ CONFIG_BLK_DEV_RAM=y
+ CONFIG_BLK_DEV_RAM_COUNT=2
+-- 
+2.25.1
+

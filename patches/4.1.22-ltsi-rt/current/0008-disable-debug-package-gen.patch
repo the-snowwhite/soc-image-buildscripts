@@ -1,0 +1,26 @@
+From e8c556703b6272ff6f0f75229988ee80d41f8110 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 1 Aug 2016 00:17:44 +0200
+Subject: [PATCH 08/10] disable debug package gen
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 666820bbcd3f..290fbe62c01c 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -153,7 +153,7 @@ CONFIG_ROOT_NFS=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_PRINTK_TIME=y
+-CONFIG_DEBUG_INFO=y
++CONFIG_DEBUG_INFO=n
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_SCHED_DEBUG is not set
+-- 
+2.11.0
+

@@ -1,0 +1,313 @@
+From bed06ef12d69dfb48c11af7516a45ef6e7727e1d Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Thu, 22 Jul 2021 10:52:56 +0200
+Subject: [PATCH 10/13] add hsynth midi driver
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+Signed-off-by: Michael Brown <mib@kubuntu-22.04-virt>
+---
+ arch/arm/configs/socfpga_defconfig |   2 +
+ sound/soc/Kconfig                  |   1 +
+ sound/soc/Makefile                 |   1 +
+ sound/soc/socsynth/Kconfig         |   2 +
+ sound/soc/socsynth/Makefile        |   2 +
+ sound/soc/socsynth/hsynth-midi.c   | 235 +++++++++++++++++++++++++++++
+ 6 files changed, 243 insertions(+)
+ create mode 100644 sound/soc/socsynth/Kconfig
+ create mode 100644 sound/soc/socsynth/Makefile
+ create mode 100644 sound/soc/socsynth/hsynth-midi.c
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index d07d46550767..4d0019124584 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -300,3 +300,5 @@ CONFIG_TOUCHSCREEN_USB_COMPOSITE=y
+ CONFIG_HID=y
+ CONFIG_USB_HID=y
+ CONFIG_HID_MULTITOUCH=y
++CONFIG_SND_SOC_HSYNTH_MIDI=m
++CONFIG_SND_SEQUENCER=y
+diff --git a/sound/soc/Kconfig b/sound/soc/Kconfig
+index bdc305cece6e..4c512beefd6b 100644
+--- a/sound/soc/Kconfig
++++ b/sound/soc/Kconfig
+@@ -63,6 +63,7 @@ source "sound/soc/rockchip/Kconfig"
+ source "sound/soc/samsung/Kconfig"
+ source "sound/soc/sh/Kconfig"
+ source "sound/soc/sirf/Kconfig"
++source "sound/soc/socsynth/Kconfig"
+ source "sound/soc/sof/Kconfig"
+ source "sound/soc/spear/Kconfig"
+ source "sound/soc/sprd/Kconfig"
+diff --git a/sound/soc/Makefile b/sound/soc/Makefile
+index 861a21b79484..8f007bae32a1 100644
+--- a/sound/soc/Makefile
++++ b/sound/soc/Makefile
+@@ -46,6 +46,7 @@ obj-$(CONFIG_SND_SOC)	+= rockchip/
+ obj-$(CONFIG_SND_SOC)	+= samsung/
+ obj-$(CONFIG_SND_SOC)	+= sh/
+ obj-$(CONFIG_SND_SOC)	+= sirf/
++obj-$(CONFIG_SND_SOC)	+= socsynth/
+ obj-$(CONFIG_SND_SOC)	+= sof/
+ obj-$(CONFIG_SND_SOC)	+= spear/
+ obj-$(CONFIG_SND_SOC)	+= sprd/
+diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
+new file mode 100644
+index 000000000000..457edbfaa620
+--- /dev/null
++++ b/sound/soc/socsynth/Kconfig
+@@ -0,0 +1,2 @@
++config SND_SOC_HSYNTH_MIDI
++       tristate "Holosynth MIDI support"
+diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
+new file mode 100644
+index 000000000000..126f34202ac8
+--- /dev/null
++++ b/sound/soc/socsynth/Makefile
+@@ -0,0 +1,2 @@
++snd-soc-hsynth-midi-objs := hsynth-midi.o
++obj-$(CONFIG_SND_SOC_HSYNTH_MIDI) += snd-soc-hsynth-midi.o
+diff --git a/sound/soc/socsynth/hsynth-midi.c b/sound/soc/socsynth/hsynth-midi.c
+new file mode 100644
+index 000000000000..34823ba80dde
+--- /dev/null
++++ b/sound/soc/socsynth/hsynth-midi.c
+@@ -0,0 +1,235 @@
++/*
++* hsynth-soc -- SoC audio ( midi for Altera SoC boards
++* Author: Michael Brown the-snowwhite <producer@holotronic.dk>
++*
++* Based on de1-soc-wm8731 by
++*  B. Steinsbo <bsteinsbo@gmail.com>
++*
++* Licensed under the GPL-2.
++*/
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/clk.h>
++#include <linux/platform_device.h>
++#include <linux/of.h>
++#include <linux/of_address.h>
++#include <linux/uaccess.h>
++#include <linux/ioport.h>
++#include <linux/io.h>
++
++#include <sound/core.h>
++#include <sound/seq_kernel.h>
++#include <sound/rawmidi.h>
++#include <sound/initval.h>
++#include <sound/soc.h>
++
++#define SYNTHSOCSOUND_LOG_PREFIX "synthsound: "
++
++#define midi_ins 0
++#define midi_outs 1
++
++#define MIDIREG_SIZE PAGE_SIZE
++
++#define printe(...) pr_err(SYNTHSOCSOUND_LOG_PREFIX __VA_ARGS__)
++
++static int snd_socmidi_open(struct snd_rawmidi_substream *substream);
++static int snd_socmidi_close(struct snd_rawmidi_substream *substream);
++static int hmidi_card_probe(struct snd_soc_card *card);
++static int hmidi_card_remove(struct snd_soc_card *card);
++static void snd_socmidi_transmit(unsigned char data);
++static void snd_socmidi_output_trigger(struct snd_rawmidi_substream *substream, int);
++static int hsound_midi_init(struct snd_card *card);
++static int hsynth_soc_audio_probe(struct platform_device *pdev);
++static int soc_audio_remove(struct platform_device *pdev);
++
++
++void *midireg_mem;
++
++static int snd_socmidi_open(struct snd_rawmidi_substream *substream)
++{
++    return 0;
++}
++
++static int snd_socmidi_close(struct snd_rawmidi_substream *substream)
++{
++    return 0;
++}
++
++static int hmidi_card_probe(struct snd_soc_card *card)
++{
++    int err;
++
++    err = hsound_midi_init(card->snd_card);
++
++    if (err < 0) {
++        return err;
++    }
++
++    return 0;
++}
++
++static int hmidi_card_remove(struct snd_soc_card *card)
++{
++    return 0;
++}
++
++static void snd_socmidi_transmit(unsigned char data){
++
++    int count;
++    unsigned char curr_status;
++    if (data >= 0x80 && data < 0xF8) {
++        count = 0;
++        curr_status = data;
++    } else {
++        count = count + 1;
++    }
++    if (count >= 3 && (count & 1) && (curr_status < 0xF0)){
++        iowrite8(curr_status, midireg_mem);
++        iowrite8(data, midireg_mem);
++    } else {
++        iowrite8(data, midireg_mem);
++    }
++
++}
++
++static void snd_socmidi_output_trigger(struct snd_rawmidi_substream *substream, int up) {
++
++    if (!up)
++        return;
++
++    while (1) {
++        unsigned char data;
++        if (snd_rawmidi_transmit(substream, &data, 1) != 1)
++            break; /* no more data */
++        snd_socmidi_transmit(data);
++    }
++}
++
++static struct snd_rawmidi *g_rmidi;
++
++static struct snd_rawmidi_ops snd_socmidi_output_ops = {
++    .open = snd_socmidi_open,
++    .close = snd_socmidi_close,
++    .trigger = snd_socmidi_output_trigger,
++};
++
++static void pisnd_get_port_info(struct snd_rawmidi *rmidi, int number, struct snd_seq_port_info *seq_port_info)
++{
++    seq_port_info->type =
++        SNDRV_SEQ_PORT_TYPE_MIDI_GENERIC |
++        SNDRV_SEQ_PORT_TYPE_HARDWARE |
++        SNDRV_SEQ_PORT_TYPE_PORT;
++    seq_port_info->midi_voices = 0;
++}
++
++static struct snd_rawmidi_global_ops hsnd_global_ops = {.get_port_info = pisnd_get_port_info, };
++
++static int hsound_midi_init(struct snd_card *card)
++{
++    int err;
++
++    err = snd_rawmidi_new(card, "SocMIDI", 0, midi_outs, midi_ins, &g_rmidi);
++
++    if (err < 0) {
++        printe("snd_rawmidi_new failed: %d\n", err);
++        return err;
++    }
++
++    strcpy(g_rmidi->name, "Holosynth MIDI ");
++
++    g_rmidi->info_flags = SNDRV_RAWMIDI_INFO_OUTPUT;
++
++    g_rmidi->ops = &hsnd_global_ops;
++
++    g_rmidi->private_data = (void *)0;
++
++    snd_rawmidi_set_ops(g_rmidi, SNDRV_RAWMIDI_STREAM_OUTPUT, &snd_socmidi_output_ops);
++
++    return 0;
++}
++
++static struct snd_soc_card snd_soc_hsynth_soc = {
++    .name = "HSYNTH-MIDI",
++    .owner = THIS_MODULE,
++    .probe        = hmidi_card_probe,
++    .remove       = hmidi_card_remove,
++
++};
++
++static int hsynth_soc_audio_probe(struct platform_device *pdev)
++{
++    struct snd_soc_card *card = &snd_soc_hsynth_soc;
++    struct resource res;
++    int ret;
++    void __iomem *base;
++
++    /* Get the addresses */
++    if (of_address_to_resource(pdev->dev.of_node, 0, &res)) {
++        dev_err(&pdev->dev, "Missing reg property\n");
++        return -ENODEV;
++    }
++    midireg_mem = ioremap(res.start, resource_size(&res));
++    if (!midireg_mem) {
++        dev_err(&pdev->dev, "Could not map registers\n");
++        return -ENODEV;
++    }
++/*
++    res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++    if (!res)
++        return -ENODEV;
++
++    res = request_mem_region(&pdev->dev, MIDIREG_SIZE, "MIDIREG");
++    if (res == NULL) {
++        return -EBUSY;
++    }
++
++    midireg_mem = ioremap(&pdev->dev, MIDIREG_SIZE);
++    if (midireg_mem == NULL) {
++        release_mem_region(&pdev->dev, MIDIREG_SIZE);
++        return -EFAULT;
++    }
++*/
++    dev_info(&pdev->dev, "Hsynth midi device at 0x%x\n", (unsigned int) midireg_mem);
++
++    card->dev = &pdev->dev;
++
++    ret = snd_soc_register_card(card);
++    if (ret) {
++        dev_err(&pdev->dev, "snd_soc_register_card() failed\n");
++    }
++
++    return ret;
++}
++
++static int soc_audio_remove(struct platform_device *pdev)
++{
++    struct snd_soc_card *card = platform_get_drvdata(pdev);
++
++     snd_soc_unregister_card(card);
++
++    return 0;
++}
++
++static const struct of_device_id soc_hsynth_dt_ids[] = {
++    { .compatible = "holotr,socsynth-midi", },
++    { }
++};
++MODULE_DEVICE_TABLE(of, soc_hsynth_dt_ids);
++
++static struct platform_driver soc_audio_driver = {
++    .driver = {
++        .name	= "soc-synth-midi",
++        .owner	= THIS_MODULE,
++        .of_match_table = of_match_ptr(soc_hsynth_dt_ids),
++    },
++    .probe	= hsynth_soc_audio_probe,
++    .remove	= soc_audio_remove,
++};
++
++module_platform_driver(soc_audio_driver);
++
++/* Module information */
++MODULE_AUTHOR("Michael Brown (the-snowwhite) <producer@holotronic.dk>");
++MODULE_DESCRIPTION("ALSA SoC HSYNTH-MIDI");
++MODULE_LICENSE("GPL");
+-- 
+2.34.1
+

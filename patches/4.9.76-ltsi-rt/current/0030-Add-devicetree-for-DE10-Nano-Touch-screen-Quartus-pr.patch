@@ -1,0 +1,305 @@
+From 98b226d3f29a20a5faddcc5451dec58d5f09b5da Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Fri, 12 Oct 2018 20:51:17 +0200
+Subject: [PATCH 30/34] Add devicetree for DE10 Nano Touch screen Quartus
+ project
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/Makefile                    |   1 +
+ ...pga_cyclone5_de10_nano_uio_aud_fbii_ts.dts | 271 ++++++++++++++++++
+ 2 files changed, 272 insertions(+)
+ create mode 100644 arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_ts.dts
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index cd54d8e8f8fe..9f43fb195c1a 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -703,6 +703,7 @@ dtb-$(CONFIG_ARCH_SOCFPGA) += \
+ 	socfpga_cyclone5_de10_nano_uio_fb.dtb \
+ 	socfpga_cyclone5_de10_nano_uio_fb_hd.dtb \
+ 	socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dtb \
++	socfpga_cyclone5_de10_nano_uio_aud_fbii_ts.dtb \
+ 	socfpga_cyclone5_de10_nano.dtb \
+ 	socfpga_cyclone5_de1_soc.dtb \
+ 	socfpga_cyclone5_de1_soc_aud_fb.dtb \
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_ts.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_ts.dts
+new file mode 100644
+index 000000000000..d18c9bea582c
+--- /dev/null
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_ts.dts
+@@ -0,0 +1,271 @@
++/*
++* Copyright Intel Corporation (C) 2017. All rights reserved.
++*
++* This program is free software; you can redistribute it and/or modify
++* it under the terms and conditions of the GNU General Public License,
++* version 2, as published by the Free Software Foundation.
++*
++* This program is distributed in the hope it will be useful, but WITHOUT
++* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++* more details.
++*
++* You should have received a copy of the GNU General Public License along with
++* this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
++
++#include "socfpga_cyclone5.dtsi"
++
++/ {
++	model = "Terasic DE10-Nano";
++	compatible = "altr,socfpga-cyclone5", "altr,socfpga";
++
++	chosen {
++		bootargs = "earlyprintk";
++		stdout-path = "serial0:115200n8";
++	};
++
++	memory {
++		name = "memory";
++		device_type = "memory";
++		reg = <0x0 0x40000000>; /* 1GB */
++	};
++
++	aliases {
++		ethernet0 = &gmac1;
++	};
++
++	regulator_3_3v: 3-3-v-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "3.3V";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++	};
++
++	leds {
++		compatible = "gpio-leds";
++		hps0 {
++			label = "hps_led0";
++			gpios = <&portb 24 0>;
++			linux,default-trigger = "heartbeat";
++		};
++	};
++
++	keys {
++		compatible = "gpio-keys";
++		hps0 {
++			label = "hps_key0";
++			gpios = <&portb 25 0>;
++			linux,code = <63>;
++			debounce-interval = <50>;
++		};
++	};
++
++	sound {
++		compatible = "holotr,hsynthpcm5102-audio";
++		i2s-controller = <&i2s>;
++		audio-codec = <&hsynthpcm5102_codec>;
++	};
++
++	clk48: clk48 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <24576000>;
++		clock-output-names = "clk48";
++	};
++
++	clk44: clk44 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency  = <33868800>;
++		clock-output-names = "clk44";
++	};
++
++	i2s: i2s@0x0 {
++		#sound-dai-cells = <1>;
++		compatible = "opencores,i2s";
++		reg = <0xff200000 0x20>, <0xff200020 0x20>;
++		clocks = <&clk44>, <&clk48>;
++		clock-names = "clk44", "clk48";
++		dmas = <&pdma 0>, <&pdma 1>;
++		dma-names = "tx", "rx";
++	};
++
++	hsynthpcm5102_codec: hsynthpcm5102-codec@34 {
++	#sound-dai-cells = <0>;
++		compatible = "holotr,hsynthpcm5102";
++		status = "okay";
++	};
++
++	bridge@0xc0000000 {
++		compatible = "altr,bridge-15.1", "simple-bus";
++		reg = <0xc0000000 0x20000000 0xff200000 0x200000>;
++		#address-cells = <0x2>;
++		#size-cells = <0x1>;
++		ranges = <0x00000001 0x00001000 0xff201000 0x00000008>,
++			<0x00000001 0x00002000 0xff202000 0x00000008>,
++			<0x00000001 0x00003000 0xff203000 0x00000010>,
++			<0x00000001 0x00004000 0xff204000 0x00000010>,
++			<0x00000001 0x00005000 0xff205000 0x00000010>,
++			<0x00000001 0x00030000 0xff230000 0x00000100>,
++			<0x00000001 0x00031000 0xff231000 0x00000040>,
++			<0x00000001 0x00040000 0xff240000 0x00010000>,
++			<0x00000001 0x00050000 0xff250000 0x00010000>;
++
++		sysid@0x100001000 {
++			compatible = "altr,sysid-15.1", "altr,sysid-1.0";
++			reg = <0x00000001 0x00001000 0x00000008>;
++			id = <0xacd51302>;
++			timestamp = <0x5929e204>;
++		};
++
++		serial@0x100002000 {
++			compatible = "altr,juart-15.1", "altr,juart-1.0";
++			reg = <0x00000001 0x00002000 0x00000008>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 40 4>;
++		};
++
++		gpio@0x100003000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00003000 0x00000010>;
++			altr,gpio-bank-width = <0x8>;
++			resetvalue = <0xff>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};// (led_pio)
++
++		gpio@0x100004000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00004000 0x00000010>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 41 1>;
++			altr,gpio-bank-width = <0x4>;
++			altr,interrupt-type = <0x3>;
++			altr,interrupt_type = <0x3>;
++			edge_type = <0x2>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};// (dipsw_pio)
++
++		gpio@0x100005000 {
++			compatible = "altr,pio-15.1", "altr,pio-1.0";
++			reg = <0x00000001 0x00005000 0x00000010>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 42 1>;
++			altr,gpio-bank-width = <0x2>;
++			altr,interrupt-type = <0x2>;
++			altr,interrupt_type = <0x2>;
++			edge_type = <0x1>;
++			level_trigger = <0x0>;
++			resetvalue = <0x0>;
++			#gpio-cells = <0x2>;
++			gpio-controller;
++		};// (button_pio)
++
++		ilc@0x100030000 {
++			compatible = "altr,altera_ilc-15.1", "altr,ilc-1.0";
++			reg = <0x00000001 0x00030000 0x00000100>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 0 4 0 2 1 0 1 1 0 3 4 0 4 4 0 5 4>;
++			interrupt-names = "jtag_uart", "button_pio", "dipsw_pio", "uioreg_io_0", "socmidi_0", "alt_vip_cl_vfb_0";
++			interrupt-controller;
++			#interrupt-cells = <0x1>;
++			altr,sw-fifo-depth = <0x20>;
++		};
++
++		vip@0x100031000 {
++			compatible = "altr,vip-frame-buffer-ii-2.0";
++			reg = <0x00000001 0x00031000 0x00000040>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 45 4>;
++			max-width = <1366>;
++			max-height = <768>;
++			bits-per-color = <0x8>;
++			colors-per-beat = <0x4>;
++			beats-per-pixel = <0x1>;
++			mem-word-width = <0x80>;
++		};
++
++		uio-socfpg0@0x100040000 {
++			compatible = "generic-uio,ui_pdrv";
++			reg = <0x00000001 0x00040000 0x00010000>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 43 4>;
++			address_width = <14>;
++			data_width = <32>;
++		};
++
++		socmidi@0x100050000 {
++			compatible = "holotr,socsynth-midi";
++			reg = <0x00000001 0x00050000 0x00010000>;
++			interrupt-parent = <&intc>;
++			interrupts = <0 44 4>;
++			address_width = <3>;   /* embeddedsw.dts.params.address_width type NUMBER */
++			data_width = <8>;      /* embeddedsw.dts.params.data_width type NUMBER */
++		};
++	};
++};
++
++&gmac1 {
++	status = "okay";
++	phy-mode = "rgmii";
++
++	txd0-skew-ps = <0>; /* -420ps */
++	txd1-skew-ps = <0>; /* -420ps */
++	txd2-skew-ps = <0>; /* -420ps */
++	txd3-skew-ps = <0>; /* -420ps */
++	rxd0-skew-ps = <420>; /* 0ps */
++	rxd1-skew-ps = <420>; /* 0ps */
++	rxd2-skew-ps = <420>; /* 0ps */
++	rxd3-skew-ps = <420>; /* 0ps */
++	txen-skew-ps = <0>; /* -420ps */
++	txc-skew-ps = <1860>; /* 960ps */
++	rxdv-skew-ps = <420>; /* 0ps */
++	rxc-skew-ps = <1680>; /* 780ps */
++
++	max-frame-size = <3800>;
++};
++
++&gpio0 {
++	status = "okay";
++};
++
++&gpio1 {
++	status = "okay";
++};
++
++&gpio2 {
++	status = "okay";
++};
++
++&i2c0 {
++	status = "okay";
++	speed-mode = <0>;
++
++	adxl345: adxl345@0 {
++		compatible = "adi,adxl34x";
++		reg = <0x53>;
++
++		interrupt-parent = <&intc>;
++		interrupts = <3 2>;
++	};
++};
++
++&mmc0 {
++	vmmc-supply = <&regulator_3_3v>;
++	vqmmc-supply = <&regulator_3_3v>;
++	status = "okay";
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&usb1 {
++	disable-over-current;
++	dr_mode = "host";
++	status = "okay";
++};
+-- 
+2.17.1
+

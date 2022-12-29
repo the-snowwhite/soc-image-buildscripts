@@ -1,0 +1,26 @@
+From 6f99e063c6684a36cb08a6252807bde79a5bde8b Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sat, 16 Jul 2016 22:25:32 +0200
+Subject: [PATCH 02/12] enable jumboframes maxmtu=9000
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts b/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
+index 555e9caf21e1..5b79c0c7c5be 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de0_sockit.dts
+@@ -69,7 +69,7 @@
+ 	rxdv-skew-ps = <420>; /* 0ps */
+ 	rxc-skew-ps = <1680>; /* 780ps */
+ 
+-	max-frame-size = <3800>;
++	max-frame-size = <9000>;
+ };
+ 
+ &gpio0 {
+-- 
+2.11.0
+

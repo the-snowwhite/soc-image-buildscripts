@@ -1,0 +1,327 @@
+From 6b534d3abc39d271f09f6671844b8d489444dab8 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 11 Jun 2018 16:18:22 +0200
+Subject: [PATCH 28/34] Sounddriver mods
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ ...pga_cyclone5_de10_nano_uio_aud_fbii_hd.dts |  4 +-
+ arch/arm/configs/socfpga_defconfig            |  4 +-
+ sound/soc/socsynth/Kconfig                    |  4 +-
+ sound/soc/socsynth/Makefile                   |  8 +-
+ .../{pcm5102-hsynth.c => hsynth-phdac.c}      | 78 +++++++++----------
+ 5 files changed, 49 insertions(+), 49 deletions(-)
+ rename sound/soc/socsynth/{pcm5102-hsynth.c => hsynth-phdac.c} (85%)
+
+diff --git a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+index 317c9c5a97c3..75a9d7a94c78 100644
+--- a/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
++++ b/arch/arm/boot/dts/socfpga_cyclone5_de10_nano_uio_aud_fbii_hd.dts
+@@ -62,7 +62,7 @@
+ 	};
+ 
+ 	sound {
+-		compatible = "opencores,hsynthpcm5102-audio";
++		compatible = "holotr,hsynthpcm5102-audio";
+ 		i2s-controller = <&i2s>;
+ 		audio-codec = <&hsynthpcm5102_codec>;
+ 	};
+@@ -91,7 +91,7 @@
+ 		dma-names = "tx", "rx";
+ 	};
+ 
+-	hsynthpcm5102_codec: hsynthpcm5102-codec {
++	hsynthpcm5102_codec: hsynthpcm5102-codec@34 {
+ 	#sound-dai-cells = <0>;
+ 		compatible = "holotr,hsynthpcm5102";
+ 		status = "okay";
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 4ca99129e968..14cf5aad9574 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -263,7 +263,7 @@ CONFIG_USB_GSPCA_SQ905C=y
+ CONFIG_USB_GSPCA_SQ930X=y
+ CONFIG_USB_GSPCA_STK014=y
+ CONFIG_USB_GSPCA_STK1135=y
+-+CONFIG_USB_GSPCA_STV0680=y
++CONFIG_USB_GSPCA_STV0680=y
+ CONFIG_USB_GSPCA_SUNPLUS=y
+ CONFIG_USB_GSPCA_T613=y
+ CONFIG_USB_GSPCA_TOPRO=y
+@@ -313,7 +313,7 @@ CONFIG_SND_SOC_DE1x_WM8731=m
+ CONFIG_SND_SOC_DE1x_WM8731_HSYNTH=m
+ CONFIG_SND_SOC_HSYNTH_MIDI=m
+ CONFIG_SND_SOC_PCM5102A=m
+-CONFIG_SND_SOC_PCM5102_HSYNTH=m
++CONFIG_SND_SOC_HSYNTH_PHDAC=m
+ CONFIG_FPGADMA=m
+ CONFIG_REGMAP_I2C=y
+ CONFIG_REGMAP_SPI=y
+diff --git a/sound/soc/socsynth/Kconfig b/sound/soc/socsynth/Kconfig
+index b6b7dec7364c..9a0516c7f60f 100644
+--- a/sound/soc/socsynth/Kconfig
++++ b/sound/soc/socsynth/Kconfig
+@@ -16,7 +16,7 @@ config SND_SOC_HSYNTHDMA
+          This driver can also be built as a module.  If so, the module
+          will be called hsynthdma.
+ 
+-config SND_SOC_DE1x_WM8731_HSYNTH
++config SND_SOC_DE1_WM8731_HSYNTH
+        tristate "DE1-Audio MIDI support"
+        select SND_SOC_WM8731
+        select SND_SOC_OC_I2S
+@@ -28,7 +28,7 @@ config SND_SOC_DE1x_WM8731_HSYNTH
+ config SND_SOC_HSYNTH_MIDI
+        tristate "Holosynth MIDI support"
+ 
+-config SND_SOC_PCM5102_HSYNTH
++config SND_SOC_HSYNTH_PHDAC
+        tristate "DE10-Nano-PiDac/Holosynth audio support"
+        select SND_SOC_HSYNTHPCM5102
+        select SND_SOC_OC_I2S
+diff --git a/sound/soc/socsynth/Makefile b/sound/soc/socsynth/Makefile
+index 69fb2aa3b284..caac9d6e9318 100644
+--- a/sound/soc/socsynth/Makefile
++++ b/sound/soc/socsynth/Makefile
+@@ -1,8 +1,8 @@
+ snd-soc-opencores_i2s-objs := opencores_i2s.o
+ obj-$(CONFIG_SND_SOC_OC_I2S) += snd-soc-opencores_i2s.o
+ 
+-snd-de1-soc-wm8731-hsynth-objs := de1-soc-wm8731-hsynth.o
+-obj-$(CONFIG_SND_SOC_DE1x_WM8731_HSYNTH) += snd-de1-soc-wm8731-hsynth.o
++snd-soc-de1-soc-wm8731-hsynth-objs := de1-soc-wm8731-hsynth.o
++obj-$(CONFIG_SND_SOC_DE1_WM8731_HSYNTH) += snd-soc-de1-soc-wm8731-hsynth.o
+ 
+ snd-soc-hsynthdma-objs := hsynthdma.o
+ obj-$(CONFIG_SND_SOC_HSYNTHDMA) += snd-soc-hsynthdma.o
+@@ -10,8 +10,8 @@ obj-$(CONFIG_SND_SOC_HSYNTHDMA) += snd-soc-hsynthdma.o
+ snd-soc-hsynth-midi-objs := hsynth-midi.o
+ obj-$(CONFIG_SND_SOC_HSYNTH_MIDI) += snd-soc-hsynth-midi.o
+ 
+-snd-pcm5102-hsynth-objs := pcm5102-hsynth.o
+-obj-$(CONFIG_SND_SOC_PCM5102_HSYNTH) += snd-pcm5102-hsynth.o
++snd-soc-hsynth-phdac-objs := hsynth-phdac.o
++obj-$(CONFIG_SND_SOC_HSYNTH_PHDAC) += snd-soc-hsynth-phdac.o
+ 
+ snd-soc-de1x-soc-wm8731-objs := de1x-soc-wm8731.o
+ obj-$(CONFIG_SND_SOC_DE1x_WM8731) += snd-soc-de1x-soc-wm8731.o
+diff --git a/sound/soc/socsynth/pcm5102-hsynth.c b/sound/soc/socsynth/hsynth-phdac.c
+similarity index 85%
+rename from sound/soc/socsynth/pcm5102-hsynth.c
+rename to sound/soc/socsynth/hsynth-phdac.c
+index 3011c2b42579..c99a5b485fee 100644
+--- a/sound/soc/socsynth/pcm5102-hsynth.c
++++ b/sound/soc/socsynth/hsynth-phdac.c
+@@ -161,7 +161,7 @@
+ /*
+ static unsigned int i2c_mux_gpio;
+ 
+-static int de10soc_hw_params(struct snd_pcm_substream *substream,
++static int hspdac_hw_params(struct snd_pcm_substream *substream,
+     struct snd_pcm_hw_params *params)
+ {
+     struct snd_soc_pcm_runtime *rtd = substream->private_data;
+@@ -187,7 +187,7 @@ static int de10soc_hw_params(struct snd_pcm_substream *substream,
+     return 0;
+ }
+ */
+-// static void de10soc_shutdown(struct snd_pcm_substream *substream)
++// static void hspdac_shutdown(struct snd_pcm_substream *substream)
+ // {
+ //     struct snd_soc_pcm_runtime *rtd = substream->private_data;
+ //     struct snd_soc_dai *codec_dai = rtd->codec_dai;
+@@ -202,16 +202,16 @@ static int de10soc_hw_params(struct snd_pcm_substream *substream,
+ //     }
+ // }
+ /*
+-static struct snd_soc_ops de10soc_ops = {
++static struct snd_soc_ops hspdac_ops = {
+     // .startup
+-//    .shutdown = de10soc_shutdown,
+-    .hw_params = de10soc_hw_params,
++//    .shutdown = hspdac_shutdown,
++    .hw_params = hspdac_hw_params,
+     // .hw_free
+     // .prepare
+     // .trigger
+ };
+ */
+-static const struct snd_soc_dapm_widget de10soc_dapm_widgets[] = {
++static const struct snd_soc_dapm_widget hspdac_dapm_widgets[] = {
+     SND_SOC_DAPM_LINE("Line Out", NULL),
+     SND_SOC_DAPM_LINE("Hsynth in", NULL),
+ };
+@@ -221,7 +221,7 @@ static const struct snd_soc_dapm_route intercon[] = {
+     {"HSYNTH", NULL, "Hsynth in"},
+ };
+ 
+-static int de10soc_hsynthpcm5102_init(struct snd_soc_pcm_runtime *rtd)
++static int hspdac_init(struct snd_soc_pcm_runtime *rtd)
+ {
+     struct snd_soc_dai *codec_dai = rtd->codec_dai;
+     struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
+@@ -281,48 +281,48 @@ static int de10soc_hsynthpcm5102_init(struct snd_soc_pcm_runtime *rtd)
+ //     return 0;
+ // }
+ 
+-static struct snd_soc_dai_link de10soc_dai = {
++static struct snd_soc_dai_link hspdac_dai = {
+ //	{ /* Primary DAI i/f */
+     .name = "SSND0",
+     .stream_name = "HSYNTH PCM5102",
+     .cpu_dai_name = "ff200000.i2s",
+     .codec_dai_name = "hsynthpcm5102-hifi",
+-    .init = de10soc_hsynthpcm5102_init,
+-    .platform_name = "de10soc",
+-    .codec_name = "hsynthpcm5102.hsynth",
+-//    .ops = &de10soc_ops,
++    .init = hspdac_init,
++    .platform_name = "hspdac",
++    .codec_name = "hsynthpcm5102.0-001b",
++//    .ops = &hspdac_ops,
+ // 	}, { /* Sec_Fifo Playback i/f */
+ //     .name = "SSND1",
+ //     .stream_name = "HSYNTH PCM",
+ //     .cpu_dai_name = "ff200000.dmalink",
+ //     .codec_dai_name = "hsynth7002-hifi",
+ //     .init = soc_hsynth_init,
+-//     .platform_name = "de10soc",
++//     .platform_name = "hspdac",
+ //     .codec_name = "hsynth7002.hsynth",
+ //	},
+ };
+ 
+-static struct snd_soc_card snd_soc_de10soc = {
++static struct snd_soc_card snd_soc_hspdac = {
+     .name = "DE10SND",
+     .owner = THIS_MODULE,
+-    .dai_link = &de10soc_dai,
+-//    .num_links = ARRAY_SIZE(de10soc_dai),
++    .dai_link = &hspdac_dai,
++//    .num_links = ARRAY_SIZE(hspdac_dai),
+     .num_links = 1,
+ 
+ //     .probe        = hmidi_card_probe,
+ //     .remove       = hmidi_card_remove,
+ 
+-    .dapm_widgets = de10soc_dapm_widgets,
+-    .num_dapm_widgets = ARRAY_SIZE(de10soc_dapm_widgets),
++    .dapm_widgets = hspdac_dapm_widgets,
++    .num_dapm_widgets = ARRAY_SIZE(hspdac_dapm_widgets),
+     .dapm_routes = intercon,
+     .num_dapm_routes = ARRAY_SIZE(intercon),
+ };
+ 
+-static int de10soc_audio_probe(struct platform_device *pdev)
++static int hspdac_audio_probe(struct platform_device *pdev)
+ {
+     struct device_node *np = pdev->dev.of_node;
+     struct device_node *codec_np, *cpu_np;
+-    struct snd_soc_card *card = &snd_soc_de10soc;
++    struct snd_soc_card *card = &snd_soc_hspdac;
+     int ret;
+ 
+     if (!np) {
+@@ -346,49 +346,49 @@ static int de10soc_audio_probe(struct platform_device *pdev)
+ //     }
+ 
+     /* Parse codec1 info */
+-    de10soc_dai.codec_name = NULL;
++    hspdac_dai.codec_name = NULL;
+     codec_np = of_parse_phandle(np, "audio-codec", 0);
+     if (!codec_np) {
+         dev_err(&pdev->dev, "audio-codec info missing\n");
+         return -EINVAL;
+     }
+-    de10soc_dai.codec_of_node = codec_np;
++    hspdac_dai.codec_of_node = codec_np;
+ 
+     /* Parse dai and platform info */
+-    de10soc_dai.cpu_dai_name = NULL;
+-    de10soc_dai.platform_name = NULL;
++    hspdac_dai.cpu_dai_name = NULL;
++    hspdac_dai.platform_name = NULL;
+     cpu_np = of_parse_phandle(np, "i2s-controller", 0);
+     if (!cpu_np) {
+         dev_err(&pdev->dev, "i2s dai1 and pcm info missing\n");
+         return -EINVAL;
+     }
+ 
+-    de10soc_dai.cpu_of_node = cpu_np;
+-    de10soc_dai.platform_of_node = cpu_np;
++    hspdac_dai.cpu_of_node = cpu_np;
++    hspdac_dai.platform_of_node = cpu_np;
+ 
+     of_node_put(codec_np);
+     of_node_put(cpu_np);
+ 
+     /* Parse codec2 info */
+-//     de10soc_dai[1].codec_name = NULL;
++//     hspdac_dai[1].codec_name = NULL;
+ //     codec_np = of_parse_phandle(np, "synth-codec", 0);
+ //     if (!codec_np) {
+ //         dev_err(&pdev->dev, "synth-codec info missing\n");
+ //         return -EINVAL;
+ //     }
+-//     de10soc_dai[1].codec_of_node = codec_np;
++//     hspdac_dai[1].codec_of_node = codec_np;
+ //
+ //     /* Parse dai and platform info */
+-//     de10soc_dai[1].cpu_dai_name = NULL;
+-//     de10soc_dai[1].platform_name = NULL;
++//     hspdac_dai[1].cpu_dai_name = NULL;
++//     hspdac_dai[1].platform_name = NULL;
+ //     cpu_np = of_parse_phandle(np, "dmalink-controller", 0);
+ //     if (!cpu_np) {
+ //         dev_err(&pdev->dev, "dmalink-controller info missing\n");
+ //         return -EINVAL;
+ //     }
+ //
+-//     de10soc_dai[1].cpu_of_node = cpu_np;
+-//     de10soc_dai[1].platform_of_node = cpu_np;
++//     hspdac_dai[1].cpu_of_node = cpu_np;
++//     hspdac_dai[1].platform_of_node = cpu_np;
+ //
+ //     of_node_put(codec_np);
+ //     of_node_put(cpu_np);
+@@ -402,7 +402,7 @@ static int de10soc_audio_probe(struct platform_device *pdev)
+     return ret;
+ }
+ 
+-static int de10soc_audio_remove(struct platform_device *pdev)
++static int hspdac_audio_remove(struct platform_device *pdev)
+ {
+     struct snd_soc_card *card = platform_get_drvdata(pdev);
+ /*
+@@ -415,22 +415,22 @@ static int de10soc_audio_remove(struct platform_device *pdev)
+ }
+ 
+ static const struct of_device_id hsynthpcm5102_dt_ids[] = {
+-    { .compatible = "opencores,hsynthpcm5102-audio", },
++    { .compatible = "holotr,hsynthpcm5102-audio", },
+     { }
+ };
+ MODULE_DEVICE_TABLE(of, hsynthpcm5102_dt_ids);
+ 
+-static struct platform_driver de10soc_audio_driver = {
++static struct platform_driver hspdac_audio_driver = {
+     .driver = {
+-        .name	= "hsynth-audio",
++        .name	= "hsphdac-audio",
+         .owner	= THIS_MODULE,
+         .of_match_table = of_match_ptr(hsynthpcm5102_dt_ids),
+     },
+-    .probe	= de10soc_audio_probe,
+-    .remove	= de10soc_audio_remove,
++    .probe	= hspdac_audio_probe,
++    .remove	= hspdac_audio_remove,
+ };
+ 
+-module_platform_driver(de10soc_audio_driver);
++module_platform_driver(hspdac_audio_driver);
+ 
+ /* Module information */
+ MODULE_AUTHOR("Bjarne Steinsbo <bsteinsbo@gmail.com>");
+-- 
+2.17.1
+

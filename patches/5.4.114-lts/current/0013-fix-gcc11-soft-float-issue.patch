@@ -1,0 +1,26 @@
+From b8cdd3ef1065810647e2b602da8e3bd1e2cc6033 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Thu, 29 Dec 2022 19:27:19 +0100
+Subject: [PATCH 13/13] fix gcc11 soft float issue
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+index 1fc32b611f8a..da4af730d3ce 100644
+--- a/arch/arm/Makefile
++++ b/arch/arm/Makefile
+@@ -16,6 +16,8 @@ LDFLAGS_vmlinux	+= --be8
+ KBUILD_LDFLAGS_MODULE	+= --be8
+ endif
+ 
++KBUILD_CFLAGS	+= -msoft-float
++
+ ifeq ($(CONFIG_ARM_MODULE_PLTS),y)
+ KBUILD_LDS_MODULE	+= $(srctree)/arch/arm/kernel/module.lds
+ endif
+-- 
+2.34.1
+

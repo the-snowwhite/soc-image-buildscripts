@@ -1,0 +1,27 @@
+From 34d4e130a9565949425782b153680f42dc253d9c Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Tue, 1 May 2018 15:37:43 +0200
+Subject: [PATCH 4/6] Enable cpu DMA(0-3), fix for audio drivers
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ include/config_distro_bootcmd.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
+index 66e10655aa..c1ca235901 100644
+--- a/include/config_distro_bootcmd.h
++++ b/include/config_distro_bootcmd.h
+@@ -338,7 +338,8 @@
+ 	\
+ 	"boot_extlinux="                                              \
+         "if test ${fpgaload_on_boot} = 1;"                         \
+-        "then run fpgaload; bridge enable; fi;"       \
++        "then run fpgaload; bridge enable;"       \
++        "mw.b 0xffd05018 0xf0; fi;"       \
+ 		"sysboot ${devtype} ${devnum}:${distro_bootpart} any "    \
+ 			"${scriptaddr} ${prefix}extlinux/extlinux.conf\0" \
+ 	\
+-- 
+2.17.1
+

@@ -1,0 +1,99 @@
+From 7de18a70c1bf1a072a232003db6254b02c71220d Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sat, 22 Oct 2016 01:03:25 +0200
+Subject: [PATCH 2/5] Add env file and bootscript select support based upon
+ chip model and installed kernel (bb style)
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ include/configs/socfpga_de0_nano_soc.h | 57 +++++++++++++++++++++++++++++++---
+ 1 file changed, 52 insertions(+), 5 deletions(-)
+
+diff --git a/include/configs/socfpga_de0_nano_soc.h b/include/configs/socfpga_de0_nano_soc.h
+index 2e55a4e..6e6377b 100644
+--- a/include/configs/socfpga_de0_nano_soc.h
++++ b/include/configs/socfpga_de0_nano_soc.h
+@@ -20,7 +20,28 @@
+ /* Booting Linux */
+ #define CONFIG_BOOTFILE		"fitImage"
+ #define CONFIG_BOOTARGS		"console=ttyS0," __stringify(CONFIG_BAUDRATE)
+-#define CONFIG_BOOTCOMMAND	"run mmcload; run mmcboot"
++#define CONFIG_BOOTCOMMAND \
++"run setbootenvs; " \
++	"mmc dev ${mmcdev}; if mmc rescan; then " \
++		"echo SD/MMC found on device ${mmcdev};" \
++		"if run loadbootenv; then " \
++			"echo Loaded environment from ${bootenv};" \
++			"run importbootenv;" \
++			"setenv bootimage ${bootfolder}vmlinuz-${kver} ;" \
++			"run findfdt ;" \
++		"fi;" \
++		"if test -n $uenvcmd; then " \
++			"echo Running uenvcmd ...;" \
++			"run uenvcmd;" \
++		"fi;" \
++"		if run loadbootscript; then " \
++			"run bootscript; " \
++	"	else " \
++			"if run loadimage; then " \
++"				run mmcboot;" \
++			"fi;" \
++		"fi; " \
++	"fi;" \
+ #define CONFIG_LOADADDR		0x01000000
+ #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
+ 
+@@ -34,20 +55,46 @@
+ 
+ /* Extra Environment */
+ #define CONFIG_EXTRA_ENV_SETTINGS \
++	"mmcdev=0\0" \
++	"bootpart=0:3\0" \
++	"bootfolder=/boot/\0" \
++	"setbootenvs=setenv bootenv ${bootfolder}uEnv.txt ;" \
++	"setenv dtbfolder ${bootfolder}dtb/ ;" \
++	"setenv bootimage ${bootfolder}zImage ;" \
++	"setenv fdtimage ${bootfolder}socfpga.dtb ;\0" \
+ 	"loadaddr=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
+ 	"ramboot=setenv bootargs " CONFIG_BOOTARGS ";" \
+ 		"bootm ${loadaddr} - ${fdt_addr}\0" \
+-	"bootimage=zImage\0" \
+ 	"fdt_addr=100\0" \
+-	"fdtimage=socfpga.dtb\0" \
+ 	"bootm ${loadaddr} - ${fdt_addr}\0" \
+ 	"mmcroot=/dev/mmcblk0p3\0" \
+ 	"mmcboot=setenv bootargs " CONFIG_BOOTARGS \
+ 		" root=${mmcroot} rw rootwait;" \
+ 		"bootz ${loadaddr} - ${fdt_addr}\0" \
+ 	"mmcload=mmc rescan;" \
+-		"load mmc 0:1 ${loadaddr} ${bootimage};" \
+-		"load mmc 0:1 ${fdt_addr} ${fdtimage}\0" \
++		"load mmc ${bootpart} ${loadaddr} ${bootimage};" \
++		"load mmc ${bootpart} ${fdt_addr} ${fdtimage}\0" \
++	"loadimage=mmc rescan;" \
++		"load mmc ${bootpart} ${loadaddr} ${bootimage};" \
++		"load mmc ${bootpart} ${fdt_addr} ${fdtimage}\0" \
++	"loaduimage=mmc rescan;" \
++		"load mmc ${bootpart} ${loadaddr} ${bootimage};" \
++		"load mmc ${bootpart} ${fdt_addr} ${fdtimage};" \
++		"load mmc ${bootpart} ${ramdisk_addr_r} ${ramdiskimage};" \
++		"setenv ramdisk_size ${filesize}\0" \
++	"loadbootscript=load mmc ${bootpart} ${loadaddr} ${bootfolder}boot.scr\0" \
++	"bootscript=echo Running bootscript from mmc${bootpart} ...; " \
++		"source ${loadaddr}\0" \
++	"loadbootenv=ext4load mmc ${bootpart} ${loadaddr} ${bootenv}\0" \
++	"importbootenv=echo Importing environment from mmc ...; " \
++		"env import -t -r $loadaddr $filesize\0" \
++	"findfdt=" \
++		"if test ${fpgatype} = cv_se_a4; then " \
++			"setenv fdtimage ${dtbfolder}socfpga_cyclone5_de0_sockit.dtb; fi; " \
++		"if test ${fpgatype} = cv_se_a5; then " \
++			"setenv fdtimage ${dtbfolder}socfpga_cyclone5_de0_sockit.dtb; fi; " \
++		"if test ${fdtimage} = undefined; then " \
++			"echo WARNING: Could not determine device tree to use; fi; \0" \
+ 
+ /* The rest of the configuration is shared */
+ #include <configs/socfpga_common.h>
+-- 
+2.7.4
+

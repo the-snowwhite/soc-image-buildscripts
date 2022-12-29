@@ -1,0 +1,37 @@
+From 87ba5571007d0ba0b2fc9e23585d17b55924dd72 Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Tue, 13 Oct 2020 16:06:24 +0200
+Subject: [PATCH 02/11] add ext4 root fs support and autofs4 module
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 1d68b1c7a072..3dfd0b066db5 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -12,7 +12,7 @@ CONFIG_EMBEDDED=y
+ CONFIG_PROFILING=y
+ CONFIG_MODULES=y
+ CONFIG_MODULE_UNLOAD=y
+-# CONFIG_LBDAF is not set
++CONFIG_LBDAF=y
+ # CONFIG_BLK_DEV_BSG is not set
+ # CONFIG_IOSCHED_DEADLINE is not set
+ # CONFIG_IOSCHED_CFQ is not set
+@@ -153,7 +153,10 @@ CONFIG_EXT2_FS=y
+ CONFIG_EXT2_FS_XATTR=y
+ CONFIG_EXT2_FS_POSIX_ACL=y
+ CONFIG_EXT3_FS=y
++CONFIG_EXT4_FS=y
+ CONFIG_AUTOFS4_FS=y
++CONFIG_EXT4_FS_POSIX_ACL=y
++CONFIG_EXT4_FS_SECURITY=y
+ CONFIG_VFAT_FS=y
+ CONFIG_NTFS_FS=y
+ CONFIG_NTFS_RW=y
+-- 
+2.25.1
+

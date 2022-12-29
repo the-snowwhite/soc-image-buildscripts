@@ -1,0 +1,105 @@
+From c04883601524ce4273c8c288efcd14031abc972e Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Wed, 11 Jul 2018 16:50:49 +0200
+Subject: [PATCH 1/4] Remove gittag from kernel debs
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm64/configs/xilinx_zynqmp_defconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/configs/xilinx_zynqmp_defconfig b/arch/arm64/configs/xilinx_zynqmp_defconfig
+index caeba20a19ae..5b96e4fdce27 100644
+--- a/arch/arm64/configs/xilinx_zynqmp_defconfig
++++ b/arch/arm64/configs/xilinx_zynqmp_defconfig
+@@ -377,4 +377,5 @@ CONFIG_MAGIC_SYSRQ=y
+ # CONFIG_FTRACE is not set
+ # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+ CONFIG_CRYPTO_CRCT10DIF=y
+-# CONFIG_CRYPTO_HW is not set
++CONFIG_OF=y
++CONFIG_LOCALVERSION_AUTO=n
+-- 
+2.17.1
+
+
+From e4b0eb58b218ce4c3de7cace60ac0c66347a8c89 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Wed, 11 Jul 2018 16:19:41 +0200
+Subject: [PATCH 2/4] Set CONFIG_OF=y to add dtb's to kernel package
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm64/configs/xilinx_zynqmp_defconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/configs/xilinx_zynqmp_defconfig b/arch/arm64/configs/xilinx_zynqmp_defconfig
+index 5b96e4fdce27..e51db1efcdec 100644
+--- a/arch/arm64/configs/xilinx_zynqmp_defconfig
++++ b/arch/arm64/configs/xilinx_zynqmp_defconfig
+@@ -377,5 +377,6 @@ CONFIG_MAGIC_SYSRQ=y
+ # CONFIG_FTRACE is not set
+ # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+ CONFIG_CRYPTO_CRCT10DIF=y
+-CONFIG_OF=y
++# CONFIG_CRYPTO_HW is not set
+ CONFIG_LOCALVERSION_AUTO=n
++CONFIG_OF=y
+-- 
+2.17.1
+
+
+From 40a7cbf1578092bbdba6a9ceb09e9defa23fcdcb Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sat, 14 Jul 2018 11:12:23 +0200
+Subject: [PATCH 3/4] add generate /boot/uEnv.txt from kernel install
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 0bc87473f68f..7ff5f070212f 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -193,6 +193,13 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
+ else
+ 	want_initrd=No
+ fi
++
++# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
++cat <<EOF > "$tmpdir/boot/uEnv.txt"
++linuximage=/boot/vmlinuz-${version}
++fdtfile=/usr/lib/linux-image-${version}/xilinx/zynqmp-zcu100-revC.dtb
++EOF
++
+ for script in postinst postrm preinst prerm ; do
+ 	mkdir -p "$tmpdir$debhookdir/$script.d"
+ 	cat <<EOF > "$tmpdir/DEBIAN/$script"
+-- 
+2.17.1
+
+
+From da1936a04796dcb802f0cdf23210df91f24246c2 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Sun, 15 Jul 2018 20:17:28 +0200
+Subject: [PATCH 4/4] Enable user Inotify
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ arch/arm64/configs/xilinx_zynqmp_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/configs/xilinx_zynqmp_defconfig b/arch/arm64/configs/xilinx_zynqmp_defconfig
+index e51db1efcdec..7c1f4da944ad 100644
+--- a/arch/arm64/configs/xilinx_zynqmp_defconfig
++++ b/arch/arm64/configs/xilinx_zynqmp_defconfig
+@@ -380,3 +380,4 @@ CONFIG_CRYPTO_CRCT10DIF=y
+ # CONFIG_CRYPTO_HW is not set
+ CONFIG_LOCALVERSION_AUTO=n
+ CONFIG_OF=y
++CONFIG_INOTIFY_USER=y
+-- 
+2.17.1
+

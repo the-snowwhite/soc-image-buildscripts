@@ -1,0 +1,46 @@
+From 90460f35d8a257ec529022fad1d5f1461015e868 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Mon, 18 Jul 2016 16:21:56 +0200
+Subject: [PATCH 7/9] generate /boot/uEnv.txt containing kernel info for uboot
+ probing
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+---
+ scripts/package/builddeb | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 67770e9eaa97..c6e4d53e4d91 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -183,6 +183,27 @@ if grep -q '^CONFIG_BLK_DEV_INITRD=y' $KCONFIG_CONFIG; then
+ else
+ 	want_initrd=No
+ fi
++
++# create uEnv.txt containing current kernelversio in /boot folder (for u-boot probing)
++cat <<EOF > "$tmpdir/boot/uEnv.txt"
++kver=${version}
++initrd_installed=$want_initrd
++EOF
++cat <<'EOF' >> "$tmpdir/boot/uEnv.txt"
++fpgaload=mmc rescan;load mmc ${bootpart} ${loadaddr} ${bitimage}; fpga load 0 ${loadaddr} ${filesize}
++fpgaintf=ffd08028
++fpgaintf_handoff=0x00000000
++fpga2sdram_apply=3ff795a4
++fpga2sdram=ffc25080
++fpga2sdram_handoff=0x00000000
++axibridge=ffd0501c
++axibridge_handoff=0x00000000
++l3remap=ff800000
++l3remap_handoff=0x00000019
++bridge_enable_handoff=mw ${fpgaintf} ${fpgaintf_handoff}; mw ${fpga2sdram} ${fpga2sdram_handoff}; mw ${axibridge} ${axibridge_handoff}; mw ${l3remap} ${l3remap_handoff}
++loadimage=run bridge_enable_handoff; load mmc ${bootpart} ${loadaddr} ${bootimage}; load mmc ${bootpart} ${fdt_addr} ${fdtimage}
++EOF
++
+ for script in postinst postrm preinst prerm ; do
+ 	mkdir -p "$tmpdir$debhookdir/$script.d"
+ 	cat <<EOF > "$tmpdir/DEBIAN/$script"
+-- 
+2.11.0
+

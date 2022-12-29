@@ -1,0 +1,31 @@
+From 7c616c36f16969848d08ed1ea607666e828f00a2 Mon Sep 17 00:00:00 2001
+From: Michael Brown <producer@holotronic.dk>
+Date: Wed, 23 May 2018 16:49:04 +0200
+Subject: [PATCH 5/7] Take fpga2sdram port 0,1 out of reset, for framebuffer
+ access
+
+Signed-off-by: Michael Brown <producer@holotronic.dk>
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ include/config_distro_bootcmd.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/include/config_distro_bootcmd.h b/include/config_distro_bootcmd.h
+index c1ca235901..37e312a46b 100644
+--- a/include/config_distro_bootcmd.h
++++ b/include/config_distro_bootcmd.h
+@@ -339,8 +339,9 @@
+ 	"boot_extlinux="                                              \
+         "if test ${fpgaload_on_boot} = 1;"                         \
+         "then run fpgaload; bridge enable;"       \
+-        "mw.b 0xffd05018 0xf0; fi;"       \
+-		"sysboot ${devtype} ${devnum}:${distro_bootpart} any "    \
++        "mw.b 0xffd05018 0xf0;"       \
++        "mw.w 0xffc25080 0x3fff; fi;"       \
++        "sysboot ${devtype} ${devnum}:${distro_bootpart} any "    \
+ 			"${scriptaddr} ${prefix}extlinux/extlinux.conf\0" \
+ 	\
+ 	"scan_dev_for_extlinux="                                          \
+-- 
+2.30.2
+

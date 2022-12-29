@@ -1,0 +1,71 @@
+From d533e27d47ea4f209c8dc6a991244efcb9aeb88b Mon Sep 17 00:00:00 2001
+From: Holotronic <producer@holotronic.dk>
+Date: Mon, 26 Jul 2021 00:30:35 +0200
+Subject: [PATCH 12/12] Enable ALSA sound
+
+Signed-off-by: Holotronic <producer@holotronic.dk>
+---
+ arch/arm/configs/socfpga_defconfig | 49 ++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+
+diff --git a/arch/arm/configs/socfpga_defconfig b/arch/arm/configs/socfpga_defconfig
+index 4d0019124584..395efbc41501 100644
+--- a/arch/arm/configs/socfpga_defconfig
++++ b/arch/arm/configs/socfpga_defconfig
+@@ -301,4 +301,53 @@ CONFIG_HID=y
+ CONFIG_USB_HID=y
+ CONFIG_HID_MULTITOUCH=y
+ CONFIG_SND_SOC_HSYNTH_MIDI=m
++CONFIG_SOUND=y
++CONFIG_SOUND_OSS_CORE=y
++CONFIG_SOUND_OSS_CORE_PRECLAIM=y
++CONFIG_SND=y
++CONFIG_SND_TIMER=y
++CONFIG_SND_PCM=y
++CONFIG_SND_HWDEP=y
++CONFIG_SND_RAWMIDI=y
++CONFIG_SND_COMPRESS_OFFLOAD=y
++CONFIG_SND_JACK=y
+ CONFIG_SND_SEQUENCER=y
++CONFIG_SND_SEQ_DUMMY=y
++CONFIG_SND_OSSEMUL=y
++CONFIG_SND_SEQUENCER_OSS=y
++CONFIG_SND_SUPPORT_OLD_API=y
++CONFIG_SND_VERBOSE_PROCFS=y
++CONFIG_SND_VERBOSE_PRINTK=y
++CONFIG_SND_DEBUG=y
++CONFIG_SND_DEBUG_VERBOSE=y
++CONFIG_SND_DMA_SGBUF=y
++CONFIG_SND_DRIVERS=y
++CONFIG_SND_DUMMY=m
++CONFIG_SND_SERIAL_U16550=m
++
++#
++# HD-Audio
++#
++CONFIG_SND_SPI=y
++CONFIG_SND_USB=y
++CONFIG_SND_USB_AUDIO=y
++CONFIG_SND_SOC=y
++
++#
++# SoC Audio for Freescale CPUs
++#
++
++#
++# Common SoC Audio options for Freescale CPUs:
++#
++CONFIG_SND_SOC_I2C_AND_SPI=y
++
++#
++# CODEC drivers
++#
++CONFIG_SND_SOC_ADAU1701=m
++CONFIG_SND_SOC_SIGMADSP=m
++CONFIG_SND_SOC_SIGMADSP_I2C=m
++CONFIG_SND_SOC_SSM2602=m
++CONFIG_SND_SOC_SSM2602_I2C=m
++CONFIG_SND_SOC_WM8731=m
+-- 
+2.25.1
+
