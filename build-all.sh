@@ -245,6 +245,7 @@ install_deps() {
 #     fi
     
     install_crossbuild_arm64
+    install_crossbuild_armhf
     install_uboot_dep
     install_kernel_dep
     sudo ${apt_cmd} install kpartx
@@ -255,6 +256,7 @@ install_deps() {
 
 ## parameters: 1: board name
 build_uboot() {
+    echo "in build_uboot()"
     contains ${BOARDS[@]} ${1}
     if [ "$?" -eq 0 ]; then
         echo "Valid boardname = ${1} given"
